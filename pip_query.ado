@@ -47,7 +47,7 @@ quietly {
 	
 	if ("`year'" != "all" & ("`wb'" != "" | "`aggregate'" != "")) {	
 		
-		import delim using "https://ippscoreapidev.aseqa.worldbank.org/api/v1/pip?format=csv", clear varn(1)
+		import delim using "https://pipscoreapiqa.worldbank.org/api/v1/pip?format=csv", clear varn(1)
 		levelsof reporting_year, local(ref_years_l)
 		local ref_years "`ref_years_l' last"
 		

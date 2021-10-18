@@ -51,6 +51,16 @@ if ("`pause'" == "pause") pause on
 else                      pause off
 
 qui {
+	// --- timer
+	local timer = "GIsj"
+	local crlf "`=char(10)'`=char(13)'"
+	scalar tt = ""
+	
+	if ("`timer'" != "") {
+		timer clear
+		local i = 1
+	}
+	// --- timer
 	
 	//========================================================
 	// Conditions
@@ -253,25 +263,35 @@ qui {
 		if ("`server'" == "") {
 			noi disp in red "You don't have access to internal servers" _n /* 
 					*/ "You're being redirected to public server"
-			local server "https://ippscoreapidev.aseqa.worldbank.org"
+			local server "https://pipscoreapiqa.worldbank.org"
 		}
 		
 	}
 	else {
-		local server "https://ippscoreapidev.aseqa.worldbank.org"
+		local server "https://pipscoreapiqa.worldbank.org"
 	}
-	
-	
+		
 	local base             = "`server'/api/v1/pip"	
 	return local server    = "`server'"
 	
 	//------------ Check internet connection
+	// --- timer
+	if ("`timer'" != "") {
+		timer on `i'
+		scalar tt = tt + "`crlf' `i': Check internet connection"
+	}
+	// --- timer
+		
 	scalar tpage = fileread(`"`server'/api/v1/pip?format=csv"')
 	
 	if regexm(tpage, "error") {
 		noi disp in red "You may not have Internet connections. Please verify"
 		error
 	}
+	// --- timer	
+	if ("`timer'" != "") timer off `i++'
+	// --- timer
+
 	
 	*---------- lower case subcommand
 	local subcommand = lower("`subcommand'")
@@ -465,8 +485,20 @@ qui {
 	
 	if ("`pcall'" == "povline") 	loc i_call "i_povline"
 	else 							loc i_call "i_popshare"
-	
+
 	foreach `i_call' of local `pcall' {	
+		// --- timer
+		if ("`timer'" != "") {
+			local i_on = `i'
+			scalar tt = tt + "`crlf' `i': pip_query loop"
+			local i_off = `i++'
+		}	
+		// --- timer
+		
+		// --- timer
+		if ("`timer'" != "") timer on `i_on'
+		// --- timer
+		
 		local ++f 
 		
 		/*==================================================
@@ -512,11 +544,9 @@ qui {
 		*---------- Query
 		if ("`popshare'" == ""){
 			local query = "`query_ys'&`query_ct'&`query_cv'&`query_pl'`query_pp'`query_ds'&format=csv"
-			*local query = "`query_ys'&`query_ct'&`query_pl'`query_pp'`query_ds'&format=csv"
 		}
 		else{
 			local query = "`query_ys'&`query_ct'&`query_cv'&`query_ps'`query_pp'`query_ds'&format=csv"
-			*local query = "`query_ys'&`query_ct'&`query_ps'`query_pp'`query_ds'&format=csv"
 		}
 		return local query_`f' "`query'"
 		global pip_query = "`query'"
@@ -524,6 +554,22 @@ qui {
 		*---------- Base + query
 		local queryfull "`base'?`query'"
 		return local queryfull_`f' = "`queryfull'"
+		
+		// --- timer
+		if ("`timer'" != "") timer off `i_off'
+		// --- timer
+		
+		// --- timer
+		if ("`timer'" != "") {
+			local i_on = `i'
+			scalar tt = tt + "`crlf' `i': download loop"
+			local i_off = `i++'
+		}	
+		// --- timer
+		
+		// --- timer
+		if ("`timer'" != "") timer on `i_on'
+		// --- timer
 		
 		
 		/*==================================================
@@ -540,8 +586,6 @@ qui {
 			cap copy "`queryfull'" `clfile'
 			if (_rc == 0) {
 				cap insheet using `clfile', clear name
-				*cap import using using `clfile', clear varn(1)
-				
 				if (_rc != 0) local rc "in"
 				continue, break
 			} 
@@ -550,6 +594,10 @@ qui {
 				local ++qr
 			} 
 		}
+		
+		// --- timer
+		if ("`timer'" != "") timer off `i_off'
+		// --- timer
 		
 		* global qr = `qr'
 		
@@ -562,11 +610,26 @@ qui {
 		
 		pause after download
 		
+		// --- timer
+		if ("`timer'" != "") {
+			local i_on = `i'
+			scalar tt = tt + "`crlf' `i': data clean loop"
+			local i_off = `i++'
+		}	
+		// --- timer
+		
+		// --- timer
+		if ("`timer'" != "") timer on `i_on'
+		// --- timer
+		
 		*---------- Clean data
 		pip_clean `rtype', year("`year'") `iso' /* 
 		*/ rc(`rc') region(`region') `pause' `wb'
 		
 		pause after cleaning
+		// --- timer
+		if ("`timer'" != "") timer off `i_off'
+		// --- timer
 		
 		/*==================================================
 		Display Query
@@ -596,6 +659,14 @@ qui {
 		save `povcalf', replace
 		
 	} // end of povline loop
+	
+	// --- timer
+	if ("`timer'" != "") {
+		noi disp tt
+		noi timer list
+	}
+	// --- timer
+	
 	return local npl = `f'
 	
 	// ------------------------------

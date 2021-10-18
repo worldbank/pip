@@ -4,8 +4,8 @@ Author:        R.Andres Castaneda
 Dependencies:  The World Bank
 ----------------------------------------------------
 Creation Date:     5 Jun 2019 - 17:09:04
-Modification Date:   
-Do-file version:    01
+Modification Date:  September, 2021 
+Do-file version:    02
 References: Adopted from povcalnet_clean
 Output:             dta
 ==================================================*/
@@ -41,7 +41,7 @@ if ("`rc'" == "copy") {
 	noi dis ""
 	noi dis in white `"(1) Please check your Internet connection by "' _c 
 	*noi dis in white  `"{browse "http://iresearch.worldbank.org/PovcalNet/home.aspx" :clicking here}"'
-	noi dis in white  `"{browse "https://ippscoreapidev.aseqa.worldbank.org/__docs__/" :clicking here}"'
+	noi dis in white  `"{browse "https://pipscoreapiqa.worldbank.org" :clicking here}"' // needs to be replaced
 	noi dis in white `"(2) Please consider adjusting your Stata timeout parameters. For more details see {help netio}"'
 	noi dis in white `"(3) Please send us an email to:"'
 	noi dis in white _col(8) `"email: data@worldbank.org"'
@@ -69,7 +69,6 @@ ren reporting_pop reqyearpopulation
 if ("`type'" == "1") {
 
 	if  ("`year'" == "last"){
-		*bys countrycode: egen maximum_y = max(requestyear)
 		bys country_code: egen maximum_y = max(requestyear)
 		keep if maximum_y ==  requestyear
 		drop maximum_y
@@ -81,7 +80,7 @@ if ("`type'" == "1") {
 	***************************************************
 	gen countryname = ""
 	
-	local vars1 country_code region_code gdp_data_level survey_year /*
+	local vars1 country_code region_code survey_coverage survey_year /*
 	*/welfare_type is_interpolated distribution_type poverty_line poverty_gap /*
 	*/poverty_severity // reporting_pop
 	
@@ -132,7 +131,6 @@ if ("`type'" == "1") {
 	 */                       4 "National (Aggregate)", modify
 	 
 	label values coveragetype coveragetype
-
 
 	replace datatype = "1" if datatype == "consumption"
 	replace datatype = "2" if datatype == "income"

@@ -20,24 +20,46 @@ server(string)     ///
 if ("`pause'" == "pause") pause on
 else                      pause off
 
-*set trace on
 qui {
-	
-	if ("`clear'" == "") preserve
-	
+
+	//if ("`clear'" == "") preserve
 	
 	*---------- API defaults
 	
 	if "`server'" == ""  {
 		local site_name = "api/v1"
-		local server   = "https://ippscoreapidev.aseqa.worldbank.org"
+		local server   = "https://pipscoreapiqa.worldbank.org"
 		local url = "`server'/`site_name'"
 		return local site_name = "`site_name'"
 		return local url       = "`url'"
 	} 
 	else {
-		local url "https://ippscoreapidev.aseqa.worldbank.org/api/v1"
+		local url "https://pipscoreapiqa.worldbank.org/api/v1"
 	}
+	
+	***************************************************
+	* 0. Country name
+	***************************************************	
+	tempfile temp100
+	
+	local csvfile0  = "`url'/aux?table=countries&format=csv"
+	return local csvfile0 = "`csvfile0'"
+	
+	cap copy "`csvfile0'" `temp100'
+	if (_rc != 0 ) {
+		noi disp in red "There is a problem accessing country name data." 
+	  noi disp in red "to check your connection, copy and paste in your browser the following address:" _n /* 
+		*/	_col(4) in w `"`url'/aux?table=countries&format=csv"'
+		
+		error 
+	} 
+
+	import delim using `temp100',  delim(",()") stringc(_all) /* 
+	*/                              stripq(yes) varnames(1)  clear 	
+	
+	keep country_code country_name income_group
+	sort country_code
+	save `temp100', replace
 	
 	***************************************************
 	* 1. Load guidance database
@@ -56,13 +78,12 @@ qui {
 		
 		error 
 	} 
-	
+
 	import delim using `temp1000',  delim(",()") stringc(_all) /* 
 	*/                              stripq(yes) varnames(1)  clear 
 	
-
-	local orgvar region_code gdp_data_level survey_year
-	local newvar wb_region coverage_level year 
+	local orgvar region_code survey_coverage reporting_year 
+	local newvar wb_region coverage_level reporting_year 
 	
 	local i = 0
 	foreach var of local orgvar {
@@ -70,10 +91,40 @@ qui {
 		rename `var' `: word `i' of `newvar''
 	}	
 
-	keep country_code wb_region coverage_level year 
-	order country_code wb_region coverage_level year
+	keep country_code wb_region coverage_level survey_year reporting_year 
+	order country_code wb_region coverage_level survey_year reporting_year
+	sort country_code
+
+	merge country_code using `temp100'
+	collapse _merge, by(country_code country_name wb_region coverage_level reporting_year income_group)
+	drop _merge
+	order country_code country_name wb_region coverage_level reporting_year income_group
 	
-	duplicates report
+	gen year = ""
+	tostring reporting_year, replace
+	tempfile lkupdata
+	save `lkupdata', replace
+	levelsof country_code , local(ctry)
+	foreach ct of local ctry{
+	    preserve
+	    levelsof coverage_level, local(cv_area)
+		disp `cv_area'
+		foreach cv of local cv_area {
+		    keep if country_code == "`ct'" & coverage_level == "`cv'"
+		    levelsof reporting_year, local(year) sep(,) clean
+			disp `year'
+			replace year = "`year'" if coverage_level == "`cv'"
+			append using `lkupdata'
+			save `lkupdata', replace
+		}
+		restore
+	}
+			
+	use `lkupdata', clear
+	drop if year == ""
+	sort country_code
+	duplicates drop country_code country_name wb_region coverage_level income_group year, force
+	drop reporting_year
 	
 	if ("`justdata'" != "") exit
 
@@ -132,9 +183,8 @@ qui {
 			local index_s = 1
 			
 			foreach n of numlist 1/`nobs' {
-				
 				noi disp in y  _n "`=country_name[`index_s']'-`=coverage_level[`index_s']'" 	
-				noi disp in y  "year (survey year)" 	
+				noi disp in y  "survey year" 	
 				local years_current = "`=year[`index_s']'"
 				local coverage = "`=coverage_level[`index_s']'"
 				local years_current: subinstr local years_current "," " ", all 
@@ -143,7 +193,7 @@ qui {
 				foreach ind_y of local years_current {
 					local current_line = `current_line' + 1 
 					local ind_y_c=substr("`ind_y'",1,4)
-					local display_this = "{stata  pip, country(`country') year(`ind_y') coverage(`coverage')   clear: `ind_y_c'(`ind_y')}"		
+					local display_this = "{stata  pip, country(`country') year(`ind_y') coverage(`coverage')   clear: `ind_y_c'}"		
 					if (`current_line' < 10) noi display in y `"`display_this'"' _continue 
 					else{
 						noi display in y `"`display_this'"' 
