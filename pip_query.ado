@@ -174,9 +174,10 @@ quietly {
 		local year_q = "year=`y_comma'"
 		local disp_q = "&aggregate=true"
 	}
+	
 	if ("`wb'" != "") {
 		local year_q = "year=`y_comma'"
-		local disp_q = "&GroupedBy=WB"
+		local disp_q = "&group_by=wb"
 	}
 	
 	return local query_ys = "`year_q'"

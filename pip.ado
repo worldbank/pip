@@ -595,6 +595,8 @@ qui {
 			} 
 		}
 		
+		pause tefera 1
+		
 		// --- timer
 		if ("`timer'" != "") timer off `i_off'
 		// --- timer

@@ -120,6 +120,8 @@ if ("`type'" == "1") {
 	qui count
 	local obs=`r(N)'
 	
+	tostring coveragetype, replace
+	
 	replace coveragetype = "1" if coveragetype == "rural"
 	replace coveragetype = "2" if coveragetype == "urban"
 	replace coveragetype = "4" if coveragetype == "A" // not available in pip data
@@ -179,15 +181,17 @@ if ("`type'" == "1") {
 /*==================================================
               2: for Aggregate requests
 ==================================================*/
+pause tefera - aggregate
 
 if ("`type'" == "2") {
-	if  ("`region'" != "" & regioncid[1] != "XX") {
+	*if  ("`region'" != "" & regioncid[1] != "XX") {
+	if  ("`region'" != "") {    
 		tempvar keep_this
 		gen `keep_this' = 0
 		local region_l = `""`region'""'
 		local region_l: subinstr local region_l " " `"", ""', all
 
-		replace `keep_this' = 1 if inlist(regioncid, `region_l')
+		replace `keep_this' = 1 if inlist(region_code, `region_l')
 		if lower("`region'") == "all" replace `keep_this' = 1
 		keep if `keep_this' == 1 
 	}
@@ -196,7 +200,8 @@ if ("`type'" == "2") {
 	
 	if  ("`year'" == "last") {
 		tempvar maximum_y
-		bys regioncid: egen `maximum_y' = max(requestyear)
+		*bys regioncid: egen `maximum_y' = max(requestyear)
+		bys region_code: egen `maximum_y' = max(requestyear)
 		keep if `maximum_y' ==  requestyear
 	}
 	
@@ -205,12 +210,13 @@ if ("`type'" == "2") {
 	***************************************************
 	
 
-	rename regioncid regioncode
-	rename regiontitle region
-	rename hc headcount
-	rename pg povgap
-	rename p2 povgapsqr
-	rename population reqyearpopulation
+	rename region_code regioncode
+	*rename regiontitle region
+	*rename hc headcount
+	rename poverty_line povertyline
+	rename poverty_gap povgap
+	rename poverty_severity povgapsqr
+	*rename reporting_pop reqyearpopulation
 	
 	label var requestyear       "Year you requested"
 	label var povertyline       "Poverty line in PPP$ (per capita per day)"
@@ -220,6 +226,8 @@ if ("`type'" == "2") {
 	label var povgapsqr         "Squared poverty gap"
 	label var reqyearpopulation "Population in year"
 	
+	keep requestyear regioncode povertyline mean headcount povgap povgapsqr reqyearpopulation
+	order requestyear regioncode povertyline mean headcount povgap povgapsqr reqyearpopulation
 	
     local Snames requestyear reqyearpopulation 
 
