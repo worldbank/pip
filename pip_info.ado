@@ -29,12 +29,14 @@ qui {
 	if "`server'" == ""  {
 		local site_name = "api/v1"
 		local server   = "https://pipscoreapiqa.worldbank.org"
+		*local server = "http://wzlxqpip01.worldbank.org"
 		local url = "`server'/`site_name'"
 		return local site_name = "`site_name'"
 		return local url       = "`url'"
 	} 
 	else {
 		local url "https://pipscoreapiqa.worldbank.org/api/v1"
+		*local url "http://wzlxqpip01.worldbank.org/api/v1"
 	}
 	
 	***************************************************

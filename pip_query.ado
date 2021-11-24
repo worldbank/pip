@@ -169,10 +169,16 @@ quietly {
 		local disp_q = "&fill_gaps=true"
 		
 	}
-	
+/*	to aggregate estimate, the pip-grp endpoint uses group_by parameter
 	if ("`aggregate'" != "") {
 		local year_q = "year=`y_comma'"
 		local disp_q = "&aggregate=true"
+	}
+*/
+
+	if ("`aggregate'" != "") {
+		local year_q = "year=`y_comma'"
+		local disp_q = "&group_by=none"
 	}
 	
 	if ("`wb'" != "") {
