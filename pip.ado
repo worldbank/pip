@@ -1,21 +1,19 @@
-*! version 1.0.0  	<sept2018>
+*! version 0.0.0.9002  	<dec2021>
 /*=======================================================
 Program Name: pip.ado
-Author:		  
-R.Andres Castaneda Aguilar
-Jorge Soler Lopez
-Espen Beer Prydz	
-Christoph Lakner	
-Ruoxuan Wu				
-Qinghua Zhao			
+Author:
+R.Andres Castaneda
+acastanedaa@worldbank.org
+
+Contributor:
+Tefera Bekele Degefu
+tdegefu@worldbank.org
+
 World Bank Group	
 
 project:	  Adoptation Stata package (from povcalnet) to easily query the [PIP API]
-Dependencies: The World Bank - DEC
+Dependencies: The World Bank - DECIS
 -----------------------------------------------------------------------
-Creation Date:    Sept 2018
-Modification Date:   23 Aug 2021 - 18:24:22
-Do-file version:    02
 References:          
 Output: 
 =======================================================*/
