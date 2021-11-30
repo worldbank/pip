@@ -1,0 +1,14 @@
+v 0.0.0.9001
+d 'PIP': Poverty and Inequality Platform API wrapper
+d 
+d Distribution-Date:   20211130
+d License: MIT
+d 
+F pip.ado
+F pip.sthlp
+F pip_cl.ado
+F pip_clean.ado
+F pip_countries.sthlp
+F pip_examples.ado
+F pip_info.ado
+F pip_query.ado
