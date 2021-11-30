@@ -264,14 +264,18 @@ qui {
 			noi disp in red "You don't have access to internal servers" _n /* 
 					*/ "You're being redirected to public server"
 			local server "https://pipscoreapiqa.worldbank.org"
+			*local server "http://wzlxqpip01.worldbank.org"
 		}
 		
 	}
 	else {
 		local server "https://pipscoreapiqa.worldbank.org"
+		*local server "http://wzlxqpip01.worldbank.org"
 	}
 		
 	local base             = "`server'/api/v1/pip"	
+	*local base2             = "`server'/api/v1/pip-grp" // to exteract aggregated result 
+	local base2             = "http://wzlxqpip01.worldbank.org/api/v1/pip-grp"
 	return local server    = "`server'"
 	
 	//------------ Check internet connection
@@ -540,7 +544,7 @@ qui {
 		return local query_cv_`f' = "`query_cv'"
 			
 		return local base      = "`base'"
-		
+	
 		*---------- Query
 		if ("`popshare'" == ""){
 			local query = "`query_ys'&`query_ct'&`query_cv'&`query_pl'`query_pp'`query_ds'&format=csv"
@@ -552,7 +556,13 @@ qui {
 		global pip_query = "`query'"
 		
 		*---------- Base + query
-		local queryfull "`base'?`query'"
+		if ("`aggregate'" != ""){
+		    local queryfull "`base2'?`query'"
+		}
+		else{
+		    local queryfull "`base'?`query'"
+		}
+
 		return local queryfull_`f' = "`queryfull'"
 		
 		// --- timer
@@ -595,7 +605,7 @@ qui {
 			} 
 		}
 		
-		pause tefera 1
+		pause tefera 1 check time taken to excute the following processes - to be removed
 		
 		// --- timer
 		if ("`timer'" != "") timer off `i_off'

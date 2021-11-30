@@ -181,16 +181,16 @@ if ("`type'" == "1") {
 /*==================================================
               2: for Aggregate requests
 ==================================================*/
-pause tefera - aggregate
-
 if ("`type'" == "2") {
-	*if  ("`region'" != "" & regioncid[1] != "XX") {
-	if  ("`region'" != "") {    
+	if  ("`region'" != "" & region_code != "CUSTOM") {
 		tempvar keep_this
 		gen `keep_this' = 0
 		local region_l = `""`region'""'
 		local region_l: subinstr local region_l " " `"", ""', all
 
+		dis "`region_l'"
+		dis "`keep_this'"
+		
 		replace `keep_this' = 1 if inlist(region_code, `region_l')
 		if lower("`region'") == "all" replace `keep_this' = 1
 		keep if `keep_this' == 1 
@@ -200,7 +200,6 @@ if ("`type'" == "2") {
 	
 	if  ("`year'" == "last") {
 		tempvar maximum_y
-		*bys regioncid: egen `maximum_y' = max(requestyear)
 		bys region_code: egen `maximum_y' = max(requestyear)
 		keep if `maximum_y' ==  requestyear
 	}
@@ -208,7 +207,6 @@ if ("`type'" == "2") {
 	***************************************************
 	* 4. Renaming and labeling
 	***************************************************
-	
 
 	rename region_code regioncode
 	*rename regiontitle region
