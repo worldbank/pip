@@ -1,8 +1,12 @@
-_v. 0.0.0.9001_  
+_v. 0.0.0.9002_  
 
-`pip` : Poverty and Inequality Platform API wrapper
-===================================================
+`pip` : Poverty and Inequality Platform Stata wrapper
+=====================================================
 
+Description
+-----------
+
+World Bank PIP API Stata wrapper
 
 ### License
 MIT
@@ -14,11 +18,8 @@ Author
 The World Bank  
 acastanedaa@worldbank.org
 
-
 Contributor
 ------
 Tefera Bekele Degefu
 The World Bank  
 tdegefu@worldbank.org
-
-

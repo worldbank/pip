@@ -1,6 +1,8 @@
-v 0.0.0.9001
+v 0.0.0.9002
 d Materials by R.Andres Castaneda
 d The World Bank
 d acastanedaa@worldbank.org
+
+d 'pip': World Bank PIP API Stata wrapper
 
 p pip
