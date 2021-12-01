@@ -43,6 +43,7 @@ syntax [anything(name=subcommand)]  ///
 	N2disp(integer 15)             /// 
 	noDIPSQuery                    ///
 	querytimes(integer 5)          ///
+	timer                          ///  
 ] 
 
 if ("`pause'" == "pause") pause on
@@ -50,7 +51,6 @@ else                      pause off
 
 qui {
 	// --- timer
-	local timer = "GIsj"
 	local crlf "`=char(10)'`=char(13)'"
 	scalar tt = ""
 	
@@ -131,10 +131,10 @@ qui {
 	
 	*---------- Modify country(all) with aggregate
 	if (lower("`country'") == "all" & "`aggregate'" != "") {
-		local country ""
-		local aggregate ""
+		local country    ""
+		local aggregate  ""
 		local subcommand "wb"
-		local wb_change 1
+		local wb_change  1
 		noi disp as err "Warning: " as text " {cmd:pip, country(all) aggregate} " /* 
 	  */	"is equivalent to {cmd:pip wb}. " _n /* 
 	  */  " if you want to aggregate all countries by survey years, " /* 
@@ -153,10 +153,12 @@ qui {
 	local coverage = lower("`coverage'")
 	
 	foreach c of local coverage {	
+	
 		if !inlist(lower("`c'"), "national", "rural", "urban", "all") {
 			noi disp in red `"option {it:coverage()} must be "national", "rural",  "urban" or "all" "'
 			error
 		}
+		
 	}
 	
 	*---------- Poverty line/population share

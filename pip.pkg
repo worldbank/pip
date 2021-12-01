@@ -15,3 +15,4 @@ F pip_examples.ado
 F pip_info.ado
 F pip_new_session.do
 F pip_query.ado
+F pip_set_server.ado

@@ -12,7 +12,7 @@ make pip, replace toc pkg                        /// readme
     url("")                                                                 ///
     title("Poverty and Inequality Platform Stata wrapper")                  ///
     description("World Bank PIP API Stata wrapper")                         ///
-    install("pip.ado;pip.sthlp;pip_cl.ado;pip_clean.ado;pip_countries.sthlp;pip_examples.ado;pip_info.ado;pip_query.ado;pip_new_session.do") ///
+    install("pip.ado;pip.sthlp;pip_cl.ado;pip_clean.ado;pip_countries.sthlp;pip_examples.ado;pip_info.ado;pip_query.ado;pip_new_session.do;pip_set_server.ado") ///
     ancillary("")                                                         
 
 
