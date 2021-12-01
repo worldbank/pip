@@ -89,41 +89,11 @@ qui {
 	==================================================*/
 	
 	*---------- API defaults
-	
-	if "`server'"!=""  {
-		
-		if !inlist(lower("`server'"), "int", "testing", "ar") {
-			noi disp in red "the server requested does not exist" 
-			error
-		}
-	
-		if (lower("`server'") == "int")     {
-			local server "${pip_svr_in}"
-		}
-		if (lower("`server'") == "testing") {
-			local server "${pip_svr_ts}"
-		}
-		if (upper("`server'") == "AR") {
-			local server "${pip_svr_ar}"
-		}
-		
-		if ("`server'" == "") {
-			noi disp in red "You don't have access to internal servers" _n /* 
-					*/ "You're being redirected to public server"
-			local server "https://pipscoreapiqa.worldbank.org"
-			*local server "http://wzlxqpip01.worldbank.org"
-		}
-		
-	}
-	else {
-		local server "https://pipscoreapiqa.worldbank.org"
-		*local server "http://wzlxqpip01.worldbank.org"
-	}
-		
-	local base             = "`server'/api/v1/pip"	
-	*local base2             = "`server'/api/v1/pip-grp" // to exteract aggregated result 
-	local base2             = "http://wzlxqpip01.worldbank.org/api/v1/pip-grp"
-	return local server    = "`server'"
+	pip_set_server  `server', `pause'
+	return add
+	local server = "`r(server)'"
+	local base   = "`r(base)'"
+	local base2  = "`r(base2)'"
 	
 	//------------ Check internet connection
 	// --- timer
