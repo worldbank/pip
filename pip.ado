@@ -19,31 +19,32 @@ Output:
 =======================================================*/
 
 /*==================================================
-              0: Program set up
+0: Program set up
 ==================================================*/
 program define pip, rclass
 version 16.1
 
 syntax [anything(name=subcommand)]  ///
 [,                             	   /// 
-	COUNtry(string)                /// 
-	REGion(string)                 /// 
-	YEAR(string)                   /// 
-	POVline(numlist)               /// 
-	POPShare(numlist)	   		   /// 
-	PPP(numlist)                   /// 
-	AGGregate                      /// 
-	CLEAR                          /// 
-	INFOrmation                    /// 
-	coverage(string)               /// 
-	ISO                            /// 
-	SERVER(string)                 /// 
-	pause                          /// 
-	FILLgaps                       /// 
-	N2disp(integer 15)             /// 
-	noDIPSQuery                    ///
-	querytimes(integer 5)          ///
-	timer                          ///  
+COUNtry(string)                /// 
+REGion(string)                 /// 
+YEAR(string)                   /// 
+POVline(numlist)               /// 
+POPShare(numlist)	   		   /// 
+PPP(numlist)                   /// 
+AGGregate                      /// 
+CLEAR                          /// 
+INFOrmation                    /// 
+coverage(string)               /// 
+ISO                            /// 
+SERVER(string)                 /// 
+pause                          /// 
+FILLgaps                       /// 
+N2disp(integer 15)             /// 
+noDIPSQuery                    ///
+querytimes(integer 5)          ///
+timer                          ///
+POVCALNET_format               ///
 ] 
 
 if ("`pause'" == "pause") pause on
@@ -65,14 +66,14 @@ qui {
 	//========================================================
 	if ("`aggregate'" != "" & "`fillgaps'" != "") {
 		noi disp in red "options {it:aggregate} and {it:fillgaps} are mutually exclusive." _n /* 
-		 */ "Please select only one."
-		 error
+		*/ "Please select only one."
+		error
 	}
 	
 	if ("`popshare'" != "" &  (lower("`subcommand'") == "wb" | "`aggregate'" != "")) {
 		noi disp in red "option {it:popshare} can't be combined with option {it:aggregate}" _c /* 
-		 */ " or with subcommand {it:wb}" _n
-		 error
+		*/ " or with subcommand {it:wb}" _n
+		error
 	}
 	
 	// ------------------------------------------------------------------------
@@ -102,7 +103,7 @@ qui {
 		scalar tt = tt + "`crlf' `i': Check internet connection"
 	}
 	// --- timer
-		
+	
 	scalar tpage = fileread(`"`server'/api/v1/pip?format=csv"')
 	
 	if regexm(tpage, "error") {
@@ -112,7 +113,7 @@ qui {
 	// --- timer	
 	if ("`timer'" != "") timer off `i++'
 	// --- timer
-
+	
 	
 	*---------- lower case subcommand
 	local subcommand = lower("`subcommand'")
@@ -153,7 +154,7 @@ qui {
 	local coverage = lower("`coverage'")
 	
 	foreach c of local coverage {	
-	
+		
 		if !inlist(lower("`c'"), "national", "rural", "urban", "all") {
 			noi disp in red `"option {it:coverage()} must be "national", "rural",  "urban" or "all" "'
 			error
@@ -235,11 +236,14 @@ qui {
 	==================================================*/
 	
 	if ("`information'" == "") {
+		
 		if (c(N) != 0 & "`clear'" == "" & /* 
 		*/ "`information'" == "") {
+			
 			noi di as err "You must start with an empty dataset; or enable the option {it:clear}."
 			error 4
 		}
+		
 		drop _all
 	}
 	
@@ -308,7 +312,7 @@ qui {
 	
 	if ("`pcall'" == "povline") 	loc i_call "i_povline"
 	else 							loc i_call "i_popshare"
-
+	
 	foreach `i_call' of local `pcall' {	
 		// --- timer
 		if ("`timer'" != "") {
@@ -361,9 +365,9 @@ qui {
 		return local query_ps_`f' = "`query_ps'"
 		
 		return local query_cv_`f' = "`query_cv'"
-			
+		
 		return local base      = "`base'"
-	
+		
 		*---------- Query
 		if ("`popshare'" == ""){
 			local query = "`query_ys'&`query_ct'&`query_cv'&`query_pl'`query_pp'`query_ds'&format=csv"
@@ -376,12 +380,12 @@ qui {
 		
 		*---------- Base + query
 		if ("`aggregate'" != ""){
-		    local queryfull "`base2'?`query'"
+			local queryfull "`base2'?`query'"
 		}
 		else{
-		    local queryfull "`base'?`query'"
+			local queryfull "`base'?`query'"
 		}
-
+		
 		return local queryfull_`f' = "`queryfull'"
 		
 		// --- timer
@@ -572,6 +576,15 @@ qui {
 	
 	return local cite `"`cite'"'
 	
+	
+	//========================================================
+	// Convert to povcalnet format
+	//========================================================
+	
+	if ("`povcalnet_format'" != "") {
+	  pip_povcalnet_format  `rtype', `pause'
+	}
+	
 } // end of qui
 end
 
@@ -627,7 +640,7 @@ exit
 ><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><
 
 Notes:
-		
+
 Version Control:
 
 
@@ -639,32 +652,32 @@ local fn = "`r(fn)'"
 mata:
 cmd = "pip"
 cmd =  cmd :+ "\.pkg"
-	
-	fh = _fopen("`fn'", "r")
-	
+
+fh = _fopen("`fn'", "r")
+
+pos_a = ftell(fh)
+pos_b = 0
+while ((line=strtrim(fget(fh)))!=J(0,0,"")) {
+	if (regexm(strtrim(line), cmd)) {
+		fseek(fh, pos_b, -1)
+		break
+	}
+	pos_b = pos_a
 	pos_a = ftell(fh)
-	pos_b = 0
-	while ((line=strtrim(fget(fh)))!=J(0,0,"")) {
-		if (regexm(strtrim(line), cmd)) {
-			fseek(fh, pos_b, -1)
-			break
-		}
-		pos_b = pos_a
-		pos_a = ftell(fh)
-	}
-	
-	src = strtrim(fget(fh))
-	if (rows(src) > 0) {
-		src = substr(src, 3)
-		st_local("src", src)
-	} 
-	else {
-		st_local("src", "NotFound")
-	}
-	
-	fclose(fh)
-	src
-	
+}
+
+src = strtrim(fget(fh))
+if (rows(src) > 0) {
+	src = substr(src, 3)
+	st_local("src", src)
+} 
+else {
+	st_local("src", "NotFound")
+}
+
+fclose(fh)
+src
+
 end 
 
 

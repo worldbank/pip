@@ -22,10 +22,10 @@ syntax anything(name=type),      ///
 								year(string)     ///
 								region(string)   ///
 								iso              ///
-								wb				///
-								nocensor			///
+								wb				       ///
+								nocensor			   ///
 								rc(string)       ///
-								pause			///
+								pause			       ///
              ]
 
 if ("`pause'" == "pause") pause on

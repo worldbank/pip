@@ -17,8 +17,8 @@ Output:
 ==================================================*/
 program define pip_set_server, rclass
 syntax [anything(name=server)]  ///
-[,                             	    /// 
-pause                             /// 
+[,                             	/// 
+pause                           /// 
 ] 
 
 if ("`pause'" == "pause") pause on
