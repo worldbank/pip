@@ -78,6 +78,12 @@ if ("`type'" == "1") {
 	}
 	
 	sort countrycode year coveragetype
+	
+	//------------ Convert to monthly values
+	
+	replace mean = mean * (360/12)
+	// do it for the median and anything else that requires changes. 
+	
 }
 
 /*==================================================
