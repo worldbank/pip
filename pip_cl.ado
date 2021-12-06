@@ -25,6 +25,7 @@ syntax , [                       ///
            pause                 /// 
            iso                   /// 
            noDIPSQuery           /// 
+		   POVCALNET_format      ///
          ]
 
 version 11.0
@@ -147,22 +148,18 @@ foreach ict of local countries {
 	
 	*---------- coverage
 	if inlist("`icv'", "-1", "all") & ("`ipp'" == "-1") {
-		*local kquery "`kquery' | (country_code == "`ict'"  & poverty_line == `ipl'  & reporting_year == `iyr')"
 		local kquery "`kquery' | (country_code == "`ict'" & reporting_year == `iyr')"
 		return local kquery_`j' = "`kquery_`j''"
 	} 
 	else if inlist("`icv'", "-1", "all") & ("`ipp'" != "-1") {
-		*local kquery "`kquery' | (country_code == "`ict'"  & poverty_line == `ipl'  & reporting_year == `iyr'  & ppp ==  `ipp')"
 		local kquery "`kquery' | (country_code == "`ict'"  & reporting_year == `iyr'  & ppp ==  "`ipp'")"
 		return local kquery_`j' = "`kquery_`j''"
 	}
 	else if !inlist("`icv'", "-1", "all") & ("`ipp'" == "-1") {
-		*local kquery "`kquery' | (country_code == "`ict'"  & poverty_line == `ipl'  & reporting_year == `iyr'  & survey_coverage == "`icv'")"
 		local kquery "`kquery' | (country_code == "`ict'"  & reporting_year == `iyr'  & survey_coverage == "`icv'")"
 		return local kquery_`j' = "`kquery_`j''"
 	} 
 	else {
-		*local kquery "`kquery' | (country_code == "`ict'"  & poverty_line == `ipl'  & reporting_year == `iyr'  & ppp ==  `ipp'  & survey_coverage == "`icv'")"
 		local kquery "`kquery' | (country_code == "`ict'"  & reporting_year == `iyr'  & ppp ==  "`ipp'"  & survey_coverage == "`icv'")"
 		return local kquery_`j' = "`kquery_`j''"
 	}
@@ -177,19 +174,12 @@ keep if `kquery'
 /*==================================================
             3:  Clean data
 ==================================================*/
-pip_clean 1, year("`year'") `iso' rc(`rc')
-/*
-if ("`dipsquery'" == "") {
-
-	noi di as res _n "{title: One-on-one query}"
-	noi di as res "{hline}"
-
-	foreach x of numlist 0/`=`j'-1' {
-		noi di as res "Condition `x':" as txt _col(15) "`kquery_`x''"
+	if ("`povcalnet_format'" != "") {
+		pip_povcalnet_format 1, year("`year'") `iso' rc(`rc')	
 	}
-		noi di as res "{hline}"
-}
-*/
+	else { 
+		pip_clean 1, year("`year'") `iso' rc(`rc')		
+	}
 
 }
 end
