@@ -15,6 +15,7 @@ clear              ///
 justdata           /// programmers option
 pause              /// debugging
 server(string)     ///
+POVCALNET_format   ///
 ] 
 
 if ("`pause'" == "pause") pause on
@@ -143,7 +144,14 @@ qui {
 			local current_line = 0
 			foreach cccc of local countries{
 				local current_line = `current_line' + 1 
-				local display_this = "{stata pip_info, country(`cccc') clear: `cccc'} "
+				
+				if ("`povcalnet_format'" != "") {
+					local display_this = "{stata pip_info, country(`cccc') clear povcalnet : `cccc'} "
+				} 
+				else {
+				    local display_this = "{stata pip_info, country(`cccc') clear : `cccc'} "
+				}				
+	
 				if (`current_line' < 10) noi display in y `"`display_this'"' _continue 
 				else{
 					noi display in y `"`display_this'"' 
@@ -156,11 +164,22 @@ qui {
 			
 			foreach i_reg of local regions{
 				local current_line = 0
-				local dipsthis "{stata  pip, region(`i_reg') year(all) aggregate clear:`i_reg' }"
+				if ("`povcalnet_format'" != "") {
+					local dipsthis "{stata  pip, region(`i_reg') year(all) aggregate povcalnet clear:`i_reg' }"
+				} 
+				else {
+				    local dipsthis "{stata  pip, region(`i_reg') year(all) aggregate clear:`i_reg' }"
+				}	
 				noi disp " `dipsthis' " _c
 			}
 			
-			noi display in y _n "{stata pip_info, region clear: World Bank regions by year}"		
+			if ("`povcalnet_format'" != "") {
+				noi display in y _n "{stata pip_info, region povcalnet povcalnet clear: World Bank regions by year}"
+			} 
+			else {
+				noi display in y _n "{stata pip_info, region clear: World Bank regions by year}"
+			}
+				
 			noi display _n ""
 			exit
 		}
@@ -195,7 +214,14 @@ qui {
 				foreach ind_y of local years_current {
 					local current_line = `current_line' + 1 
 					local ind_y_c=substr("`ind_y'",1,4)
-					local display_this = "{stata  pip, country(`country') year(`ind_y') coverage(`coverage')   clear: `ind_y_c'}"		
+					if ("`povcalnet_format'" != "") {
+					    local display_this = "{stata  pip, country(`country') year(`ind_y') coverage(`coverage') povcalnet clear: `ind_y_c'}"
+					} 
+					else {
+						local display_this = "{stata  pip, country(`country') year(`ind_y') coverage(`coverage') clear: `ind_y_c'}"
+					}	
+				
+							
 					if (`current_line' < 10) noi display in y `"`display_this'"' _continue 
 					else{
 						noi display in y `"`display_this'"' 
@@ -203,7 +229,13 @@ qui {
 					}
 				}	
 				
-				noi display `"{stata  pip, country(`country') year(all) coverage(`coverage')  clear: All}"'
+				if ("`povcalnet_format'" != "") {
+				    noi display `"{stata  pip, country(`country') year(all) coverage(`coverage') povcalnet clear: All}"'
+				} 
+				else {
+					noi display `"{stata  pip, country(`country') year(all) coverage(`coverage')  clear: All}"'
+				}
+				
 			}
 			restore
 			noi display _n ""
@@ -228,14 +260,27 @@ qui {
 				local years_current = "$refyears"
 				foreach ind_y of local years_current {
 					local current_line = `current_line' + 1 
-					local display_this = "{stata  pip, region(`i_reg') year(`ind_y') aggregate clear: `ind_y'}"		
+					if ("`povcalnet_format'" != "") {
+						local display_this = "{stata  pip, region(`i_reg') year(`ind_y') aggregate povcalnet clear: `ind_y'}"	
+					} 
+					else {
+						local display_this = "{stata  pip, region(`i_reg') year(`ind_y') aggregate clear: `ind_y'}"	
+					}
+						
 					if (`current_line' < 10) noi display in y `"`display_this'"' _continue 
 					else{
 						noi display in y `"`display_this'"' 
 						local current_line = 0		
 					}
 				}
-				noi display in y "{stata  pip, region(`i_reg') year(all) aggregate clear: All}"				
+				if ("`povcalnet_format'" != "") {
+					noi display in y "{stata  pip, region(`i_reg') year(all) aggregate povcalnet clear: All}"
+				} 
+				else {
+					noi display in y "{stata  pip, region(`i_reg') year(all) aggregate clear: All}"
+				}
+								
+								
 			}
 			noi display _n ""
 			exit

@@ -22,10 +22,10 @@ syntax anything(name=type),      ///
 								year(string)     ///
 								region(string)   ///
 								iso              ///
-								wb				       ///
-								nocensor			   ///
+								wb				///
+								nocensor			///
 								rc(string)       ///
-								pause			       ///
+								pause			///
              ]
 
 if ("`pause'" == "pause") pause on
@@ -64,13 +64,12 @@ if ("`rc'" == "in" | c(N) == 0) {
 /*==================================================
               1: type 1
 ==================================================*/
-ren reporting_year requestyear
-ren reporting_pop reqyearpopulation
+
 if ("`type'" == "1") {
 
 	if  ("`year'" == "last"){
-		bys country_code: egen maximum_y = max(requestyear)
-		keep if maximum_y ==  requestyear
+		bys country_code: egen maximum_y = max(reporting_year)
+		keep if maximum_y ==  reporting_year
 		drop maximum_y
 	}
 
@@ -80,30 +79,14 @@ if ("`type'" == "1") {
 	***************************************************
 	gen countryname = ""
 	
-	local vars1 country_code region_code survey_coverage survey_year /*
-	*/welfare_type is_interpolated distribution_type poverty_line poverty_gap /*
-	*/poverty_severity // reporting_pop
-	
-	local vars2 countrycode regioncode coveragetype datayear datatype isinterpolated usemicrodata /*
-	*/povertyline povgap povgapsqr //population
-	
-	local i = 0
-	foreach var of local vars1 {
-		local ++i
-		rename `var' `: word `i' of `vars2''
-	}	
-	
-	keep countrycode countryname regioncode coveragetype requestyear datayear datatype isinterpolated usemicrodata /*
-	*/ ppp povertyline mean headcount povgap povgapsqr watts gini median mld polarization reqyearpopulation decile? decile10
-	
-	order countrycode countryname regioncode coveragetype requestyear datayear datatype isinterpolated usemicrodata /*
-	*/ ppp povertyline mean headcount povgap povgapsqr watts gini median mld polarization reqyearpopulation decile? decile10
+	order country_code countryname region_code survey_coverage reporting_year survey_year welfare_type is_interpolated distribution_type /*
+	*/ ppp poverty_line mean headcount poverty_gap poverty_severity watts gini median mld polarization reporting_pop decile? decile10
 	
 	if "`iso'"!="" {
-		cap replace countrycode="XKX" if countrycode=="KSV"
-		cap replace countrycode="TLS" if countrycode=="TMP"
-		cap replace countrycode="PSE" if countrycode=="WBG"
-		cap replace countrycode="COD" if countrycode=="ZAR"
+		cap replace country_code = "XKX" if country_code == "KSV"
+		cap replace country_code = "TLS" if country_code == "TMP"
+		cap replace country_code = "PSE" if country_code == "WBG"
+		cap replace country_code = "COD" if country_code == "ZAR"
 	}
 
 	*rename  prmld  mld
@@ -120,62 +103,49 @@ if ("`type'" == "1") {
 	qui count
 	local obs=`r(N)'
 	
-	tostring coveragetype, replace
+	tostring survey_coverage, replace
 	
-	replace coveragetype = "1" if coveragetype == "rural"
-	replace coveragetype = "2" if coveragetype == "urban"
-	replace coveragetype = "4" if coveragetype == "A" // not available in pip data
-	replace coveragetype = "3" if coveragetype == "national"
-	destring coveragetype, force replace
-	label define coveragetype 1 "Rural"     /* 
+	replace survey_coverage = "1" if survey_coverage == "rural"
+	replace survey_coverage = "2" if survey_coverage == "urban"
+	replace survey_coverage = "4" if survey_coverage == "A" // not available in pip data
+	replace survey_coverage = "3" if survey_coverage == "national"
+	destring survey_coverage, force replace
+	label define survey_coverage 1 "Rural"     /* 
 	 */                       2 "Urban"     /* 
 	 */                       3 "National"  /* 
 	 */                       4 "National (Aggregate)", modify
 	 
-	label values coveragetype coveragetype
+	label values survey_coverage survey_coverage
 
-	replace datatype = "1" if datatype == "consumption"
-	replace datatype = "2" if datatype == "income"
-	destring datatype, force replace
-	label define datatype 1 "Consumption" 2 "Income", modify
-	label values datatype datatype
+	replace welfare_type = "1" if welfare_type == "consumption"
+	replace welfare_type = "2" if welfare_type == "income"
+	destring welfare_type, force replace
+	label define welfare_type 1 "Consumption" 2 "Income", modify
+	label values welfare_type welfare_type
 
-	label var isinterpolated    "Data is interpolated"
-	label var countrycode       "Country/Economy Code"
-	label var usemicrodata      "Data comes from grouped or microdata"
+	label var is_interpolated   "Data is interpolated"
+	label var country_code      "Country/Economy Code"
+	label var distribution_type "Data comes from grouped or microdata"
 	label var countryname       "Country/Economy Name"
-	label var regioncode        "Region Code"
+	label var region_code       "Region Code"
 	label var region            "Region Name"
-	label var coveragetype      "Coverage"
-	label var requestyear       "Year you requested"
-	label var datayear          "Survey year"
-	label var datatype          "Welfare measured by income or consumption"
+	label var survey_coverage   "Coverage"
+	label var reporting_year    "Year you requested"
+	label var survey_year       "Survey year"
+	label var welfare_type      "Welfare measured by income or consumption"
 	label var ppp               "Purchasing Power Parity"
-	label var povertyline       "Poverty line in PPP$ (per capita per day)"
+	label var poverty_line      "Poverty line in PPP$ (per capita per day)"
 	label var mean              "Average monthly per capita income/consumption in PPP$"
 	label var headcount         "Poverty Headcount"
-	label var povgap            "Poverty Gap."
-	label var povgapsqr         "Squared poverty gap."
+	label var poverty_gap       "Poverty Gap."
+	label var poverty_severity  "Squared poverty gap."
 	label var watts             "Watts index"
 	label var gini              "Gini index"
 	label var median            "Median monthly income or expenditure in PPP$"
 	label var mld               "Mean Log Deviation"
-	label var reqyearpopulation "Population in year"
+	label var reporting_pop     "Population in year"
 
-
-	* Standardize names with R package
-
-	local Snames requestyear reqyearpopulation 
-
-	local Rnames year population 
-
-	local i = 0
-	foreach var of local Snames {
-		local ++i
-		rename `var' `: word `i' of `Rnames''
-	}
-	 
-	sort countrycode year coveragetype
+	sort country_code reporting_year survey_coverage 
 }
 
 /*==================================================
@@ -200,43 +170,26 @@ if ("`type'" == "2") {
 	
 	if  ("`year'" == "last") {
 		tempvar maximum_y
-		bys region_code: egen `maximum_y' = max(requestyear)
-		keep if `maximum_y' ==  requestyear
+		bys region_code: egen `maximum_y' = max(reporting_year)
+		keep if `maximum_y' ==  reporting_year
 	}
 	
 	***************************************************
 	* 4. Renaming and labeling
 	***************************************************
 
-	rename region_code regioncode
-	*rename regiontitle region
-	*rename hc headcount
-	rename poverty_line povertyline
-	rename poverty_gap povgap
-	rename poverty_severity povgapsqr
-	*rename reporting_pop reqyearpopulation
+	label var region_code      "Region code"
+	label var reporting_year   "Year you requested"
+	label var poverty_line     "Poverty line in PPP$ (per capita per day)"
+	label var mean             "Average monthly per capita income/consumption in PPP$"
+	label var headcount        "Poverty Headcount"
+	label var poverty_gap      "Poverty Gap"
+	label var poverty_severity "Squared poverty gap"
+	label var reporting_pop    "Population in year"
+	label var pop_in_poverty   "Population in poverty"
 	
-	label var requestyear       "Year you requested"
-	label var povertyline       "Poverty line in PPP$ (per capita per day)"
-	label var mean              "Average monthly per capita income/consumption in PPP$"
-	label var headcount         "Poverty Headcount"
-	label var povgap            "Poverty Gap"
-	label var povgapsqr         "Squared poverty gap"
-	label var reqyearpopulation "Population in year"
-	
-	keep requestyear regioncode povertyline mean headcount povgap povgapsqr reqyearpopulation
-	order requestyear regioncode povertyline mean headcount povgap povgapsqr reqyearpopulation
-	
-    local Snames requestyear reqyearpopulation 
+	order reporting_year region_code poverty_line mean headcount poverty_gap poverty_severity reporting_pop
 
-	local Rnames year population 
-	 
-	local i = 0
-	foreach var of local Snames {
-		local ++i
-		rename `var' `: word `i' of `Rnames''
-	}
-	
 } // end of type 2
 
 
