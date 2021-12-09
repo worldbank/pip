@@ -25,7 +25,6 @@ syntax , [                       ///
            pause                 /// 
            iso                   /// 
            noDIPSQuery           /// 
-		   POVCALNET_format      ///
          ]
 
 version 11.0
@@ -170,16 +169,6 @@ foreach ict of local countries {
 
 local kquery : subinstr  local kquery  "|" " "
 keep if `kquery'
-
-/*==================================================
-            3:  Clean data
-==================================================*/
-	if ("`povcalnet_format'" != "") {
-		pip_povcalnet_format 1, year("`year'") `iso' rc(`rc')	
-	}
-	else { 
-		pip_clean 1, year("`year'") `iso' rc(`rc')		
-	}
 
 }
 end
