@@ -295,6 +295,16 @@ qui {
 		`iso'                            ///
 		`pause'
 		return add
+		
+		pip_clean 1, year("`year'") `iso' rc(`rc')
+		
+		//========================================================
+		// Convert to povcalnet format
+		//========================================================
+		if ("`povcalnet_format'" != "") {
+			pip_povcalnet_format 1, `pause'
+		}
+		
 		exit
 	}
 	
@@ -459,14 +469,8 @@ qui {
 		// --- timer
 		
 		*---------- Clean data
-		if ("`povcalnet_format'" != "") {
-			pip_povcalnet_format `rtype', year("`year'") `iso' /* 
-			*/ rc(`rc') region(`region') `pause' `wb'	
-		}
-		else { 
-			pip_clean `rtype', year("`year'") `iso' /* 
+		pip_clean `rtype', year("`year'") `iso' /* 
 			*/ rc(`rc') region(`region') `pause' `wb'		
-		}
 		
 		pause after cleaning
 		// --- timer
@@ -518,48 +522,25 @@ qui {
 	local n2disp = min(`c(N)', `n2disp')
 	noi di as res _n "{ul: first `n2disp' observations}"
 	
-	if ("`povcalnet_format'" != "") {
-		if ("`subcommand'" == "wb") {
-			sort  year regioncode
-			noi list region year povertyline headcount mean in 1/`n2disp', /*
-			*/ abbreviate(12)  sepby(year)
-		}
+	if ("`subcommand'" == "wb") {
+		sort reporting_year region_code 
+		noi list region reporting_year poverty_line headcount mean in 1/`n2disp', /*
+		*/ abbreviate(12)  sepby(reporting_year)
+	}
 		
+	else {
+		if ("`aggregate'" == "") {
+			sort country_code reporting_year region_code 
+			noi list country_code reporting_year poverty_line headcount mean median welfare_type /*
+			*/ in 1/`n2disp',  abbreviate(12)  sepby(country_code)
+		}
 		else {
-			if ("`aggregate'" == "") {
-				sort countrycode year regioncode
-				noi list countrycode year povertyline headcount mean median datatype /*
-				*/ in 1/`n2disp',  abbreviate(12)  sepby(countrycode)
-			}
-			else {
-				sort year
-				noi list year povertyline headcount mean , /*
-				*/ abbreviate(12) sepby(povertyline)
-			}		
-		}
+			sort reporting_year 
+			noi list reporting_year poverty_line headcount mean , /*
+			*/ abbreviate(12) sepby(poverty_line)
+		}		
 	}	
-	else { 
-		if ("`subcommand'" == "wb") {
-			sort reporting_year region_code 
-			noi list region reporting_year poverty_line headcount mean in 1/`n2disp', /*
-			*/ abbreviate(12)  sepby(reporting_year)
-		}
 		
-		else {
-			if ("`aggregate'" == "") {
-				sort country_code reporting_year region_code 
-				noi list country_code reporting_year poverty_line headcount mean median welfare_type /*
-				*/ in 1/`n2disp',  abbreviate(12)  sepby(country_code)
-			}
-			else {
-				sort reporting_year 
-				noi list reporting_year poverty_line headcount mean , /*
-				*/ abbreviate(12) sepby(poverty_line)
-			}		
-		}	
-	}	
-	
-
 	//========================================================
 	//  Create notes
 	//========================================================
@@ -608,10 +589,10 @@ qui {
 	//========================================================
 	// Convert to povcalnet format
 	//========================================================
-	/*
+	
 	if ("`povcalnet_format'" != "") {
 	  pip_povcalnet_format  `rtype', `pause'
-	} */
+	}
 	
 } // end of qui
 end
