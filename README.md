@@ -1,4 +1,4 @@
-_v. 0.0.0.9002_  
+_v. 0.0.1_  
 
 `pip` : Poverty and Inequality Platform Stata wrapper
 =====================================================
