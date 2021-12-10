@@ -52,7 +52,7 @@ else                      pause off
 
 qui {
 	// --- timer
-	local timer = "GIsj"
+	local i = 0
 	local crlf "`=char(10)'`=char(13)'"
 	scalar tt = ""
 	
