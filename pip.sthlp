@@ -710,8 +710,7 @@ example of wbopendata developed by Joao-Pedro Azevedo.
 {marker authors}{...}
 {title:Authors}
 {pstd}
-R.Andres Castaneda, Christoph Lakner, Espen Beer Prydz, Jorge Soler Lopez, 
-Ruoxuan Wu, and Qinghua Zhao
+R.Andres Castaneda and Tefera Bekele Degefu
 
 {title:Maintainer}
 {p 4 4 4}R.Andres Castaneda, The World Bank{p_end}
@@ -729,8 +728,8 @@ All the files are available in the {browse "https://github.com/worldbank/pip":Gi
 {title:Thanks for citing {cmd:pip} as follows}
 {p 40 20 2}(Go up to {it:{help pip##sections:Sections Menu}}){p_end}
 
-{p 4 8 2}Castaneda Aguilar, R. A., C. Lakner, E. B. Prydz, J. S. Lopez, R. Wu and Q. Zhao 
-(2019) "pip: Stata module to access World Bank’s Global Poverty and Inequality data," 
+{p 4 8 2}Castaneda Aguilar, R.A. and T.B. Degefu (2021) 
+"pip: Stata module to access World Bank’s Global Poverty and Inequality data," 
 Statistical Software Components 2019, Boston College Department of Economics.{p_end}
 
 {pstd}

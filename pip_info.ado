@@ -15,6 +15,7 @@ clear              ///
 justdata           /// programmers option
 pause              /// debugging
 server(string)     ///
+POVCALNET_format   ///
 ] 
 
 if ("`pause'" == "pause") pause on
