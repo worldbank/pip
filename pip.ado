@@ -49,6 +49,7 @@ POVCALNET_format               ///
 
 if ("`pause'" == "pause") pause on
 else                      pause off
+set checksum off
 
 qui {
 	// --- timer
