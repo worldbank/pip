@@ -578,7 +578,7 @@ qui {
 	label data "`datalabel' (`c(current_date)')"
 	
 	* citations
-	local cite `"Please cite as: Castaneda Aguilar, R. A., C. Lakner, E. B. Prydz, J. S. Lopez, R. Wu and Q. Zhao (2019) "pip: Stata module to access World Bank’s Global Poverty and Inequality data," Statistical Software Components 2019, Boston College Department of Economics."'
+	local cite `"Please cite as: Castaneda Aguilar, R. A. and T.B. Degefu (2021) "pip: Stata module to access World Bank’s Global Poverty and Inequality data," Statistical Software Components 2019, Boston College Department of Economics."'
 	notes: `cite'
 	
 	noi disp in y _n `"`cite'"'
@@ -590,8 +590,11 @@ qui {
 	// Convert to povcalnet format
 	//========================================================
 	
+	
 	if ("`povcalnet_format'" != "") {
+		pause before povcalnet format
 	  pip_povcalnet_format  `rtype', `pause'
+		
 	}
 	
 } // end of qui

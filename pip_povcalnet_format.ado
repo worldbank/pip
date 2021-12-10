@@ -27,8 +27,7 @@ else                      pause off
 version 16.1
 
 
-noi disp in red "Warning: " in yellow /// 
-"option {it:povcalnet_format} is intended only to " _n ///
+noi disp in red "Warning: option {it:povcalnet_format} is intended only to " _n ///
 "replicate results or to use Stata code that still" _n ///
 "executes the deprecated {cmd:povcalnet} command."
 
