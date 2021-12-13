@@ -13,7 +13,7 @@ F pip_clean.ado
 F pip_countries.sthlp
 F pip_examples.ado
 F pip_info.ado
-F pip_new_session.do
+F pip_new_session.ado
 F pip_povcalnet_format.ado
 F pip_query.ado
 F pip_set_server.ado
