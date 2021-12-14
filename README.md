@@ -1,4 +1,4 @@
-_v. 0.0.1_  
+[![](https://img.shields.io/badge/devel%20version-0.0.1.9000-blue.svg)](https://github.com/PIP-Technical-Team/pip)
 
 `pip` : Poverty and Inequality Platform Stata wrapper
 =====================================================
