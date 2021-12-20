@@ -15,7 +15,7 @@
 
 capture program drop pip_examples
 program pip_examples
-version 11.0
+version 16.0
 args EXAMPLE
 set more off
 `EXAMPLE'
