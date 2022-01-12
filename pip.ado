@@ -22,7 +22,7 @@ Output:
 0: Program set up
 ==================================================*/
 program define pip, rclass
-version 16.1
+version 16.0
 
 syntax [anything(name=subcommand)]  ///
 [,                             	   /// 
@@ -432,6 +432,19 @@ qui {
 			if (_rc == 0) {
 				cap insheet using `clfile', clear name
 				if (_rc != 0) local rc "in"
+				
+				ds
+				local vars = "`r(varlist)'"
+				if (wordcount("`vars'") == 1) {
+					local varlabel: variable label `vars'
+					noi disp in red "The parameters selected are not valid." _n ///
+					 "Poverty line might out of range."
+					noi disp in red `"`varlabel'"'
+					error 
+				}
+				
+				pause after loading data in memory
+				
 				continue, break
 			} 
 			else {

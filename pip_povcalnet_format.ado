@@ -24,7 +24,7 @@ pause                           ///
 if ("`pause'" == "pause") pause on
 else                      pause off
 
-version 16.1
+version 16.0
 
 
 noi disp in red "Warning: option {it:povcalnet_format} is intended only to " _n ///
