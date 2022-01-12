@@ -166,6 +166,12 @@ qui {
 	
 	*---------- Poverty line/population share
 	
+	// allowed povline 
+	if ("`povline'" != "" & !inlist("`povline'", "1.9", "3.2", "5.5"))  {
+		noi disp as err "allowed poverty lines are 1.9, 3.2, and 5.5"
+		error
+	}
+	
 	// Blank popshare and blank povline = default povline 1.9
 	if ("`popshare'" == "" & "`povline'" == "")  {
 		local povline = 1.9
