@@ -22,47 +22,44 @@ if ("`pause'" == "pause") pause on
 else                      pause off
 
 qui {
-
+	
 	//if ("`clear'" == "") preserve
 	
 	*---------- API defaults
+	pip_set_server  `server', `pause'
+	*return add
+	local server = "`r(server)'"
+	local base   = "`r(base)'"
+	local base2  = "`r(base2)'"
 	
-	if "`server'" == ""  {
-		local site_name = "api/v1"
-		local server   = "https://pipscoreapiqa.worldbank.org"
-		*local server = "http://wzlxqpip01.worldbank.org"
-		local url = "`server'/`site_name'"
-		return local site_name = "`site_name'"
-		return local url       = "`url'"
-	} 
-	else {
-		local url "https://pipscoreapiqa.worldbank.org/api/v1"
-		*local url "http://wzlxqpip01.worldbank.org/api/v1"
-	}
+	local site_name = "api/v1"
+	local url = "`server'/`site_name'"
+	
+	return local site_name = "`site_name'"
+	return local url       = "`url'"
+	
 	
 	***************************************************
 	* 0. Country name
 	***************************************************	
-	tempfile temp100
 	
-	local csvfile0  = "`url'/aux?table=countries&format=csv"
-	return local csvfile0 = "`csvfile0'"
-	
-	cap copy "`csvfile0'" `temp100'
-	if (_rc != 0 ) {
-		noi disp in red "There is a problem accessing country name data." 
-	  noi disp in red "to check your connection, copy and paste in your browser the following address:" _n /* 
-		*/	_col(4) in w `"`url'/aux?table=countries&format=csv"'
+	frame pip_countries {
 		
-		error 
-	} 
-
-	import delim using `temp100',  delim(",()") stringc(_all) /* 
-	*/                              stripq(yes) varnames(1)  clear 	
+		local csvfile0  = "`url'/aux?table=countries&format=csv"
+		cap import delimited using "`csvfile0'", clear varn(1)
+		
+		if (_rc != 0 ) {
+			noi disp in red "There is a problem accessing country name data." 
+			noi disp in red "to check your connection, copy and paste in your browser the following address:" _n /* 
+			*/	_col(4) in w `"`csvfile0'"'
+			
+			error 
+		} 
+		
+		drop iso2_code
+		sort country_code
+	}
 	
-	keep country_code country_name income_group
-	sort country_code
-	save `temp100', replace
 	
 	***************************************************
 	* 1. Load guidance database
@@ -70,38 +67,41 @@ qui {
 	
 	tempfile temp1000
 	
-	local csvfile  = "`url'/pip?format=csv"
-	return local csvfile = "`csvfile'"
+	frame pip_int_means {
 	
-	cap copy "`csvfile'" `temp1000'
-	if (_rc != 0 ) {
-		noi disp in red "There is a problem accessing the information file." 
-	  noi disp in red "to check your connection, copy and paste in your browser the following address:" _n /* 
-		*/	_col(4) in w `"`url'/pip?format=csv"'
+		local csvfile  = "`url'/aux?table=interpolated_means&format=csv"
+		cap import delim using "`csvfile'", clear varn(1)
+		if (_rc != 0 ) {
+			noi disp in red "There is a problem accessing the information file." 
+			noi disp in red "to check your connection, copy and paste in your browser the following address:" _n /* 
+			*/	_col(4) in w `"`csvfile'"'
+			
+			error 
+		} 
 		
-		error 
-	} 
-
-	import delim using `temp1000',  delim(",()") stringc(_all) /* 
-	*/                              stripq(yes) varnames(1)  clear 
+	}
+	if ("`justdata'" != "") exit
 	
-	local orgvar region_code survey_coverage reporting_year 
-	local newvar wb_region coverage_level reporting_year 
+	
+	
+	
+	local orgvar survey_coverage reporting_year 
+	local newvar coverage_level reporting_year 
 	
 	local i = 0
 	foreach var of local orgvar {
 		local ++i
 		rename `var' `: word `i' of `newvar''
 	}	
-
-	keep country_code wb_region coverage_level survey_year reporting_year 
-	order country_code wb_region coverage_level survey_year reporting_year
+	
+	keep country_code coverage_level survey_year reporting_year 
+	order country_code coverage_level survey_year reporting_year
 	sort country_code
-
+	
 	merge country_code using `temp100'
-	collapse _merge, by(country_code country_name wb_region coverage_level reporting_year income_group)
+	collapse _merge, by(country_code country_name coverage_level reporting_year income_group)
 	drop _merge
-	order country_code country_name wb_region coverage_level reporting_year income_group
+	order country_code country_name coverage_level reporting_year income_group
 	
 	gen year = ""
 	tostring reporting_year, replace
@@ -109,28 +109,31 @@ qui {
 	save `lkupdata', replace
 	levelsof country_code , local(ctry)
 	foreach ct of local ctry{
-	    preserve
-	    levelsof coverage_level, local(cv_area)
+		
+		preserve
+		levelsof coverage_level, local(cv_area)
 		disp `cv_area'
+		
 		foreach cv of local cv_area {
-		    keep if country_code == "`ct'" & coverage_level == "`cv'"
-		    levelsof reporting_year, local(year) sep(,) clean
+			keep if country_code == "`ct'" & coverage_level == "`cv'"
+			levelsof reporting_year, local(year) sep(,) clean
 			disp `year'
 			replace year = "`year'" if coverage_level == "`cv'"
 			append using `lkupdata'
 			save `lkupdata', replace
 		}
+		
 		restore
 	}
-			
+	
 	use `lkupdata', clear
 	drop if year == ""
 	sort country_code
 	duplicates drop country_code country_name wb_region coverage_level income_group year, force
 	drop reporting_year
 	
-	if ("`justdata'" != "") exit
-
+	
+	
 	***************************************************
 	* 2. Inital listing with countries and regions
 	***************************************************
