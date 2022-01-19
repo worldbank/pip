@@ -43,7 +43,7 @@ FILLgaps                       ///
 N2disp(integer 15)             /// 
 noDIPSQuery                    ///
 querytimes(integer 5)          ///
-timer                          ///
+TIMEr                          ///
 POVCALNET_format               ///
 ] 
 
@@ -106,10 +106,12 @@ qui {
 	}
 	// --- timer
 	
-	scalar tpage = fileread(`"`server'/api/v1/pip?format=csv"')
+	scalar tpage = fileread(`"`server'/api/v1/health-check"')
+	disp tpage
 	
-	if regexm(tpage, "error") {
-		noi disp in red "You may not have Internet connections. Please verify"
+	
+	if !regexm(tpage, "API is running") {
+		noi disp in red "There is a problem with PIP API server. Try again later"
 		error
 	}
 	// --- timer	
