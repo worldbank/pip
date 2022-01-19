@@ -45,6 +45,7 @@ noDIPSQuery                    ///
 querytimes(integer 5)          ///
 TIMEr                          ///
 POVCALNET_format               ///
+keep_frames                    ///
 ] 
 
 if ("`pause'" == "pause") pause on
@@ -62,6 +63,13 @@ qui {
 		local i = 1
 	}
 	// --- timer
+	
+	
+	//========================================================
+	// Frames
+	//========================================================
+	local curframe = c(frame)
+	
 	
 	//========================================================
 	// Conditions
@@ -440,7 +448,7 @@ qui {
 				if (wordcount("`vars'") == 1) {
 					local varlabel: variable label `vars'
 					noi disp in red "The parameters selected are not valid." _n ///
-					 "Poverty line might out of range."
+					"Poverty line might out of range."
 					noi disp in red `"`varlabel'"'
 					error 
 				}
@@ -486,7 +494,7 @@ qui {
 		
 		*---------- Clean data
 		pip_clean `rtype', year("`year'") `iso' /* 
-			*/ rc(`rc') region(`region') `pause' `wb'		
+		*/ rc(`rc') region(`region') `pause' `wb'		
 		
 		pause after cleaning
 		// --- timer
@@ -543,7 +551,7 @@ qui {
 		noi list region reporting_year poverty_line headcount mean in 1/`n2disp', /*
 		*/ abbreviate(12)  sepby(reporting_year)
 	}
-		
+	
 	else {
 		if ("`aggregate'" == "") {
 			sort country_code reporting_year region_code 
@@ -556,7 +564,7 @@ qui {
 			*/ abbreviate(12) sepby(poverty_line)
 		}		
 	}	
-		
+	
 	//========================================================
 	//  Create notes
 	//========================================================
@@ -610,8 +618,24 @@ qui {
 	if ("`povcalnet_format'" != "") {
 		pause before povcalnet format
 	  pip_povcalnet_format  `rtype', `pause'
-		
 	}
+	
+	//========================================================
+	//  Drop frames created in the middle of the process
+	//========================================================
+	
+	if ("`keep_frames'" == "") {
+		
+		frame dir
+		local av_frames "`r(frames)'"
+		foreach fr of local av_frames {
+			if (regexm("`fr'", "^pip_")) {
+				frame drop `fr'
+			}
+		}
+		
+	} // condition to keep frames
+	
 	
 } // end of qui
 end
@@ -673,40 +697,3 @@ Version Control:
 
 
 *##s
-
-findfile stata.trk
-local fn = "`r(fn)'"
-
-mata:
-cmd = "pip"
-cmd =  cmd :+ "\.pkg"
-
-fh = _fopen("`fn'", "r")
-
-pos_a = ftell(fh)
-pos_b = 0
-while ((line=strtrim(fget(fh)))!=J(0,0,"")) {
-	if (regexm(strtrim(line), cmd)) {
-		fseek(fh, pos_b, -1)
-		break
-	}
-	pos_b = pos_a
-	pos_a = ftell(fh)
-}
-
-src = strtrim(fget(fh))
-if (rows(src) > 0) {
-	src = substr(src, 3)
-	st_local("src", src)
-} 
-else {
-	st_local("src", "NotFound")
-}
-
-fclose(fh)
-src
-
-end 
-
-
-*##e

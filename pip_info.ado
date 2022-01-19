@@ -40,50 +40,59 @@ qui {
 	
 	
 	***************************************************
-	* 0. Country name
+	* 0. Info frame 
 	***************************************************	
 	
-	frame pip_countries {
+	//------------ Find available frames
+	frame dir 
+	local av_frames "`r(frames)'"
+	local av_frames: subinstr local  av_frames " " "|", all
+	
+	//------------ countries frame 
+	if (!regexm("pip_countries", "`av_frames'")) {
 		
-		local csvfile0  = "`url'/aux?table=countries&format=csv"
-		cap import delimited using "`csvfile0'", clear varn(1)
+		frame create pip_countries
 		
-		if (_rc != 0 ) {
-			noi disp in red "There is a problem accessing country name data." 
-			noi disp in red "to check your connection, copy and paste in your browser the following address:" _n /* 
-			*/	_col(4) in w `"`csvfile0'"'
+		frame pip_countries {
 			
-			error 
-		} 
+			local csvfile0  = "`url'/aux?table=countries&format=csv"
+			cap import delimited using "`csvfile0'", clear varn(1)
+			
+			if (_rc != 0 ) {
+				noi disp in red "There is a problem accessing country name data." 
+				noi disp in red "to check your connection, copy and paste in your browser the following address:" _n /* 
+				*/	_col(4) in w `"`csvfile0'"'
+				
+				error 
+			} 
+			
+			drop iso2_code
+			sort country_code
+		}
 		
-		drop iso2_code
-		sort country_code
 	}
+	//------------ interpolated means frame
 	
-	
-	***************************************************
-	* 1. Load guidance database
-	***************************************************
-	
-	tempfile temp1000
-	
-	frame pip_int_means {
-	
-		local csvfile  = "`url'/aux?table=interpolated_means&format=csv"
-		cap import delim using "`csvfile'", clear varn(1)
-		if (_rc != 0 ) {
-			noi disp in red "There is a problem accessing the information file." 
-			noi disp in red "to check your connection, copy and paste in your browser the following address:" _n /* 
-			*/	_col(4) in w `"`csvfile'"'
+	if (!regexm("pip_int_means", "`av_frames'")) {
+		
+		frame create pip_int_means
+		
+		frame pip_int_means {
 			
-			error 
-		} 
+			local csvfile  = "`url'/aux?table=interpolated_means&format=csv"
+			cap import delim using "`csvfile'", clear varn(1)
+			if (_rc != 0 ) {
+				noi disp in red "There is a problem accessing the information file." 
+				noi disp in red "to check your connection, copy and paste in your browser the following address:" _n /* 
+				*/	_col(4) in w `"`csvfile'"'
+				
+				error 
+			} 
+			
+		}
 		
 	}
 	if ("`justdata'" != "") exit
-	
-	
-	
 	
 	local orgvar survey_coverage reporting_year 
 	local newvar coverage_level reporting_year 

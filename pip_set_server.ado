@@ -30,7 +30,10 @@ version 16.0
 /*==================================================
 1:  If Server defined
 ==================================================*/
-if "`server'"!=""  {
+
+local current_server "https://pipscoreapiqa.worldbank.org"
+
+if "`server'"!="" & "`server'" != "`current_server'"  {
 	
 	if !inlist(lower("`server'"), "int", "testing", "ar") {
 		noi disp in red "the server requested does not exist" 
@@ -50,8 +53,7 @@ if "`server'"!=""  {
 	if ("`server'" == "") {
 		noi disp in red "You don't have access to internal servers" _n /* 
 		*/ "You're being redirected to public server"
-		local server "https://pipscoreapiqa.worldbank.org"
-		*local server "http://wzlxqpip01.worldbank.org"
+		local server "`current_server'"
 	}
 	
 }
@@ -59,13 +61,11 @@ if "`server'"!=""  {
 2:  Server not defined
 ==================================================*/
 else {
-	local server "https://pipscoreapiqa.worldbank.org"
-	*local server "http://wzlxqpip01.worldbank.org"
+	local server "`current_server'"
 }
 
-local base          = "`server'/api/v1/pip"	
-*local base2             = "`server'/api/v1/pip-grp" // to exteract aggregated result 
-local base2         = "http://wzlxqpip01.worldbank.org/api/v1/pip-grp"
+local base     = "`server'/api/v1/pip"	
+local base2    = "http://wzlxqpip01.worldbank.org/api/v1/pip-grp"
 
 
 
