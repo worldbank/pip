@@ -63,7 +63,7 @@ if ("`server'" == "") {
 //========================================================
 
 
-cap scalar tpage = fileread(`"`server'/api/v1/health-check"')
+cap scalar tpage = fileread(`"`server'/pip/v1/health-check"')
 
 if (!regexm(tpage, "API is running") | _rc) {
 	noi disp in red "There is a problem with PIP API server. Try again later"
