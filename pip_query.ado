@@ -57,11 +57,12 @@ quietly {
 	pip_info, clear justdata `pause' server(`server')
 	
 	*---------- Make sure at least one reference year is selected
+	local frpipim "_pip_int_means"
 	
 	if ("`year'" != "all" & ("`wb'" != "" | "`aggregate'" != "")) {	
 		
 		
-		frame pip_int_means: levelsof reporting_year, local(ref_years_l)
+		frame `frpipim': levelsof reporting_year, local(ref_years_l)
 		local ref_years "`ref_years_l' last"
 		
 		local no_ref: list year - ref_years
@@ -86,7 +87,7 @@ quietly {
 	*---------- Keep selected country
 	
 	
-	frame pip_int_means {
+	frame `frpipim' {
 		
 		cap confirm var keep_this
 		if (_rc) {

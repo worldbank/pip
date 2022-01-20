@@ -47,13 +47,15 @@ qui {
 	frame dir 
 	local av_frames "`r(frames)'"
 	local av_frames: subinstr local  av_frames " " "|", all
+	local av_frames = "^(" + "`av_frames'" + ")"
 	
-	//------------ countries frame 
-	if (!regexm("pip_countries", "`av_frames'")) {
+	//------------ countries frame
+	local frpipcts "_pip_countries"
+	if (!regexm("`frpipcts'", "`av_frames'")) {
 		
-		frame create pip_countries
+		frame create `frpipcts'
 		
-		frame pip_countries {
+		frame `frpipcts' {
 			
 			local csvfile0  = "`url'/aux?table=countries&format=csv"
 			cap import delimited using "`csvfile0'", clear varn(1)
@@ -73,11 +75,12 @@ qui {
 	}
 	//------------ interpolated means frame
 	
-	if (!regexm("pip_int_means", "`av_frames'")) {
+	local frpipim "_pip_int_means"
+	if (!regexm("`frpipim'", "`av_frames'")) {
 		
-		frame create pip_int_means
+		frame create `frpipim'
 		
-		frame pip_int_means {
+		frame `frpipim' {
 			
 			local csvfile  = "`url'/aux?table=interpolated_means&format=csv"
 			cap import delim using "`csvfile'", clear varn(1)
@@ -92,7 +95,13 @@ qui {
 		}
 		
 	}
+	
 	if ("`justdata'" != "") exit
+	
+	//========================================================
+	//  To be continued by Tefera
+	//========================================================
+	
 	
 	local orgvar survey_coverage reporting_year 
 	local newvar coverage_level reporting_year 

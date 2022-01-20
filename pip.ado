@@ -30,7 +30,7 @@ COUNtry(string)                ///
 REGion(string)                 /// 
 YEAR(string)                   /// 
 POVline(numlist)               /// 
-POPShare(numlist)	   		   /// 
+POPShare(numlist)	   		       /// 
 PPP(numlist)                   /// 
 AGGregate                      /// 
 CLEAR                          /// 
@@ -45,7 +45,10 @@ noDIPSQuery                    ///
 querytimes(integer 5)          ///
 TIMEr                          ///
 POVCALNET_format               ///
-keep_frames                    ///
+KEEPFrames                     ///
+noEFFICIENT                    ///
+frame_prefix(string)           ///
+replace                        ///
 ] 
 
 if ("`pause'" == "pause") pause on
@@ -53,7 +56,21 @@ else                      pause off
 set checksum off
 
 qui {
-	// --- timer
+	//========================================================
+	// Frames
+	//========================================================
+	local curframe = c(frame)
+	
+	if ("`subcommand'" == "dropframes") {
+		pip_drop_frames, frame_prefix(`frame_prefix')
+		exit
+	}
+	
+		
+	//========================================================
+	//  Timer
+	//========================================================
+	
 	local i = 0
 	local crlf "`=char(10)'`=char(13)'"
 	scalar tt = ""
@@ -62,14 +79,6 @@ qui {
 		timer clear
 		local i = 1
 	}
-	// --- timer
-	
-	
-	//========================================================
-	// Frames
-	//========================================================
-	local curframe = c(frame)
-	
 	
 	//========================================================
 	// Conditions
@@ -84,6 +93,10 @@ qui {
 		noi disp in red "option {it:popshare} can't be combined with option {it:aggregate}" _c /* 
 		*/ " or with subcommand {it:wb}" _n
 		error
+	}
+	
+	if ("`frame_prefix'" == "") {
+		local frame_prefix "pip_"
 	}
 	
 	// ------------------------------------------------------------------------
@@ -624,18 +637,28 @@ qui {
 	//  Drop frames created in the middle of the process
 	//========================================================
 	
-	if ("`keep_frames'" == "") {
-		
-		frame dir
-		local av_frames "`r(frames)'"
-		foreach fr of local av_frames {
-			if (regexm("`fr'", "^pip_")) {
+	
+	frame dir
+	local av_frames "`r(frames)'"
+	
+	* set trace on 
+	foreach fr of local av_frames {
+	
+		if (regexm("`fr'", "(^_pip_)(.+)")) {
+			
+			// If users wants to keep frames
+			if ("`keepframes'" != "") {
+				local frname = "`frame_prefix'" + regexs(2)
+				frame copy `fr' `frname', `replace'
+			}
+			// if user wants to drop them
+			if ("`efficient'" == "noefficient") {
 				frame drop `fr'
 			}
 		}
 		
 	} // condition to keep frames
-	
+	* set trace off
 	
 } // end of qui
 end
