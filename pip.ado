@@ -309,7 +309,7 @@ qui {
 	
 	*---------- Country Level (one-on-one query)
 	if ("`subcommand'" == "cl") {
-		noi pip_cl, country("`country'")  ///
+		noi pip_cl, country("`country'")  /// this needs to accommodate to new structure
 		year("`year'")                   ///
 		povline("`povline'")             ///
 		ppp("`ppp'")                     ///
