@@ -31,7 +31,8 @@ version 16.0
 1:  If Server defined
 ==================================================*/
 
-local current_server "https://pipscoreapiqa.worldbank.org"
+* local current_server "https://pipscoreapiqa.worldbank.org"
+local current_server "https://apiv2qa.worldbank.org"
 
 if "`server'"!="" & "`server'" != "`current_server'"  {
 	
@@ -64,7 +65,7 @@ else {
 	local server "`current_server'"
 }
 
-local base     = "`server'/api/v1/pip"	
+local base     = "`server'/pip/v1/pip"	
 local base2    = "http://wzlxqpip01.worldbank.org/api/v1/pip-grp"
 
 
