@@ -102,6 +102,19 @@ qui {
 	//  To be continued by Tefera
 	//========================================================
 	
+	local frlkup "_pip_lkup"
+	if (!regexm("`frlkup'", "`av_frames'")) {
+	
+		frame copy `frpipim' `frlkup'
+		
+		frame `frlkup' {
+				
+			// and do all that is below 
+		
+		}
+		
+		
+	}
 	
 	local orgvar survey_coverage reporting_year 
 	local newvar coverage_level reporting_year 

@@ -45,8 +45,8 @@ noDIPSQuery                    ///
 querytimes(integer 5)          ///
 TIMEr                          ///
 POVCALNET_format               ///
-KEEPFrames                     ///
 noEFFICIENT                    ///
+KEEPFrames                     ///
 frame_prefix(string)           ///
 replace                        ///
 ] 
