@@ -26,22 +26,20 @@ else                      pause off
 
 version 16.0
 
+//========================================================
+// Defina server
+//========================================================
 
-/*==================================================
-1:  If Server defined
-==================================================*/
+
+//------------ If shortcut used
 
 * local current_server "https://pipscoreapiqa.worldbank.org"
 local current_server "https://apiv2qa.worldbank.org"
+* local current_server "https://api.worldbank.org" // production
 
-if "`server'"!="" & "`server'" != "`current_server'"  {
-	
-	if !inlist(lower("`server'"), "int", "testing", "ar") {
-		noi disp in red "the server requested does not exist" 
-		error
-	}
-	
-	if (lower("`server'") == "int")     {
+if (inlist(lower("`server'"), "qa", "testing", "ar"))  {
+		
+	if (lower("`server'") == "qa")     {
 		local server "${pip_svr_in}"
 	}
 	if (lower("`server'") == "testing") {
@@ -51,23 +49,29 @@ if "`server'"!="" & "`server'" != "`current_server'"  {
 		local server "${pip_svr_ar}"
 	}
 	
-	if ("`server'" == "") {
-		noi disp in red "You don't have access to internal servers" _n /* 
-		*/ "You're being redirected to public server"
-		local server "`current_server'"
-	}
-	
 }
+
 /*==================================================
 2:  Server not defined
 ==================================================*/
-else {
+if ("`server'" == "") {
 	local server "`current_server'"
+}
+
+//========================================================
+//  Test API Health
+//========================================================
+
+
+cap scalar tpage = fileread(`"`server'/api/v1/health-check"')
+
+if (!regexm(tpage, "API is running") | _rc) {
+	noi disp in red "There is a problem with PIP API server. Try again later"
+	error
 }
 
 local base     = "`server'/pip/v1/pip"	
 local base2    = "http://wzlxqpip01.worldbank.org/api/v1/pip-grp"
-
 
 
 //========================================================

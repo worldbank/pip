@@ -119,26 +119,6 @@ qui {
 	local base   = "`r(base)'"
 	local base2  = "`r(base2)'"
 	
-	//------------ Check internet connection
-	// --- timer
-	if ("`timer'" != "") {
-		timer on `i'
-		scalar tt = tt + "`crlf' `i': Check internet connection"
-	}
-	// --- timer
-	
-	scalar tpage = fileread(`"`server'/api/v1/health-check"')
-	disp tpage
-	
-	
-	if !regexm(tpage, "API is running") {
-		noi disp in red "There is a problem with PIP API server. Try again later"
-		error
-	}
-	// --- timer	
-	if ("`timer'" != "") timer off `i++'
-	// --- timer
-	
 	
 	*---------- lower case subcommand
 	local subcommand = lower("`subcommand'")
