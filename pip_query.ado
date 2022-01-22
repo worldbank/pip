@@ -39,12 +39,6 @@ quietly {
 	* 0. Housekeeping
 	************************************************
 	
-	pip_set_server  `server', `pause'
-	*return add
-	local server = "`r(server)'"
-	local base   = "`r(base)'"
-	
-	
 	if ("`ppp'" != "") local ppp_q = "&PPP0=`ppp'"
 	return local query_pp = "`ppp_q'"
 	

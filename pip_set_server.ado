@@ -27,7 +27,7 @@ else                      pause off
 version 16.0
 
 //========================================================
-// Defina server
+// Define server
 //========================================================
 
 
@@ -35,6 +35,7 @@ version 16.0
 
 * local current_server "https://pipscoreapiqa.worldbank.org"
 local current_server "https://apiv2qa.worldbank.org"
+local handle         "pip/v1"
 * local current_server "https://api.worldbank.org" // production
 
 if (inlist(lower("`server'"), "qa", "testing", "ar"))  {
@@ -63,15 +64,15 @@ if ("`server'" == "") {
 //========================================================
 
 
-cap scalar tpage = fileread(`"`server'/pip/v1/health-check"')
+cap scalar tpage = fileread(`"`server'/`handle'/health-check"')
 
 if (!regexm(tpage, "API is running") | _rc) {
 	noi disp in red "There is a problem with PIP API server. Try again later"
 	error
 }
 
-local base     = "`server'/pip/v1/pip"	
-local base2    = "http://wzlxqpip01.worldbank.org/api/v1/pip-grp"
+local url     = "`server'/`handle'"	
+local url2    = "http://wzlxqpip01.worldbank.org/`handle'"
 
 
 //========================================================
@@ -79,8 +80,10 @@ local base2    = "http://wzlxqpip01.worldbank.org/api/v1/pip-grp"
 //========================================================
 
 return local server = "`server'"
-return local base   = "`base'"
-return local base2  = "`base2'"
+return local url    = "`url'"
+return local base   = "`url'/pip"
+return local base2  = "`url2'/pip-grp"
+return local handle  = "`handle'"
 
 
 end

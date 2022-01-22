@@ -35,7 +35,7 @@ else                      pause off
            handling errors
 ==================================================*/
 
-if ("`rc'" == "copy") {
+if ("`rc'" == "import") {
 	noi dis ""
 	noi dis in red "It was not possible to download data from the PIP API."
 	noi dis ""
@@ -45,19 +45,9 @@ if ("`rc'" == "copy") {
 	noi dis in white `"(2) Please consider adjusting your Stata timeout parameters. For more details see {help netio}"'
 	noi dis in white `"(3) Please send us an email to:"'
 	noi dis in white _col(8) `"email: data@worldbank.org"'
-	noi dis in white _col(8) `"subject: pip query error 20 on `c(current_date)' `c(current_time)'"'
+	noi dis in white _col(8) `"subject: pip query error on `c(current_date)' `c(current_time)'"'
 	noi di ""
 	error 673
-}
-
-if ("`rc'" == "in" | c(N) == 0) {
-	noi di ""
-	noi di as err "There was a problem loading the downloaded data." /* 
-	 */ _n "Check that all parameters are correct and try again."
-	noi dis as text  `"{p 4 4 2} You could use the {stata pip_info:guided selection} instead. {p_end}"'
-	noi di ""
-	break
-	error 
 }
 
 

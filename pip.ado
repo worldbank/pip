@@ -66,7 +66,7 @@ qui {
 		exit
 	}
 	
-		
+	
 	//========================================================
 	//  Timer
 	//========================================================
@@ -426,37 +426,8 @@ qui {
 		
 		*---------- download data
 		local rc = 0
-		
-		local qr = 1 // query round		
-		while (`qr' <= `querytimes') {
-			
-			tempfile clfile
-			cap copy "`queryfull'" `clfile'
-			if (_rc == 0) {
-				cap insheet using `clfile', clear name
-				if (_rc != 0) local rc "in"
-				
-				ds
-				local vars = "`r(varlist)'"
-				if (wordcount("`vars'") == 1) {
-					local varlabel: variable label `vars'
-					noi disp in red "The parameters selected are not valid." _n ///
-					"Poverty line might out of range."
-					noi disp in red `"`varlabel'"'
-					error 
-				}
-				
-				pause after loading data in memory
-				
-				continue, break
-			} 
-			else {
-				local rc "copy"
-				local ++qr
-			} 
-		}
-		
-		pause tefera 1 check time taken to excute the following processes - to be removed
+		cap import delimited  "`queryfull'", `clear'
+		if (_rc) local rc "import"
 		
 		// --- timer
 		if ("`timer'" != "") timer off `i_off'
@@ -487,159 +458,159 @@ qui {
 		
 		*---------- Clean data
 		pip_clean `rtype', year("`year'") `iso' /* 
-		*/ rc(`rc') region(`region') `pause' `wb'		
-		
-		pause after cleaning
-		// --- timer
-		if ("`timer'" != "") timer off `i_off'
-		// --- timer
-		
-		/*==================================================
-		Display Query
-		==================================================*/
-		
-		if ("`dipsquery'" == "" & "`rc'" == "0") {
-			noi di as res _n "{ul: Query at \$`i_povline' poverty line}"
-			noi di as res "{hline}"
-			if ("`query_ys'" != "") noi di as res "Year:"         as txt "{p 4 6 2} `query_ys' {p_end}"
-			if ("`query_ct'" != "") noi di as res "Country:"      as txt "{p 4 6 2} `query_ct' {p_end}"
-			if ("`query_pl'" != "") noi di as res "Poverty line:" as txt "{p 4 6 2} `query_pl' {p_end}"
-			if ("`query_ps'" != "") noi di as res "Population share:" as txt "{p 4 6 2} `query_ps' {p_end}"
-			if ("`query_ds'" != "") noi di as res "Aggregation:"  as txt "{p 4 6 2} `query_ds' {p_end}"
-			if ("`query_pp'" != "") noi di as res "PPP:"          as txt "{p 4 6 2} `query_pp' {p_end}"
-			noi di as res _dup(20) "-"
-			noi di as res "No. Obs:"      as txt _col(20) c(N)
-			noi di as res "{hline}"
-		}
-		
-		/*==================================================
-		Append data
-		==================================================*/			
-		if (`wb_change' == 1) {
-			keep if regioncode == "WLD"
-		}
-		append using `povcalf'
-		save `povcalf', replace
-		
-	} // end of povline loop
+	*/ rc(`rc') region(`region') `pause' `wb'		
 	
+	pause after cleaning
 	// --- timer
-	if ("`timer'" != "") {
-		noi disp tt
-		noi timer list
-	}
+	if ("`timer'" != "") timer off `i_off'
 	// --- timer
 	
-	return local npl = `f'
+	/*==================================================
+	Display Query
+	==================================================*/
 	
-	// ------------------------------
-	//  display results 
-	// ------------------------------
-	
-	local n2disp = min(`c(N)', `n2disp')
-	noi di as res _n "{ul: first `n2disp' observations}"
-	
-	if ("`subcommand'" == "wb") {
-		sort reporting_year region_code 
-		noi list region reporting_year poverty_line headcount mean in 1/`n2disp', /*
-		*/ abbreviate(12)  sepby(reporting_year)
+	if ("`dipsquery'" == "" & "`rc'" == "0") {
+		noi di as res _n "{ul: Query at \$`i_povline' poverty line}"
+		noi di as res "{hline}"
+		if ("`query_ys'" != "") noi di as res "Year:"         as txt "{p 4 6 2} `query_ys' {p_end}"
+		if ("`query_ct'" != "") noi di as res "Country:"      as txt "{p 4 6 2} `query_ct' {p_end}"
+		if ("`query_pl'" != "") noi di as res "Poverty line:" as txt "{p 4 6 2} `query_pl' {p_end}"
+		if ("`query_ps'" != "") noi di as res "Population share:" as txt "{p 4 6 2} `query_ps' {p_end}"
+		if ("`query_ds'" != "") noi di as res "Aggregation:"  as txt "{p 4 6 2} `query_ds' {p_end}"
+		if ("`query_pp'" != "") noi di as res "PPP:"          as txt "{p 4 6 2} `query_pp' {p_end}"
+		noi di as res _dup(20) "-"
+		noi di as res "No. Obs:"      as txt _col(20) c(N)
+		noi di as res "{hline}"
 	}
 	
+	/*==================================================
+	Append data
+	==================================================*/			
+	if (`wb_change' == 1) {
+		keep if regioncode == "WLD"
+	}
+	append using `povcalf'
+	save `povcalf', replace
+	
+} // end of povline loop
+
+// --- timer
+if ("`timer'" != "") {
+	noi disp tt
+	noi timer list
+}
+// --- timer
+
+return local npl = `f'
+
+// ------------------------------
+//  display results 
+// ------------------------------
+
+local n2disp = min(`c(N)', `n2disp')
+noi di as res _n "{ul: first `n2disp' observations}"
+
+if ("`subcommand'" == "wb") {
+	sort reporting_year region_code 
+	noi list region reporting_year poverty_line headcount mean in 1/`n2disp', /*
+	*/ abbreviate(12)  sepby(reporting_year)
+}
+
+else {
+	if ("`aggregate'" == "") {
+		sort country_code reporting_year region_code 
+		noi list country_code reporting_year poverty_line headcount mean median welfare_type /*
+		*/ in 1/`n2disp',  abbreviate(12)  sepby(country_code)
+	}
 	else {
-		if ("`aggregate'" == "") {
-			sort country_code reporting_year region_code 
-			noi list country_code reporting_year poverty_line headcount mean median welfare_type /*
-			*/ in 1/`n2disp',  abbreviate(12)  sepby(country_code)
-		}
-		else {
-			sort reporting_year 
-			noi list reporting_year poverty_line headcount mean , /*
-			*/ abbreviate(12) sepby(poverty_line)
-		}		
-	}	
-	
-	//========================================================
-	//  Create notes
-	//========================================================
-	
-	local pllabel ""
-	foreach p of local povline {
-		local pllabel "`pllabel' \$`p'"
-	}
-	local pllabel = trim("`pllabel'")
-	local pllabel: subinstr local pllabel " " ", ", all
-	
-	
-	if ("`wb'" == "")   {
-		if ("`aggregate'" == "" & "`fillgaps'" == "") {
-			local lvlabel "country level"
-		} 
-		else if ("`aggregate'" != "" & "`fillgaps'" == "") {
-			local lvlabel "aggregated level"
-		} 
-		else if ("`aggregate'" == "" & "`fillgaps'" != "") {
-			local lvlabel "Country level (lined up)"
-		} 
-		else {
-			local lvlabel ""
-		}
-	}   
+		sort reporting_year 
+		noi list reporting_year poverty_line headcount mean , /*
+		*/ abbreviate(12) sepby(poverty_line)
+	}		
+}	
+
+//========================================================
+//  Create notes
+//========================================================
+
+local pllabel ""
+foreach p of local povline {
+	local pllabel "`pllabel' \$`p'"
+}
+local pllabel = trim("`pllabel'")
+local pllabel: subinstr local pllabel " " ", ", all
+
+
+if ("`wb'" == "")   {
+	if ("`aggregate'" == "" & "`fillgaps'" == "") {
+		local lvlabel "country level"
+	} 
+	else if ("`aggregate'" != "" & "`fillgaps'" == "") {
+		local lvlabel "aggregated level"
+	} 
+	else if ("`aggregate'" == "" & "`fillgaps'" != "") {
+		local lvlabel "Country level (lined up)"
+	} 
 	else {
-		local lvlabel "regional and global level"
+		local lvlabel ""
 	}
+}   
+else {
+	local lvlabel "regional and global level"
+}
+
+
+local datalabel "WB poverty at `lvlabel' using `pllabel'"
+local datalabel = substr("`datalabel'", 1, 80)
+
+label data "`datalabel' (`c(current_date)')"
+
+* citations
+local cite `"Please cite as: Castaneda Aguilar, R.A. and T.B. Degefu (2021) "pip: Stata module to access World Bank’s Global Poverty and Inequality data," Statistical Software Components 2019, Boston College Department of Economics."'
+notes: `cite'
+
+noi disp in y _n `"`cite'"'
+
+return local cite `"`cite'"'
+
+
+//========================================================
+// Convert to povcalnet format
+//========================================================
+
+
+if ("`povcalnet_format'" != "") {
+	pause before povcalnet format
+	pip_povcalnet_format  `rtype', `pause'
+}
+
+//========================================================
+//  Drop frames created in the middle of the process
+//========================================================
+
+
+frame dir
+local av_frames "`r(frames)'"
+
+* set trace on 
+foreach fr of local av_frames {
 	
-	
-	local datalabel "WB poverty at `lvlabel' using `pllabel'"
-	local datalabel = substr("`datalabel'", 1, 80)
-	
-	label data "`datalabel' (`c(current_date)')"
-	
-	* citations
-	local cite `"Please cite as: Castaneda Aguilar, R.A. and T.B. Degefu (2021) "pip: Stata module to access World Bank’s Global Poverty and Inequality data," Statistical Software Components 2019, Boston College Department of Economics."'
-	notes: `cite'
-	
-	noi disp in y _n `"`cite'"'
-	
-	return local cite `"`cite'"'
-	
-	
-	//========================================================
-	// Convert to povcalnet format
-	//========================================================
-	
-	
-	if ("`povcalnet_format'" != "") {
-		pause before povcalnet format
-	  pip_povcalnet_format  `rtype', `pause'
-	}
-	
-	//========================================================
-	//  Drop frames created in the middle of the process
-	//========================================================
-	
-	
-	frame dir
-	local av_frames "`r(frames)'"
-	
-	* set trace on 
-	foreach fr of local av_frames {
-	
-		if (regexm("`fr'", "(^_pip_)(.+)")) {
-			
-			// If users wants to keep frames
-			if ("`keepframes'" != "") {
-				local frname = "`frame_prefix'" + regexs(2)
-				frame copy `fr' `frname', `replace'
-			}
-			// if user wants to drop them
-			if ("`efficient'" == "noefficient") {
-				frame drop `fr'
-			}
-		}
+	if (regexm("`fr'", "(^_pip_)(.+)")) {
 		
-	} // condition to keep frames
-	* set trace off
+		// If users wants to keep frames
+		if ("`keepframes'" != "") {
+			local frname = "`frame_prefix'" + regexs(2)
+			frame copy `fr' `frname', `replace'
+		}
+		// if user wants to drop them
+		if ("`efficient'" == "noefficient") {
+			frame drop `fr'
+		}
+	}
 	
+} // condition to keep frames
+* set trace off
+
 } // end of qui
 end
 

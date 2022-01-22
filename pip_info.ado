@@ -27,16 +27,11 @@ qui {
 	
 	*---------- API defaults
 	pip_set_server  `server', `pause'
-	*return add
 	local server = "`r(server)'"
+	local url    = "`r(url)'"
 	local base   = "`r(base)'"
 	local base2  = "`r(base2)'"
-	
-	local site_name = "api/v1"
-	local url = "`server'/`site_name'"
-	
-	return local site_name = "`site_name'"
-	return local url       = "`url'"
+	return add
 	
 	
 	***************************************************
@@ -59,18 +54,22 @@ qui {
 			
 			local csvfile0  = "`url'/aux?table=countries&format=csv"
 			cap import delimited using "`csvfile0'", clear varn(1)
+			local rc1 = _rc
 			
-			if (_rc != 0 ) {
-				noi disp in red "There is a problem accessing country name data." 
-				noi disp in red "to check your connection, copy and paste in your browser the following address:" _n /* 
-				*/	_col(4) in w `"`csvfile0'"'
-				
-				error 
-			} 
-			
-			drop iso2_code
-			sort country_code
+			if (`rc1' == 0) {
+				drop iso2_code
+				sort country_code
+			}
 		}
+		
+		// drop frame if error happened
+		if (`rc1' != 0) {
+			noi disp in red "There is a problem accessing country name data." 
+			noi disp in red "to check your connection, copy and paste in your browser the following address:" _n /* 
+			*/	_col(4) in w `"`csvfile0'"'
+			frame drop `frpipcts'
+			error 
+		} 
 		
 	}
 	//------------ interpolated means frame
@@ -81,18 +80,21 @@ qui {
 		frame create `frpipim'
 		
 		frame `frpipim' {
-			
+		
 			local csvfile  = "`url'/aux?table=interpolated_means&format=csv"
 			cap import delim using "`csvfile'", clear varn(1)
-			if (_rc != 0 ) {
-				noi disp in red "There is a problem accessing the information file." 
-				noi disp in red "to check your connection, copy and paste in your browser the following address:" _n /* 
-				*/	_col(4) in w `"`csvfile'"'
-				
-				error 
-			} 
 			
 		}
+		
+		if (_rc != 0 ) {
+		
+			noi disp in red "There is a problem accessing the information file." 
+			noi disp in red "to check your connection, copy and paste in your browser the following address:" _n /* 
+			*/	_col(4) in w `"`csvfile'"'
+			frame drop `frpipim'
+			error 
+		} 
+		
 		
 	}
 	
@@ -104,13 +106,13 @@ qui {
 	
 	local frlkup "_pip_lkup"
 	if (!regexm("`frlkup'", "`av_frames'")) {
-	
+		
 		frame copy `frpipim' `frlkup'
 		
 		frame `frlkup' {
-				
+			
 			// and do all that is below 
-		
+			
 		}
 		
 		
