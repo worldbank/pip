@@ -22,33 +22,13 @@ syntax anything(name=type),      ///
 								year(string)     ///
 								region(string)   ///
 								iso              ///
-								wb				///
+								wb				    ///
 								nocensor			///
-								rc(string)       ///
 								pause			///
              ]
 
 if ("`pause'" == "pause") pause on
 else                      pause off
-
-/*==================================================
-           handling errors
-==================================================*/
-
-if ("`rc'" == "import") {
-	noi dis ""
-	noi dis in red "It was not possible to download data from the PIP API."
-	noi dis ""
-	noi dis in white `"(1) Please check your Internet connection by "' _c 
-	*noi dis in white  `"{browse "http://iresearch.worldbank.org/PovcalNet/home.aspx" :clicking here}"'
-	noi dis in white  `"{browse "https://pipscoreapiqa.worldbank.org" :clicking here}"' // needs to be replaced
-	noi dis in white `"(2) Please consider adjusting your Stata timeout parameters. For more details see {help netio}"'
-	noi dis in white `"(3) Please send us an email to:"'
-	noi dis in white _col(8) `"email: data@worldbank.org"'
-	noi dis in white _col(8) `"subject: pip query error on `c(current_date)' `c(current_time)'"'
-	noi di ""
-	error 673
-}
 
 
 /*==================================================
