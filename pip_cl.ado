@@ -14,12 +14,13 @@ Output:             dta
                         0: Program set up
 ==================================================*/
 program define pip_cl, rclass
-syntax , [                       ///
+syntax ,   server(string)        ///
+           handle(string)        ///
+          [                       ///
            country(string)       ///
            year(string)          ///
            povline(numlist)      ///
            ppp(numlist)          ///
-           server(string)        ///
            coverage(string)      /// 
            clear                 ///
            pause                 /// 
@@ -37,11 +38,9 @@ qui {
            conditions and setup 
 ==================================================*/
 
-local base = "https://pipscoreapiqa.worldbank.org/api/v1/pip?format=csv"
 
-if "`server'"!=""  {
-	local base = "`server'/api/v1/pip"
-}
+local base = "`server'/`handle'/pip"
+
 
 if ("`povline'" == "")  local povline  1.9
 if ("`ppp'" == "")      local ppp      -1
@@ -121,7 +120,7 @@ foreach o in pl pp yr cv {
 
 *----------2.1: download data
 tempfile clfile
-local queryfull "https://pipscoreapiqa.worldbank.org/api/v1/pip?format=csv"
+local queryfull "`base'?format=csv"
 return local queryfull = "`queryfull'"
 
 local rc = 0

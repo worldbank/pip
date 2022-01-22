@@ -296,6 +296,7 @@ qui {
 		povline("`povline'")             ///
 		ppp("`ppp'")                     ///
 		server("`server'")               ///
+		server("`handle'")               ///
 		coverage(`coverage')             /// 
 		`clear'                          ///
 		`iso'                            ///
