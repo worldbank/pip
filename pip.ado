@@ -489,12 +489,30 @@ qui {
 		if ("`dipsquery'" == "" & "`rc'" == "0") {
 			noi di as res _n "{ul: Query at \$`i_povline' poverty line}"
 			noi di as res "{hline}"
-			if ("`query_ys'" != "") noi di as res "Year:"         as txt "{p 4 6 2} `query_ys' {p_end}"
-			if ("`query_ct'" != "") noi di as res "Country:"      as txt "{p 4 6 2} `query_ct' {p_end}"
-			if ("`query_pl'" != "") noi di as res "Poverty line:" as txt "{p 4 6 2} `query_pl' {p_end}"
-			if ("`query_ps'" != "") noi di as res "Population share:" as txt "{p 4 6 2} `query_ps' {p_end}"
-			if ("`query_ds'" != "") noi di as res "Aggregation:"  as txt "{p 4 6 2} `query_ds' {p_end}"
-			if ("`query_pp'" != "") noi di as res "PPP:"          as txt "{p 4 6 2} `query_pp' {p_end}"
+			
+			if ("`query_ys'" != "") {
+				noi di as res "Year:" as txt "{p 4 6 2} `query_ys' {p_end}"
+			}
+			
+			if ("`query_ct'" != "") {
+				noi di as res "Country:" as txt "{p 4 6 2} `query_ct' {p_end}"
+			}
+			
+			if ("`query_pl'" != "") {
+				noi di as res "Poverty line:" as txt "{p 4 6 2} `query_pl' {p_end}"
+			}
+			
+			if ("`query_ps'" != "") {
+				noi di as res "Population share:" as txt "{p 4 6 2} `query_ps' {p_end}"
+			}
+			
+			if ("`query_ds'" != "") {
+				noi di as res "Aggregation:" as txt "{p 4 6 2} `query_ds' {p_end}"
+			}
+			
+			if ("`query_pp'" != "") {
+				noi di as res "PPP:" as txt "{p 4 6 2} `query_pp' {p_end}"
+			}
 			noi di as res _dup(20) "-"
 			noi di as res "No. Obs:"      as txt _col(20) c(N)
 			noi di as res "{hline}"
