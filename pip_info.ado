@@ -32,7 +32,7 @@ qui {
 	local base   = "`r(base)'"
 	local base2  = "`r(base2)'"
 	
-	local site_name = "api/v1"
+	local site_name = "pip/v1"
 	local url = "`server'/`site_name'"
 	
 	return local site_name = "`site_name'"
@@ -99,71 +99,45 @@ qui {
 	if ("`justdata'" != "") exit
 	
 	//========================================================
-	//  To be continued by Tefera
+	//  generating a lookup data
 	//========================================================
 	
-	local frlkup "_pip_lkup"
-	if (!regexm("`frlkup'", "`av_frames'")) {
+	local frlkupb "_pip_lkupb"
+	if (!regexm("`frlkupb'", "`av_frames'")) {
 	
-		frame copy `frpipim' `frlkup'
+		frame copy `frpipim' `frlkupb'
 		
-		frame `frlkup' {
-				
-			// and do all that is below 
-		
+		frame `frlkupb' {
+			
+			frlink m:1 country_code, frame(_pip_countries) generate(ctry)
+			frget country_name income_group, from(ctry)
+			
+			keep country_code country_name wb_region_code pcn_region_code income_group survey_coverage surveyid_year
+			
+			local orgvar survey_coverage surveyid_year
+			local newvar coverage_level reporting_year 
+	
+			local i = 0
+			foreach var of local orgvar {
+				local ++i
+				rename `var' `: word `i' of `newvar''
+			}	
+
+			tostring reporting_year, replace
+			gen year = reporting_year
+			duplicates drop
+			reshape wide year, i( wb_region_code pcn_region_code country_code coverage_level country_name income_group ) j(reporting_year) string
+			egen year = concat(year*), p(" ")
+			replace year = stritrim(year)
+			replace year = subinstr(year," ", ",",.)
+			keep country_code country_name wb_region_code pcn_region_code income_group coverage_level year
+			order country_code country_name wb_region_code pcn_region_code income_group coverage_level year
+
 		}
-		
-		
 	}
-	
-	local orgvar survey_coverage reporting_year 
-	local newvar coverage_level reporting_year 
-	
-	local i = 0
-	foreach var of local orgvar {
-		local ++i
-		rename `var' `: word `i' of `newvar''
-	}	
-	
-	keep country_code coverage_level survey_year reporting_year 
-	order country_code coverage_level survey_year reporting_year
-	sort country_code
-	
-	merge country_code using `temp100'
-	collapse _merge, by(country_code country_name coverage_level reporting_year income_group)
-	drop _merge
-	order country_code country_name coverage_level reporting_year income_group
-	
-	gen year = ""
-	tostring reporting_year, replace
-	tempfile lkupdata
-	save `lkupdata', replace
-	levelsof country_code , local(ctry)
-	foreach ct of local ctry{
-		
-		preserve
-		levelsof coverage_level, local(cv_area)
-		disp `cv_area'
-		
-		foreach cv of local cv_area {
-			keep if country_code == "`ct'" & coverage_level == "`cv'"
-			levelsof reporting_year, local(year) sep(,) clean
-			disp `year'
-			replace year = "`year'" if coverage_level == "`cv'"
-			append using `lkupdata'
-			save `lkupdata', replace
-		}
-		
-		restore
-	}
-	
-	use `lkupdata', clear
-	drop if year == ""
-	sort country_code
-	duplicates drop country_code country_name wb_region coverage_level income_group year, force
-	drop reporting_year
-	
-	
+
+	frame copy _pip_lkupb _pip_lkup, replace
+	cwf _pip_lkup
 	
 	***************************************************
 	* 2. Inital listing with countries and regions

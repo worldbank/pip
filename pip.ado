@@ -127,7 +127,7 @@ qui {
 	}
 	// --- timer
 	
-	scalar tpage = fileread(`"`server'/api/v1/health-check"')
+	scalar tpage = fileread(`"`server'/pip/v1/health-check"')
 	disp tpage
 	
 	
