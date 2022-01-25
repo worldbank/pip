@@ -96,7 +96,7 @@ qui {
 		
 	}
 	
-	if ("`justdata'" != "") exit
+	*if ("`justdata'" != "") exit
 	
 	//========================================================
 	//  generating a lookup data
@@ -137,6 +137,9 @@ qui {
 	}
 
 	frame copy _pip_lkupb _pip_lkup, replace
+		
+	if ("`justdata'" != "") exit
+	
 	cwf _pip_lkup
 	
 	***************************************************

@@ -37,18 +37,14 @@ qui {
            conditions and setup 
 ==================================================*/
 
-local base = "https://pipscoreapiqa.worldbank.org/api/v1/pip?format=csv"
-
-if "`server'"!=""  {
-	local base = "`server'/api/v1/pip"
-}
-
 if ("`povline'" == "")  local povline  1.9
 if ("`ppp'" == "")      local ppp      -1
 if ("`coverage'" == "") local coverage -1
 
 *---------- download guidance data
 pip_info, clear justdata `pause'
+
+cwf _pip_lkup
 
 levelsof country_code, local(countries) clean
 if (lower("`country'") != "all") {
@@ -121,7 +117,7 @@ foreach o in pl pp yr cv {
 
 *----------2.1: download data
 tempfile clfile
-local queryfull "https://pipscoreapiqa.worldbank.org/api/v1/pip?format=csv"
+local queryfull "https://apiv2qa.worldbank.org/pip/v1/pip?format=csv"
 return local queryfull = "`queryfull'"
 
 local rc = 0

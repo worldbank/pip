@@ -112,6 +112,8 @@ if ("`type'" == "1") {
 	frlink m:1 country_code, frame(_pip_countries) generate(ctry_name)
 	frget country_name, from(ctry_name)
 	
+	drop ctry_name
+	
 	rename country_name countryname
 	
 	order country_code countryname region_code survey_coverage reporting_year survey_year welfare_type is_interpolated distribution_type /*
