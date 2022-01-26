@@ -296,14 +296,14 @@ qui {
 		povline("`povline'")             ///
 		ppp("`ppp'")                     ///
 		server("`server'")               ///
-		server("`handle'")               ///
+		handle("`handle'")               ///
 		coverage(`coverage')             /// 
 		`clear'                          ///
 		`iso'                            ///
 		`pause'
 		return add
 		
-		pip_clean 1, year("`year'") `iso' rc(`rc')
+		pip_clean 1, year("`year'") `iso' //rc(`rc')
 		
 		//========================================================
 		// Convert to povcalnet format
