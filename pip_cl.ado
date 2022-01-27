@@ -49,6 +49,8 @@ if ("`coverage'" == "") local coverage -1
 *---------- download guidance data
 pip_info, clear justdata `pause'
 
+cwf _pip_lkup
+
 levelsof country_code, local(countries) clean
 if (lower("`country'") != "all") {
 
