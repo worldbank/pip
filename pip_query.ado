@@ -194,9 +194,11 @@ quietly {
 		
 		*---------- Country query
 		
-		if ( inlist(lower("`country'"), "", "all") ) {
+		if ( inlist(lower("`country'"), "", "all") & "`region'" == "") {
+			
 			local country_q = "country=all"
-		} 
+			
+		}
 		else {
 			levelsof country_code if `touse', local(country_q) sep(&country=) clean
 			local country_q = "country=`country_q'"
