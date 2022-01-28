@@ -131,20 +131,7 @@ if ("`type'" == "1") {
               2: for Aggregate requests
 ==================================================*/
 if ("`type'" == "2") {
-	if  ("`region'" != "" & region_code != "CUSTOM") {
-		tempvar keep_this
-		gen `keep_this' = 0
-		local region_l = `""`region'""'
-		local region_l: subinstr local region_l " " `"", ""', all
-
-		dis "`region_l'"
-		dis "`keep_this'"
 		
-		replace `keep_this' = 1 if inlist(region_code, `region_l')
-		if lower("`region'") == "all" replace `keep_this' = 1
-		keep if `keep_this' == 1 
-	}
-	
 	pause clean - after dropping by region 
 	
 	if  ("`year'" == "last") {
