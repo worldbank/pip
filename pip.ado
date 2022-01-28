@@ -115,11 +115,11 @@ qui {
 	*---------- API defaults
 	pip_set_server  `server', `pause'
 	*return add
-	local server = "`r(server)'"
-	local base   = "`r(base)'"
-	local base2  = "`r(base2)'"
-	local url    = "`r(url)'"
-	local handle = "`r(handle)'"
+	local server    = "`r(server)'"
+	local base      = "`r(base)'"
+	local base_grp  = "`r(base_grp)'"
+	local url       = "`r(url)'"
+	local handle    = "`r(handle)'"
 	
 	
 	*---------- lower case subcommand
@@ -292,14 +292,14 @@ qui {
 	*---------- Country Level (one-on-one query)
 	if ("`subcommand'" == "cl") {
 		noi pip_cl, country("`country'")  /// this needs to accommodate to new structure
-		year("`year'")                   ///
-		povline("`povline'")             ///
-		ppp("`ppp'")                     ///
-		server("`server'")               ///
-		handle("`handle'")               ///
-		coverage(`coverage')             /// 
-		`clear'                          ///
-		`iso'                            ///
+		year("`year'")                    ///
+		povline("`povline'")              ///
+		ppp("`ppp'")                      ///
+		server("`server'")                ///
+		handle("`handle'")                ///
+		coverage(`coverage')              /// 
+		`clear'                           ///
+		`iso'                             ///
 		`pause'
 		return add
 		
@@ -349,22 +349,22 @@ qui {
 		/*==================================================
 		Create Query
 		==================================================*/
-		pip_query,   country("`country'")  ///
-		region("`region'")                     ///
-		year("`year'")                         ///
-		povline("`i_povline'")                 ///
+		pip_query,   country("`country'")       ///
+		region("`region'")                      ///
+		year("`year'")                          ///
+		povline("`i_povline'")                  ///
 		popshare("`i_popshare'")	   					  ///
-		ppp("`ppp'")                         ///
-		coverage(`coverage')                   ///
-		server(`server')                       ///
-		`clear'                                ///
-		`information'                          ///
-		`iso'                                  ///
-		`fillgaps'                             ///
-		`aggregate'                            ///
-		`wb'                                   ///
-		`pause'                                ///
-		`groupedby'                            //
+		ppp("`ppp'")                            ///
+		coverage(`coverage')                    ///
+		server(`server')                        ///
+		`clear'                                 ///
+		`information'                           ///
+		`iso'                                   ///
+		`fillgaps'                              ///
+		`aggregate'                             ///
+		`wb'                                    ///
+		`pause'                                 ///
+		`groupedby'                             //
 		
 		local query_ys = "`r(query_ys)'"
 		local query_ct = "`r(query_ct)'"
@@ -398,7 +398,7 @@ qui {
 		
 		*---------- Base + query
 		if ("`aggregate'" != ""){
-			local queryfull "`base2'?`query'"
+			local queryfull "`base_grp'?`query'"
 		}
 		else{
 			local queryfull "`base'?`query'"
