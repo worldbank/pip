@@ -72,7 +72,7 @@ if (!regexm(tpage, "API is running") | _rc) {
 }
 
 local url     = "`server'/`handle'"	
-local url2    = "http://wzlxqpip01.worldbank.org/api/v1"
+* local url2    = "http://wzlxqpip01.worldbank.org/api/v1"
 
 
 //========================================================
@@ -82,7 +82,7 @@ local url2    = "http://wzlxqpip01.worldbank.org/api/v1"
 return local server = "`server'"
 return local url    = "`url'"
 return local base   = "`url'/pip"
-return local base2  = "`url2'/pip-grp"
+return local base_grp  = "`url'/pip-grp"
 return local handle  = "`handle'"
 
 

@@ -547,14 +547,14 @@ qui {
 	noi di as res _n "{ul: first `n2disp' observations}"
 	
 	if ("`subcommand'" == "wb") {
-		sort reporting_year region_code 
+		sort region_code reporting_year 
 		noi list region reporting_year poverty_line headcount mean in 1/`n2disp', /*
 		*/ abbreviate(12)  sepby(reporting_year)
 	}
 	
 	else {
 		if ("`aggregate'" == "") {
-			sort country_code reporting_year region_code 
+			sort country_code reporting_year 
 			noi list country_code reporting_year poverty_line headcount mean median welfare_type /*
 			*/ in 1/`n2disp',  abbreviate(12)  sepby(country_code)
 		}
