@@ -548,15 +548,24 @@ qui {
 	
 	if ("`subcommand'" == "wb") {
 		sort region_code reporting_year 
-		noi list region reporting_year poverty_line headcount mean in 1/`n2disp', /*
-		*/ abbreviate(12)  sepby(reporting_year)
+		
+		tempname tolist
+		frame copy `c(frame)' `tolist'
+		frame `tolist' {
+			gsort region_code -reporting_year 
+			keep if (region_code == "WLD")
+			noi list region reporting_year poverty_line headcount mean ///
+			  in 1/`n2disp',  abbreviate(12) 
+		}
+		
 	}
 	
 	else {
 		if ("`aggregate'" == "") {
 			sort country_code reporting_year 
-			noi list country_code reporting_year poverty_line headcount mean median welfare_type /*
-			*/ in 1/`n2disp',  abbreviate(12)  sepby(country_code)
+			noi list country_code reporting_year poverty_line headcount  /*
+			*/  mean median welfare_type in 1/`n2disp',  /* 
+			*/  abbreviate(12)  sepby(country_code)
 		}
 		else {
 			sort reporting_year 
