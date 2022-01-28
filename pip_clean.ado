@@ -49,35 +49,7 @@ if ("`type'" == "1") {
 	***************************************************
 	// check if country data frame is available
 	
-	frame dir 
-	local av_frames "`r(frames)'"
-	local av_frames: subinstr local  av_frames " " "|", all
-	local av_frames = "^(" + "`av_frames'" + ")"
-	
-	//------------ countries frame
-	local frpipcts "_pip_countries"
-	if (!regexm("`frpipcts'", "`av_frames'")) {
-		
-		frame create `frpipcts'
-		
-		frame `frpipcts' {
-			
-			local csvfile0  = "`url'/aux?table=countries&format=csv"
-			cap import delimited using "`csvfile0'", clear varn(1)
-			
-			if (_rc != 0 ) {
-				noi disp in red "There is a problem accessing country name data." 
-				noi disp in red "to check your connection, copy and paste in your browser the following address:" _n /* 
-				*/	_col(4) in w `"`csvfile0'"'
-				
-				error 
-			} 
-			
-			drop iso2_code
-			sort country_code
-		}
-		
-	}
+	pip_info, clear justdata `pause' server(`server')
 	
 	frlink m:1 country_code, frame(_pip_countries) generate(ctry_name)
 	frget country_name, from(ctry_name)
