@@ -38,6 +38,8 @@ qui {
 	* 0. Info frame 
 	***************************************************	
 	
+	local curframe = c(frame)
+	
 	//------------ Find available frames
 	frame dir 
 	local av_frames "`r(frames)'"
@@ -80,14 +82,14 @@ qui {
 		frame create `frpipim'
 		
 		frame `frpipim' {
-		
+			
 			local csvfile  = "`url'/aux?table=interpolated_means&format=csv"
 			cap import delim using "`csvfile'", clear varn(1)
 			
 		}
 		
 		if (_rc != 0 ) {
-		
+			
 			noi disp in red "There is a problem accessing the information file." 
 			noi disp in red "to check your connection, copy and paste in your browser the following address:" _n /* 
 			*/	_col(4) in w `"`csvfile'"'
@@ -106,7 +108,7 @@ qui {
 	
 	local frlkupb "_pip_lkupb"
 	if (!regexm("`frlkupb'", "`av_frames'")) {
-	
+		
 		frame copy `frpipim' `frlkupb'
 		
 		frame `frlkupb' {
@@ -118,41 +120,44 @@ qui {
 			
 			local orgvar survey_coverage surveyid_year
 			local newvar coverage_level reporting_year 
-	
+			
 			local i = 0
 			foreach var of local orgvar {
 				local ++i
 				rename `var' `: word `i' of `newvar''
 			}	
-
+			
 			tostring reporting_year, replace
 			gen year = reporting_year
 			duplicates drop
+			
 			reshape wide year, i( wb_region_code pcn_region_code country_code coverage_level country_name income_group ) j(reporting_year) string
-			egen year = concat(year*), p(" ")
+			
+			egen year    = concat(year*), p(" ")
 			replace year = stritrim(year)
 			replace year = subinstr(year," ", ",",.)
+			
 			keep country_code country_name wb_region_code pcn_region_code income_group coverage_level year
 			order country_code country_name wb_region_code pcn_region_code income_group coverage_level year
-
+			
 		}
 	}
-
+	
+	
+	
 	frame copy _pip_lkupb _pip_lkup, replace
-		
 	if ("`justdata'" != "") exit
-	
-	cwf _pip_lkup
-	
 	
 	***************************************************
 	* 2. Inital listing with countries and regions
 	***************************************************
 	
 	if  ("`country'" == "") & ("`region'" == "") {
-		qui{
-			noi disp in y  _n "{title:Available Surveys}: " in g "Select a country or region" 
-			noi disp in y  _n "{title: Countries}"  
+		
+		noi disp in y  _n "{title:Available Surveys}: " in g "Select a country or region" 
+		noi disp in y  _n "{title: Countries}"  
+		
+		frame _pip_lkup {
 			
 			quietly levelsof country_code , local(countries) 
 			local current_line = 0
@@ -174,21 +179,24 @@ qui {
 				local dipsthis "{stata  pip, region(`i_reg') year(all) aggregate clear:`i_reg' }"
 				noi disp " `dipsthis' " _c
 			}
-			
-			noi display in y _n "{stata pip_info, region clear: World Bank regions by year}"		
-			noi display _n ""
-			exit
-		}
-	}
+		} // end of frame
+		
+		noi display in y _n "{stata pip_info, region clear: World Bank regions by year}"		
+		noi display _n ""
+		
+		cwf `curframe'
+		exit
+	} // end of condition
 	
 	***************************************************
 	* 3. Listing of country surveys
 	***************************************************
 	
 	if  ("`country'" != "") & ("`region'" == "") {
-		qui{
+		
+		frame _pip_lkup {
+			
 			noi disp in y  _n "{title:Available Surveys for `country'}" 	
-			preserve
 			local country = upper("`country'")
 			keep if country_code == "`country'"
 			
@@ -212,26 +220,33 @@ qui {
 					local ind_y_c=substr("`ind_y'",1,4)
 					local display_this = "{stata  pip, country(`country') year(`ind_y') coverage(`coverage')   clear: `ind_y_c'}"		
 					if (`current_line' < 10) noi display in y `"`display_this'"' _continue 
-					else{
+					
+					else {
 						noi display in y `"`display_this'"' 
 						local current_line = 0		
 					}
-				}	
+					
+				} // end of inner loop	
 				
 				noi display `"{stata  pip, country(`country') year(all) coverage(`coverage')  clear: All}"'
-			}
-			restore
+				
+			} // end of loop
+			
+			
 			noi display _n ""
-			exit
-			break
-		}
-	}	
+			
+		} // end of frame
+		
+		cwf `curframe'
+		exit	
+	}	 // end of condition 
 	
 	***************************************************
 	* 4. Listing of regions
 	***************************************************
 	if  ("`country'" == "") & ("`region'" != "") {
-		qui{
+		
+		frame _pip_lkup {
 			noi disp in y  _n "{title:Available Surveys}" 
 			noi disp in y  _n "{title:Select a Year}" 	
 			
@@ -250,13 +265,16 @@ qui {
 						local current_line = 0		
 					}
 				}
-				noi display in y "{stata  pip, region(`i_reg') year(all) aggregate clear: All}"				
-			}
-			noi display _n ""
-			exit
-			break
-		}
-	}
-}
+				noi display in y "{stata  pip, region(`i_reg') year(all) aggregate clear: All}"
+			} // end of loop 
+			
+		} // end of frame
+		noi display _n ""
+		cwf `curframe'
+		exit			
+			
+	}	 // end of condition 
+	
+} // end of large quietly
 
 end	
