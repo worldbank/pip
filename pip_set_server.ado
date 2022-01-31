@@ -32,11 +32,8 @@ version 16.0
 
 
 //------------ If shortcut used
-
-* local current_server "https://pipscoreapiqa.worldbank.org"
-local current_server "https://apiv2qa.worldbank.org"
+local current_server "https://api.worldbank.org" // production
 local handle         "pip/v1"
-* local current_server "https://api.worldbank.org" // production
 
 if (inlist(lower("`server'"), "qa", "testing", "ar"))  {
 		
@@ -72,7 +69,6 @@ if (!regexm(tpage, "API is running") | _rc) {
 }
 
 local url     = "`server'/`handle'"	
-* local url2    = "http://wzlxqpip01.worldbank.org/api/v1"
 
 
 //========================================================
