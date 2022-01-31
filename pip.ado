@@ -83,6 +83,10 @@ qui {
 	//========================================================
 	// Conditions
 	//========================================================
+	if ("`aggregate'" != "") {
+		noi disp in red "Option {it:aggregate} is disable for now."
+		exit
+	}
 	if ("`aggregate'" != "" & "`fillgaps'" != "") {
 		noi disp in red "options {it:aggregate} and {it:fillgaps} are mutually exclusive." _n /* 
 		*/ "Please select only one."
@@ -291,6 +295,10 @@ qui {
 	
 	*---------- Country Level (one-on-one query)
 	if ("`subcommand'" == "cl") {
+		
+		noi disp in red "Subcommand {it:cl} is temporary out of service."
+		exit
+	
 		noi pip_cl, country("`country'")  /// this needs to accommodate to new structure
 		year("`year'")                    ///
 		povline("`povline'")              ///
@@ -553,7 +561,12 @@ qui {
 		frame copy `c(frame)' `tolist'
 		frame `tolist' {
 			gsort region_code -reporting_year 
-			keep if (region_code == "WLD")
+			
+			count if (region_code == "WLD")
+			local cwld = r(N)
+			if (`cwld' >= `n2disp') {
+				keep if (region_code == "WLD")			
+			}
 			noi list region reporting_year poverty_line headcount mean ///
 			  in 1/`n2disp',  abbreviate(12) 
 		}
