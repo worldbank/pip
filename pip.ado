@@ -611,7 +611,7 @@ qui {
 	label data "`datalabel' (`c(current_date)')"
 	
 	* citations
-	local cite `"Please cite as: Castaneda Aguilar, R.A. and T.B. Degefu (2021) "pip: Stata module to access World Bank’s Global Poverty and Inequality data," Statistical Software Components 2019, Boston College Department of Economics."'
+	local cite `"Please cite as: XXXXX (2021) "pip: Stata module to access World Bank’s Global Poverty and Inequality data," Statistical Software Components 2019, Boston College Department of Economics."'
 	notes: `cite'
 	
 	noi disp in y _n `"`cite'"'
