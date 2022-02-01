@@ -26,18 +26,18 @@ else                      pause off
 
 version 16.0
 
+//========================================================
+// Define server
+//========================================================
 
-/*==================================================
-1:  If Server defined
-==================================================*/
-if "`server'"!=""  {
-	
-	if !inlist(lower("`server'"), "int", "testing", "ar") {
-		noi disp in red "the server requested does not exist" 
-		error
-	}
-	
-	if (lower("`server'") == "int")     {
+
+//------------ If shortcut used
+local current_server "https://api.worldbank.org" // production
+local handle         "pip/v1"
+
+if (inlist(lower("`server'"), "qa", "testing", "ar"))  {
+		
+	if (lower("`server'") == "qa")     {
 		local server "${pip_svr_in}"
 	}
 	if (lower("`server'") == "testing") {
@@ -47,26 +47,28 @@ if "`server'"!=""  {
 		local server "${pip_svr_ar}"
 	}
 	
-	if ("`server'" == "") {
-		noi disp in red "You don't have access to internal servers" _n /* 
-		*/ "You're being redirected to public server"
-		local server "https://pipscoreapiqa.worldbank.org"
-		*local server "http://wzlxqpip01.worldbank.org"
-	}
-	
 }
+
 /*==================================================
 2:  Server not defined
 ==================================================*/
-else {
-	local server "https://pipscoreapiqa.worldbank.org"
-	*local server "http://wzlxqpip01.worldbank.org"
+if ("`server'" == "") {
+	local server "`current_server'"
 }
 
-local base          = "`server'/api/v1/pip"	
-*local base2             = "`server'/api/v1/pip-grp" // to exteract aggregated result 
-local base2         = "http://wzlxqpip01.worldbank.org/api/v1/pip-grp"
+//========================================================
+//  Test API Health
+//========================================================
 
+
+cap scalar tpage = fileread(`"`server'/`handle'/health-check"')
+
+if (!regexm(tpage, "API is running") | _rc) {
+	noi disp in red "There is a problem with PIP API server. Try again later"
+	error
+}
+
+local url     = "`server'/`handle'"	
 
 
 //========================================================
@@ -74,8 +76,10 @@ local base2         = "http://wzlxqpip01.worldbank.org/api/v1/pip-grp"
 //========================================================
 
 return local server = "`server'"
-return local base   = "`base'"
-return local base2  = "`base2'"
+return local url    = "`url'"
+return local base   = "`url'/pip"
+return local base_grp  = "`url'/pip-grp"
+return local handle  = "`handle'"
 
 
 end

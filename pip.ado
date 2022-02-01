@@ -1,4 +1,7 @@
-*! version 0.0.1  	<dec2021>
+*! version 0.1.0.  	    <2022feb01>
+*! version 0.0.2.9000  	<2022jan19>
+*! version 0.0.2  	    <2022jan12>
+*! version 0.0.1  	    <2021dec01>
 /*=======================================================
 Program Name: pip.ado
 Author:
@@ -30,7 +33,7 @@ COUNtry(string)                ///
 REGion(string)                 /// 
 YEAR(string)                   /// 
 POVline(numlist)               /// 
-POPShare(numlist)	   		   /// 
+POPShare(numlist)	   		       /// 
 PPP(numlist)                   /// 
 AGGregate                      /// 
 CLEAR                          /// 
@@ -43,8 +46,12 @@ FILLgaps                       ///
 N2disp(integer 15)             /// 
 noDIPSQuery                    ///
 querytimes(integer 5)          ///
-timer                          ///
+TIMEr                          ///
 POVCALNET_format               ///
+noEFFICIENT                    ///
+KEEPFrames                     ///
+frame_prefix(string)           ///
+replace                        ///
 ] 
 
 if ("`pause'" == "pause") pause on
@@ -52,7 +59,21 @@ else                      pause off
 set checksum off
 
 qui {
-	// --- timer
+	//========================================================
+	// Frames
+	//========================================================
+	local curframe = c(frame)
+	
+	if ("`subcommand'" == "dropframes") {
+		pip_drop_frames, frame_prefix(`frame_prefix')
+		exit
+	}
+	
+	
+	//========================================================
+	//  Timer
+	//========================================================
+	
 	local i = 0
 	local crlf "`=char(10)'`=char(13)'"
 	scalar tt = ""
@@ -61,11 +82,14 @@ qui {
 		timer clear
 		local i = 1
 	}
-	// --- timer
 	
 	//========================================================
 	// Conditions
 	//========================================================
+	if ("`aggregate'" != "") {
+		noi disp in red "Option {it:aggregate} is disable for now."
+		exit
+	}
 	if ("`aggregate'" != "" & "`fillgaps'" != "") {
 		noi disp in red "options {it:aggregate} and {it:fillgaps} are mutually exclusive." _n /* 
 		*/ "Please select only one."
@@ -76,6 +100,10 @@ qui {
 		noi disp in red "option {it:popshare} can't be combined with option {it:aggregate}" _c /* 
 		*/ " or with subcommand {it:wb}" _n
 		error
+	}
+	
+	if ("`frame_prefix'" == "") {
+		local frame_prefix "pip_"
 	}
 	
 	// ------------------------------------------------------------------------
@@ -94,27 +122,11 @@ qui {
 	*---------- API defaults
 	pip_set_server  `server', `pause'
 	*return add
-	local server = "`r(server)'"
-	local base   = "`r(base)'"
-	local base2  = "`r(base2)'"
-	
-	//------------ Check internet connection
-	// --- timer
-	if ("`timer'" != "") {
-		timer on `i'
-		scalar tt = tt + "`crlf' `i': Check internet connection"
-	}
-	// --- timer
-	
-	scalar tpage = fileread(`"`server'/api/v1/pip?format=csv"')
-	
-	if regexm(tpage, "error") {
-		noi disp in red "You may not have Internet connections. Please verify"
-		error
-	}
-	// --- timer	
-	if ("`timer'" != "") timer off `i++'
-	// --- timer
+	local server    = "`r(server)'"
+	local base      = "`r(base)'"
+	local base_grp  = "`r(base_grp)'"
+	local url       = "`r(url)'"
+	local handle    = "`r(handle)'"
 	
 	
 	*---------- lower case subcommand
@@ -286,18 +298,23 @@ qui {
 	
 	*---------- Country Level (one-on-one query)
 	if ("`subcommand'" == "cl") {
-		noi pip_cl, country("`country'")  ///
-		year("`year'")                   ///
-		povline("`povline'")             ///
-		ppp("`ppp'")                     ///
-		server("`server'")               ///
-		coverage(`coverage')             /// 
-		`clear'                          ///
-		`iso'                            ///
+		
+		noi disp in red "Subcommand {it:cl} is temporary out of service."
+		exit
+	
+		noi pip_cl, country("`country'")  /// this needs to accommodate to new structure
+		year("`year'")                    ///
+		povline("`povline'")              ///
+		ppp("`ppp'")                      ///
+		server("`server'")                ///
+		handle("`handle'")                ///
+		coverage(`coverage')              /// 
+		`clear'                           ///
+		`iso'                             ///
 		`pause'
 		return add
 		
-		pip_clean 1, year("`year'") `iso' rc(`rc')
+		pip_clean 1, year("`year'") `iso' //rc(`rc')
 		
 		//========================================================
 		// Convert to povcalnet format
@@ -343,22 +360,22 @@ qui {
 		/*==================================================
 		Create Query
 		==================================================*/
-		pip_query,   country("`country'")  ///
-		region("`region'")                     ///
-		year("`year'")                         ///
-		povline("`i_povline'")                 ///
+		pip_query,   country("`country'")       ///
+		region("`region'")                      ///
+		year("`year'")                          ///
+		povline("`i_povline'")                  ///
 		popshare("`i_popshare'")	   					  ///
-		ppp("`ppp'")                         ///
-		coverage(`coverage')                   ///
-		server(`server')                       ///
-		`clear'                                ///
-		`information'                          ///
-		`iso'                                  ///
-		`fillgaps'                             ///
-		`aggregate'                            ///
-		`wb'                                   ///
-		`pause'                                ///
-		`groupedby'                            //
+		ppp("`ppp'")                            ///
+		coverage(`coverage')                    ///
+		server(`server')                        ///
+		`clear'                                 ///
+		`information'                           ///
+		`iso'                                   ///
+		`fillgaps'                              ///
+		`aggregate'                             ///
+		`wb'                                    ///
+		`pause'                                 ///
+		`groupedby'                             //
 		
 		local query_ys = "`r(query_ys)'"
 		local query_ct = "`r(query_ct)'"
@@ -392,7 +409,7 @@ qui {
 		
 		*---------- Base + query
 		if ("`aggregate'" != ""){
-			local queryfull "`base2'?`query'"
+			local queryfull "`base_grp'?`query'"
 		}
 		else{
 			local queryfull "`base'?`query'"
@@ -422,38 +439,24 @@ qui {
 		==================================================*/
 		
 		*---------- download data
-		local rc = 0
-		
-		local qr = 1 // query round		
-		while (`qr' <= `querytimes') {
-			
-			tempfile clfile
-			cap copy "`queryfull'" `clfile'
-			if (_rc == 0) {
-				cap insheet using `clfile', clear name
-				if (_rc != 0) local rc "in"
-				
-				ds
-				local vars = "`r(varlist)'"
-				if (wordcount("`vars'") == 1) {
-					local varlabel: variable label `vars'
-					noi disp in red "The parameters selected are not valid." _n ///
-					 "Poverty line might out of range."
-					noi disp in red `"`varlabel'"'
-					error 
-				}
-				
-				pause after loading data in memory
-				
-				continue, break
-			} 
-			else {
-				local rc "copy"
-				local ++qr
-			} 
+		cap import delimited  "`queryfull'", `clear'
+		if (_rc) {
+			noi dis ""
+			noi dis in red "It was not possible to download data from the PIP API."
+			noi dis ""
+			noi dis in white `"(1) Please check your Internet connection by "' _c 
+			noi dis in white  `"{browse "`server'/`handle'/health-check" :clicking here}"'
+			noi dis in white `"(2) Test that the data is retrievable. By"' _c
+		  noi dis in white  `"{stata pip test: clicking here }"' _c
+			noi dis in white  "you should be able to download the data."
+			noi dis in white `"(3) Please consider adjusting your Stata timeout parameters. For more details see {help netio}"'
+			noi dis in white `"(4) Please send us an email to:"'
+			noi dis in white _col(8) `"email: data@worldbank.org"'
+			noi dis in white _col(8) `"subject: pip query error on `c(current_date)' `c(current_time)'"'
+			noi di ""
+			error 673
 		}
 		
-		pause tefera 1 check time taken to excute the following processes - to be removed
 		
 		// --- timer
 		if ("`timer'" != "") timer off `i_off'
@@ -484,7 +487,7 @@ qui {
 		
 		*---------- Clean data
 		pip_clean `rtype', year("`year'") `iso' /* 
-			*/ rc(`rc') region(`region') `pause' `wb'		
+		*/ region(`region') `pause' `wb'		
 		
 		pause after cleaning
 		// --- timer
@@ -498,12 +501,30 @@ qui {
 		if ("`dipsquery'" == "" & "`rc'" == "0") {
 			noi di as res _n "{ul: Query at \$`i_povline' poverty line}"
 			noi di as res "{hline}"
-			if ("`query_ys'" != "") noi di as res "Year:"         as txt "{p 4 6 2} `query_ys' {p_end}"
-			if ("`query_ct'" != "") noi di as res "Country:"      as txt "{p 4 6 2} `query_ct' {p_end}"
-			if ("`query_pl'" != "") noi di as res "Poverty line:" as txt "{p 4 6 2} `query_pl' {p_end}"
-			if ("`query_ps'" != "") noi di as res "Population share:" as txt "{p 4 6 2} `query_ps' {p_end}"
-			if ("`query_ds'" != "") noi di as res "Aggregation:"  as txt "{p 4 6 2} `query_ds' {p_end}"
-			if ("`query_pp'" != "") noi di as res "PPP:"          as txt "{p 4 6 2} `query_pp' {p_end}"
+			
+			if ("`query_ys'" != "") {
+				noi di as res "Year:" as txt "{p 4 6 2} `query_ys' {p_end}"
+			}
+			
+			if ("`query_ct'" != "") {
+				noi di as res "Country:" as txt "{p 4 6 2} `query_ct' {p_end}"
+			}
+			
+			if ("`query_pl'" != "") {
+				noi di as res "Poverty line:" as txt "{p 4 6 2} `query_pl' {p_end}"
+			}
+			
+			if ("`query_ps'" != "") {
+				noi di as res "Population share:" as txt "{p 4 6 2} `query_ps' {p_end}"
+			}
+			
+			if ("`query_ds'" != "") {
+				noi di as res "Aggregation:" as txt "{p 4 6 2} `query_ds' {p_end}"
+			}
+			
+			if ("`query_pp'" != "") {
+				noi di as res "PPP:" as txt "{p 4 6 2} `query_pp' {p_end}"
+			}
 			noi di as res _dup(20) "-"
 			noi di as res "No. Obs:"      as txt _col(20) c(N)
 			noi di as res "{hline}"
@@ -537,16 +558,30 @@ qui {
 	noi di as res _n "{ul: first `n2disp' observations}"
 	
 	if ("`subcommand'" == "wb") {
-		sort reporting_year region_code 
-		noi list region reporting_year poverty_line headcount mean in 1/`n2disp', /*
-		*/ abbreviate(12)  sepby(reporting_year)
-	}
+		sort region_code reporting_year 
 		
+		tempname tolist
+		frame copy `c(frame)' `tolist'
+		frame `tolist' {
+			gsort region_code -reporting_year 
+			
+			count if (region_code == "WLD")
+			local cwld = r(N)
+			if (`cwld' >= `n2disp') {
+				keep if (region_code == "WLD")			
+			}
+			noi list region reporting_year poverty_line headcount mean ///
+			  in 1/`n2disp',  abbreviate(12) 
+		}
+		
+	}
+	
 	else {
 		if ("`aggregate'" == "") {
-			sort country_code reporting_year region_code 
-			noi list country_code reporting_year poverty_line headcount mean median welfare_type /*
-			*/ in 1/`n2disp',  abbreviate(12)  sepby(country_code)
+			sort country_code reporting_year 
+			noi list country_code reporting_year poverty_line headcount  /*
+			*/  mean median welfare_type in 1/`n2disp',  /* 
+			*/  abbreviate(12)  sepby(country_code)
 		}
 		else {
 			sort reporting_year 
@@ -554,7 +589,7 @@ qui {
 			*/ abbreviate(12) sepby(poverty_line)
 		}		
 	}	
-		
+	
 	//========================================================
 	//  Create notes
 	//========================================================
@@ -592,7 +627,7 @@ qui {
 	label data "`datalabel' (`c(current_date)')"
 	
 	* citations
-	local cite `"Please cite as: Castaneda Aguilar, R.A. and T.B. Degefu (2021) "pip: Stata module to access World Bank’s Global Poverty and Inequality data," Statistical Software Components 2019, Boston College Department of Economics."'
+	local cite `"Please cite as: XXXXX (2021) "pip: Stata module to access World Bank’s Global Poverty and Inequality data," Statistical Software Components 2022, Boston College Department of Economics."'
 	notes: `cite'
 	
 	noi disp in y _n `"`cite'"'
@@ -607,9 +642,35 @@ qui {
 	
 	if ("`povcalnet_format'" != "") {
 		pause before povcalnet format
-	  pip_povcalnet_format  `rtype', `pause'
-		
+		pip_povcalnet_format  `rtype', `pause'
 	}
+	
+	//========================================================
+	//  Drop frames created in the middle of the process
+	//========================================================
+	
+	
+	frame dir
+	local av_frames "`r(frames)'"
+	
+	* set trace on 
+	foreach fr of local av_frames {
+		
+		if (regexm("`fr'", "(^_pip_)(.+)")) {
+			
+			// If users wants to keep frames
+			if ("`keepframes'" != "") {
+				local frname = "`frame_prefix'" + regexs(2)
+				frame copy `fr' `frname', `replace'
+			}
+			// if user wants to drop them
+			if ("`efficient'" == "noefficient") {
+				frame drop `fr'
+			}
+		}
+		
+	} // condition to keep frames
+	* set trace off
 	
 } // end of qui
 end
@@ -671,40 +732,3 @@ Version Control:
 
 
 *##s
-
-findfile stata.trk
-local fn = "`r(fn)'"
-
-mata:
-cmd = "pip"
-cmd =  cmd :+ "\.pkg"
-
-fh = _fopen("`fn'", "r")
-
-pos_a = ftell(fh)
-pos_b = 0
-while ((line=strtrim(fget(fh)))!=J(0,0,"")) {
-	if (regexm(strtrim(line), cmd)) {
-		fseek(fh, pos_b, -1)
-		break
-	}
-	pos_b = pos_a
-	pos_a = ftell(fh)
-}
-
-src = strtrim(fget(fh))
-if (rows(src) > 0) {
-	src = substr(src, 3)
-	st_local("src", src)
-} 
-else {
-	st_local("src", "NotFound")
-}
-
-fclose(fh)
-src
-
-end 
-
-
-*##e

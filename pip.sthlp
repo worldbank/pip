@@ -510,6 +510,7 @@ Here are the list of pip and povcalnet variables.
 {ul:3.2} National coverage (when available) and longest possible time series for each country, restrict to same welfare type throughout.
 
 {cmd}
+	. pip, clear
 	. bysort countrycode datatype year: egen _ncover = count(coveragetype)
 	. gen _tokeepn = ( (inlist(coveragetype, 3, 4) & _ncover > 1) | _ncover == 1)
 
@@ -728,9 +729,9 @@ All the files are available in the {browse "https://github.com/worldbank/pip":Gi
 {title:Thanks for citing {cmd:pip} as follows}
 {p 40 20 2}(Go up to {it:{help pip##sections:Sections Menu}}){p_end}
 
-{p 4 8 2}Castaneda Aguilar, R.A. and T.B. Degefu (2021) 
+{p 4 8 2}XXXXX (2022) 
 "pip: Stata module to access World Bank’s Global Poverty and Inequality data," 
-Statistical Software Components 2019, Boston College Department of Economics.{p_end}
+Statistical Software Components 2022, Boston College Department of Economics.{p_end}
 
 {pstd}
 Please make reference to the date when the database was downloaded, as statistics may change

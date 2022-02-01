@@ -22,123 +22,172 @@ if ("`pause'" == "pause") pause on
 else                      pause off
 
 qui {
-
+	
 	//if ("`clear'" == "") preserve
 	
 	*---------- API defaults
+	pip_set_server  `server', `pause'
+	local server = "`r(server)'"
+	local url    = "`r(url)'"
+	local base   = "`r(base)'"
+	local base2  = "`r(base2)'"
+	return add
 	
-	if "`server'" == ""  {
-		local site_name = "api/v1"
-		local server   = "https://pipscoreapiqa.worldbank.org"
-		*local server = "http://wzlxqpip01.worldbank.org"
-		local url = "`server'/`site_name'"
-		return local site_name = "`site_name'"
-		return local url       = "`url'"
-	} 
-	else {
-		local url "https://pipscoreapiqa.worldbank.org/api/v1"
-		*local url "http://wzlxqpip01.worldbank.org/api/v1"
-	}
 	
 	***************************************************
-	* 0. Country name
+	* 0. Info frame 
 	***************************************************	
-	tempfile temp100
 	
-	local csvfile0  = "`url'/aux?table=countries&format=csv"
-	return local csvfile0 = "`csvfile0'"
+	local curframe = c(frame)
 	
-	cap copy "`csvfile0'" `temp100'
-	if (_rc != 0 ) {
-		noi disp in red "There is a problem accessing country name data." 
-	  noi disp in red "to check your connection, copy and paste in your browser the following address:" _n /* 
-		*/	_col(4) in w `"`url'/aux?table=countries&format=csv"'
+	//------------ Find available frames
+	frame dir 
+	local av_frames "`r(frames)'"
+	local av_frames: subinstr local  av_frames " " "|", all
+	local av_frames = "^(" + "`av_frames'" + ")"
+	
+	//------------ countries frame
+	local frpipcts "_pip_countries"
+	if (!regexm("`frpipcts'", "`av_frames'")) {
 		
-		error 
-	} 
-
-	import delim using `temp100',  delim(",()") stringc(_all) /* 
-	*/                              stripq(yes) varnames(1)  clear 	
-	
-	keep country_code country_name income_group
-	sort country_code
-	save `temp100', replace
-	
-	***************************************************
-	* 1. Load guidance database
-	***************************************************
-	
-	tempfile temp1000
-	
-	local csvfile  = "`url'/pip?format=csv"
-	return local csvfile = "`csvfile'"
-	
-	cap copy "`csvfile'" `temp1000'
-	if (_rc != 0 ) {
-		noi disp in red "There is a problem accessing the information file." 
-	  noi disp in red "to check your connection, copy and paste in your browser the following address:" _n /* 
-		*/	_col(4) in w `"`url'/pip?format=csv"'
+		frame create `frpipcts'
 		
-		error 
-	} 
-
-	import delim using `temp1000',  delim(",()") stringc(_all) /* 
-	*/                              stripq(yes) varnames(1)  clear 
-	
-	local orgvar region_code survey_coverage reporting_year 
-	local newvar wb_region coverage_level reporting_year 
-	
-	local i = 0
-	foreach var of local orgvar {
-		local ++i
-		rename `var' `: word `i' of `newvar''
-	}	
-
-	keep country_code wb_region coverage_level survey_year reporting_year 
-	order country_code wb_region coverage_level survey_year reporting_year
-	sort country_code
-
-	merge country_code using `temp100'
-	collapse _merge, by(country_code country_name wb_region coverage_level reporting_year income_group)
-	drop _merge
-	order country_code country_name wb_region coverage_level reporting_year income_group
-	
-	gen year = ""
-	tostring reporting_year, replace
-	tempfile lkupdata
-	save `lkupdata', replace
-	levelsof country_code , local(ctry)
-	foreach ct of local ctry{
-	    preserve
-	    levelsof coverage_level, local(cv_area)
-		disp `cv_area'
-		foreach cv of local cv_area {
-		    keep if country_code == "`ct'" & coverage_level == "`cv'"
-		    levelsof reporting_year, local(year) sep(,) clean
-			disp `year'
-			replace year = "`year'" if coverage_level == "`cv'"
-			append using `lkupdata'
-			save `lkupdata', replace
-		}
-		restore
-	}
+		frame `frpipcts' {
 			
-	use `lkupdata', clear
-	drop if year == ""
-	sort country_code
-	duplicates drop country_code country_name wb_region coverage_level income_group year, force
-	drop reporting_year
+			local csvfile0  = "`url'/aux?table=countries&format=csv"
+			cap import delimited using "`csvfile0'", clear varn(1)
+			local rc1 = _rc
+			
+			if (`rc1' == 0) {
+				drop iso2_code
+				sort country_code
+			}
+		}
+		
+		// drop frame if error happened
+		if (`rc1' != 0) {
+			noi disp in red "There is a problem accessing country name data." 
+			noi disp in red "to check your connection, copy and paste in your browser the following address:" _n /* 
+			*/	_col(4) in w `"`csvfile0'"'
+			frame drop `frpipcts'
+			error 
+		} 
+		
+	}
 	
+	//------------ regions frame
+	local frpiprgn "_pip_regions"
+	if (!regexm("`frpiprgn'", "`av_frames'")) {
+		
+		frame create `frpiprgn'
+		
+		frame `frpiprgn' {
+			
+			local csvfilergn  = "`url'/aux?table=regions&format=csv"
+			cap import delimited using "`csvfilergn'", clear varn(1)
+			local rc1 = _rc
+			
+			if (`rc1' == 0) {
+				drop grouping_type
+				sort region_code
+			}
+		}
+		
+		// drop frame if error happened
+		if (`rc1' != 0) {
+			noi disp in red "There is a problem accessing region name data." 
+			noi disp in red "to check your connection, copy and paste in your browser the following address:" _n /* 
+			*/	_col(4) in w `"`csvfilergn'"'
+			frame drop `frpiprgn'
+			error 
+		} 
+		
+	}	
+	
+	//------------ interpolated means frame
+	
+	local frpipim "_pip_int_means"
+	if (!regexm("`frpipim'", "`av_frames'")) {
+		
+		frame create `frpipim'
+		
+		frame `frpipim' {
+			
+			local csvfile  = "`url'/aux?table=interpolated_means&format=csv"
+			cap import delim using "`csvfile'", clear varn(1)
+			
+		}
+		
+		if (_rc != 0 ) {
+			
+			noi disp in red "There is a problem accessing the information file." 
+			noi disp in red "to check your connection, copy and paste in your browser the following address:" _n /* 
+			*/	_col(4) in w `"`csvfile'"'
+			frame drop `frpipim'
+			error 
+		} 
+		
+		
+	}
+	
+	*if ("`justdata'" != "") exit
+	
+	//========================================================
+	//  generating a lookup data
+	//========================================================
+	
+	local frlkupb "_pip_lkupb"
+	if (!regexm("`frlkupb'", "`av_frames'")) {
+		
+		frame copy `frpipim' `frlkupb'
+		
+		frame `frlkupb' {
+			
+			frlink m:1 country_code, frame(_pip_countries) generate(ctry)
+			frget country_name income_group, from(ctry)
+			
+			keep country_code country_name wb_region_code pcn_region_code income_group survey_coverage surveyid_year
+			
+			local orgvar survey_coverage surveyid_year
+			local newvar coverage_level reporting_year 
+			
+			local i = 0
+			foreach var of local orgvar {
+				local ++i
+				rename `var' `: word `i' of `newvar''
+			}	
+			
+			tostring reporting_year, replace
+			gen year = reporting_year
+			duplicates drop
+			
+			reshape wide year, i( wb_region_code pcn_region_code country_code coverage_level country_name income_group ) j(reporting_year) string
+			
+			egen year    = concat(year*), p(" ")
+			replace year = stritrim(year)
+			replace year = subinstr(year," ", ",",.)
+			
+			keep country_code country_name wb_region_code pcn_region_code income_group coverage_level year
+			order country_code country_name wb_region_code pcn_region_code income_group coverage_level year
+			
+		}
+	}
+	
+	
+	
+	frame copy _pip_lkupb _pip_lkup, replace
 	if ("`justdata'" != "") exit
-
+	
 	***************************************************
 	* 2. Inital listing with countries and regions
 	***************************************************
 	
 	if  ("`country'" == "") & ("`region'" == "") {
-		qui{
-			noi disp in y  _n "{title:Available Surveys}: " in g "Select a country or region" 
-			noi disp in y  _n "{title: Countries}"  
+		
+		noi disp in y  _n "{title:Available Surveys}: " in g "Select a country or region" 
+		noi disp in y  _n "{title: Countries}"  
+		
+		frame _pip_lkup {
 			
 			quietly levelsof country_code , local(countries) 
 			local current_line = 0
@@ -160,21 +209,24 @@ qui {
 				local dipsthis "{stata  pip, region(`i_reg') year(all) aggregate clear:`i_reg' }"
 				noi disp " `dipsthis' " _c
 			}
-			
-			noi display in y _n "{stata pip_info, region clear: World Bank regions by year}"		
-			noi display _n ""
-			exit
-		}
-	}
+		} // end of frame
+		
+		noi display in y _n "{stata pip_info, region clear: World Bank regions by year}"		
+		noi display _n ""
+		
+		cwf `curframe'
+		exit
+	} // end of condition
 	
 	***************************************************
 	* 3. Listing of country surveys
 	***************************************************
 	
 	if  ("`country'" != "") & ("`region'" == "") {
-		qui{
+		
+		frame _pip_lkup {
+			
 			noi disp in y  _n "{title:Available Surveys for `country'}" 	
-			preserve
 			local country = upper("`country'")
 			keep if country_code == "`country'"
 			
@@ -198,26 +250,33 @@ qui {
 					local ind_y_c=substr("`ind_y'",1,4)
 					local display_this = "{stata  pip, country(`country') year(`ind_y') coverage(`coverage')   clear: `ind_y_c'}"		
 					if (`current_line' < 10) noi display in y `"`display_this'"' _continue 
-					else{
+					
+					else {
 						noi display in y `"`display_this'"' 
 						local current_line = 0		
 					}
-				}	
+					
+				} // end of inner loop	
 				
 				noi display `"{stata  pip, country(`country') year(all) coverage(`coverage')  clear: All}"'
-			}
-			restore
+				
+			} // end of loop
+			
+			
 			noi display _n ""
-			exit
-			break
-		}
-	}	
+			
+		} // end of frame
+		
+		cwf `curframe'
+		exit	
+	}	 // end of condition 
 	
 	***************************************************
 	* 4. Listing of regions
 	***************************************************
 	if  ("`country'" == "") & ("`region'" != "") {
-		qui{
+		
+		frame _pip_lkup {
 			noi disp in y  _n "{title:Available Surveys}" 
 			noi disp in y  _n "{title:Select a Year}" 	
 			
@@ -236,13 +295,16 @@ qui {
 						local current_line = 0		
 					}
 				}
-				noi display in y "{stata  pip, region(`i_reg') year(all) aggregate clear: All}"				
-			}
-			noi display _n ""
-			exit
-			break
-		}
-	}
-}
+				noi display in y "{stata  pip, region(`i_reg') year(all) aggregate clear: All}"
+			} // end of loop 
+			
+		} // end of frame
+		noi display _n ""
+		cwf `curframe'
+		exit			
+			
+	}	 // end of condition 
+	
+} // end of large quietly
 
 end	
