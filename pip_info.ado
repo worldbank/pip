@@ -74,6 +74,36 @@ qui {
 		} 
 		
 	}
+	
+	//------------ regions frame
+	local frpiprgn "_pip_regions"
+	if (!regexm("`frpiprgn'", "`av_frames'")) {
+		
+		frame create `frpiprgn'
+		
+		frame `frpiprgn' {
+			
+			local csvfilergn  = "`url'/aux?table=regions&format=csv"
+			cap import delimited using "`csvfilergn'", clear varn(1)
+			local rc1 = _rc
+			
+			if (`rc1' == 0) {
+				drop grouping_type
+				sort region_code
+			}
+		}
+		
+		// drop frame if error happened
+		if (`rc1' != 0) {
+			noi disp in red "There is a problem accessing region name data." 
+			noi disp in red "to check your connection, copy and paste in your browser the following address:" _n /* 
+			*/	_col(4) in w `"`csvfilergn'"'
+			frame drop `frpiprgn'
+			error 
+		} 
+		
+	}	
+	
 	//------------ interpolated means frame
 	
 	local frpipim "_pip_int_means"

@@ -54,12 +54,22 @@ if ("`type'" == "1") {
 	frlink m:1 country_code, frame(_pip_countries) generate(ctry_name)
 	frget country_name, from(ctry_name)
 	
-	drop ctry_name
+	frlink m:1 region_code, frame(_pip_regions) generate(rgn_name)
+	frget region, from(rgn_name)
 	
-	rename country_name countryname
+	drop ctry_name rgn_name
 	
-	order country_code countryname region_code survey_coverage reporting_year survey_year welfare_type is_interpolated distribution_type /*
-	*/ ppp poverty_line mean headcount poverty_gap poverty_severity watts gini median mld polarization reporting_pop decile? decile10
+	local orgvar country_name region reporting_pop reporting_pce pce_data_level
+	local newvar countryname region_name population reporting_hfce hfce_data_level
+			
+	local i = 0
+		foreach var of local orgvar {
+			local ++i
+			rename `var' `: word `i' of `newvar''
+		}	
+	
+	order country_code countryname region_code region_name survey_coverage reporting_year survey_year welfare_type is_interpolated distribution_type /*
+	*/ ppp poverty_line mean headcount poverty_gap poverty_severity watts gini median mld polarization population decile? decile10
 	
 	if "`iso'"!="" {
 		cap replace country_code = "XKX" if country_code == "KSV"
@@ -102,27 +112,55 @@ if ("`type'" == "1") {
 	label define welfare_type 1 "Consumption" 2 "Income", modify
 	label values welfare_type welfare_type
 
-	label var is_interpolated   "Data is interpolated"
-	label var country_code      "Country/Economy Code"
+	label var country_code		"Country/Economy code"
+	label var countryname 		"Country/Economy name"
+	label var region_code 		"Region code"
+	label var region_name 		"Region name"
+	label var survey_coverage 	"Survey coverage"
+	label var reporting_year	"Year"
+	label var survey_year 		"Survey year"
+	label var welfare_type 		"Welfare measured by income or consumption"
+	label var is_interpolated 	"Data is interpolated"
 	label var distribution_type "Data comes from grouped or microdata"
-	label var countryname       "Country/Economy Name"
-	label var region_code       "Region Code"
-	label var region            "Region Name"
-	label var survey_coverage   "Coverage"
-	label var reporting_year    "Year you requested"
-	label var survey_year       "Survey year"
-	label var welfare_type      "Welfare measured by income or consumption"
-	label var ppp               "Purchasing Power Parity"
-	label var poverty_line      "Poverty line in PPP$ (per capita per day)"
-	label var mean              "Average monthly per capita income/consumption in PPP$"
-	label var headcount         "Poverty Headcount"
-	label var poverty_gap       "Poverty Gap."
-	label var poverty_severity  "Squared poverty gap."
-	label var watts             "Watts index"
-	label var gini              "Gini index"
-	label var median            "Median monthly income or expenditure in PPP$"
-	label var mld               "Mean Log Deviation"
-	label var reporting_pop     "Population in year"
+	label var ppp 				"2011 Purchasing Power Parity"
+	label var poverty_line 		"Poverty line in PPP$ (per capita per day)"
+	label var mean				"Average monthly per capita income/consumption PPP$"
+	label var headcount 		"Poverty Headcount"
+	label var poverty_gap 		"Poverty Gap"
+	label var poverty_severity 	"Squared poverty gap"
+	label var watts 			"Watts index"
+	label var gini 				"Gini index"
+	label var median 			"Median monthly income or expenditure in PPP$"
+	label var mld 				"Mean Log Deviation"
+	label var polarization 		"Polarization"
+	label var population 		"Population in year"
+	label var decile1 			"Share of total welfare in decile 1"
+	label var decile2 			"Share of total welfare in decile 2"
+	label var decile3 			"Share of total welfare in decile 3"
+	label var decile4 			"Share of total welfare in decile 4"
+	label var decile5 			"Share of total welfare in decile 5"
+	label var decile6 			"Share of total welfare in decile 6"
+	label var decile7 			"Share of total welfare in decile 7"
+	label var decile8 			"Share of total welfare in decile 8"
+	label var decile9 			"Share of total welfare in decile 9"
+	label var decile10 			"Share of total welfare in decile 10"
+	label var reporting_level 	"Reporting data level"
+	label var survey_acronym 	"Survey acronym"     
+	label var survey_comparability "Survey comparability"
+	label var comparable_spell 	"Comparability over time at country level"
+	label var survey_mean_lcu 	"Daily mean income or expenditure in LCU"
+	label var survey_mean_ppp 	"Daily mean income or expenditure in PPP$"
+	label var predicted_mean_ppp "Daily interpolated mean in PPP$"       
+	label var cpi 				"Consumer Price Index (CPI)"
+	label var cpi_data_level 	"CPI data level"
+	label var ppp_data_level 	"PPP data level"
+	label var pop_data_level 	"Population level"
+	label var reporting_gdp 	"Reported GDP"
+	label var gdp_data_level 	"GDP data level"
+	label var reporting_hfce 	"Reported per capita"
+	label var hfce_data_level 	"Per capita data level"
+	label var is_used_for_aggregation "Used for aggregation"
+	label var estimation_type 	"Estimation type"
 
 	sort country_code reporting_year survey_coverage 
 }
@@ -145,7 +183,7 @@ if ("`type'" == "2") {
 	***************************************************
 
 	label var region_code      "Region code"
-	label var reporting_year   "Year you requested"
+	label var reporting_year   "Year"
 	label var poverty_line     "Poverty line in PPP$ (per capita per day)"
 	label var mean             "Average monthly per capita income/consumption in PPP$"
 	label var headcount        "Poverty Headcount"
