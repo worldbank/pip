@@ -38,7 +38,7 @@ ren reporting_year requestyear
 ren reporting_pop reqyearpopulation
 if ("`type'" == "1") {
 	
-	local vars1 country_code region_code survey_coverage survey_year /*
+	local vars1 country_code region_code reporting_level survey_year /*
 	*/welfare_type is_interpolated distribution_type poverty_line poverty_gap /*
 	*/poverty_severity // reporting_pop
 	

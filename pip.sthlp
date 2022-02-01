@@ -510,6 +510,7 @@ Here are the list of pip and povcalnet variables.
 {ul:3.2} National coverage (when available) and longest possible time series for each country, restrict to same welfare type throughout.
 
 {cmd}
+	. pip, clear
 	. bysort countrycode datatype year: egen _ncover = count(coveragetype)
 	. gen _tokeepn = ( (inlist(coveragetype, 3, 4) & _ncover > 1) | _ncover == 1)
 
