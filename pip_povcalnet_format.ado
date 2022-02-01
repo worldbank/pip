@@ -52,14 +52,14 @@ if ("`type'" == "1") {
 	}	
 	
 	keep countrycode countryname regioncode coveragetype requestyear /* 
-	 */datayear datatype isinterpolated usemicrodata /*
+	 */ datayear datatype isinterpolated usemicrodata /*
    */ ppp povertyline mean headcount povgap povgapsqr watts gini /* 
 	 */ median mld polarization reqyearpopulation decile? decile10
 	
 	order countrycode countryname regioncode coveragetype requestyear /* 
   */	datayear datatype isinterpolated usemicrodata /*
-	*/ ppp povertyline mean headcount povgap povgapsqr watts gini /* 
-  s*/	median mld polarization reqyearpopulation decile? decile10
+	*/  ppp povertyline mean headcount povgap povgapsqr watts gini /* 
+  */	median mld polarization reqyearpopulation decile? decile10
 	
 	
 	* Standardize names with R package	
