@@ -731,7 +731,7 @@ All the files are available in the {browse "https://github.com/worldbank/pip":Gi
 
 {p 4 8 2}XXXXX (2022) 
 "pip: Stata module to access World Bank’s Global Poverty and Inequality data," 
-Statistical Software Components 2019, Boston College Department of Economics.{p_end}
+Statistical Software Components 2022, Boston College Department of Economics.{p_end}
 
 {pstd}
 Please make reference to the date when the database was downloaded, as statistics may change
