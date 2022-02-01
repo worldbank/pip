@@ -72,6 +72,7 @@ if (regexm("`src'", "github")) {
 			local crrMinor = regexs(2)
 			local crrPatch = regexs(3)
 		}
+		/* 
 		foreach x in repo cmd {
 			local `x' : subinstr local `x' "." "", all 
 			local `x' : subinstr local `x' "-" ".", all 
@@ -80,7 +81,9 @@ if (regexm("`src'", "github")) {
 			}
 			
 		}
-		
+		 */
+		 
+		 
 		* force installation 
 		if ("`crrtversion'" == "") {
 			github install `repo', replace
