@@ -1,7 +1,7 @@
-*! version 0.1.0.  	    <2022feb01>
-*! version 0.0.2.9000  	<2022jan19>
-*! version 0.0.2  	    <2022jan12>
-*! version 0.0.1  	    <2021dec01>
+*! version 0.1.0.       <2022feb01>
+*! version 0.0.2.9000   <2022jan19>
+*! version 0.0.2        <2022jan12>
+*! version 0.0.1        <2021dec01>
 /*=======================================================
 Program Name: pip.ado
 Author:

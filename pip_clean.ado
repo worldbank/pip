@@ -163,6 +163,17 @@ if ("`type'" == "1") {
 	label var estimation_type 	"Estimation type"
 
 	sort country_code reporting_year survey_coverage 
+	
+	
+	//------------ Formatting
+	format headcount poverty_gap poverty_severity watts  gini mld polarization ///
+	decile*  mean survey_mean_ppp  cpi %8.4f
+	
+	format ppp survey_mean_lcu  %10.2fc
+	format reporting_gdp  reporting_hfce %15.2fc
+	
+	format population %15.0fc
+	
 }
 
 /*==================================================
