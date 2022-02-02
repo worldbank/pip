@@ -35,7 +35,7 @@ noi disp in red "Warning: option {it:povcalnet_format} is intended only to " _n 
 1:  country data 
 ==================================================*/
 ren reporting_year requestyear
-ren reporting_pop reqyearpopulation
+ren population     reqyearpopulation
 if ("`type'" == "1") {
 	
 	local vars1 country_code region_code reporting_level survey_year /*
@@ -88,13 +88,15 @@ if ("`type'" == "2") {
 	
   //------------ Renaming and labeling
 	
-	rename region_code regioncode
-	rename poverty_line povertyline
-	rename poverty_gap povgap
+	rename region_code      regioncode
+	rename poverty_line     povertyline
+	rename poverty_gap      povgap
 	rename poverty_severity povgapsqr
 	
-	keep requestyear regioncode povertyline mean headcount povgap povgapsqr reqyearpopulation
-	order requestyear regioncode povertyline mean headcount povgap povgapsqr reqyearpopulation
+	keep requestyear regioncode povertyline mean headcount povgap ///
+	     povgapsqr reqyearpopulation
+	order requestyear regioncode povertyline mean headcount povgap ///
+	      povgapsqr reqyearpopulation
 	
 	local Snames requestyear reqyearpopulation 
 	

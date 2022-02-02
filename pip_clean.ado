@@ -67,10 +67,7 @@ if ("`type'" == "1") {
 			local ++i
 			rename `var' `: word `i' of `newvar''
 		}	
-	
-	order country_code countryname region_code region_name survey_coverage reporting_year survey_year welfare_type is_interpolated distribution_type /*
-	*/ ppp poverty_line mean headcount poverty_gap poverty_severity watts gini median mld polarization population decile? decile10
-	
+		
 	if "`iso'"!="" {
 		cap replace country_code = "XKX" if country_code == "KSV"
 		cap replace country_code = "TLS" if country_code == "TMP"
@@ -165,6 +162,12 @@ if ("`type'" == "1") {
 	sort country_code reporting_year survey_coverage 
 	
 	
+	order country_code countryname region_code region_name survey_coverage     ///
+	reporting_year survey_year welfare_type is_interpolated distribution_type  ///
+	ppp poverty_line mean headcount poverty_gap poverty_severity watts gini    ///
+	median mld polarization population decile? decile10
+	
+	
 	//------------ Formatting
 	format headcount poverty_gap poverty_severity watts  gini mld polarization ///
 	decile*  mean survey_mean_ppp  cpi %8.4f
@@ -180,8 +183,7 @@ if ("`type'" == "1") {
               2: for Aggregate requests
 ==================================================*/
 if ("`type'" == "2") {
-		
-	pause clean - after dropping by region 
+	
 	
 	if  ("`year'" == "last") {
 		tempvar maximum_y
@@ -192,6 +194,8 @@ if ("`type'" == "2") {
 	***************************************************
 	* 4. Renaming and labeling
 	***************************************************
+	
+	rename reporting_pop population
 
 	label var region_code      "Region code"
 	label var reporting_year   "Year"
@@ -200,10 +204,17 @@ if ("`type'" == "2") {
 	label var headcount        "Poverty Headcount"
 	label var poverty_gap      "Poverty Gap"
 	label var poverty_severity "Squared poverty gap"
-	label var reporting_pop    "Population in year"
+	label var population       "Population in year"
 	label var pop_in_poverty   "Population in poverty"
+	label var watts            "Watts index"
 	
-	order reporting_year region_code poverty_line mean headcount poverty_gap poverty_severity reporting_pop
+	order region_code reporting_year  poverty_line mean headcount poverty_gap ///
+	poverty_severity watts population 
+	
+	//------------ Formatting
+	format headcount poverty_gap poverty_severity watts mean  %8.4f
+	
+	format pop_in_poverty  population %15.0fc
 
 } // end of type 2
 
