@@ -83,7 +83,8 @@ if (!regexm("`src'", "repec")) {
 	
 	github query `repo'
 	local latestversion = "`r(latestversion)'"
-	if regexm("`r(latestversion)'", "([0-9]+)\.([0-9]+)\.([0-9]+)\.?([0-9]*)"){
+	* disp "`latestversion'"
+	if regexm("`latestversion'", "([0-9]+)\.([0-9]+)\.([0-9]+)\.?([0-9]*)") {
 		local lastMajor = regexs(1)
 		local lastMinor = regexs(2)
 		local lastPatch = regexs(3)		 
@@ -94,7 +95,7 @@ if (!regexm("`src'", "repec")) {
 	
 	* github version `cmd'
 	* local crrtversion =  "`r(version)'"
-	if regexm("`r(version)'", "([0-9]+)\.([0-9]+)\.([0-9]+)\.?([0-9]*)"){
+	if regexm("`crrtversion'", "([0-9]+)\.([0-9]+)\.([0-9]+)\.?([0-9]*)"){
 		local crrMajor = regexs(1)
 		local crrMinor = regexs(2)
 		local crrPatch = regexs(3)
