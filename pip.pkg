@@ -1,4 +1,4 @@
-v 0.1.0.9005
+v 0.1.0.9006
 d 'PIP': Poverty and Inequality Platform Stata wrapper
 d 
 d World Bank PIP API Stata wrapper
@@ -11,7 +11,7 @@ F pip.sthlp
 F pip_cl.ado
 F pip_clean.ado
 F pip_countries.sthlp
-F pip_drop_frames.ado
+F pip_drop.ado
 F pip_examples.ado
 F pip_info.ado
 F pip_new_session.ado
