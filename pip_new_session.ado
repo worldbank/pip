@@ -20,7 +20,7 @@ version 16.0
 
 syntax [anything(name=subcommand)]  ///
 [,                             	    /// 
-	pause                             /// 
+pause                             /// 
 ] 
 
 if ("`pause'" == "pause") pause on
@@ -32,107 +32,118 @@ else                      pause off
 ==================================================*/
 
 * mata: povcalnet_source("povcalnet") // creates local src
-_pip_find_src pip
+local cmd pip
+local username "pip-technical-team"  // to modify
+
+_pip_find_src `cmd'
 local src = "`r(src)'"
 
+
 * If PIP was installed from github
-if (regexm("`src'", "github")) {
-	local git_cmds pip
+if (!regexm("`src'", "repec")) {
 	
-	foreach cmd of local git_cmds {
-		
-		* Check repository of files 
-		* mata: povcalnet_source("`cmd'")
-		local cmd pip
-		_pip_find_src `cmd'
-		local src = "`r(src)'"
-		
-		if regexm("`src'", "\.io/") {  // if site
-			if regexm("`src'", "://([^ ]+)\.github") {
-				local repo = regexs(1) + "/`cmd'"
-			}
-		}
-		else {  // if branch
-			if regexm("`src'", "\.com/([^ ]+)(/`cmd')") {
-				local repo = regexs(1) + regexs(2) 
-			}
-		}
-		
-		github query `repo'
-		local latestversion = "`r(latestversion)'"
-		if regexm("`r(latestversion)'", "([0-9]+)\.([0-9]+)\.([0-9]+)\.?([0-9]+?)"){
-			local lastMajor = regexs(1)
-			local lastMinor = regexs(2)
-			local lastPatch = regexs(3)		 
-			local lastDevel = regexs(4)		 
-		}
-		if ("`lastDevel'" == "") local lastDevel 0
-		
-		github version `cmd'
-		local crrtversion =  "`r(version)'"
-		if regexm("`r(version)'", "([0-9]+)\.([0-9]+)\.([0-9]+)\.?([0-9]+?)"){
-			local crrMajor = regexs(1)
-			local crrMinor = regexs(2)
-			local crrPatch = regexs(3)
-			local crrDevel = regexs(4)		 
-		}
-		if ("`crrDevel'" == "") local crrDevel 0
-		
-		/* 
-		foreach x in repo cmd {
-			local `x' : subinstr local `x' "." "", all 
-			local `x' : subinstr local `x' "-" ".", all 
-			if regexm("``x''", "([0-9]+)(\.)?([a-z]+)?([0-9]?)") {
-				disp regexs(1) regexs(2) regexs(4)
-			}
-			
-		}
-		 */
-		 
-		 
-		* force installation 
-		if ("`crrtversion'" == "") {
-			github install `repo', replace
-			cap window stopbox note "github command has been reinstalled to " ///
+	* Check repository of files 
+	* mata: povcalnet_source("`cmd'")
+	cap findfile github.dta, path("`c(sysdir_plus)'g/")
+	if (_rc) {
+		github install `username'/`cmd', replace
+		cap window stopbox note "pip command has been reinstalled to " ///
+		"keep record of new updates. Please type discard and retry."
+		global pip_cmds_ssc = ""
+		exit 
+	}
+	
+	tempname ghdta 
+	frame create `ghdta'
+	frame `ghdta' {
+		use "`r(fn)'", clear
+		qui keep if name == "`name'"  
+		if _N == 0 {
+			di in red "`name' package was not found"
+			github install `username'/`cmd', replace
+			cap window stopbox note "pip command has been reinstalled to " ///
 			"keep record of new updates. Please type discard and retry."
 			global pip_cmds_ssc = ""
 			exit 
 		}
-		
-		local last    = `lastMajor'`lastMinor'`lastPatch'.`lastDevel'
-		local current = `crrMajor'`crrMinor'`crrPatch'.`crrDevel'
-		if (`last' > `current' ) {
-			cap window stopbox rusure "There is a new version of `cmd' in Github (`latestversion')." ///
-			"Would you like to install it now?"
-			
-			if (_rc == 0) {
-				cap github install `repo', replace
-				if (_rc == 0) {
-					cap window stopbox note "Installation complete. please type" ///
-					"discard in your command window to finish"
-					local bye "exit"
-				}
-				else {
-					noi disp as err "there was an error in the installation. " _n ///
-					"please run the following to retry, " _n(2) ///
-					"{stata github install `repo', replace}"
-					local bye "error"
-				}
-			}	
-			else local bye ""
-			
-		}  // end of checking github update
-		
-		else {
-			noi disp as result "Github version of {cmd:`cmd'} is up to date."
-			local bye ""
+		if _N > 1 {
+			di as err "{p}multiple packages with this name are found!"      ///
+			"this can be caused if you had installed multiple "     ///
+			"packages from different repositories, but with an "    ///
+			"identical name..." _n
+			noi list
 		}
+		if _N == 1 {
+			local repo        : di address[1]
+			local crrtversion : di version[1]
+		}
+	}
+	
+	github query `repo'
+	local latestversion = "`r(latestversion)'"
+	if regexm("`r(latestversion)'", "([0-9]+)\.([0-9]+)\.([0-9]+)\.?([0-9]+?)"){
+		local lastMajor = regexs(1)
+		local lastMinor = regexs(2)
+		local lastPatch = regexs(3)		 
+		local lastDevel = regexs(4)		 
+	}
+	if ("`lastDevel'" == "") local lastDevel 0
+	
+	github version `cmd'
+	local crrtversion =  "`r(version)'"
+	if regexm("`r(version)'", "([0-9]+)\.([0-9]+)\.([0-9]+)\.?([0-9]+?)"){
+		local crrMajor = regexs(1)
+		local crrMinor = regexs(2)
+		local crrPatch = regexs(3)
+		local crrDevel = regexs(4)		 
+	}
+	if ("`crrDevel'" == "") local crrDevel 0
+	
+	* force installation 
+	if ("`crrtversion'" == "") {
+		local username "pip-technical-team"  // to modify
+		github install `username'/`cmd', replace
+		cap window stopbox note "pip command has been reinstalled to " ///
+		"keep record of new updates. Please type discard and retry."
+		global pip_cmds_ssc = ""
+		exit 
+	}
+	
+	local last    = `lastMajor'`lastMinor'`lastPatch'.`lastDevel'
+	local current = `crrMajor'`crrMinor'`crrPatch'.`crrDevel'
+	if (`last' > `current' ) {
+		cap window stopbox rusure "There is a new version of `cmd' in Github (`latestversion')." ///
+		"Would you like to install it now?"
 		
-	} // end of loop
+		if (_rc == 0) {
+			cap github install `repo', replace
+			if (_rc == 0) {
+				cap window stopbox note "Installation complete. please type" ///
+				"discard in your command window to finish"
+				local bye "exit"
+			}
+			else {
+				noi disp as err "there was an error in the installation. " _n ///
+				"please run the following to retry, " _n(2) ///
+				"{stata github install `repo', replace}"
+				local bye "error"
+			}
+		}	
+		else local bye ""
+		
+	}  // end of checking github update
+	
+	else {
+		noi disp as result "Github version of {cmd:`cmd'} is up to date."
+		local bye ""
+	}
+	
+	
 	
 } // end if installed from github 
 
-else if (regexm("`src'", "repec")) {  // if pip was installed from SSC
+else {  // if pip was installed from SSC
+	
 	qui adoupdate pip, ssconly
 	if ("`r(pkglist)'" == "pip") {
 		cap window stopbox rusure "There is a new version of pip in SSC." ///
@@ -159,11 +170,6 @@ else if (regexm("`src'", "repec")) {  // if pip was installed from SSC
 		local bye ""
 	}
 }  // Finish checking pip update 
-else {
-	noi disp as result "Source of {cmd:pip} package not found." _n ///
-	"You won't be able to benefit from latest updates."
-	local bye ""
-}
 
 
 /*==================================================
@@ -223,7 +229,7 @@ qui {
 	
 	if (`"`pklines'"' == `""') local src = "NotInstalled"
 	else {
-	
+		
 		// the latest source and subtract which refers to the source 
 		local sourceline = max(0, `pklines') - 1 
 		
