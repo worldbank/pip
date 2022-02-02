@@ -43,7 +43,7 @@ local src = "`r(src)'"
 if (!regexm("`src'", "repec")) {
 	
 	* Check repository of files 
-	* mata: povcalnet_source("`cmd'")
+	* local cmd pip
 	cap findfile github.dta, path("`c(sysdir_plus)'g/")
 	if (_rc) {
 		github install `username'/`cmd', replace
@@ -52,14 +52,16 @@ if (!regexm("`src'", "repec")) {
 		global pip_cmds_ssc = ""
 		exit 
 	}
+	local ghfile "`r(fn)'"
+	* use "`ghfile'", clear
 	
 	tempname ghdta 
 	frame create `ghdta'
 	frame `ghdta' {
-		use "`r(fn)'", clear
-		qui keep if name == "`name'"  
+		use "`ghfile'", clear
+		qui keep if name == "`cmd'"  
 		if _N == 0 {
-			di in red "`name' package was not found"
+			di in red "`cmd' package was not found"
 			github install `username'/`cmd', replace
 			cap window stopbox note "pip command has been reinstalled to " ///
 			"keep record of new updates. Please type discard and retry."
