@@ -93,8 +93,16 @@ quietly {
 		if ("`country'" != "" & lower("`country'") != "all") {
 			
 			local countries_ : subinstr local country " " "|", all 
-			replace keep_this = 1 if regexm(country_code, "`countries_'")
 			
+			count if regexm(country_code, "`countries_'")
+			if (r(N) == 0) {
+				noi disp in red "None of the country codes provided corresponds to the " _n ///
+				"set of country codes available. Type {stata pip info} to get the full " _n ///
+				"list of the PIP inventory"
+				error
+			}
+			
+			replace keep_this = 1 if regexm(country_code, "`countries_'")
 		}
 		
 		if lower("`country'") == "all" replace keep_this = 1
