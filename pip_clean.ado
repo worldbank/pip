@@ -131,16 +131,14 @@ if ("`type'" == "1") {
 	label var mld 				"Mean Log Deviation"
 	label var polarization 		"Polarization"
 	label var population 		"Population in year"
-	label var decile1 			"Share of total welfare in decile 1"
-	label var decile2 			"Share of total welfare in decile 2"
-	label var decile3 			"Share of total welfare in decile 3"
-	label var decile4 			"Share of total welfare in decile 4"
-	label var decile5 			"Share of total welfare in decile 5"
-	label var decile6 			"Share of total welfare in decile 6"
-	label var decile7 			"Share of total welfare in decile 7"
-	label var decile8 			"Share of total welfare in decile 8"
-	label var decile9 			"Share of total welfare in decile 9"
-	label var decile10 			"Share of total welfare in decile 10"
+	
+	ds decile*
+	local vardec = "`r(varlist)'"
+	foreach var of local vardec {
+		if regexm("`var'", "([0-9]+)") local q = regexs(1)
+		label var `var' "Decile `q' welfare share"
+	}
+	
 	label var reporting_level 	"Reporting data level"
 	label var survey_acronym 	"Survey acronym"     
 	label var survey_comparability "Survey comparability"
@@ -176,6 +174,8 @@ if ("`type'" == "1") {
 	format reporting_gdp  reporting_hfce %15.2fc
 	
 	format population %15.0fc
+	
+	format poverty_line %6.2f
 	
 }
 
@@ -215,6 +215,8 @@ if ("`type'" == "2") {
 	format headcount poverty_gap poverty_severity watts mean  %8.4f
 	
 	format pop_in_poverty  population %15.0fc
+	
+	format poverty_line %6.2f
 
 } // end of type 2
 
