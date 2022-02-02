@@ -66,8 +66,13 @@ qui {
 	//========================================================
 	local curframe = c(frame)
 	
-	if ("`subcommand'" == "dropframes") {
-		pip_drop_frames, frame_prefix(`frame_prefix')
+	if regexm("`subcommand'", "^dropframe") {
+		pip_drop frame, frame_prefix(`frame_prefix')
+		exit
+	}
+	
+	if regexm("`subcommand'", "^dropglobal") {
+		pip_drop global
 		exit
 	}
 	
