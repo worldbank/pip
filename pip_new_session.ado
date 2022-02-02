@@ -43,6 +43,7 @@ if (regexm("`src'", "github")) {
 		
 		* Check repository of files 
 		* mata: povcalnet_source("`cmd'")
+		local cmd pip
 		_pip_find_src `cmd'
 		local src = "`r(src)'"
 		
@@ -57,21 +58,26 @@ if (regexm("`src'", "github")) {
 			}
 		}
 		
-		qui github query `repo'
+		github query `repo'
 		local latestversion = "`r(latestversion)'"
-		if regexm("`r(latestversion)'", "([0-9]+)\.([0-9]+)\.([0-9]+)"){
+		if regexm("`r(latestversion)'", "([0-9]+)\.([0-9]+)\.([0-9]+)\.?([0-9]+?)"){
 			local lastMajor = regexs(1)
 			local lastMinor = regexs(2)
 			local lastPatch = regexs(3)		 
+			local lastDevel = regexs(4)		 
 		}
+		if ("`lastDevel'" == "") local lastDevel 0
 		
-		qui github version `cmd'
+		github version `cmd'
 		local crrtversion =  "`r(version)'"
-		if regexm("`r(version)'", "([0-9]+)\.([0-9]+)\.([0-9]+)"){
+		if regexm("`r(version)'", "([0-9]+)\.([0-9]+)\.([0-9]+)\.?([0-9]+?)"){
 			local crrMajor = regexs(1)
 			local crrMinor = regexs(2)
 			local crrPatch = regexs(3)
+			local crrDevel = regexs(4)		 
 		}
+		if ("`crrDevel'" == "") local crrDevel 0
+		
 		/* 
 		foreach x in repo cmd {
 			local `x' : subinstr local `x' "." "", all 
@@ -93,8 +99,9 @@ if (regexm("`src'", "github")) {
 			exit 
 		}
 		
-		if (`lastMajor' > `crrMajor' | `lastMinor' > `crrMinor' | `lastPatch' > `crrPatch') {
-			* if (`lastMajor'`lastMinor'`lastPatch' > `crrMajor'`crrMinor'`crrPatch') {
+		local last    = `lastMajor'`lastMinor'`lastPatch'.`lastDevel'
+		local current = `crrMajor'`crrMinor'`crrPatch'.`crrDevel'
+		if (`last' > `current' ) {
 			cap window stopbox rusure "There is a new version of `cmd' in Github (`latestversion')." ///
 			"Would you like to install it now?"
 			
