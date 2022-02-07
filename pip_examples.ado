@@ -57,7 +57,7 @@ end
 program define pcn_example02
 	pip wb, clear
 	keep if reporting_year > 1989
-	gen poorpop = headcount * reporting_pop 
+	gen poorpop = headcount * population 
 	gen hcpercent = round(headcount*100, 0.1) 
 	gen poorpopround = round(poorpop, 1)
 	encode region, gen(rid)

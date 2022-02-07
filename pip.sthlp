@@ -599,44 +599,7 @@ Here are the list of pip and povcalnet variables.
 {txt}      ({stata "pip_examples pcn_example07":click to run})
 
 {phang2}
-{ul:4.3} Millions of poor by region
-
-{cmd}
-	. pip wb, clear
-	. keep if year > 1989
-	. gen poorpop = headcount * population 
-	. gen hcpercent = round(headcount*100, 0.1) 
-	. gen poorpopround = round(poorpop, 1)
-	. encode region, gen(rid)
-
-	. levelsof rid, local(regions)
-	. foreach region of local regions {
-	. 	local legend = `"`legend' `region' "`: label rid `region''" "'
-	. }
-
-	. keep year rid poorpop
-	. reshape wide poorpop,i(year) j(rid)
-	. foreach i of numlist 2(1)7{
-	. 	egen poorpopacc`i'=rowtotal(poorpop1 - poorpop`i')
-	. }
-
-	. twoway (area poorpop1 year)                              ///
-	. 	(rarea poorpopacc2 poorpop1 year)                      ///
-	. 	(rarea poorpopacc3 poorpopacc2 year)                   ///
-	. 	(rarea poorpopacc4 poorpopacc3 year)                   ///
-	. 	(rarea poorpopacc5 poorpopacc4 year)                   ///
-	. 	(rarea poorpopacc6 poorpopacc5 year)                   ///
-	. 	(rarea poorpopacc7 poorpopacc6 year)                   ///
-	. 	(line poorpopacc7 year, lwidth(midthick) lcolor(gs0)), ///
-	. 	ytitle("Millions of Poor" " ", size(small))            ///
-	. 	xtitle(" " "", size(small)) scheme(s2color)            ///
-	. 	graphregion(c(white)) ysize(7) xsize(8)                ///
-	. 	ylabel(,labs(small) nogrid angle(verticle)) xlabel(,labs(small)) ///
-	. 	legend(order(`legend') si(vsmall))
-{txt}      ({stata "pip_examples pcn_example02":click to run})
-
-{phang2}
-{ul:4.4} Graph of population distribution across income categories in Latin America, by country
+{ul:4.3} Graph of population distribution across income categories in Latin America, by country
 
 {cmd}
 	. pip, region(lac) year(last) povline(3.2 5.5 15) clear 
