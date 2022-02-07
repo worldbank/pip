@@ -20,7 +20,7 @@
 
 {p2colset 9 24 22 2}{...}
 {p2col :{hi:pip} {hline 2}}Access World Bank Global Poverty and Inequality Platform (PIP). PIP is a new platform that allows Stata users to estimate poverty and inequality indicators. The platform has more indicators than its predecessor(povcalnet). However, to make the platform compatible with povcalnet, the PIP allows to estimate same indicators that are available in povcalnet. See {help pip##list: below} the list of pip and povcalnet indicators.{p_end}
-{p2col :{hi:Website: }}{browse "https://worldbank.github.io/pip/"}{p_end}
+{p2col :{hi:Website: }}{browse "https://worldbank.github.io/pip/"}{err: (temporally disabled)}{p_end}
 {p2colreset}{...}
 {title:Syntax}
 
@@ -46,8 +46,6 @@ Cannot be used with option {it:country()}{p_end}
 {synopthdr:Options}
 {synoptline}
 {synopt :{opt clear}} replace data in memory.{p_end}
-{synopt :{opt agg:regate}} calculates poverty measures for regions or user-specified
-groups of countries instead of country-level estimated.{p_end}
 {synopt :{opt coverage(string)}} loads coverage level ("national", "urban", "rural", "all"). Default "all".{p_end}
 {synopt :{opt fill:gaps}} loads all countries used to create regional aggregates.{p_end}
 {synopt :{opt info:rmation}} presents a clickable version of the available surveys, countries and regions.{p_end}
@@ -60,8 +58,8 @@ Default is 5. {it:Advance option. Just use it if Internet connection is poor}{p_
 {synoptline}
 {synopt :{opt info:rmation}}presents a clickable version of the available surveys, 
 countries and regions. Same as option {it:information}{p_end}
-{synopt :{opt cl}} {it:country-level} query that changes the default combinatorial 
-arrangement of parameters for a one-on-one correspondence. 
+{synopt :{opt cl}} {err:(temporally disabled)} {it:country-level} query that changes the default combinatorial 
+arrangement of parameters for a one-on-one correspondence.  
 See{help pip##typesq: below} for a detailed explanation.{p_end}
 {synopt :{opt wb}}downloads World Bank's regional and global aggregation{p_end}
 {synopt :{opt test}}executes the last query in browser regardless of failure by 
@@ -152,8 +150,7 @@ rates, and assuming distribution-neutrality. {cmd: pip wb} returns the global an
 regional poverty aggregates used by the World Bank. 
 
 {pin}
-{err:Important}: Choosing option {it:aggregate} displays (population-weighted) 
-averages for the specified group of countries. Option {it:fillgaps} reports the
+{err:Important}: Option {it:fillgaps} reports the
 underlying lined-up country estimates for a reference-year. Poverty measures 
 calculated for both survey-years and reference-years  include Headcount ratio, 
 Poverty Gap, Squared Poverty Gap.  Inequality measures, including the Gini index, 
@@ -223,27 +220,6 @@ The resulting poverty lines are expressed in 2011 PPP-adjusted USD per capita pe
 {title:Options description}
 
 {phang}
-{opt aggregate} Will calculate the aggregated poverty measures for the given set of 
-countries or regions.
-
-{p 8 8 2}{err:Note 1}: If option {it:country({ul:all})} is combined with 
-option {it:aggregate}, {cmd:pip} executes instead {cmd: pip wb}, 
-which returns the 
-{browse "http://iresearch.worldbank.org/pip/povDuplicateWB.aspx":default global aggregates} 
-used by the World Bank as explained in more detail below. In contrast, to aggregate 
-all countries in a particular reference year, users need to list them all in the
-{it:country()} option. One way to do so is as follows:{p_end}
-{cmd}
-		. pip info, clear
-		. levelsof country_code, local(all) clean 
-		. pip, country(`all') year(2015) clear  aggregate
-{txt}
-{p 8 8 2}{err:Note 2}: Aggregation can only be done for the reference years (As of 
-Sep 2018: 1981, 1984, 1987, 1990, 1993, 1996, 1999, 2002, 2005, 2008, 2010, 2011, 
-2012, 2013 and 2015). Using the option {it:last} or {it:all}, {cmd:pip}
-loads the most up-to-date year(s).{p_end}
-
-{phang}
 {opt fillgaps} Loads all country-level estimates that are used to create the  
 aggregates in the reference years. This means that estimates use the same reference 
 years as aggregate estimates. 
@@ -289,27 +265,6 @@ availability in the results window.{p_end}
 {opt cl} Stands for {it:country-level} queries. It changes combinatorial query of parameters 
 for one-on-one correspondence of parameters. See {help pip##typesq:above} 
 for a detailed explanation. 
-
-{phang}
-{opt wb} Downloads World Bank's regional and global aggregation. These functions
-differ from option {it:aggregate} in two ways: [1] {it:wb} uses a predefined set of countries
-in each region, whereas option {it:aggregate} allows users to select their own set 
-of countries for aggregation. [2] The World Bank aggregation (queried by the {cmd:wb} 
-subcommand) assumes that the poverty rate for an economy without a household survey is 
-the regional average. This creates differences in two types of estimates: [a] When a
-region includes countries without a household survey, the number of poor is different
-between the two methods even when users query the same set of countries. The number of
-poor according to the World Bank method is obtained as the product of the region’s
-headcount index and the total regional population (which includes the population of
-countries without any household survey). In contrast, when using {it:aggregate}, 
-the number of poor is the product of the region’s headcount index and the total
-population of the economies included in the aggregation. [b] In computing the poverty
-estimates for the world, the World Bank aggregation takes the population-weighted
-average of the regional estimates. Each region is weighted using the total regional
-population, including the population of countries without any household survey.
-Countries without a survey are thus implicitly assigned the regional poverty rate. In
-contrast, when using the option aggregate, only countries with a survey are considered
-(which are then weighted by their population).
 
 {phang}
 {opt test} Executes the last query in browser regardless of failure by 
@@ -442,12 +397,6 @@ Here are the list of pip and povcalnet variables.
 
 {phang2}
 {stata pip, country(COL BRA ARG IND) year(2015) clear  fillgaps}
-
-{phang}
-2.3. Estimate aggregates over the economies listed in {it:country()}. 
-
-{phang2}
-{stata pip, country(COL BRA ARG IND) year(2015) clear  aggregate}
 
 {phang}
 2.4. World Bank aggregation ({it:country()} is not available)
