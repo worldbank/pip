@@ -58,7 +58,7 @@ Default is 5. {it:Advance option. Just use it if Internet connection is poor}{p_
 {synoptline}
 {synopt :{opt info:rmation}}presents a clickable version of the available surveys, 
 countries and regions. Same as option {it:information}{p_end}
-{synopt :{opt cl}} {err:(temporally disabled)} {it:country-level} query that changes the default combinatorial 
+{synopt :{opt cl}}{err:(temporally disabled)} {it:country-level} query that changes the default combinatorial 
 arrangement of parameters for a one-on-one correspondence.  
 See{help pip##typesq: below} for a detailed explanation.{p_end}
 {synopt :{opt wb}}downloads World Bank's regional and global aggregation{p_end}
