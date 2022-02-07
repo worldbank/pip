@@ -30,13 +30,14 @@ qui {
 	
 	*----------1.1:
 	global pip_cmds_ssc = 1  // make sure it does not execute again per session
-	pip, countr(COL) povline(51) clear // to initiate 
+	local pp = round(runiform()*100, .01)  // random poverty line
+	
 	*----------1.2:
 	local stime 100
 	timer clear 1
 	timer on 1
-	pip, clear
-	pip wb, clear
+	pip, povline(`pp') clear
+	pip wb, povline(`pp') clear
 	timer off 1
 	timer list 1
 	
@@ -109,7 +110,10 @@ qui {
 			sleep `stime'
 		}
 		if (_rc) {
-			noi disp in red "error in `x'" 
+			noi _dots `i' 2
+		}
+		else {
+			noi _dots `i' 0
 		}
 		
 	}
@@ -121,25 +125,69 @@ qui {
 	noi pip_time_convertor `act_time', type(Actual)
 	
 	
-	* frame _pip_countries {
-		* levelsof country_code, local(countries) clean 
-	* }
 	
-	* foreach country of local countries {
+	timer clear 3
+	timer on 3
+	pip, countr(COL) povline(`pp') clear // to initiate 
+	timer off 3
+	timer list 3
+	
+	local cty_time = r(t3)
+	
+	
+	
+	frame _pip_countries {
+		levelsof country_code, local(countries) clean 
+	}
+	
+	local ncty: word count `countries'
+	
+	* seconds of number of queries per country and poverty lines
+	local cty_n_queries = `cty_time'*`ncty'*`3'  + ///   
+	(`ncty'*`3') * (`stime'/1000) // extra time if sleep between calls
+	
+	
+	
+  noi disp as txt ". " in y "= saved successfully"
+  noi disp as txt "s " in y "= skipped - already exists (unchanged)"
+  noi disp as err "x " in y "= skipped - already exists (changed)"
+  noi disp as err "e " in y "= error"
+  noi disp ""
+  
+  local i = 0
+  noi _dots 0, title(caching country queries with basic poverty liens 1.90, 3.20, and 5.50) reps(`ncty')	
+	
+	
+	noi pip_time_convertor `cty_n_queries', type(Estimated)
+	
+	timer clear 4
+	timer on 4
+	
+	foreach country of local countries {
 		
-		* cap {
-			* pip, countr(`country') clear
-			* sleep `stime'
-			* pip, countr(`country') povline(3.2)  clear
-			* sleep `stime'
-			* pip, countr(`country') povline(5.5)  clear
-			* sleep `stime'
-		* }
-		* if (_rc) {
-			* noi disp in red "error in `country'" 
-		* }
+		cap {
+			pip, countr(`country') clear
+			sleep `stime'
+			pip, countr(`country') povline(3.2)  clear
+			sleep `stime'
+			pip, countr(`country') povline(5.5)  clear
+			sleep `stime'
+		}
+		if (_rc) {
+			noi _dots `i' 2
+		}
+		else {
+			noi _dots `i' 0
+		}
 		
-	* }
+	}
+	
+	
+	timer off 4
+	timer list 4
+	
+	local cty_actual = r(t4)
+	noi pip_time_convertor `cty_actual', type(Actual)
 	
 }
 
@@ -172,23 +220,34 @@ type(string)                                     ///
 noPRINT                                          ///
 ]
 
-		
-	if (mod(`time'/60, 2) >= 1) {
-		
-		local minute   = `time'/60 - mod(`time'/60,2) + 1
-		local second   = round(60*(mod(`time'/60,2) - 1))		
-	} 
-	else {
-		local minute   = `time'/60 - mod(`time'/60,2) 
-		local second = round(60*mod(`time'/60,2))
-	}
+
+if (mod(`time'/(3600), 2) >= 1) {
 	
-	if ("`print'" == "") {
-		disp in y "`type' time is `minute' minutes and `second' seconds"
-	}
-	
-	return local minutes = `minute'
-	return local seconds = `second'
+	local hour   = `time'/3600 - mod(`time'/3600,2) + 1
+	local min_dec = 60*(mod(`time'/3600,2) - 1)
+	local minute = round(`min_dec')
+	local second = round(60*mod(`min_dec',1))
+} 
+
+else if (mod(`time'/60, 2) >= 1) {
+	local hour     = 0
+	local minute   = `time'/60 - mod(`time'/60,2) + 1
+	local second   = round(60*(mod(`time'/60,2) - 1))		
+} 
+else {
+	local hour     = 0
+	local minute   = `time'/60 - mod(`time'/60,2) 
+	local second = round(60*mod(`time'/60,2))
+}
+
+if ("`print'" == "") {
+	disp "`type' time"
+	disp in y "hours: `hour'" _n "minutes: `minute'" _n "seconds: `second'"
+}
+
+return local hours   = `hour'
+return local minutes = `minute'
+return local seconds = `second'
 
 
 end
