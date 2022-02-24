@@ -15,7 +15,3 @@ make pip, replace toc pkg                         ///  readme
     install("pip.ado;pip.sthlp;pip_cl.ado;pip_clean.ado;pip_countries.sthlp;pip_drop.ado;pip_examples.ado;pip_info.ado;pip_new_session.ado;pip_povcalnet_format.ado;pip_query.ado;pip_set_server.ado;pip_cache.ado") ///
     ancillary("")                                                         
 
-
-
-
-
