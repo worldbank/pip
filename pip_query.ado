@@ -56,7 +56,7 @@ quietly {
 	if ("`year'" != "all" & ("`wb'" != "" | "`aggregate'" != "")) {	
 		
 		
-		frame `frpipim': levelsof reporting_year, local(ref_years_l)
+		frame `frpipim': levelsof surveyid_year, local(ref_years_l)
 		local ref_years "`ref_years_l' last"
 		
 		local no_ref: list year - ref_years
@@ -148,7 +148,7 @@ quietly {
 				foreach ct of local cts {
 					
 					count if country_code == "`ct'" & ///
-					      regexm(strofreal(reporting_year), "`years_'") & `touse'
+					      regexm(strofreal(surveyid_year), "`years_'") & `touse'
 								
 					local year_ok =  r(N)
 					

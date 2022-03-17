@@ -169,6 +169,14 @@ qui {
 	}
 	
 	if ("`year'" == "") local year "all"
+	if ("`year'" != "" & "`year'" != "all"){
+		local yrtemp
+		foreach yr of local year {
+			local tt = substr("`yr'", 1, 4) 
+			local yrtemp `yrtemp' `tt'
+		}
+		local year "`yrtemp'"
+	} 
 	* 
 	
 	*---------- Coverage
