@@ -169,7 +169,8 @@ qui {
 	}
 	
 	if ("`year'" == "") local year "all"
-	if ("`year'" != "" & "`year'" != "all"){
+	
+	if ("`year'" != "" & "`year'" != "all") {
 		local yrtemp
 		foreach yr of local year {
 			local tt = substr("`yr'", 1, 4) 
@@ -425,7 +426,7 @@ qui {
 		global pip_query = "`query'"
 		
 		*---------- Base + query
-		if ("`aggregate'" != ""){
+		if ("`aggregate'" != "" | "`subcommand'" == "wb"){
 			local queryfull "`base_grp'?`query'"
 		}
 		else{
