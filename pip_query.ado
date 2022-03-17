@@ -90,6 +90,7 @@ quietly {
 		else {
 			replace keep_this = 0
 		}
+		
 		if ("`country'" != "" & lower("`country'") != "all") {
 			
 			local countries_ : subinstr local country " " "|", all 
