@@ -51,16 +51,16 @@ if ("`type'" == "1") {
 	
 	pip_info, clear justdata `pause' server(`server')
 	
-	frlink m:1 country_code, frame(_pip_countries) generate(ctry_name)
-	frget country_name, from(ctry_name)
+	* frlink m:1 country_code, frame(_pip_countries) generate(ctry_name)
+	* frget country_name, from(ctry_name)
 	
-	frlink m:1 region_code, frame(_pip_regions) generate(rgn_name)
-	frget region, from(rgn_name)
+	* frlink m:1 region_code, frame(_pip_regions) generate(rgn_name)
+	* frget region, from(rgn_name)
 	
-	drop ctry_name rgn_name
+	* drop ctry_name rgn_name
 	
-	local orgvar country_name region reporting_pop reporting_pce pce_data_level
-	local newvar countryname region_name population reporting_hfce hfce_data_level
+	local orgvar  reporting_pop reporting_pce 
+	local newvar  population reporting_hfce
 			
 	local i = 0
 		foreach var of local orgvar {
@@ -110,7 +110,7 @@ if ("`type'" == "1") {
 	label values welfare_type welfare_type
 
 	label var country_code		"Country/Economy code"
-	label var countryname 		"Country/Economy name"
+	label var country_name 		"Country/Economy name"
 	label var region_code 		"Region code"
 	label var region_name 		"Region name"
 	label var survey_coverage 	"Survey coverage"
@@ -143,24 +143,24 @@ if ("`type'" == "1") {
 	label var survey_acronym 	"Survey acronym"     
 	label var survey_comparability "Survey comparability"
 	label var comparable_spell 	"Comparability over time at country level"
-	label var survey_mean_lcu 	"Daily mean income or expenditure in LCU"
-	label var survey_mean_ppp 	"Daily mean income or expenditure in PPP$"
-	label var predicted_mean_ppp "Daily interpolated mean in PPP$"       
+	* label var survey_mean_lcu 	"Daily mean income or expenditure in LCU"
+	* label var survey_mean_ppp 	"Daily mean income or expenditure in PPP$"
+	* label var predicted_mean_ppp "Daily interpolated mean in PPP$"       
 	label var cpi 				"Consumer Price Index (CPI)"
-	label var cpi_data_level 	"CPI data level"
-	label var ppp_data_level 	"PPP data level"
-	label var pop_data_level 	"Population level"
+	* label var cpi_data_level 	"CPI data level"
+	* label var ppp_data_level 	"PPP data level"
+	* label var pop_data_level 	"Population level"
 	label var reporting_gdp 	"Reported GDP"
-	label var gdp_data_level 	"GDP data level"
+	* label var gdp_data_level 	"GDP data level"
 	label var reporting_hfce 	"Reported per capita"
-	label var hfce_data_level 	"Per capita data level"
-	label var is_used_for_aggregation "Used for aggregation"
-	label var estimation_type 	"Estimation type"
+	* label var hfce_data_level 	"Per capita data level"
+	* label var is_used_for_aggregation "Used for aggregation"
+	* label var estimation_type 	"Estimation type"
 
 	sort country_code reporting_year survey_coverage 
 	
 	
-	order country_code countryname region_code region_name survey_coverage     ///
+	order country_code country_name region_code region_name survey_coverage     ///
 	reporting_year survey_year welfare_type is_interpolated distribution_type  ///
 	ppp poverty_line mean headcount poverty_gap poverty_severity watts gini    ///
 	median mld polarization population decile? decile10
@@ -168,9 +168,9 @@ if ("`type'" == "1") {
 	
 	//------------ Formatting
 	format headcount poverty_gap poverty_severity watts  gini mld polarization ///
-	decile*  mean survey_mean_ppp  cpi %8.4f
+	decile*  mean /* survey_mean_ppp */  cpi %8.4f
 	
-	format ppp survey_mean_lcu  %10.2fc
+	* format ppp survey_mean_lcu  %10.2fc
 	format reporting_gdp  reporting_hfce %15.2fc
 	
 	format population %15.0fc

@@ -27,10 +27,8 @@ qui {
 	
 	*---------- API defaults
 	pip_set_server  `server', `pause'
-	local server = "`r(server)'"
-	local url    = "`r(url)'"
-	local base   = "`r(base)'"
-	local base2  = "`r(base2)'"
+	local server    = "`r(server)'"
+	local url       = "`r(url)'"
 	return add
 	
 	

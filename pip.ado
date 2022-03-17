@@ -1,3 +1,4 @@
+*! version 0.1.2.9000   <2022mar17>
 *! version 0.1.2        <2022feb07>
 *! version 0.1.1        <2022feb01>
 *! version 0.1.0.9010   <2022feb01>
@@ -130,11 +131,10 @@ qui {
 	*---------- API defaults
 	pip_set_server  `server', `pause'
 	*return add
+	local url       = "`r(url)'"
 	local server    = "`r(server)'"
 	local base      = "`r(base)'"
 	local base_grp  = "`r(base_grp)'"
-	local url       = "`r(url)'"
-	local handle    = "`r(handle)'"
 	
 	
 	*---------- lower case subcommand
@@ -309,7 +309,7 @@ qui {
 		
 		noi disp in red "Subcommand {it:cl} is temporary out of service."
 		exit
-	
+		
 		noi pip_cl, country("`country'")  /// this needs to accommodate to new structure
 		year("`year'")                    ///
 		povline("`povline'")              ///
@@ -351,6 +351,7 @@ qui {
 	else 							loc i_call "i_popshare"
 	
 	foreach `i_call' of local `pcall' {	
+		
 		// --- timer
 		if ("`timer'" != "") {
 			local i_on = `i'
@@ -579,7 +580,7 @@ qui {
 				keep if (region_code == "WLD")			
 			}
 			noi list region reporting_year poverty_line headcount mean ///
-			  in 1/`n2disp',  abbreviate(12) 
+			in 1/`n2disp',  abbreviate(12) 
 		}
 		
 	}
