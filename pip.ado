@@ -144,11 +144,19 @@ qui {
 	// versions
 	//========================================================
 	if regexm("`subcommand'", "^version") {
-		noi pip_versions `server'
+		noi pip_versions, server(`server') availability
 		return add
 		exit
 	}
+	noi pip_versions, server(`server') ///
+	version(`version')                ///
+	release(`release')               ///
+	ppp_year(`ppp_year')             ///
+	identity(`identity')    
 	
+	local version_qr = "`r(version_qr)'"
+	local version    = "`r(version)'"
+	return local pip_version = "`version'"
 	
 	//========================================================
 	// conditions
@@ -432,10 +440,10 @@ qui {
 		
 		*---------- Query
 		if ("`popshare'" == ""){
-			local query = "`query_ys'&`query_ct'&`query_cv'&`query_pl'`query_pp'`query_ds'&format=csv"
+			local query = "`query_ys'&`query_ct'&`query_cv'&`query_pl'`query_pp'`query_ds'&`version_qr'&format=csv"
 		}
 		else{
-			local query = "`query_ys'&`query_ct'&`query_cv'&`query_ps'`query_pp'`query_ds'&format=csv"
+			local query = "`query_ys'&`query_ct'&`query_cv'&`query_ps'`query_pp'`query_ds'&`version_qr'&format=csv"
 		}
 		return local query_`f' "`query'"
 		global pip_query = "`query'"
