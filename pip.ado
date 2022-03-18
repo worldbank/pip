@@ -56,6 +56,9 @@ noEFFICIENT                    ///
 KEEPFrames                     ///
 frame_prefix(string)           ///
 replace                        ///
+version(string)                ///
+PPPyear(numlist)               ///
+identity(string)               ///
 ] 
 
 if ("`pause'" == "pause") pause on
@@ -139,9 +142,66 @@ qui {
 	//========================================================
 	// versions
 	//========================================================
+	if regexm("`subcommand'", "^version") {
+		noi pip_versions `server'
+		return add
+		exit
+	}
+	
+	if ("`version'" == "") {
+		* if version is empty
+		if ("${pip_version}" != "")  {
+			local version = "${pip_version}"
+		} 
+		else {
+			if ("${pip_pppyear}" != "" & "`pppyear'" == "") {
+				local pppyear = "${pip_pppyear}"
+			}
+			if ("${pip_identity}" != "" & "`identity'" == "") {
+				local identity = "${pip_identity}"
+			}
+			
+		}
+		
+	}
 	
 	
+	if ("`version'" != "") {
+		* local version "2022484_2011_02_02_PROD"
+		* check format
+		local vintage_pattern = "[0-9]{8}_[0-9]{4}_[0-9]{2}_[0-9]{2}_(PROD|INT|TEST)$"
+		if (!ustrregexm("`version'", "`vintage_pattern'")) {
+			noi disp in red "version provided, {it:`version'}, does not meet the " _c ///
+			"format criteria: " _n in y "`vintage_pattern'"
+			error
+		}
+		
+		* check availability
+		* local server "http://wzlxdpip01.worldbank.org/api/v1"
+		* local version "20220408_2011_02_02_PROD"
+		pip_versions `server'
+		local vers = "`r(versions)'"
+		
+		local ver_avlb: list version in vers
+		
+		if (`ver_avlb' == 0) {
+			noi disp in red "version {it:`version'} is not available in this server" _n ///
+			"Versions available are: "
+			foreach ver of local vers {
+				noi disp in y "`ver'"
+			}
+			error
+		}
+		else {
+			local version_qr = "version=`version'"
+		}
+		
+	}
 	
+	
+	//========================================================
+	// conditions
+	//========================================================
 	*---------- lower case subcommand
 	local subcommand = lower("`subcommand'")
 	
@@ -462,7 +522,7 @@ qui {
 		==================================================*/
 		
 		*---------- download data
-		cap import delimited  "`queryfull'", `clear'
+		cap import delimited  "`queryfull'", `clear' varn(1)
 		if (_rc) {
 			noi dis ""
 			noi dis in red "It was not possible to download data from the PIP API."
