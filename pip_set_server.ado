@@ -36,15 +36,21 @@ version 16.0
 local current_server "https://api.worldbank.org/pip/v1" // production
 
 if (inlist(lower("`server'"), "qa", "dev", "prod"))  {
-		local server "${pip_svr_`server'}"
+		local url "${pip_svr_`server'}"
 }
 
 
 /*==================================================
 2:  Server not defined
 ==================================================*/
-if ("`server'" == "") {
-	local server "`current_server'"
+else if ("`server'" == "") {
+	local url "`current_server'"
+	local server "prod"
+}
+
+else {
+	noi disp in red "server {it:`server'} not allowed"
+	error
 }
 
 //========================================================
@@ -52,7 +58,7 @@ if ("`server'" == "") {
 //========================================================
 
 
-cap scalar tpage = fileread(`"`server'/health-check"')
+cap scalar tpage = fileread(`"`url'/health-check"')
 * disp tpage
 
 *##e
@@ -62,9 +68,6 @@ if (!regexm(tpage, "API is running") | _rc) {
 	noi disp in red "There is a problem with PIP API server. Try again later"
 	error
 }
-
-local url     = "`server'"	
-
 
 //========================================================
 // Return values
