@@ -76,8 +76,7 @@ qui {
 	if regexm("`subcommand'", "^dropglobal") {
 		pip_drop global
 		exit
-	}
-	
+	}	
 	
 	//========================================================
 	//  Timer
@@ -135,6 +134,12 @@ qui {
 	local server    = "`r(server)'"
 	local base      = "`r(base)'"
 	local base_grp  = "`r(base_grp)'"
+	
+	
+	//========================================================
+	// versions
+	//========================================================
+	
 	
 	
 	*---------- lower case subcommand
@@ -588,7 +593,7 @@ qui {
 			if (`cwld' >= `n2disp') {
 				keep if (region_code == "WLD")			
 			}
-			noi list region reporting_year poverty_line headcount mean ///
+			noi list region_code reporting_year poverty_line headcount mean ///
 			in 1/`n2disp',  abbreviate(12) 
 		}
 		
