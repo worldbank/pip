@@ -55,7 +55,7 @@ quietly {
 	
 	if ("`year'" != "all" & ("`wb'" != "" | "`aggregate'" != "")) {	
 		
-		
+		* 
 		frame `frpipim': levelsof surveyid_year, local(ref_years_l)
 		local ref_years "`ref_years_l' last"
 		
@@ -70,6 +70,8 @@ quietly {
 		if ("`no_ref'" != "") {
 			noi disp in y "Warning: `no_ref' is/are not part of reference years: `ref_years_l'"
 		}
+		
+		 */
 		
 	}  // end of 'if' condition
 	
