@@ -36,7 +36,7 @@ qui {
 	
 	* local version has prvalence over everything else
 	if ("${pip_version}" != "" & "`version'" == "") {
-		noi disp in red "warning:" in y "Glabal {it:pip_version} is in use"
+		noi disp in red "warning:" in y "Global {it:pip_version} is in use"
 		local version = "${pip_version}"
 	}
 	
@@ -54,15 +54,15 @@ qui {
 	* locals have prevalence over globals
 	else { // if version is specified, all of this is ignored
 		if ("${pip_ppp_year}" != "" & "`ppp_year'" == "") {
-			noi disp in red "warning:" in y "Glabal {it:pip_ppp_year} is in use"
+			noi disp in red "warning:" in y "Global {it:pip_ppp_year} is in use"
 			local ppp_year = "${pip_ppp_year}"
 		}
 		if ("${pip_identity}" != "" & "`identity'" == "") {
-			noi disp in red "warning:" in y "Glabal {it:pip_identity} is in use"
+			noi disp in red "warning:" in y "Global {it:pip_identity} is in use"
 			local identity = "${pip_identity}"
 		}
 		if ("${pip_release}" != "" & "`release'" == "") {
-			noi disp in red "warning:" in y "Glabal {it:pip_release} is in use"
+			noi disp in red "warning:" in y "Global {it:pip_release} is in use"
 			local release = "${pip_release}"
 		}
 	}
