@@ -1,12 +1,3 @@
-*! version 0.1.3        <2022mar18>
-*! version 0.1.2.9000   <2022mar17>
-*! version 0.1.2        <2022feb07>
-*! version 0.1.1        <2022feb01>
-*! version 0.1.0.9010   <2022feb01>
-*! version 0.1.0        <2022feb01>
-*! version 0.0.2.9000   <2022jan19>
-*! version 0.0.2        <2022jan12>
-*! version 0.0.1        <2021dec01>
 /*=======================================================
 Program Name: pip.ado
 Author:
@@ -771,6 +762,17 @@ exit
 Notes:
 
 Version Control:
+
+*! version 0.1.4        <2022mar18>
+*! version 0.1.3        <2022mar18>
+*! version 0.1.2.9000   <2022mar17>
+*! version 0.1.2        <2022feb07>
+*! version 0.1.1        <2022feb01>
+*! version 0.1.0.9010   <2022feb01>
+*! version 0.1.0        <2022feb01>
+*! version 0.0.2.9000   <2022jan19>
+*! version 0.0.2        <2022jan12>
+*! version 0.0.1        <2021dec01>
 
 
 *##s
