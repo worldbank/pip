@@ -15,6 +15,7 @@ clear              ///
 justdata           /// programmers option
 pause              /// debugging
 server(string)     ///
+version(string)    ///
 POVCALNET_format   ///
 ] 
 
@@ -31,6 +32,17 @@ qui {
 	local url       = "`r(url)'"
 	return add
 	
+	//------------ version
+	if ("`version'" != "") {
+		local version_qr = "&version=`version'"
+		tokenize "`version'", parse("_")
+		local _version   = "_`1'_`3'_`9'"
+	}
+	else {
+		local version_qr = ""
+		local _version   = ""
+	}
+	
 	
 	***************************************************
 	* 0. Info frame 
@@ -45,14 +57,14 @@ qui {
 	local av_frames = "^(" + "`av_frames'" + ")"
 	
 	//------------ countries frame
-	local frpipcts "_pip_countries"
+	local frpipcts "_pip_cts`_version'"
 	if (!regexm("`frpipcts'", "`av_frames'")) {
 		
 		frame create `frpipcts'
 		
 		frame `frpipcts' {
 			
-			local csvfile0  = "`url'/aux?table=countries&format=csv"
+			local csvfile0  = "`url'/aux?table=countries`version_qr'&format=csv"
 			cap import delimited using "`csvfile0'", clear varn(1)
 			local rc1 = _rc
 			
@@ -74,14 +86,14 @@ qui {
 	}
 	
 	//------------ regions frame
-	local frpiprgn "_pip_regions"
+	local frpiprgn "_pip_regions`_version'"
 	if (!regexm("`frpiprgn'", "`av_frames'")) {
 		
 		frame create `frpiprgn'
 		
 		frame `frpiprgn' {
 			
-			local csvfilergn  = "`url'/aux?table=regions&format=csv"
+			local csvfilergn  = "`url'/aux?table=regions`version_qr'&format=csv"
 			cap import delimited using "`csvfilergn'", clear varn(1)
 			local rc1 = _rc
 			
@@ -104,7 +116,7 @@ qui {
 	
 	//------------ interpolated means frame
 	
-	local frpipim "_pip_int_means"
+	local frpipim "_pip_imns`_version'"
 	if (!regexm("`frpipim'", "`av_frames'")) {
 		
 		frame create `frpipim'
@@ -115,7 +127,7 @@ qui {
 				local csvfile  = "${pip_svr_prod}/aux?table=interpolated_means&format=csv"
 			}
 			else {
-				local csvfile  = "`url'/aux?table=interpolated_means&format=csv"
+				local csvfile  = "`url'/aux?table=interpolated_means`version_qr'&format=csv"
 			}
 			cap import delim using "`csvfile'", clear varn(1)
 		}
@@ -138,14 +150,14 @@ qui {
 	//  generating a lookup data
 	//========================================================
 	
-	local frlkupb "_pip_lkupb"
+	local frlkupb "_pip_lkupb`_version'"
 	if (!regexm("`frlkupb'", "`av_frames'")) {
 		
 		frame copy `frpipim' `frlkupb'
 		
 		frame `frlkupb' {
 			
-			frlink m:1 country_code, frame(_pip_countries) generate(ctry)
+			frlink m:1 country_code, frame(_pip_cts`_version') generate(ctry)
 			frget country_name income_group, from(ctry)
 			
 			keep country_code country_name wb_region_code pcn_region_code income_group survey_coverage surveyid_year
@@ -177,7 +189,7 @@ qui {
 	
 	
 	
-	frame copy _pip_lkupb _pip_lkup, replace
+	frame copy _pip_lkupb`_version' _pip_lkup, replace
 	if ("`justdata'" != "") exit
 	
 	***************************************************
@@ -195,7 +207,7 @@ qui {
 			local current_line = 0
 			foreach cccc of local countries{
 				local current_line = `current_line' + 1 
-				local display_this = "{stata pip_info, country(`cccc') clear: `cccc'} "
+				local display_this = "{stata pip_info, country(`cccc') clear version(`version'): `cccc'} "
 				if (`current_line' < 10) noi display in y `"`display_this'"' _continue 
 				else{
 					noi display in y `"`display_this'"' 

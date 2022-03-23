@@ -22,9 +22,10 @@ syntax anything(name=type),      ///
 								year(string)     ///
 								region(string)   ///
 								iso              ///
-								wb				    ///
-								nocensor			///
-								pause			///
+								wb				       ///
+								nocensor			   ///
+								pause			       ///
+								version(string)  ///
              ]
 
 if ("`pause'" == "pause") pause on
@@ -49,15 +50,7 @@ if ("`type'" == "1") {
 	***************************************************
 	// check if country data frame is available
 	
-	pip_info, clear justdata `pause' server(`server')
-	
-	* frlink m:1 country_code, frame(_pip_countries) generate(ctry_name)
-	* frget country_name, from(ctry_name)
-	
-	* frlink m:1 region_code, frame(_pip_regions) generate(rgn_name)
-	* frget region, from(rgn_name)
-	
-	* drop ctry_name rgn_name
+	pip_info, clear justdata `pause' server(`server') version(`version')
 	
 	local orgvar  reporting_pop reporting_pce 
 	local newvar  population reporting_hfce

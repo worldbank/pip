@@ -78,10 +78,10 @@ qui {
 	local server    = "`r(server)'"
 	
 	
-	cap frame drop _pip_versions // change this later
-	frame create _pip_versions
+	cap frame drop _pip_versions_`server' // change this later
+	frame create _pip_versions_`server'
 	
-	frame _pip_versions {
+	frame _pip_versions_`server' {
 		
 		
 		local url "http://wzlxdpip01.worldbank.org/api/v1"
@@ -99,7 +99,7 @@ qui {
 	//========================================================
 	
 	if ("`availability'" != "") {
-		frame _pip_versions {
+		frame _pip_versions_`server' {
 			levelsof versions, local(versions) clean
 			return local versions = "`versions'"
 			noi list versions // fast list
@@ -108,7 +108,7 @@ qui {
 	}
 	
 	
-	frame  copy _pip_versions _pip_versions_wrk, replace
+	frame  copy _pip_versions_`server' _pip_versions_wrk, replace
 	frame _pip_versions_wrk {
 		
 		//========================================================

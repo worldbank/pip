@@ -323,7 +323,7 @@ qui {
 	
 	*---------- Information
 	if ("`information'" != ""){
-		noi pip_info, `clear' `pause' server(`server')
+		noi pip_info, `clear' `pause' server(`server') version(`version')
 		return add 
 		exit
 	}	
@@ -401,6 +401,7 @@ qui {
 		ppp("`ppp'")                            ///
 		coverage(`coverage')                    ///
 		server(`server')                        ///
+		version(`version')                      ///
 		`clear'                                 ///
 		`information'                           ///
 		`iso'                                   ///
@@ -520,7 +521,7 @@ qui {
 		
 		*---------- Clean data
 		pip_clean `rtype', year("`year'") `iso' /* 
-		*/ region(`region') `pause' `wb'		
+		*/ region(`region') `pause' `wb' version(`version')
 		
 		pause after cleaning
 		// --- timer

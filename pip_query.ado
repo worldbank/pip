@@ -21,6 +21,7 @@ ORIginal               ///
 INFOrmation            ///
 COESP(string)          ///
 SERVER(string)         ///
+version(string)        ///
 groupedby(string)      ///
 coverage(string)       ///
 pause                  /// 
@@ -47,11 +48,22 @@ quietly {
 	***************************************************
 	* 1. Will load guidance database
 	***************************************************
+	pip_info, clear justdata `pause' server(`server') version(`version')
 	
-	pip_info, clear justdata `pause' server(`server')
+		//------------ version
+		if ("`version'" != "") {
+			local version_qr = "&version=`version'"
+			tokenize "`version'", parse("_")
+			local _version   = "_`1'_`3'_`9'"
+		}
+		else {
+			local version_qr = ""
+			local _version   = ""
+		}
+		
 	
 	*---------- Make sure at least one reference year is selected
-	local frpipim "_pip_int_means"
+	local frpipim "_pip_imns`_version'"
 	
 	if ("`year'" != "all" & ("`wb'" != "" | "`aggregate'" != "")) {	
 		
@@ -158,7 +170,7 @@ quietly {
 						
 						disp as err _n "Warning: " as text "years selected for `ct' do not " /// 
 						"match any survey year." _n /// 
-						"You could type {stata pip_info, country(`ct') clear} to check availability." 
+						"You could type {stata pip_info, country(`ct') version(`version') clear} to check availability." 
 					} 
 					else {
 						if (`yearcheck' == 0 ) {
