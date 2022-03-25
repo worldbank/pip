@@ -76,15 +76,15 @@ qui {
 	pip_set_server `server', `pause'
 	local url       = "`r(url)'"
 	local server    = "`r(server)'"
+	return add 
+	
 	
 	
 	cap frame drop _pip_versions_`server' // change this later
 	frame create _pip_versions_`server'
 	
 	frame _pip_versions_`server' {
-		
-		
-		local url "http://wzlxdpip01.worldbank.org/api/v1"
+
 		import delimited using "`url'/versions?format=csv", clear varn(1)
 		
 		//------------* Split and rename 

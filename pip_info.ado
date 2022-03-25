@@ -123,13 +123,9 @@ qui {
 		
 		frame `frpipim' {
 		
-			if ("${pip_bypass}" == "bypass") {
-				local csvfile  = "${pip_svr_prod}/aux?table=interpolated_means&format=csv"
-			}
-			else {
-				local csvfile  = "`url'/aux?table=interpolated_means`version_qr'&format=csv"
-			}
+			local csvfile  = "`url'/aux?table=interpolated_means`version_qr'&format=csv"
 			cap import delim using "`csvfile'", clear varn(1)
+			
 		}
 		
 		if (_rc != 0 ) {

@@ -49,9 +49,10 @@ KEEPFrames                     ///
 frame_prefix(string)           ///
 replace                        ///
 version(string)                ///
-PPP_year(numlist)               ///
+PPP_year(numlist)              ///
 identity(string)               ///
 release(numlist)               ///
+table(string)                  ///
 ] 
 
 if ("`pause'" == "pause") pause on
@@ -72,7 +73,29 @@ qui {
 	if regexm("`subcommand'", "^dropglobal") {
 		pip_drop global
 		exit
-	}	
+	}
+	
+	// ------------------------------------------------------------------------
+	// New session procedure
+	// ------------------------------------------------------------------------
+	
+	if ("${pip_cmds_ssc}" == "") {
+		pip_new_session , `pause'
+	}
+	
+	//========================================================
+	// Auxiliary tables
+	//========================================================
+	if regexm("`subcommand'", "^table") {
+		noi pip_tables `table', server(`server')        ///
+	     		version(`version')                ///
+	     		release(`release')                ///
+	     		ppp_year(`ppp_year')              ///
+	     		identity(`identity')              ///
+	     		`clear' 
+		exit
+	}
+	
 	
 	//========================================================
 	//  Timer
@@ -109,15 +132,6 @@ qui {
 	if ("`frame_prefix'" == "") {
 		local frame_prefix "pip_"
 	}
-	
-	// ------------------------------------------------------------------------
-	// New session procedure
-	// ------------------------------------------------------------------------
-	
-	if ("${pip_cmds_ssc}" == "") {
-		pip_new_session , `pause'
-	}
-	
 	
 	/*==================================================
 	Defaults           
