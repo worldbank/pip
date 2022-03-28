@@ -184,8 +184,8 @@ qui {
 	}
 	
 	
-	
-	frame copy _pip_lkupb`_version' _pip_lkup, replace
+	local frlkupwr "_pip_lkup_wrk"
+	frame copy `frlkupb' `frlkupwr', replace
 	if ("`justdata'" != "") exit
 	
 	***************************************************
@@ -197,7 +197,7 @@ qui {
 		noi disp in y  _n "{title:Available Surveys}: " in g "Select a country or region" 
 		noi disp in y  _n "{title: Countries}"  
 		
-		frame _pip_lkup {
+		frame `frlkupwr' {
 			
 			quietly levelsof country_code , local(countries) 
 			local current_line = 0
@@ -234,7 +234,7 @@ qui {
 	
 	if  ("`country'" != "") & ("`region'" == "") {
 		
-		frame _pip_lkup {
+		frame `frlkupwr' {
 			
 			noi disp in y  _n "{title:Available Surveys for `country'}" 	
 			local country = upper("`country'")
@@ -286,7 +286,7 @@ qui {
 	***************************************************
 	if  ("`country'" == "") & ("`region'" != "") {
 		
-		frame _pip_lkup {
+		frame `frlkupwr' {
 			noi disp in y  _n "{title:Available Surveys}" 
 			noi disp in y  _n "{title:Select a Year}" 	
 			
