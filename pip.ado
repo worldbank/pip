@@ -65,6 +65,12 @@ qui {
 	//========================================================
 	local curframe = c(frame)
 	
+	if regexm("`subcommand'", "^clean") {
+		noi pip_cleanup
+		exit
+	}
+	
+	
 	if regexm("`subcommand'", "^dropframe") {
 		pip_drop frame, frame_prefix(`frame_prefix')
 		exit
@@ -778,6 +784,7 @@ Notes:
 
 Version Control:
 
+*! version 0.1.6        <2022mar28>
 *! version 0.1.5.9001   <2022mar28>
 *! version 0.1.5        <2022mar25>
 *! version 0.1.4        <2022mar18>
