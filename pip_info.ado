@@ -64,8 +64,7 @@ qui {
 		
 		frame `frpipcts' {
 			
-			local csvfile0  = "`url'/aux?table=countries`version_qr'&format=csv"
-			cap import delimited using "`csvfile0'", clear varn(1)
+			cap pip_tables countries, server(`server') version(`version') clear
 			local rc1 = _rc
 			
 			if (`rc1' == 0) {
@@ -76,6 +75,8 @@ qui {
 		
 		// drop frame if error happened
 		if (`rc1' != 0) {
+			local csvfile0  = "`url'/aux?table=countries`version_qr'&format=csv"
+			
 			noi disp in red "There is a problem accessing country name data." 
 			noi disp in red "to check your connection, copy and paste in your browser the following address:" _n /* 
 			*/	_col(4) in w `"`csvfile0'"'
@@ -93,8 +94,7 @@ qui {
 		
 		frame `frpiprgn' {
 			
-			local csvfilergn  = "`url'/aux?table=regions`version_qr'&format=csv"
-			cap import delimited using "`csvfilergn'", clear varn(1)
+			cap pip_tables regions, server(`server') version(`version') clear
 			local rc1 = _rc
 			
 			if (`rc1' == 0) {
@@ -105,6 +105,7 @@ qui {
 		
 		// drop frame if error happened
 		if (`rc1' != 0) {
+			local csvfilergn  = "`url'/aux?table=regions`version_qr'&format=csv"
 			noi disp in red "There is a problem accessing region name data." 
 			noi disp in red "to check your connection, copy and paste in your browser the following address:" _n /* 
 			*/	_col(4) in w `"`csvfilergn'"'
@@ -114,6 +115,32 @@ qui {
 		
 	}	
 	
+	
+	
+	//------------ regions price framework
+	local frpipfw "_pip_fw`_version'"
+	if (!regexm("`frpipfw'", "`av_frames'")) {
+		frame create `frpipfw'
+		
+		frame `frpipfw' {
+			
+			cap pip_tables framework, server(`server') version(`version') clear
+			local rc1 = _rc
+		}
+		
+		// drop frame if error happened
+		if (`rc1' != 0) {
+			local csvfile2  = "`url'/aux?table=framework`version_qr'&format=csv"
+			
+			noi disp in red "There is a problem accessing framework name data." 
+			noi disp in red "to check your connection, copy and paste in your browser the following address:" _n /* 
+			*/	_col(4) in w `"`csvfile2'"'
+			frame drop `frpipfw'
+			error 
+		} 
+		
+	}
+	
 	//------------ interpolated means frame
 	
 	local frpipim "_pip_imns`_version'"
@@ -122,7 +149,7 @@ qui {
 		frame create `frpipim'
 		
 		frame `frpipim' {
-		
+			
 			local csvfile  = "`url'/aux?table=interpolated_means`version_qr'&format=csv"
 			cap import delim using "`csvfile'", clear varn(1)
 			
@@ -136,7 +163,7 @@ qui {
 			frame drop `frpipim'
 			error 
 		} 
-		 */
+		*/
 		
 	}
 	
@@ -312,7 +339,7 @@ qui {
 		noi display _n ""
 		cwf `curframe'
 		exit			
-			
+		
 	}	 // end of condition 
 	
 } // end of large quietly
