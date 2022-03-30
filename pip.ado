@@ -784,6 +784,7 @@ Notes:
 
 Version Control:
 
+*! version 0.1.7        <2022mar30>
 *! version 0.1.6        <2022mar28>
 *! version 0.1.5.9001   <2022mar28>
 *! version 0.1.5        <2022mar25>
