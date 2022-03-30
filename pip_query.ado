@@ -63,12 +63,12 @@ quietly {
 		
 	
 	*---------- Make sure at least one reference year is selected
-	local frpipim "_pip_imns`_version'"
+	local frpipfw "_pip_fw`_version'"
 	
 	if ("`year'" != "all" & ("`wb'" != "" | "`aggregate'" != "")) {	
 		
 		* 
-		frame `frpipim': levelsof surveyid_year, local(ref_years_l)
+		frame `frpipfw': levelsof surveyid_year, local(ref_years_l)
 		local ref_years "`ref_years_l' last"
 		
 		local no_ref: list year - ref_years
@@ -95,7 +95,7 @@ quietly {
 	*---------- Keep selected country
 	
 	
-	frame `frpipim' {
+	frame `frpipfw' {
 		
 		cap confirm var keep_this
 		if (_rc) {
@@ -128,7 +128,7 @@ quietly {
 			
 			local region_l: subinstr local region " " "|", all
 			
-			replace keep_this = 1 if regexm(wb_region, "`region_l'")
+			replace keep_this = 1 if regexm(wb_region_code, "`region_l'")
 			if lower("`region'") == "all" replace keep_this = 1
 		}
 		
