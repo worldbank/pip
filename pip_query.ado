@@ -21,6 +21,7 @@ ORIginal               ///
 INFOrmation            ///
 COESP(string)          ///
 SERVER(string)         ///
+version(string)        ///
 groupedby(string)      ///
 coverage(string)       ///
 pause                  /// 
@@ -47,16 +48,27 @@ quietly {
 	***************************************************
 	* 1. Will load guidance database
 	***************************************************
+	pip_info, clear justdata `pause' server(`server') version(`version')
 	
-	pip_info, clear justdata `pause' server(`server')
+		//------------ version
+		if ("`version'" != "") {
+			local version_qr = "&version=`version'"
+			tokenize "`version'", parse("_")
+			local _version   = "_`1'_`3'_`9'"
+		}
+		else {
+			local version_qr = ""
+			local _version   = ""
+		}
+		
 	
 	*---------- Make sure at least one reference year is selected
-	local frpipim "_pip_int_means"
+	local frpipfw "_pip_fw`_version'"
 	
 	if ("`year'" != "all" & ("`wb'" != "" | "`aggregate'" != "")) {	
 		
-		
-		frame `frpipim': levelsof reporting_year, local(ref_years_l)
+		* 
+		frame `frpipfw': levelsof surveyid_year, local(ref_years_l)
 		local ref_years "`ref_years_l' last"
 		
 		local no_ref: list year - ref_years
@@ -71,6 +83,8 @@ quietly {
 			noi disp in y "Warning: `no_ref' is/are not part of reference years: `ref_years_l'"
 		}
 		
+		 */
+		
 	}  // end of 'if' condition
 	
 	
@@ -81,7 +95,7 @@ quietly {
 	*---------- Keep selected country
 	
 	
-	frame `frpipim' {
+	frame `frpipfw' {
 		
 		cap confirm var keep_this
 		if (_rc) {
@@ -90,6 +104,7 @@ quietly {
 		else {
 			replace keep_this = 0
 		}
+		
 		if ("`country'" != "" & lower("`country'") != "all") {
 			
 			local countries_ : subinstr local country " " "|", all 
@@ -113,7 +128,7 @@ quietly {
 			
 			local region_l: subinstr local region " " "|", all
 			
-			replace keep_this = 1 if regexm(wb_region, "`region_l'")
+			replace keep_this = 1 if regexm(wb_region_code, "`region_l'")
 			if lower("`region'") == "all" replace keep_this = 1
 		}
 		
@@ -147,7 +162,7 @@ quietly {
 				foreach ct of local cts {
 					
 					count if country_code == "`ct'" & ///
-					      regexm(strofreal(reporting_year), "`years_'") & `touse'
+					      regexm(strofreal(surveyid_year), "`years_'") & `touse'
 								
 					local year_ok =  r(N)
 					
@@ -155,7 +170,7 @@ quietly {
 						
 						disp as err _n "Warning: " as text "years selected for `ct' do not " /// 
 						"match any survey year." _n /// 
-						"You could type {stata pip_info, country(`ct') clear} to check availability." 
+						"You could type {stata pip_info, country(`ct') version(`version') clear} to check availability." 
 					} 
 					else {
 						if (`yearcheck' == 0 ) {

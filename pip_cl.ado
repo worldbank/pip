@@ -26,6 +26,7 @@ clear                 ///
 pause                 /// 
 iso                   /// 
 noDIPSQuery           /// 
+version(string)       ///
 ]
 
 version 16.0
@@ -47,7 +48,7 @@ qui {
 	if ("`coverage'" == "") local coverage -1
 	
 	*---------- download guidance data
-	pip_info, clear justdata `pause'
+	pip_info, clear justdata `pause' 
 	
 	tempname pip_lkup
 	frame copy _pip_lkupb `pip_lkup', replace

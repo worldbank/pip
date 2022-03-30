@@ -29,31 +29,28 @@ version 16.0
 //========================================================
 // Define server
 //========================================================
-
+*##s
+* local server "prod"
 
 //------------ If shortcut used
-local current_server "https://api.worldbank.org" // production
-local handle         "pip/v1"
+local current_server "https://api.worldbank.org/pip/v1" // production
 
-if (inlist(lower("`server'"), "qa", "testing", "ar"))  {
-		
-	if (lower("`server'") == "qa")     {
-		local server "${pip_svr_in}"
-	}
-	if (lower("`server'") == "testing") {
-		local server "${pip_svr_ts}"
-	}
-	if (upper("`server'") == "AR") {
-		local server "${pip_svr_ar}"
-	}
-	
+if (inlist(lower("`server'"), "qa", "dev", "prod"))  {
+		local url "${pip_svr_`server'}"
 }
+
 
 /*==================================================
 2:  Server not defined
 ==================================================*/
-if ("`server'" == "") {
-	local server "`current_server'"
+else if ("`server'" == "") {
+	local url "`current_server'"
+	local server "prod"
+}
+
+else {
+	noi disp in red "server {it:`server'} not allowed"
+	error
 }
 
 //========================================================
@@ -61,15 +58,16 @@ if ("`server'" == "") {
 //========================================================
 
 
-cap scalar tpage = fileread(`"`server'/`handle'/health-check"')
+cap scalar tpage = fileread(`"`url'/health-check"')
+* disp tpage
+
+*##e
+
 
 if (!regexm(tpage, "API is running") | _rc) {
 	noi disp in red "There is a problem with PIP API server. Try again later"
 	error
 }
-
-local url     = "`server'/`handle'"	
-
 
 //========================================================
 // Return values
@@ -79,8 +77,6 @@ return local server = "`server'"
 return local url    = "`url'"
 return local base   = "`url'/pip"
 return local base_grp  = "`url'/pip-grp"
-return local handle  = "`handle'"
-
 
 end
 exit

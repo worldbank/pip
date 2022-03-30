@@ -9,7 +9,7 @@ Creation Date:    20 Jan 2022 - 09:44:03
 0: Program set up
 ==================================================*/
 program define pip_drop, rclass
-syntax [anything(name=subcommand)], [frame_prefix(string)]
+syntax [anything(name=subcommand)], [frame_prefix(string) qui]
 
 
 qui {
@@ -39,10 +39,15 @@ qui {
 		} // loop over frames
 		
 		if ("`dropped'" == "") {
-			noi disp in y "NO frame was dropped"
+			if ("`qui'" == "") noi disp in y "NO frame was dropped"
 		}
 		else {
-			noi disp in r "frames `dropped' were dropped"
+			if ("`qui'" == "")  {
+				noi disp in y "The following internal frames were dropped:" 
+				foreach f of local dropped {
+					noi disp in w "`f'"
+				}
+			}
 		}
 		
 		
@@ -52,8 +57,13 @@ qui {
 	// Globals 
 	//========================================================
 	if regexm("`subcommand'", "^global") {
-		global pip_cmds_ssc ""
-		global pip_query    ""
+		local pip_globals: all globals "pip_*"
+		* disp "`pip_globals'"
+		foreach gl of local pip_globals {
+			if regexm("`gl'", "svr") continue
+			global `gl' ""
+		}
+		
 	}
 	
 	
