@@ -168,6 +168,10 @@ qui {
 	
 	local version_qr = "`r(version_qr)'"
 	local version    = "`r(version)'"
+	local release    = "`r(release)'"
+	local ppp_year   = "`r(ppp_year)'"
+	local identity   = "`r(identity)'"
+	
 	return local pip_version = "`version'"
 	
 	//========================================================
@@ -233,7 +237,11 @@ qui {
 	
 	// Blank popshare and blank povline = default povline 1.9
 	if ("`popshare'" == "" & "`povline'" == "")  {
-		local povline = 1.9
+		
+		if ("`ppp_year'" == "2005") local povline = 1.25
+		if ("`ppp_year'" == "2011") local povline = 1.9
+		if ("`ppp_year'" == "2017") local povline = 2.15
+		
 		local pcall = "povline"
 	}
 	
