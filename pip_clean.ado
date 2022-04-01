@@ -11,40 +11,40 @@ Output:             dta
 ==================================================*/
 
 /*==================================================
-                        0: Program set up
+0: Program set up
 ==================================================*/
 program define pip_clean, rclass
 
 version 16.0
 
 syntax anything(name=type),      ///
-             [                   ///
-								year(string)     ///
-								region(string)   ///
-								iso              ///
-								wb				       ///
-								nocensor			   ///
-								pause			       ///
-								version(string)  ///
-             ]
+[                   ///
+year(string)     ///
+region(string)   ///
+iso              ///
+wb				       ///
+nocensor			   ///
+pause			       ///
+version(string)  ///
+]
 
 if ("`pause'" == "pause") pause on
 else                      pause off
 
 
 /*==================================================
-              1: type 1
+1: type 1
 ==================================================*/
 
 if ("`type'" == "1") {
-
+	
 	if  ("`year'" == "last"){
 		bys country_code: egen maximum_y = max(reporting_year)
 		keep if maximum_y ==  reporting_year
 		drop maximum_y
 	}
-
-
+	
+	
 	***************************************************
 	* 5. Labeling/cleaning
 	***************************************************
@@ -54,25 +54,25 @@ if ("`type'" == "1") {
 	
 	local orgvar  reporting_pop reporting_pce 
 	local newvar  population reporting_hfce
-			
+	
 	local i = 0
-		foreach var of local orgvar {
-			local ++i
-			rename `var' `: word `i' of `newvar''
-		}	
-		
+	foreach var of local orgvar {
+		local ++i
+		rename `var' `: word `i' of `newvar''
+	}	
+	
 	if "`iso'"!="" {
 		cap replace country_code = "XKX" if country_code == "KSV"
 		cap replace country_code = "TLS" if country_code == "TMP"
 		cap replace country_code = "PSE" if country_code == "WBG"
 		cap replace country_code = "COD" if country_code == "ZAR"
 	}
-
+	
 	*rename  prmld  mld
 	foreach v of varlist polarization median gini mld decile? decile10 {
 		qui cap replace `v'=. if `v'==-1 | `v' == 0
 	}
-
+	
 	cap drop if ppp==""
 	cap drop  svyinfoid
 	
@@ -90,18 +90,18 @@ if ("`type'" == "1") {
 	replace survey_coverage = "3" if survey_coverage == "national"
 	destring survey_coverage, force replace
 	label define survey_coverage 1 "Rural"     /* 
-	 */                       2 "Urban"     /* 
-	 */                       3 "National"  /* 
-	 */                       4 "National (Aggregate)", modify
-	 
+	*/                       2 "Urban"     /* 
+	*/                       3 "National"  /* 
+	*/                       4 "National (Aggregate)", modify
+	
 	label values survey_coverage survey_coverage
-
+	
 	replace welfare_type = "1" if welfare_type == "consumption"
 	replace welfare_type = "2" if welfare_type == "income"
 	destring welfare_type, force replace
 	label define welfare_type 1 "Consumption" 2 "Income", modify
 	label values welfare_type welfare_type
-
+	
 	label var country_code		"Country/Economy code"
 	label var country_name 		"Country/Economy name"
 	label var region_code 		"Region code"
@@ -135,21 +135,11 @@ if ("`type'" == "1") {
 	label var reporting_level 	"Reporting data level"
 	label var survey_acronym 	"Survey acronym"     
 	label var survey_comparability "Survey comparability"
-	label var comparable_spell 	"Comparability over time at country level"
-	* label var survey_mean_lcu 	"Daily mean income or expenditure in LCU"
-	* label var survey_mean_ppp 	"Daily mean income or expenditure in PPP$"
-	* label var predicted_mean_ppp "Daily interpolated mean in PPP$"       
+	label var comparable_spell 	"Comparability over time at country level"   
 	label var cpi 				"Consumer Price Index (CPI)"
-	* label var cpi_data_level 	"CPI data level"
-	* label var ppp_data_level 	"PPP data level"
-	* label var pop_data_level 	"Population level"
 	label var reporting_gdp 	"Reported GDP"
-	* label var gdp_data_level 	"GDP data level"
 	label var reporting_hfce 	"Reported per capita"
-	* label var hfce_data_level 	"Per capita data level"
-	* label var is_used_for_aggregation "Used for aggregation"
-	* label var estimation_type 	"Estimation type"
-
+	
 	sort country_code reporting_year survey_coverage 
 	
 	
@@ -170,10 +160,29 @@ if ("`type'" == "1") {
 	
 	format poverty_line %6.2f
 	
+	//------------ New variable names
+	
+	
+	local old "survey_year reporting_year  reporting_gdp reporting_hfce"
+	local new  "welfare_time year gdp hfce"
+	
+	
+	local i = 1
+	while ("`i'" != "") {
+		local o: word `i' of `old'
+		local n: word `i' of `new'
+		if ("`o'" == "") {
+			local i ""
+			continue
+		}
+		clonevar `n' = `o'
+		local i = `i' + 1
+	}
+	
 }
 
 /*==================================================
-              2: for Aggregate requests
+2: for Aggregate requests
 ==================================================*/
 if ("`type'" == "2") {
 	
@@ -189,7 +198,7 @@ if ("`type'" == "2") {
 	***************************************************
 	
 	rename reporting_pop population
-
+	
 	label var region_code      "Region code"
 	label var reporting_year   "Year"
 	label var poverty_line     "Poverty line in PPP$ (per capita per day)"
@@ -210,7 +219,7 @@ if ("`type'" == "2") {
 	format pop_in_poverty  population %15.0fc
 	
 	format poverty_line %6.2f
-
+	
 } // end of type 2
 
 
