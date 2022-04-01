@@ -620,19 +620,19 @@ qui {
 	noi di as res _n "{ul: first `n2disp' observations}"
 	
 	if ("`subcommand'" == "wb") {
-		sort region_code reporting_year 
+		sort region_code year 
 		
 		tempname tolist
 		frame copy `c(frame)' `tolist'
 		frame `tolist' {
-			gsort region_code -reporting_year 
+			gsort region_code -year 
 			
 			count if (region_code == "WLD")
 			local cwld = r(N)
 			if (`cwld' >= `n2disp') {
 				keep if (region_code == "WLD")			
 			}
-			noi list region_code reporting_year poverty_line headcount mean ///
+			noi list region_code year poverty_line headcount mean ///
 			in 1/`n2disp',  abbreviate(12) 
 		}
 		
@@ -640,14 +640,14 @@ qui {
 	
 	else {
 		if ("`aggregate'" == "") {
-			sort country_code reporting_year 
-			noi list country_code reporting_year poverty_line headcount  /*
+			sort country_code year 
+			noi list country_code year poverty_line headcount  /*
 			*/  mean median welfare_type in 1/`n2disp',  /* 
 			*/  abbreviate(12)  sepby(country_code)
 		}
 		else {
-			sort reporting_year 
-			noi list reporting_year poverty_line headcount mean , /*
+			sort year 
+			noi list year poverty_line headcount mean , /*
 			*/ abbreviate(12) sepby(poverty_line)
 		}		
 	}	

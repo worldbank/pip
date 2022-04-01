@@ -32,6 +32,19 @@ if ("`pause'" == "pause") pause on
 else                      pause off
 
 
+//------------ version
+if ("`version'" != "") {
+	local version_qr = "&version=`version'"
+	tokenize "`version'", parse("_")
+	local _version   = "_`1'_`3'_`9'"
+}
+else {
+	local version_qr = ""
+	local _version   = ""
+}
+
+
+
 /*==================================================
 1: type 1
 ==================================================*/
@@ -163,21 +176,31 @@ if ("`type'" == "1") {
 	//------------ New variable names
 	
 	
+	
+	
+	
 	local old "survey_year reporting_year  reporting_gdp reporting_hfce"
 	local new  "welfare_time year gdp hfce"
+	rename (`old') (`new')
+	 */
 	
+	local frpipfw "_pip_fw`_version'"
+	local frpipfw "_pip_fw_20220331_2017_INT"
 	
-	local i = 1
-	while ("`i'" != "") {
-		local o: word `i' of `old'
-		local n: word `i' of `new'
-		if ("`o'" == "") {
-			local i ""
-			continue
-		}
-		clonevar `n' = `o'
-		local i = `i' + 1
+	tempname frfw
+	frame copy `frpipfw' `frfw'
+	frame `frfw' {
+		drop year
+		rename reporting_year year
 	}
+	
+	frlink m:1 country_code year welfare_type, frame(`frfw') generate(fw)
+	frget survey_acronym surveyid_year, from(fw)
+			
+	 */
+	
+	
+	qui missings dropvars, force
 	
 }
 
@@ -209,9 +232,11 @@ if ("`type'" == "2") {
 	label var population       "Population in year"
 	label var pop_in_poverty   "Population in poverty"
 	label var watts            "Watts index"
+	label var region_name      "World Bank Region"
 	
-	order region_code reporting_year  poverty_line mean headcount poverty_gap ///
-	poverty_severity watts population 
+	order region_name region_code reporting_year  poverty_line ///
+	mean headcount poverty_gap  poverty_severity watts   ///
+	population 
 	
 	//------------ Formatting
 	format headcount poverty_gap poverty_severity watts mean  %8.4f
@@ -219,6 +244,12 @@ if ("`type'" == "2") {
 	format pop_in_poverty  population %15.0fc
 	
 	format poverty_line %6.2f
+	
+	local old "reporting_year"
+	local new  "year"
+	rename (`old') (`new')
+	
+	qui missings dropvars, force
 	
 } // end of type 2
 
