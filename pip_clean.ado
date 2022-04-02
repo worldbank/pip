@@ -155,13 +155,6 @@ if ("`type'" == "1") {
 	
 	sort country_code reporting_year survey_coverage 
 	
-	
-	order country_code country_name region_code region_name survey_coverage     ///
-	reporting_year survey_year welfare_type is_interpolated distribution_type  ///
-	ppp poverty_line mean headcount poverty_gap poverty_severity watts gini    ///
-	median mld polarization population decile? decile10
-	
-	
 	//------------ Formatting
 	format headcount poverty_gap poverty_severity watts  gini mld polarization ///
 	decile*  mean /* survey_mean_ppp */  cpi %8.4f
@@ -177,13 +170,12 @@ if ("`type'" == "1") {
 	
 	
 	
-	
-	
 	local old "survey_year reporting_year  reporting_gdp reporting_hfce"
 	local new  "welfare_time year gdp hfce"
 	rename (`old') (`new')
 	 */
 	
+	/*
 	local frpipfw "_pip_fw`_version'"
 	local frpipfw "_pip_fw_20220331_2017_INT"
 	
@@ -199,7 +191,32 @@ if ("`type'" == "1") {
 			
 	 */
 	
+	gen survey_time = strofreal(year)
+	replace survey_time = strofreal(year) + "-" + strofreal(year + 1) /* 
+ */	                   if mod(welfare_time, 1) > 0
+	replace survey_time = strofreal(year + 1)     /* 
+  */                  if regexm(upper(survey_acronym), "SILC") 
+						
 	
+	
+	/* 
+	replace survey_time = ///
+	   cond(mod(welfare_time, 1) > 0, ///
+	       strofreal(year) + "-" + strofreal(year + 1),  ///
+						cond(regexm(upper(survey_acronym), "SILC"), ///
+						      strofreal(year + 1),                   ///
+								strofreal(year)))
+	 */			 
+	
+	order country_code country_name region_code region_name survey_coverage ///
+	year welfare_time welfare_type poverty_line mean headcount ///
+	poverty_gap  poverty_severity watts gini    ///
+	median mld polarization population decile? decile10 cpi ppp gdp hfce ///
+	survey_comparability   ///
+	survey_acronym  survey_time  is_interpolated distribution_type
+	
+	
+	cap drop estimation_type	
 	qui missings dropvars, force
 	
 }
