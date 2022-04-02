@@ -168,45 +168,19 @@ if ("`type'" == "1") {
 	
 	//------------ New variable names
 	
-	
-	
 	local old "survey_year reporting_year  reporting_gdp reporting_hfce"
 	local new  "welfare_time year gdp hfce"
 	rename (`old') (`new')
 	 */
 	
-	/*
-	local frpipfw "_pip_fw`_version'"
-	local frpipfw "_pip_fw_20220331_2017_INT"
-	
-	tempname frfw
-	frame copy `frpipfw' `frfw'
-	frame `frfw' {
-		drop year
-		rename reporting_year year
-	}
-	
-	frlink m:1 country_code year welfare_type, frame(`frfw') generate(fw)
-	frget survey_acronym surveyid_year, from(fw)
-			
-	 */
-	
+	//------------survey_time	
 	gen survey_time = strofreal(year)
 	replace survey_time = strofreal(year) + "-" + strofreal(year + 1) /* 
- */	                   if mod(welfare_time, 1) > 0
+     */	             if mod(welfare_time, 1) > 0
 	replace survey_time = strofreal(year + 1)     /* 
-  */                  if regexm(upper(survey_acronym), "SILC") 
+     */              if regexm(upper(survey_acronym), "SILC") 
 						
 	
-	
-	/* 
-	replace survey_time = ///
-	   cond(mod(welfare_time, 1) > 0, ///
-	       strofreal(year) + "-" + strofreal(year + 1),  ///
-						cond(regexm(upper(survey_acronym), "SILC"), ///
-						      strofreal(year + 1),                   ///
-								strofreal(year)))
-	 */			 
 	
 	order country_code country_name region_code region_name survey_coverage ///
 	year welfare_time welfare_type poverty_line mean headcount ///
@@ -216,6 +190,11 @@ if ("`type'" == "1") {
 	survey_acronym  survey_time  is_interpolated distribution_type
 	
 	
+	//------------remaining labels
+	label var welfare_time "Time income or consumption refers to"
+	label var survey_time  "Time of survey in the field"
+		
+	//------------drop unnecesary variables
 	cap drop estimation_type	
 	qui missings dropvars, force
 	
