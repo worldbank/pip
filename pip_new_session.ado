@@ -142,8 +142,6 @@ if (!regexm("`src'", "repec")) {
 		local bye ""
 	}
 	
-	
-	
 } // end if installed from github 
 
 else {  // if pip was installed from SSC

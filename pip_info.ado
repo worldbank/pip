@@ -125,6 +125,12 @@ qui {
 		frame `frpipfw' {
 			
 			cap pip_tables framework, server(`server') version(`version') clear
+			
+			//------------format variables to make them link to data. 
+			rename welfare_type wt
+			label define welfare_type 1 "consumption" 2 "income"
+			encode wt, gen(welfare_type)
+			
 			local rc1 = _rc
 		}
 		

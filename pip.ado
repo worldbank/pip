@@ -168,6 +168,10 @@ qui {
 	
 	local version_qr = "`r(version_qr)'"
 	local version    = "`r(version)'"
+	local release    = "`r(release)'"
+	local ppp_year   = "`r(ppp_year)'"
+	local identity   = "`r(identity)'"
+	
 	return local pip_version = "`version'"
 	
 	//========================================================
@@ -233,7 +237,11 @@ qui {
 	
 	// Blank popshare and blank povline = default povline 1.9
 	if ("`popshare'" == "" & "`povline'" == "")  {
-		local povline = 1.9
+		
+		if ("`ppp_year'" == "2005") local povline = 1.25
+		if ("`ppp_year'" == "2011") local povline = 1.9
+		if ("`ppp_year'" == "2017") local povline = 2.15
+		
 		local pcall = "povline"
 	}
 	
@@ -612,19 +620,19 @@ qui {
 	noi di as res _n "{ul: first `n2disp' observations}"
 	
 	if ("`subcommand'" == "wb") {
-		sort region_code reporting_year 
+		sort region_code year 
 		
 		tempname tolist
 		frame copy `c(frame)' `tolist'
 		frame `tolist' {
-			gsort region_code -reporting_year 
+			gsort region_code -year 
 			
 			count if (region_code == "WLD")
 			local cwld = r(N)
 			if (`cwld' >= `n2disp') {
 				keep if (region_code == "WLD")			
 			}
-			noi list region_code reporting_year poverty_line headcount mean ///
+			noi list region_code year poverty_line headcount mean ///
 			in 1/`n2disp',  abbreviate(12) 
 		}
 		
@@ -632,14 +640,14 @@ qui {
 	
 	else {
 		if ("`aggregate'" == "") {
-			sort country_code reporting_year 
-			noi list country_code reporting_year poverty_line headcount  /*
+			sort country_code year 
+			noi list country_code year poverty_line headcount  /*
 			*/  mean median welfare_type in 1/`n2disp',  /* 
 			*/  abbreviate(12)  sepby(country_code)
 		}
 		else {
-			sort reporting_year 
-			noi list reporting_year poverty_line headcount mean , /*
+			sort year 
+			noi list year poverty_line headcount mean , /*
 			*/ abbreviate(12) sepby(poverty_line)
 		}		
 	}	
@@ -784,6 +792,7 @@ Notes:
 
 Version Control:
 
+*! version 0.2.0        <2022apr01>
 *! version 0.1.7        <2022mar30>
 *! version 0.1.6        <2022mar28>
 *! version 0.1.5.9001   <2022mar28>

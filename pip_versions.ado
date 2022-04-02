@@ -229,7 +229,10 @@ qui {
 		} // end of version not specified
 		
 	} // end frame  
-	
+	tokenize "`version'", parse("_")
+	return local release    = "`1'"
+	return local ppp_year   = "`3'"
+	return local identity   = "`9'"
 	return local version_qr = "`version_qr'"
 	return local version    = "`version'"
 	
