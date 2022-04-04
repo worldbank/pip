@@ -171,15 +171,23 @@ if ("`type'" == "1") {
 	local old "survey_year reporting_year  reporting_gdp reporting_hfce"
 	local new  "welfare_time year gdp hfce"
 	rename (`old') (`new')
-	 */
+	*/
 	
-	//------------survey_time	
-	gen survey_time = strofreal(year)
-	replace survey_time = strofreal(year) + "-" + strofreal(year + 1) /* 
-     */	             if mod(welfare_time, 1) > 0
-	replace survey_time = strofreal(year + 1)     /* 
-     */              if regexm(upper(survey_acronym), "SILC") 
-						
+	//------------survey_time
+	cap confirm string var survey_acronym
+	if (_rc == 0) {
+		
+		gen survey_time = strofreal(year)
+		replace survey_time = strofreal(year) + "-" + strofreal(year + 1) /* 
+		*/	             if mod(welfare_time, 1) > 0
+		replace survey_time = strofreal(year + 1)     /* 
+		*/              if regexm(upper(survey_acronym), "SILC") 
+		
+	}
+	else {
+		gen survey_time = ""
+	}
+	
 	
 	
 	order country_code country_name region_code region_name survey_coverage ///
@@ -193,7 +201,7 @@ if ("`type'" == "1") {
 	//------------remaining labels
 	label var welfare_time "Time income or consumption refers to"
 	label var survey_time  "Time of survey in the field"
-		
+	
 	//------------drop unnecesary variables
 	cap drop estimation_type	
 	qui missings dropvars, force
