@@ -162,7 +162,7 @@ quietly {
 				foreach ct of local cts {
 					
 					count if country_code == "`ct'" & ///
-					      regexm(strofreal(surveyid_year), "`years_'") & `touse'
+					      regexm(strofreal(reporting_year), "`years_'") & `touse'
 								
 					local year_ok =  r(N)
 					
