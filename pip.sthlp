@@ -19,7 +19,7 @@
 {title:Title}
 
 {p2colset 9 24 22 2}{...}
-{p2col :{hi:pip} {hline 2}}Access World Bank Global Poverty and Inequality Platform (PIP). PIP is a new platform that allows Stata users to estimate poverty and inequality indicators. The platform has more indicators than its predecessor(povcalnet). However, to make the platform compatible with povcalnet, the PIP allows to estimate same indicators that are available in povcalnet. See {help pip##list: below} the list of pip and povcalnet indicators.{p_end}
+{p2col :{hi:pip} {hline 2}}Access World Bank Global Poverty and Inequality Platform (PIP). PIP is a new platform that allows Stata users to estimate poverty and inequality indicators. The platform has more indicators than its predecessor(povcalnet). However, to make the platform compatible with povcalnet, the PIP allows to estimate same indicators that are available in povcalnet. See {help pip##list: below} the list of pip and povcalnet indicators. {p_end}
 {p2col :{hi:Website: }}{browse "https://worldbank.github.io/pip/"}{err: (temporally disabled)}{p_end}
 {p2colreset}{...}
 {title:Syntax}
@@ -106,7 +106,7 @@ The {cmd:pip} commands allows Stata users to compute poverty and inequality
  surveys. It has the same functionality as the pip website. pip is a 
  computational tool that allows users to estimate poverty rates for regions, sets of 
  countries or individual countries, over time and at any poverty line.
-
+ 
 {pstd}
 PIP is managed jointly by the Data and Research Group in the World Bank's
  Development Economics Division. It draws heavily upon a strong collaboration with the 
