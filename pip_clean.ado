@@ -174,20 +174,17 @@ if ("`type'" == "1") {
 	*/
 	
 	//------------survey_time
-	cap confirm string var survey_acronym
-	if (_rc == 0) {
-		
-		gen survey_time = strofreal(year)
-		replace survey_time = strofreal(year) + "-" + strofreal(year + 1) /* 
-		*/	             if mod(welfare_time, 1) > 0
-		replace survey_time = strofreal(year + 1)     /* 
-		*/              if regexm(upper(survey_acronym), "SILC") 
-		
-	}
-	else {
-		gen survey_time = ""
+	local frpipfw "_pip_fw`_version'"
+	
+	tempname frfw
+	frame copy `frpipfw' `frfw'
+	frame `frfw' {
+		drop year
+		rename reporting_year year
 	}
 	
+	frlink m:1 country_code year welfare_type, frame(`frfw') 
+	frget survey_time, from(`frfw')
 	
 	
 	order country_code country_name region_code region_name survey_coverage ///
