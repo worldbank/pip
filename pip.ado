@@ -99,6 +99,7 @@ qui {
 	     		ppp_year(`ppp_year')              ///
 	     		identity(`identity')              ///
 	     		`clear' 
+		return add
 		exit
 	}
 	
