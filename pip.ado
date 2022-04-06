@@ -90,6 +90,17 @@ qui {
 	}
 	
 	//========================================================
+	// setup defaults
+	//========================================================
+	
+	local server     = lower("`server'")
+	local identity   = upper("`identity'")
+	local country    = upper("`country'")
+	local coverage   = lower("`coverage'")
+	local table      = lower("`table'")
+	
+	
+	//========================================================
 	// Auxiliary tables
 	//========================================================
 	if regexm("`subcommand'", "^table") {
