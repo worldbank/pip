@@ -652,7 +652,7 @@ qui {
 		}
 		
 		foreach v of local varstodisp {
-			cap assert missing(`v')
+			cap confirm var `v', exact
 			if _rc continue 
 			local v2d "`v2d' `v'"
 		}
@@ -801,7 +801,7 @@ Notes:
 
 Version Control:
 
-*! version 0.2.1.9000   <2022apr05>
+*! version 0.2.1.9001   <2022apr06>
 *! version 0.2.1        <2022apr04>
 *! version 0.2.0.9002   <2022apr04>
 *! version 0.2.0        <2022apr01>
