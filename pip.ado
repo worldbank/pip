@@ -99,6 +99,12 @@ qui {
 	local coverage   = lower("`coverage'")
 	local table      = lower("`table'")
 	
+	* In case global server is specified
+	if ("${pip_server}" != "" & "`server'" == "") {
+		noi disp in red "warning:" in y "Global {it:pip_server} is in use"
+		local server = "${pip_server}"
+	}
+	
 	
 	//========================================================
 	// Auxiliary tables

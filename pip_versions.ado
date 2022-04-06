@@ -33,7 +33,7 @@ qui {
 	/*==================================================
 	Check conditions
 	==================================================*/
-	
+		
 	* local version has prvalence over everything else
 	if ("${pip_version}" != "" & "`version'" == "") {
 		noi disp in red "warning:" in y "Global {it:pip_version} is in use"
