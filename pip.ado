@@ -25,18 +25,18 @@ version 16.0
 
 syntax [anything(name=subcommand)]  ///
 [,                             	   /// 
-COUNtry(string)                /// 
+COUntry(string)                /// 
 REGion(string)                 /// 
 YEAR(string)                   /// 
-POVline(numlist)               /// 
+POVLine(numlist)               /// 
 POPShare(numlist)	   		       /// 
 PPP(numlist)                   /// 
 AGGregate                      /// 
 CLEAR                          /// 
 INFOrmation                    /// 
-coverage(string)               /// 
+COVerage(string)               /// 
 ISO                            /// 
-SERVER(string)                 /// 
+SERver(string)                 /// 
 pause                          /// 
 FILLgaps                       /// 
 N2disp(integer 15)             /// 
@@ -48,11 +48,11 @@ noEFFICIENT                    ///
 KEEPFrames                     ///
 frame_prefix(string)           ///
 replace                        ///
-version(string)                ///
+VERsion(string)                ///
 PPP_year(numlist)              ///
-identity(string)               ///
-release(numlist)               ///
-table(string)                  ///
+IDEntity(string)               ///
+RELease(numlist)               ///
+TABle(string)                  ///
 ] 
 
 if ("`pause'" == "pause") pause on
