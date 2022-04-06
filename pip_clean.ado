@@ -174,6 +174,7 @@ if ("`type'" == "1") {
 	*/
 	
 	//------------survey_time
+
 	local frpipfw "_pip_fw`_version'"
 	
 	tempname frfw

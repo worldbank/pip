@@ -94,11 +94,11 @@ qui {
 	//========================================================
 	if regexm("`subcommand'", "^table") {
 		noi pip_tables `table', server(`server')        ///
-	     		version(`version')                ///
-	     		release(`release')                ///
-	     		ppp_year(`ppp_year')              ///
-	     		identity(`identity')              ///
-	     		`clear' 
+		version(`version')                ///
+		release(`release')                ///
+		ppp_year(`ppp_year')              ///
+		identity(`identity')              ///
+		`clear' 
 		return add
 		exit
 	}
@@ -641,16 +641,24 @@ qui {
 	
 	else {
 		if ("`aggregate'" == "") {
-			sort country_code year 
-			noi list country_code year poverty_line headcount  /*
-			*/  mean median welfare_type in 1/`n2disp',  /* 
-			*/  abbreviate(12)  sepby(country_code)
+			sort country_code year
+			local varstodisp "country_code year poverty_line headcount mean median welfare_type"
+			local sepby "country_code"
 		}
 		else {
-			sort year 
-			noi list year poverty_line headcount mean , /*
-			*/ abbreviate(12) sepby(poverty_line)
-		}		
+			sort year
+			local varstodisp "year poverty_line headcount mean"
+			local sepby "poverty_line"
+		}
+		
+		foreach v of local varstodisp {
+			cap assert missing(`v')
+			if _rc continue 
+			local v2d "`v2d' `v'"
+		}
+		
+		noi list `v2d' in 1/`n2disp',  abbreviate(12)  sepby(`sepby')
+			
 	}	
 	
 	//========================================================

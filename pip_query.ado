@@ -168,7 +168,7 @@ quietly {
 					
 					if (`year_ok' == 0) {
 						
-						disp as err _n "Warning: " as text "years selected for `ct' do not " /// 
+						disp in r _n "Warning: years selected for `ct' do not " /// 
 						"match any survey year." _n /// 
 						"You could type {stata pip_info, country(`ct') version(`version') clear} to check availability." 
 					} 
