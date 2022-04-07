@@ -135,7 +135,7 @@ qui {
 	}
 	
 	//========================================================
-	// Conditions
+	// Conditions (Defenses)
 	//========================================================
 	if ("`aggregate'" != "") {
 		noi disp in red "Option {it:aggregate} is disable for now."
@@ -148,8 +148,7 @@ qui {
 	}
 	
 	if ("`popshare'" != "" &  (lower("`subcommand'") == "wb" | "`aggregate'" != "")) {
-		noi disp in red "option {it:popshare} can't be combined with option {it:aggregate}" _c /* 
-		*/ " or with subcommand {it:wb}" _n
+		noi disp in red "option {it:popshare} can't be combined with option {it:aggregate} or with subcommand {it:wb}" _n
 		error
 	}
 	
@@ -157,8 +156,14 @@ qui {
 		local frame_prefix "pip_"
 	}
 	
+	if ("`region'" != "" & lower("`subcommand'") == "wb" ) {
+		noi disp in red "Option {it:region} has been disabled with subcommand {it:wb}"
+		error
+	}
+	
+	
 	/*==================================================
-	Defaults           
+	Defaults
 	==================================================*/
 	
 	*---------- API defaults
@@ -566,7 +571,7 @@ qui {
 		// --- timer
 		
 		*---------- Clean data
-		pip_clean `rtype', year("`year'") `iso' /* 
+		pip_clean `rtype', year("`year'") `iso' server(`server') /* 
 		*/ region(`region') `pause' `wb' version(`version')
 		
 		pause after cleaning

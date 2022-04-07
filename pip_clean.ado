@@ -26,6 +26,7 @@ wb				       ///
 nocensor			   ///
 pause			       ///
 version(string)  ///
+server(string)   ///
 ]
 
 if ("`pause'" == "pause") pause on
@@ -179,7 +180,7 @@ if ("`type'" == "1") {
 	
 	tempname frfw
 	frame copy `frpipfw' `frfw'
-	frame `frfw' {
+	frame `frfw' {  
 		drop year
 		rename reporting_year year
 	}
