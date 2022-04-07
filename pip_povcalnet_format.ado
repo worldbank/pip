@@ -34,32 +34,37 @@ noi disp in red "Warning: option {it:povcalnet_format} is intended only to " _n 
 /*==================================================
 1:  country data 
 ==================================================*/
-ren reporting_year requestyear
+ren year requestyear
 ren population     reqyearpopulation
 if ("`type'" == "1") {
 	
-	local vars1 country_code region_code reporting_level survey_year /*
-	*/welfare_type is_interpolated distribution_type poverty_line poverty_gap /*
-	*/poverty_severity // reporting_pop
+	local vars1 country_code region_code reporting_level welfare_time /*
+	*/ welfare_type is_interpolated distribution_type poverty_line poverty_gap /*
+	*/ poverty_severity country_name 
 	
 	local vars2 countrycode regioncode coveragetype datayear datatype isinterpolated usemicrodata /*
-	*/povertyline povgap povgapsqr //population
+	*/povertyline povgap povgapsqr countryname
 	
 	local i = 0
 	foreach var of local vars1 {
 		local ++i
+		cap confirm var `var', exact
+		if _rc continue
 		rename `var' `: word `i' of `vars2''
 	}	
 	
-	keep countrycode countryname regioncode coveragetype requestyear /* 
+	local keepvars  countrycode countryname regioncode coveragetype requestyear /* 
 	 */ datayear datatype isinterpolated usemicrodata /*
    */ ppp povertyline mean headcount povgap povgapsqr watts gini /* 
 	 */ median mld polarization reqyearpopulation decile? decile10
 	
-	order countrycode countryname regioncode coveragetype requestyear /* 
-  */	datayear datatype isinterpolated usemicrodata /*
-	*/  ppp povertyline mean headcount povgap povgapsqr watts gini /* 
-  */	median mld polarization reqyearpopulation decile? decile10
+	foreach v of local keepvars {
+		cap confirm var `v', exact
+		if _rc continue
+		local tokeep "`tokeep' `v'"
+	}
+	keep  `tokeep'
+	order `tokeep'
 	
 	
 	* Standardize names with R package	
