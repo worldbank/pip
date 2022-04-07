@@ -28,49 +28,56 @@
 {cmd:pip} [{it:{help pip##subcommands:subcommand}}]{cmd:,} 
 [{it:{help pip##Options2:Parameters}} {it:{help pip##options:Options}}]
 
+{pstd}
+Description of parameter options
 
 {synoptset 27 tabbed}{...}
-{synopthdr:Parameters}
+{synopthdr:Estimations}
 {synoptline}
-{synopt :{opt coun:try:}(3-letter code)}list of country code (accepts multiples) or {it:all}. 
+{synopt :{opt coun:try:}(3-letter code)}List of country code (accepts multiples) or {it:all}. 
 Cannot be used with option {it:region()}{p_end}
-{synopt :{opt reg:ion}(WB code)}list of region code (accepts multiple) or {it:all}. 
+{synopt :{opt reg:ion}(WB code)}List of region code (accepts multiple) or {it:all}. 
 Cannot be used with option {it:country()}{p_end}
-{synopt :{opt year:}(numlist|string)}list of years (accepts up to 10),  or {it:all}, or {it:last}. Default "all".{p_end}
-{synopt :{opt pov:line:}(#)}list of poverty lines (in 2011 PPP-adjusted USD) to calculate
+{synopt :{opt coverage(string)}}Loads coverage level ("national", "urban", "rural", "all"). Default "all".{p_end}
+{synopt :{opt year:}(numlist|string)}List of years (accepts up to 10),  or {it:all}, or {it:last}. Default "all".{p_end}
+{synopt :{opt pov:line:}(#)}List of poverty lines (in 2011 PPP-adjusted USD) to calculate
  poverty measures (accepts up to 5). Default is 1.9.{p_end}
-{synopt :{opt pops:hare:}(#)}list of population shares to calculate poverty lines (in 2011 PPP-adjusted USD) and poverty measures. No default. Do not combine with {opt pov:line:}{p_end}
-
+{synopt :{opt pops:hare:}(#)}List of population shares to calculate poverty lines (in 2011 PPP-adjusted USD) and poverty measures. No default. Do not combine with {opt pov:line:}{p_end}
+{synopt :{opt fill:gaps}}Loads all countries used to create regional aggregates.{p_end}
+{synopt :{opt ppp}{cmd:(#)}}Allows the selection of PPP. {p_end}
 
 {synoptset 27 tabbed}{...}
-{synopthdr:Options}
+{synopthdr:Versioning}
 {synoptline}
-{synopt :{opt clear}} replace data in memory.{p_end}
-{synopt :{opt coverage(string)}} loads coverage level ("national", "urban", "rural", "all"). Default "all".{p_end}
-{synopt :{opt fill:gaps}} loads all countries used to create regional aggregates.{p_end}
-{synopt :{opt info:rmation}} presents a clickable version of the available surveys, countries and regions.{p_end}
-{synopt :{opt ppp}{cmd:(#)}} allows the selection of PPP. {p_end}
-{synopt :{opt querytimes(integer)}} Number of times the API is hit before defaulting to failure. 
+{synopt :{opt server(string)}}Name of a server to query on (e.g, prod, dev, qa). See description of each of the server here{p_end}
+{synopt :{opt identity(string)}}Version of data to run the query on (e.g., prod, int, test).{p_end}
+{synopt :{opt ppp:_year:}(#)}PPP round (eg., 2005, 2011, 2017).{p_end}
+{synopt :{opt release(numlist)}}PIP data released date.{p_end}
+
+{synoptset 27 tabbed}{...}
+{synopthdr:Operational}
+{synoptline}
+{synopt :{opt info:rmation}}Presents a clickable version of the available surveys, countries and regions.{p_end}
+{synopt :{opt clear}}Replaces data in memory.{p_end}
+{synopt :{opt querytimes(integer)}}Number of times the API is hit before defaulting to failure. 
 Default is 5. {it:Advance option. Just use it if Internet connection is poor}{p_end}
+{synopt :{opt table(string)}}Loads one auxilary table, this option is used along with {cmd:tables} subcommand.{p_end}
 
 {synoptset 27 tabbed}{...}
 {synopthdr:subcommands}
 {synoptline}
-{synopt :{opt info:rmation}}presents a clickable version of the available surveys, 
+{synopt :{opt info:rmation}}Presents a clickable version of the available surveys, 
 countries and regions. Same as option {it:information}{p_end}
 {synopt :{opt cl}}{err:(temporally disabled)} {it:country-level} query that changes the default combinatorial 
 arrangement of parameters for a one-on-one correspondence.  
 See{help pip##typesq: below} for a detailed explanation.{p_end}
-{synopt :{opt wb}}downloads World Bank's regional and global aggregation{p_end}
-{synopt :{opt test}}executes the last query in browser regardless of failure by 
-{cmd:pip}.{p_end}
+{synopt :{opt wb}}Downloads World Bank's regional and global aggregation.{p_end}
+{synopt :{opt tables}}Provides clickable list of auxiliary tables for download.{p_end}
+{synopt :{opt cleanup}}Deletes all pip data from current stata memory.{p_end}
 
-{synoptset 27 tabbed}{...}
-{synopthdr:Internal options}
-{synoptline}
-{synopt :{opt server(string)}}This option is only available for developers of the 
-{cmd:pip} package.{p_end}
-{synoptline}
+
+{pstd}
+{err:Note}: {cmd:server()} and {cmd:identity()} options are available internally only for the Bank staff via the Bank’s intranet.
 
 {pstd}
 {bf:Note}: {cmd:pip} requires Internet connection.
@@ -180,14 +187,14 @@ to option {it:ppp()}, it would be applied to all the countries listed in {it:cou
 {title:Parameters description}
 
 {phang}
-{opt country(string)}{help pip_countries##countries:Countries and Economies Abbreviations}. 
+{opt country(string)} {help pip_countries##countries:Countries and Economies Abbreviations}. 
 If specified with {opt year(string)}, this option will return all the specific
 countries and years for which there is actual survey data.  When selecting multiple
 countries, use the corresponding three-letter codes separated by spaces. The option 
 {it:all} is a shorthand for calling all countries.
 
 {phang}
-{opt region(string)}{help pip_countries##regions:Regions Abbreviations}  If 
+{opt region(string)} {help pip_countries##regions:Regions Abbreviations}  If 
 specified with {opt year(string)}, this option will return all the specific countries 
 and years that belong to the specified region(s). 
 For example, {opt region(LAC)} will return all countries in Latin America and the 
@@ -209,11 +216,39 @@ each value with spaces. If left empty, the default poverty line of $1.9 is used.
 Poverty lines are expressed in 2011 PPP-adjusted USD per capita per day.
 
 {phang}
-{opt povline(#)} The desired population share (headcount) for which the poverty lines as poverty measures will be calculated. 
-This has not default, and should not be combined with {opt povline}. 
+{opt popshare(#)} The desired population share (headcount) for which the poverty lines as poverty measures will be calculated. 
+This has not default, and should not be combined with {opt povline}.
 The resulting poverty lines are expressed in 2011 PPP-adjusted USD per capita per day.
 
+{phang}
+{opt server(string)} Three server options (prod, dev, and qa) are available for this parameter depending on access requirement.
 
+{p 8 8 2}{bf:1) PROD (Production)}: It contains everything that is available outside the Bank’s intranet. 
+To access data in the PROD server we should provide this option as {cmd:server(prod)}. 
+
+{p 8 8 2}{bf:2) QA (Quality Assurance)}: This server is available within the intranet to check new version of pip data before it is available outside the Bank’s intranet. 
+This option can be provided in the pip command call as {cmd:server(qa)}. 
+
+{p 8 8 2}{bf:3) DEV (Development)}: This serve is used for testing new features and improvements in the API or wrappers, and it is also the server where you will work in for special projects like the PSPR. 
+This option can be provided in the pip command call as {cmd:server(dev)}.
+
+{p 8 8 2}{bf:Note:} We can see all the versions available in a server using {cmd:versions} option as {stata pip versions, server(prod)}
+
+{phang}
+{opt identity(string)} PIP commands allows us to specify which version of the data we want to make a query on. 
+To specify the version of the data, we can include optional parameter as {cmd:identity()} with three possible values (prod, int, and test). 
+Here are descriptions of each of the values: 
+
+{p 8 8 2}{bf: PROD} : Refers to production. Only the folders with this suffix will be considered by the API as production folders that will be deploy in the main API and website. 
+You Could find this kind of folder in the in any of the three servers explained above.
+
+{p 8 8 2}{bf: INT} : Refers to folders that will be used internally by specific people for specific purposes. 
+These folders won’t be ever sent to production. Also, these folders are static and should not be modified by the PIP technical team for any reason. 
+If the contents of an INT folder are needed to be sent to production, the PROD folder has to be recreated and tested to guarantee full transparency in the process.  
+These folders available only in the DEV server.
+
+{p 8 8 2}{bf: TEST} : Refers to testing folders that could vary and be modified as needed by the PIP technical team, but they are still understood by the PIP API. 
+These folders available only in the DEV server.
 
 {marker options}{...}
 {p 40 20 2}(Go up to {it:{help pip##sections:Sections Menu}}){p_end}
@@ -252,6 +287,9 @@ with a pip guidance database. If option {it:clear} is {ul:not} included,
 availability in the results window.{p_end}
 
 {phang}
+{opt table} Allows us to load one auxilary table, this option is used along with {cmd:tables} subcommand. {stata pip tables, table(countries)}
+
+{phang}
 {opt clear} replaces data in memory.
 
 {marker subcommands}{...}
@@ -267,7 +305,18 @@ for one-on-one correspondence of parameters. See {help pip##typesq:above}
 for a detailed explanation. 
 
 {phang}
-{opt test} Executes the last query in browser regardless of failure by 
+{opt tables} Allows us to download any auxilary table of the PIP project. 
+Defualt tables command {stata pip tables} provides us list of auxilary tables for download from PROD server in INT folder based on PPP 2011. 
+We can also specify the server, version of the data, and PPP year as {stata  pip tables, server(prod) identity(int) ppp_year(2011)}
+
+{phang}
+{opt cleanup} Allows us to delete all PIP data from Stata's memory. 
+The pip wrapper makes use of the `frames` feature—available since Stata 16—to store a lot of information in memory.   
+This is in part the reason why the first call of pip in a Stata new session is relatively slower to subsequent calls. 
+We may have seen the message below before closing Stata. 
+That is perfectly normal and should not cause any concern. Just click “Exist without saving.” 
+However, you can delete all PIP data in memory usin command {stata pip cleanup}
+
 {cmd:pip}. It makes use of the global "${pcn_query}".
 
 
@@ -308,25 +357,24 @@ Here are the list of pip and povcalnet variables.
 		{hline 43}
 		PIP variables    {col 40}povcalnet variables
 		{hline 20}{col 40}{hline 20}
-		region_code      {col 40}regioncode
 		country_code     {col 40}countrycode
-		reporting_year   {col 40}year
-		survey_acronym   {col 40}
-		survey_coverage  {col 40}coveragetype
-		survey_year      {col 40}datayear
+		country_name     {col 40}countryname
+		region_code      {col 40}regioncode
+		survey_coverage  {col 40}coveragetype		
+		year             {col 40}year
+		welfare_time     {col 40}datayear
 		welfare_type     {col 40}datatype
-		survey_comparability       {col 40}
-		comparable_spell   {col 40}
-		poverty_line       {col 40}povertyline
+		poverty_line     {col 40}povertyline
+		mean             {col 40}mean
 		headcount        {col 40}headcount
 		poverty_gap      {col 40}povgap
-		poverty_severity   {col 40}povgapsqr
-		mean             {col 40}mean 
-		median           {col 40}median
-		mld              {col 40}mld 
-		gini             {col 40}gini 
-		polarization     {col 40}polarization 
+		poverty_severity {col 40}povgapsqr
 		watts            {col 40}watts 
+		gini             {col 40}gini
+		median           {col 40}median
+		mld              {col 40}mld
+		polarization     {col 40}polarization
+		population       {col 40}population
 		decile1          {col 40}decile1
 		decile2          {col 40}decile2
 		decile3          {col 40}decile3
@@ -336,24 +384,18 @@ Here are the list of pip and povcalnet variables.
 		decile7          {col 40}decile7
 		decile8          {col 40}decile8
 		decile9          {col 40}decile9
-		decile10         {col 40}decile10
-		survey_mean_lcu         {col 40}
-		survey_mean_ppp         {col 40}
-		predicted_mean_ppp      {col 40}
-		cpi                     {col 40}
-		cpi_data_level          {col 40}
-		ppp                     {col 40}ppp 
-		ppp_data_level          {col 40}
-		reporting_pop           {col 40}population
-		pop_data_level          {col 40}
-		reporting_gdp           {col 40}
-		gdp_data_level          {col 40}
-		reporting_pce           {col 40}
-		pce_data_level          {col 40}
-		is_interpolated         {col 40}isinterpolated
-		is_used_for_aggregation {col 40}
-		distribution_type       {col 40}usemicrodata
-		estimation_type         {col 40}
+		decile10         {col 40}decile10		
+		cpi              {col 40}
+		ppp              {col 40}ppp
+		gdp              {col 40}
+		hfce             {col 40}
+		survey_comparability {col 40}
+		survey_acronym   {col 40}
+		survey_time      {col 40}
+		is_interpolated  {col 40}isinterpolated
+		distribution_type {col 40}usemicrodata
+		reporting_level   {col 40}
+		comparable_spell   {col 40}
 		{hline 43}
 
 
