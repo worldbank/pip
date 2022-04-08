@@ -1,5 +1,5 @@
 {smcl}
-{* *! version 1.0.0 20 sep 2019}{...}
+{* *! version 0.3.0 08 apr 2022}{...}
 {vieweralsosee "" "--"}{...}
 {vieweralsosee "Install wbopendata" "ssc install wbopendata"}{...}
 {vieweralsosee "Help wbopendata (if installed)" "help wbopendata"}{...}
