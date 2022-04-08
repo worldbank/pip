@@ -165,23 +165,6 @@ mean log deviation and decile shares, are calculated only in survey-years where
 micro data is available. Inequality measures are not reported for reference-years.
 
 
-{marker typesq}{...}
-{title:Combinatorial and one-on-one queries} ({err:temporally disabled}):
-
-{pstd}
-Be default, {cmd:pip} creates a combinatorial query of the parameters selected, 
-so that the output contains all the possible combinations between {it:country()}, 
-{it:povline()}, {it:year()}, and {it:coverage()}. Option {it:ppp()} is not part of the 
-combinatorial query. Alternatively, the user may select the subcommand {it:cl} to 
-parse a one-on-one (i.e., country by country) request. In this case, the first 
-country listed in {it:country()} will be combined with the first year in 
-{it:year()}, the first poverty lines in {it:povline()}, the first coverage area 
-in {it:coverage()}, and similarly for subsequent elements in the parameter
-{it:country()}. If only one element is added to parameters {it:povline()}, 
-{it:year()}, or {it:coverage()}, it would be applied to all the elements in the
-parameter {it:countr()}. {err:caution}: if only one element is added 
-to option {it:ppp()}, it would be applied to all the countries listed in {it:country()}. 
-
 {marker param}{...}
 {p 40 20 2}(Go up to {it:{help pip##sections:Sections Menu}}){p_end}
 {title:Parameters description}
