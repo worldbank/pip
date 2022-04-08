@@ -145,7 +145,7 @@ qui {
 		
 		
 		
-		frame _pip_countries {
+		frame _pip_cts {
 			levelsof country_code, local(countries) clean 
 		}
 		

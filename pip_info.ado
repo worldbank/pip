@@ -15,6 +15,7 @@ clear              ///
 justdata           /// programmers option
 pause              /// debugging
 server(string)     ///
+version(string)    ///
 POVCALNET_format   ///
 ] 
 
@@ -27,11 +28,20 @@ qui {
 	
 	*---------- API defaults
 	pip_set_server  `server', `pause'
-	local server = "`r(server)'"
-	local url    = "`r(url)'"
-	local base   = "`r(base)'"
-	local base2  = "`r(base2)'"
+	local server    = "`r(server)'"
+	local url       = "`r(url)'"
 	return add
+	
+	//------------ version
+	if ("`version'" != "") {
+		local version_qr = "&version=`version'"
+		tokenize "`version'", parse("_")
+		local _version   = "_`1'_`3'_`9'"
+	}
+	else {
+		local version_qr = ""
+		local _version   = ""
+	}
 	
 	
 	***************************************************
@@ -47,15 +57,14 @@ qui {
 	local av_frames = "^(" + "`av_frames'" + ")"
 	
 	//------------ countries frame
-	local frpipcts "_pip_countries"
+	local frpipcts "_pip_cts`_version'"
 	if (!regexm("`frpipcts'", "`av_frames'")) {
 		
 		frame create `frpipcts'
 		
 		frame `frpipcts' {
 			
-			local csvfile0  = "`url'/aux?table=countries&format=csv"
-			cap import delimited using "`csvfile0'", clear varn(1)
+			cap pip_tables countries, server(`server') version(`version') clear
 			local rc1 = _rc
 			
 			if (`rc1' == 0) {
@@ -66,6 +75,8 @@ qui {
 		
 		// drop frame if error happened
 		if (`rc1' != 0) {
+			local csvfile0  = "`url'/aux?table=countries`version_qr'&format=csv"
+			
 			noi disp in red "There is a problem accessing country name data." 
 			noi disp in red "to check your connection, copy and paste in your browser the following address:" _n /* 
 			*/	_col(4) in w `"`csvfile0'"'
@@ -76,15 +87,14 @@ qui {
 	}
 	
 	//------------ regions frame
-	local frpiprgn "_pip_regions"
+	local frpiprgn "_pip_regions`_version'"
 	if (!regexm("`frpiprgn'", "`av_frames'")) {
 		
 		frame create `frpiprgn'
 		
 		frame `frpiprgn' {
 			
-			local csvfilergn  = "`url'/aux?table=regions&format=csv"
-			cap import delimited using "`csvfilergn'", clear varn(1)
+			cap pip_tables regions, server(`server') version(`version') clear
 			local rc1 = _rc
 			
 			if (`rc1' == 0) {
@@ -95,6 +105,7 @@ qui {
 		
 		// drop frame if error happened
 		if (`rc1' != 0) {
+			local csvfilergn  = "`url'/aux?table=regions`version_qr'&format=csv"
 			noi disp in red "There is a problem accessing region name data." 
 			noi disp in red "to check your connection, copy and paste in your browser the following address:" _n /* 
 			*/	_col(4) in w `"`csvfilergn'"'
@@ -104,16 +115,48 @@ qui {
 		
 	}	
 	
+	
+	
+	//------------ regions price framework
+	local frpipfw "_pip_fw`_version'"
+	if (!regexm("`frpipfw'", "`av_frames'")) {
+		frame create `frpipfw'
+		
+		frame `frpipfw' {
+			
+			cap pip_tables framework, server(`server') version(`version') clear
+			
+			//------------format variables to make them link to data. 
+			rename welfare_type wt
+			label define welfare_type 1 "consumption" 2 "income"
+			encode wt, gen(welfare_type)
+			
+			local rc1 = _rc
+		}
+		
+		// drop frame if error happened
+		if (`rc1' != 0) {
+			local csvfile2  = "`url'/aux?table=framework`version_qr'&format=csv"
+			
+			noi disp in red "There is a problem accessing framework name data." 
+			noi disp in red "to check your connection, copy and paste in your browser the following address:" _n /* 
+			*/	_col(4) in w `"`csvfile2'"'
+			frame drop `frpipfw'
+			error 
+		} 
+		
+	}
+	
 	//------------ interpolated means frame
 	
-	local frpipim "_pip_int_means"
+	local frpipim "_pip_imns`_version'"
 	if (!regexm("`frpipim'", "`av_frames'")) {
 		
 		frame create `frpipim'
 		
 		frame `frpipim' {
 			
-			local csvfile  = "`url'/aux?table=interpolated_means&format=csv"
+			local csvfile  = "`url'/aux?table=interpolated_means`version_qr'&format=csv"
 			cap import delim using "`csvfile'", clear varn(1)
 			
 		}
@@ -126,7 +169,7 @@ qui {
 			frame drop `frpipim'
 			error 
 		} 
-		
+		*/
 		
 	}
 	
@@ -136,14 +179,14 @@ qui {
 	//  generating a lookup data
 	//========================================================
 	
-	local frlkupb "_pip_lkupb"
+	local frlkupb "_pip_lkupb`_version'"
 	if (!regexm("`frlkupb'", "`av_frames'")) {
 		
 		frame copy `frpipim' `frlkupb'
 		
 		frame `frlkupb' {
 			
-			frlink m:1 country_code, frame(_pip_countries) generate(ctry)
+			frlink m:1 country_code, frame(_pip_cts`_version') generate(ctry)
 			frget country_name income_group, from(ctry)
 			
 			keep country_code country_name wb_region_code pcn_region_code income_group survey_coverage surveyid_year
@@ -174,8 +217,8 @@ qui {
 	}
 	
 	
-	
-	frame copy _pip_lkupb _pip_lkup, replace
+	local frlkupwr "_pip_lkup_wrk"
+	frame copy `frlkupb' `frlkupwr', replace
 	if ("`justdata'" != "") exit
 	
 	***************************************************
@@ -187,13 +230,13 @@ qui {
 		noi disp in y  _n "{title:Available Surveys}: " in g "Select a country or region" 
 		noi disp in y  _n "{title: Countries}"  
 		
-		frame _pip_lkup {
+		frame `frlkupwr' {
 			
 			quietly levelsof country_code , local(countries) 
 			local current_line = 0
 			foreach cccc of local countries{
 				local current_line = `current_line' + 1 
-				local display_this = "{stata pip_info, country(`cccc') clear: `cccc'} "
+				local display_this = "{stata pip_info, country(`cccc') clear version(`version'): `cccc'} "
 				if (`current_line' < 10) noi display in y `"`display_this'"' _continue 
 				else{
 					noi display in y `"`display_this'"' 
@@ -224,7 +267,7 @@ qui {
 	
 	if  ("`country'" != "") & ("`region'" == "") {
 		
-		frame _pip_lkup {
+		frame `frlkupwr' {
 			
 			noi disp in y  _n "{title:Available Surveys for `country'}" 	
 			local country = upper("`country'")
@@ -276,7 +319,7 @@ qui {
 	***************************************************
 	if  ("`country'" == "") & ("`region'" != "") {
 		
-		frame _pip_lkup {
+		frame `frlkupwr' {
 			noi disp in y  _n "{title:Available Surveys}" 
 			noi disp in y  _n "{title:Select a Year}" 	
 			
@@ -302,7 +345,7 @@ qui {
 		noi display _n ""
 		cwf `curframe'
 		exit			
-			
+		
 	}	 // end of condition 
 	
 } // end of large quietly

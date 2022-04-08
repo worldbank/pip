@@ -1,10 +1,3 @@
-*! version 0.1.2        <2022feb07>
-*! version 0.1.1        <2022feb01>
-*! version 0.1.0.9010   <2022feb01>
-*! version 0.1.0        <2022feb01>
-*! version 0.0.2.9000   <2022jan19>
-*! version 0.0.2        <2022jan12>
-*! version 0.0.1        <2021dec01>
 /*=======================================================
 Program Name: pip.ado
 Author:
@@ -32,18 +25,18 @@ version 16.0
 
 syntax [anything(name=subcommand)]  ///
 [,                             	   /// 
-COUNtry(string)                /// 
+COUntry(string)                /// 
 REGion(string)                 /// 
 YEAR(string)                   /// 
-POVline(numlist)               /// 
+POVLine(numlist)               /// 
 POPShare(numlist)	   		       /// 
 PPP(numlist)                   /// 
 AGGregate                      /// 
 CLEAR                          /// 
 INFOrmation                    /// 
-coverage(string)               /// 
+COVerage(string)               /// 
 ISO                            /// 
-SERVER(string)                 /// 
+SERver(string)                 /// 
 pause                          /// 
 FILLgaps                       /// 
 N2disp(integer 15)             /// 
@@ -55,6 +48,11 @@ noEFFICIENT                    ///
 KEEPFrames                     ///
 frame_prefix(string)           ///
 replace                        ///
+VERsion(string)                ///
+PPP_year(numlist)              ///
+IDEntity(string)               ///
+RELease(numlist)               ///
+TABle(string)                  ///
 ] 
 
 if ("`pause'" == "pause") pause on
@@ -67,6 +65,12 @@ qui {
 	//========================================================
 	local curframe = c(frame)
 	
+	if regexm("`subcommand'", "^clean") {
+		noi pip_cleanup
+		exit
+	}
+	
+	
 	if regexm("`subcommand'", "^dropframe") {
 		pip_drop frame, frame_prefix(`frame_prefix')
 		exit
@@ -74,6 +78,45 @@ qui {
 	
 	if regexm("`subcommand'", "^dropglobal") {
 		pip_drop global
+		exit
+	}
+	
+	// ------------------------------------------------------------------------
+	// New session procedure
+	// ------------------------------------------------------------------------
+	
+	if ("${pip_cmds_ssc}" == "") {
+		pip_new_session , `pause'
+	}
+	
+	//========================================================
+	// setup defaults
+	//========================================================
+	
+	local server     = lower("`server'")
+	local identity   = upper("`identity'")
+	local country    = upper("`country'")
+	local coverage   = lower("`coverage'")
+	local table      = lower("`table'")
+	
+	* In case global server is specified
+	if ("${pip_server}" != "" & "`server'" == "") {
+		noi disp in red "warning:" in y "Global {it:pip_server} (${pip_server}) is in use"
+		local server = "${pip_server}"
+	}
+	
+	
+	//========================================================
+	// Auxiliary tables
+	//========================================================
+	if regexm("`subcommand'", "^table") {
+		noi pip_tables `table', server(`server')        ///
+		version(`version')                ///
+		release(`release')                ///
+		ppp_year(`ppp_year')              ///
+		identity(`identity')              ///
+		`clear' 
+		return add
 		exit
 	}
 	
@@ -92,7 +135,7 @@ qui {
 	}
 	
 	//========================================================
-	// Conditions
+	// Conditions (Defenses)
 	//========================================================
 	if ("`aggregate'" != "") {
 		noi disp in red "Option {it:aggregate} is disable for now."
@@ -105,8 +148,7 @@ qui {
 	}
 	
 	if ("`popshare'" != "" &  (lower("`subcommand'") == "wb" | "`aggregate'" != "")) {
-		noi disp in red "option {it:popshare} can't be combined with option {it:aggregate}" _c /* 
-		*/ " or with subcommand {it:wb}" _n
+		noi disp in red "option {it:popshare} can't be combined with option {it:aggregate} or with subcommand {it:wb}" _n
 		error
 	}
 	
@@ -114,29 +156,83 @@ qui {
 		local frame_prefix "pip_"
 	}
 	
-	// ------------------------------------------------------------------------
-	// New session procedure
-	// ------------------------------------------------------------------------
-	
-	if ("${pip_cmds_ssc}" == "") {
-		pip_new_session , `pause'
+	if ("`region'" != "" & lower("`subcommand'") == "wb" ) {
+		noi disp in red "Option {it:region} has been disabled with subcommand {it:wb}"
+		error
 	}
 	
 	
 	/*==================================================
-	Defaults           
+	Defaults
 	==================================================*/
+	// --- timer
+	if ("`timer'" != "") {
+		local i_on = `i'
+		scalar tt = tt + "`crlf' `i': Set server"
+		local i_off = `i++'
+	}	
+	// --- timer
+	
+	// --- timer
+	if ("`timer'" != "") timer on `i_on'
+	// --- timer
 	
 	*---------- API defaults
 	pip_set_server  `server', `pause'
 	*return add
+	local url       = "`r(url)'"
 	local server    = "`r(server)'"
 	local base      = "`r(base)'"
 	local base_grp  = "`r(base_grp)'"
-	local url       = "`r(url)'"
-	local handle    = "`r(handle)'"
+	
+	// --- timer
+	if ("`timer'" != "") timer off `i_off'
+	// --- timer
+	
+	//========================================================
+	// versions
+	//========================================================
+	
+	// --- timer
+	if ("`timer'" != "") {
+		local i_on = `i'
+		scalar tt = tt + "`crlf' `i': Get version"
+		local i_off = `i++'
+	}	
+	// --- timer
+	
+	// --- timer
+	if ("`timer'" != "") timer on `i_on'
+	// --- timer
 	
 	
+	if regexm("`subcommand'", "^version") {
+		noi pip_versions, server(`server') availability
+		return add
+		exit
+	}
+	noi pip_versions, server(`server') ///
+	version(`version')                ///
+	release(`release')               ///
+	ppp_year(`ppp_year')             ///
+	identity(`identity')    
+	
+	local version_qr = "`r(version_qr)'"
+	local version    = "`r(version)'"
+	local release    = "`r(release)'"
+	local ppp_year   = "`r(ppp_year)'"
+	local identity   = "`r(identity)'"
+	
+	return local pip_version = "`version'"
+	
+	// --- timer
+	if ("`timer'" != "") timer off `i_off'
+	// --- timer
+	
+	
+	//========================================================
+	// conditions
+	//========================================================
 	*---------- lower case subcommand
 	local subcommand = lower("`subcommand'")
 	
@@ -169,6 +265,15 @@ qui {
 	}
 	
 	if ("`year'" == "") local year "all"
+	
+	if ("`year'" != "" & "`year'" != "all") {
+		local yrtemp
+		foreach yr of local year {
+			local tt = substr("`yr'", 1, 4) 
+			local yrtemp `yrtemp' `tt'
+		}
+		local year "`yrtemp'"
+	} 
 	* 
 	
 	*---------- Coverage
@@ -188,7 +293,11 @@ qui {
 	
 	// Blank popshare and blank povline = default povline 1.9
 	if ("`popshare'" == "" & "`povline'" == "")  {
-		local povline = 1.9
+		
+		if ("`ppp_year'" == "2005") local povline = 1.25
+		if ("`ppp_year'" == "2011") local povline = 1.9
+		if ("`ppp_year'" == "2017") local povline = 2.15
+		
 		local pcall = "povline"
 	}
 	
@@ -259,8 +368,7 @@ qui {
 	
 	if ("`information'" == "") {
 		
-		if (c(N) != 0 & "`clear'" == "" & /* 
-		*/ "`information'" == "") {
+		if (c(N) != 0 & "`clear'" == "" & "`information'" == "") {
 			
 			noi di as err "You must start with an empty dataset; or enable the option {it:clear}."
 			error 4
@@ -298,18 +406,37 @@ qui {
 	pause pip - before execution
 	
 	*---------- Information
+	// --- timer
+	if ("`timer'" != "") {
+		local i_on = `i'
+		scalar tt = tt + "`crlf' `i': Get info"
+		local i_off = `i++'
+	}	
+	// --- timer
+	
+	// --- timer
+	if ("`timer'" != "") timer on `i_on'
+	// --- timer
+	
+	
 	if ("`information'" != ""){
-		noi pip_info, `clear' `pause' server(`server')
+		noi pip_info, `clear' `pause' server(`server') version(`version')
 		return add 
 		exit
 	}	
+	
+	// --- timer
+	if ("`timer'" != "") timer off `i_off'
+	// --- timer
+	
+	
 	
 	*---------- Country Level (one-on-one query)
 	if ("`subcommand'" == "cl") {
 		
 		noi disp in red "Subcommand {it:cl} is temporary out of service."
 		exit
-	
+		
 		noi pip_cl, country("`country'")  /// this needs to accommodate to new structure
 		year("`year'")                    ///
 		povline("`povline'")              ///
@@ -350,17 +477,22 @@ qui {
 	if ("`pcall'" == "povline") 	loc i_call "i_povline"
 	else 							loc i_call "i_popshare"
 	
+	
+	// --- timer
+	if ("`timer'" != "") {
+		local j = `i++'
+		local k = `i++'
+		local h = `i++'
+		scalar tt = tt + "`crlf' `j': bulding query"
+		scalar tt = tt + "`crlf' `k': downloading data"
+		scalar tt = tt + "`crlf' `h': cleaning data"
+	}	
+	// --- timer		
+	
 	foreach `i_call' of local `pcall' {	
-		// --- timer
-		if ("`timer'" != "") {
-			local i_on = `i'
-			scalar tt = tt + "`crlf' `i': pip_query loop"
-			local i_off = `i++'
-		}	
-		// --- timer
 		
 		// --- timer
-		if ("`timer'" != "") timer on `i_on'
+		if ("`timer'" != "") timer on `j'
 		// --- timer
 		
 		local ++f 
@@ -376,6 +508,7 @@ qui {
 		ppp("`ppp'")                            ///
 		coverage(`coverage')                    ///
 		server(`server')                        ///
+		version(`version')                      ///
 		`clear'                                 ///
 		`information'                           ///
 		`iso'                                   ///
@@ -407,16 +540,16 @@ qui {
 		
 		*---------- Query
 		if ("`popshare'" == ""){
-			local query = "`query_ys'&`query_ct'&`query_cv'&`query_pl'`query_pp'`query_ds'&format=csv"
+			local query = "`query_ys'&`query_ct'&`query_cv'&`query_pl'`query_pp'`query_ds'&`version_qr'&format=csv"
 		}
 		else{
-			local query = "`query_ys'&`query_ct'&`query_cv'&`query_ps'`query_pp'`query_ds'&format=csv"
+			local query = "`query_ys'&`query_ct'&`query_cv'&`query_ps'`query_pp'`query_ds'&`version_qr'&format=csv"
 		}
 		return local query_`f' "`query'"
 		global pip_query = "`query'"
 		
 		*---------- Base + query
-		if ("`aggregate'" != ""){
+		if ("`aggregate'" != "" | "`subcommand'" == "wb"){
 			local queryfull "`base_grp'?`query'"
 		}
 		else{
@@ -426,34 +559,26 @@ qui {
 		return local queryfull_`f' = "`queryfull'"
 		
 		// --- timer
-		if ("`timer'" != "") timer off `i_off'
+		if ("`timer'" != "") timer off `j'
 		// --- timer
-		
-		// --- timer
-		if ("`timer'" != "") {
-			local i_on = `i'
-			scalar tt = tt + "`crlf' `i': download loop"
-			local i_off = `i++'
-		}	
-		// --- timer
-		
-		// --- timer
-		if ("`timer'" != "") timer on `i_on'
-		// --- timer
-		
 		
 		/*==================================================
 		Download  and clean data
 		==================================================*/
 		
+		
+		// --- timer
+		if ("`timer'" != "") timer on `k'
+		// --- timer
+		
 		*---------- download data
-		cap import delimited  "`queryfull'", `clear'
+		cap import delimited  "`queryfull'", `clear' varn(1)
 		if (_rc) {
 			noi dis ""
 			noi dis in red "It was not possible to download data from the PIP API."
 			noi dis ""
 			noi dis in white `"(1) Please check your Internet connection by "' _c 
-			noi dis in white  `"{browse "`server'/`handle'/health-check" :clicking here}"'
+			noi dis in white  `"{browse "`url'/health-check" :clicking here}"'
 			noi dis in white `"(2) Test that the data is retrievable. By"' _c
 		  noi dis in white  `"{stata pip test: clicking here }"' _c
 			noi dis in white  "you should be able to download the data."
@@ -467,7 +592,7 @@ qui {
 		
 		
 		// --- timer
-		if ("`timer'" != "") timer off `i_off'
+		if ("`timer'" != "") timer off `k'
 		// --- timer
 		
 		* global qr = `qr'
@@ -482,24 +607,16 @@ qui {
 		pause after download
 		
 		// --- timer
-		if ("`timer'" != "") {
-			local i_on = `i'
-			scalar tt = tt + "`crlf' `i': data clean loop"
-			local i_off = `i++'
-		}	
-		// --- timer
-		
-		// --- timer
-		if ("`timer'" != "") timer on `i_on'
+		if ("`timer'" != "") timer on `h'
 		// --- timer
 		
 		*---------- Clean data
-		pip_clean `rtype', year("`year'") `iso' /* 
-		*/ region(`region') `pause' `wb'		
+		pip_clean `rtype', year("`year'") `iso' server(`server') /* 
+		*/ region(`region') `pause' `wb' version(`version')
 		
 		pause after cleaning
 		// --- timer
-		if ("`timer'" != "") timer off `i_off'
+		if ("`timer'" != "") timer off `h'
 		// --- timer
 		
 		/*==================================================
@@ -549,13 +666,6 @@ qui {
 		
 	} // end of povline loop
 	
-	// --- timer
-	if ("`timer'" != "") {
-		noi disp tt
-		noi timer list
-	}
-	// --- timer
-	
 	return local npl = `f'
 	
 	// ------------------------------
@@ -566,36 +676,44 @@ qui {
 	noi di as res _n "{ul: first `n2disp' observations}"
 	
 	if ("`subcommand'" == "wb") {
-		sort region_code reporting_year 
+		sort region_code year 
 		
 		tempname tolist
 		frame copy `c(frame)' `tolist'
 		frame `tolist' {
-			gsort region_code -reporting_year 
+			gsort region_code -year 
 			
 			count if (region_code == "WLD")
 			local cwld = r(N)
 			if (`cwld' >= `n2disp') {
 				keep if (region_code == "WLD")			
 			}
-			noi list region reporting_year poverty_line headcount mean ///
-			  in 1/`n2disp',  abbreviate(12) 
+			noi list region_code year poverty_line headcount mean ///
+			in 1/`n2disp',  abbreviate(12) 
 		}
 		
 	}
 	
 	else {
 		if ("`aggregate'" == "") {
-			sort country_code reporting_year 
-			noi list country_code reporting_year poverty_line headcount  /*
-			*/  mean median welfare_type in 1/`n2disp',  /* 
-			*/  abbreviate(12)  sepby(country_code)
+			sort country_code year
+			local varstodisp "country_code year poverty_line headcount mean median welfare_type"
+			local sepby "country_code"
 		}
 		else {
-			sort reporting_year 
-			noi list reporting_year poverty_line headcount mean , /*
-			*/ abbreviate(12) sepby(poverty_line)
-		}		
+			sort year
+			local varstodisp "year poverty_line headcount mean"
+			local sepby "poverty_line"
+		}
+		
+		foreach v of local varstodisp {
+			cap confirm var `v', exact
+			if _rc continue 
+			local v2d "`v2d' `v'"
+		}
+		
+		noi list `v2d' in 1/`n2disp',  abbreviate(12)  sepby(`sepby')
+		
 	}	
 	
 	//========================================================
@@ -647,16 +765,40 @@ qui {
 	// Convert to povcalnet format
 	//========================================================
 	
+	if ("`timer'" != "") {
+		local i_on = `i'
+		scalar tt = tt + "`crlf' `i': formating to povcalnet"
+		local i_off = `i++'
+	}	
+	// --- timer
+	
+	// --- timer
+	if ("`timer'" != "") timer on `i_on'
+	// --- timer
 	
 	if ("`povcalnet_format'" != "") {
 		pause before povcalnet format
 		pip_povcalnet_format  `rtype', `pause'
 	}
 	
+	// --- timer
+	if ("`timer'" != "") timer off `i_off'
+	// --- timer
+	
 	//========================================================
 	//  Drop frames created in the middle of the process
 	//========================================================
 	
+	if ("`timer'" != "") {
+		local i_on = `i'
+		scalar tt = tt + "`crlf' `i': remove frames"
+		local i_off = `i++'
+	}	
+	// --- timer
+	
+	// --- timer
+	if ("`timer'" != "") timer on `i_on'
+	// --- timer
 	
 	frame dir
 	local av_frames "`r(frames)'"
@@ -678,7 +820,22 @@ qui {
 		}
 		
 	} // condition to keep frames
+	
+	// --- timer
+	if ("`timer'" != "") timer off `i_on'
+	// --- timer
+	
+	
 	* set trace off
+	
+	
+	
+	// --- timer
+	if ("`timer'" != "") {
+		noi disp tt
+		noi timer list
+	}
+	// --- timer
 	
 } // end of qui
 end
@@ -737,6 +894,28 @@ exit
 Notes:
 
 Version Control:
+
+*! version 0.3.0        <2022apr07>
+*! version 0.2.2.9002   <2022apr07>
+*! version 0.2.2        <2022apr06>
+*! version 0.2.1.9001   <2022apr06>
+*! version 0.2.1        <2022apr04>
+*! version 0.2.0.9002   <2022apr04>
+*! version 0.2.0        <2022apr01>
+*! version 0.1.7        <2022mar30>
+*! version 0.1.6        <2022mar28>
+*! version 0.1.5.9001   <2022mar28>
+*! version 0.1.5        <2022mar25>
+*! version 0.1.4        <2022mar18>
+*! version 0.1.3        <2022mar18>
+*! version 0.1.2.9000   <2022mar17>
+*! version 0.1.2        <2022feb07>
+*! version 0.1.1        <2022feb01>
+*! version 0.1.0.9010   <2022feb01>
+*! version 0.1.0        <2022feb01>
+*! version 0.0.2.9000   <2022jan19>
+*! version 0.0.2        <2022jan12>
+*! version 0.0.1        <2021dec01>
 
 
 *##s

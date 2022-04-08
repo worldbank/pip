@@ -108,7 +108,7 @@ if (!regexm("`src'", "repec")) {
 	* force installation 
 	if ("`crrtversion'" == "") {
 		local username "pip-technical-team"  // to modify
-		github install `username'/`cmd', replace
+		github install `username'/`cmd', replace version(`latestversion')
 		cap window stopbox note "pip command has been reinstalled to " ///
 		"keep record of new updates. Please type discard and retry."
 		global pip_cmds_ssc = ""
@@ -120,7 +120,7 @@ if (!regexm("`src'", "repec")) {
 		"Would you like to install it now?"
 		
 		if (_rc == 0) {
-			cap github install `repo', replace
+			cap github install `repo', replace version(`latestversion')
 			if (_rc == 0) {
 				cap window stopbox note "Installation complete. please type" ///
 				"discard in your command window to finish"
@@ -141,8 +141,6 @@ if (!regexm("`src'", "repec")) {
 		noi disp as result "Github version of {cmd:`cmd'} is up to date."
 		local bye ""
 	}
-	
-	
 	
 } // end if installed from github 
 
