@@ -25,7 +25,7 @@ end
 *  ----------------------------------------------------------------------------
 *  World Poverty Trend (reference year)
 *  ----------------------------------------------------------------------------
-program define pcn_example01
+program define pip_example01
 
 	pip wb,  clear
 
@@ -54,7 +54,7 @@ end
 *  ----------------------------------------------------------------------------
 *  Millions of poor by region (reference year) 
 *  ----------------------------------------------------------------------------
-program define pcn_example02
+program define pip_example02
 	pip wb, clear
 	keep if reporting_year > 1989
 	gen poorpop = headcount * population 
@@ -91,7 +91,7 @@ end
 *  ----------------------------------------------------------------------------
 *  Categories of income and poverty in LAC
 *  ----------------------------------------------------------------------------
-program pcn_example03
+program pip_example03
 	pip, region(lac) year(last) povline(3.2 5.5 15) clear 
 	keep if welfare_type ==2 & reporting_year>=2014             // keep income surveys
 	keep poverty_line country_code countryname reporting_year headcount
@@ -128,7 +128,7 @@ end
 *  ----------------------------------------------------------------------------
 * Trend of Gini 
 *  ----------------------------------------------------------------------------
-program pcn_example04
+program pip_example04
 pip, country(arg gha tha) year(all) clear
 	replace gini = gini * 100
 	keep if survey_year  > 1989
@@ -146,7 +146,7 @@ end
 *  ----------------------------------------------------------------------------
 *  Growth incidence curves
 *  ----------------------------------------------------------------------------
-program pcn_example05
+program pip_example05
   pip, country(arg gha tha) year(all)  clear
 	reshape long decile, i(country_code survey_year ) j(dec)
 	
@@ -175,7 +175,7 @@ end
 *  ----------------------------------------------------------------------------
 *  Gini & per capita GDP
 *  ----------------------------------------------------------------------------
-program pcn_example06
+program pip_example06
 	set checksum off
 	wbopendata, indicator(NY.GDP.PCAP.PP.KD) long clear
 	tempfile PerCapitaGDP
@@ -204,7 +204,7 @@ end
 *  ----------------------------------------------------------------------------
 *  Regional Poverty Evolution
 *  ----------------------------------------------------------------------------
-program define pcn_example07
+program define pip_example07
 	pip wb, povline(1.9 3.2 5.5) clear
 	drop if inlist(region_code, "OHI", "WLD") | reporting_year<1990 
 	keep poverty_line region reporting_year headcount
@@ -236,7 +236,7 @@ end
 // National level and longest available series (temporal change in welfare)
 // ------------------------------------------------------------------------
 
-program define pcn_example08
+program define pip_example08
 
 pip, clear
 
@@ -276,7 +276,7 @@ end
 // National level and longest available series of same welfare type
 // ------------------------------------------------------------------------
 
-program define pcn_example09
+program define pip_example09
 
 pip, clear
 

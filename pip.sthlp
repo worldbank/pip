@@ -47,7 +47,7 @@ Cannot be used with option {it:country()}{p_end}
 {synopt :{opt ppp}{cmd:(#)}}Allows the selection of PPP. {p_end}
 
 {synoptset 27 tabbed}{...}
-{synopthdr:Versioning}
+{synopthdr:Version}
 {synoptline}
 {synopt :{opt server(string)}}Name of a server to query on (e.g, prod, dev, qa). See description of each of the server here{p_end}
 {synopt :{opt identity(string)}}Version of data to run the query on (e.g., prod, int, test).{p_end}
@@ -61,7 +61,7 @@ Cannot be used with option {it:country()}{p_end}
 {synopt :{opt clear}}Replaces data in memory.{p_end}
 {synopt :{opt querytimes(integer)}}Number of times the API is hit before defaulting to failure. 
 Default is 5. {it:Advance option. Just use it if Internet connection is poor}{p_end}
-{synopt :{opt table(string)}}Loads one auxilary table, this option is used along with {cmd:tables} subcommand.{p_end}
+{synopt :{opt table(string)}}Loads one auxiliary table, this option is used along with {cmd:tables} subcommand.{p_end}
 
 {synoptset 27 tabbed}{...}
 {synopthdr:subcommands}
@@ -166,7 +166,7 @@ micro data is available. Inequality measures are not reported for reference-year
 
 
 {marker typesq}{...}
-{title:Combinatorial and one-on-one queries}:
+{title:Combinatorial and one-on-one queries} ({err:temporally disabled}):
 
 {pstd}
 Be default, {cmd:pip} creates a combinatorial query of the parameters selected, 
@@ -287,7 +287,7 @@ with a pip guidance database. If option {it:clear} is {ul:not} included,
 availability in the results window.{p_end}
 
 {phang}
-{opt table} Allows us to load one auxilary table, this option is used along with {cmd:tables} subcommand. {stata pip tables, table(countries)}
+{opt table} Allows us to load one auxiliary table, this option is used along with {cmd:tables} subcommand. {stata pip tables, table(countries)}
 
 {phang}
 {opt clear} replaces data in memory.
@@ -305,8 +305,8 @@ for one-on-one correspondence of parameters. See {help pip##typesq:above}
 for a detailed explanation. 
 
 {phang}
-{opt tables} Allows us to download any auxilary table of the PIP project. 
-Defualt tables command {stata pip tables} provides us list of auxilary tables for download from PROD server in INT folder based on PPP 2011. 
+{opt tables} Allows us to download any auxiliary table of the PIP project. 
+Default tables command {stata pip tables} provides us list of auxiliary tables for download from PROD server in INT folder based on PPP 2011. 
 We can also specify the server, version of the data, and PPP year as {stata  pip tables, server(prod) identity(int) ppp_year(2011)}
 
 {phang}
@@ -315,9 +315,9 @@ The pip wrapper makes use of the `frames` feature—available since Stata 16—t
 This is in part the reason why the first call of pip in a Stata new session is relatively slower to subsequent calls. 
 We may have seen the message below before closing Stata. 
 That is perfectly normal and should not cause any concern. Just click “Exist without saving.” 
-However, you can delete all PIP data in memory usin command {stata pip cleanup}
+However, you can delete all PIP data in memory using command {stata pip cleanup}
 
-{cmd:pip}. It makes use of the global "${pcn_query}".
+{cmd:pip}. It makes use of the global "${pip_query}".
 
 
 {marker return}{...}
@@ -344,8 +344,8 @@ poverty lines included in {it:povlines()}:
 {p2col 5 20 24 2: additional info}{p_end}
 {synopt:{cmd:r(queryfull_{it:#})}}Complete query{p_end}
 {synopt:{cmd:r(npl)}}Number of poverty lines{p_end}
-{synopt:{cmd:pcn_query}}Global macro with query information in case {cmd:pip} fails. 
-"${pcn_query}" to display {p_end}
+{synopt:{cmd:pip_query}}Global macro with query information in case {cmd:pip} fails. 
+"${pip_query}" to display {p_end}
 
 {marker list}{...}
 {p 40 20 2}(Go up to {it:{help pip##sections:Sections Menu}}){p_end}
@@ -482,7 +482,7 @@ Here are the list of pip and povcalnet variables.
 	.bysort countrycode: egen _type_max = max(_type_length)   // longest type series
 	.replace _type_max = (_type_max == _type_length)
 
-	* in case of same elngth in series, keep consumption
+	* in case of same length in series, keep consumption
 	. by countrycode _type_max, sort:  gen _ntmax = _n == 1
 	. by countrycode : replace _ntmax = sum(_ntmax)
 	. by countrycode : replace _ntmax = _ntmax[_N]  // number of datatype per country
@@ -495,7 +495,7 @@ Here are the list of pip and povcalnet variables.
 	. keep if _tokeepl == 1
 	. drop _*
 
-{txt}      ({stata "pip_examples pcn_example08":click to run})
+{txt}      ({stata "pip_examples pip_example08":click to run})
 
 {phang2}
 {ul:3.2} National coverage (when available) and longest possible time series for each country, restrict to same welfare type throughout.
@@ -516,7 +516,7 @@ Here are the list of pip and povcalnet variables.
 	. bysort countrycode: egen _type_max = max(_type_length)
 	. replace _type_max = (_type_max == _type_length)
 
-	* in case of same elngth in series, keep consumption
+	* in case of same length in series, keep consumption
 	. by countrycode _type_max, sort:  gen _ntmax = _n == 1
 	. by countrycode : replace _ntmax = sum(_ntmax)
 	. by countrycode : replace _ntmax = _ntmax[_N]  // max 
@@ -529,7 +529,7 @@ Here are the list of pip and povcalnet variables.
 	. keep if _tokeepl == 1
 	. drop _*
 
-{txt}      ({stata "pip_examples pcn_example09":click to run})
+{txt}      ({stata "pip_examples pip_example09":click to run})
 
 {dlgtab: 4. Analytical examples}
 
@@ -560,7 +560,7 @@ Here are the list of pip and povcalnet variables.
 	.        2 "Number of people who live below $1.90") si(vsmall)  ///
 	.        row(2)) scheme(s2color)
 	
-{txt}      ({stata "pip_examples pcn_example01":click to run})
+{txt}      ({stata "pip_examples pip_example01":click to run})
 
 {phang2}
 {ul:4.2} Graph of trends in poverty headcount ratio by region, multiple poverty lines ($1.9, $3.2, $5.5)
@@ -587,7 +587,7 @@ Here are the list of pip and povcalnet variables.
 	.        yti("Poverty headcount (%)", si(vsmall))                      ///
 	.        leg(order(1 "$1.9" 2 "$3.2" 3 "$5.5") r(1) si(vsmall))        ///
 	.        sub(, si(small))	scheme(s2color)
-{txt}      ({stata "pip_examples pcn_example07":click to run})
+{txt}      ({stata "pip_examples pip_example07":click to run})
 
 {phang2}
 {ul:4.3} Graph of population distribution across income categories in Latin America, by country
@@ -624,7 +624,7 @@ Here are the list of pip and povcalnet variables.
 	. 	graphregion(c(white)) ysize(6) xsize(6.5)                         ///
 	. 		legend(si(vsmall) r(3))  yti("`yti'", si(small))                ///
 	. 	ylab(,labs(small) nogrid angle(0)) scheme(s2color)
-{txt}      ({stata "pip_examples pcn_example03":click to run})
+{txt}      ({stata "pip_examples pip_example03":click to run})
 
 
 
@@ -655,17 +655,17 @@ Note, No. 9, World Bank, Washington, DC
 {p 40 20 2}(Go up to {it:{help pip##sections:Sections Menu}}){p_end}
 
 {pstd}
-The authors would like to thank Joao-Pedro Azevedo, Tony Fujs, Dean Jolliffe, 
-Aart Kraay, Kihoon Lee, Daniel Mahler, Minh Cong Nguyen, Marco Ranaldi and Prem 
-Sangraula, as well as seminar participants at the World Bank, for comments received 
-on earlier versions of this code. In developing this code, we closely followed the 
-example of wbopendata developed by Joao-Pedro Azevedo.
+The authors would like to thank Tony Fujs, Dean Jolliffe, Daniel Mahler, Minh
+Cong Nguyen, Christoph Lakner, Martha Viveros, Marta Schoch, Samuel Kofi Tetteh
+Baah, Nishan Yonzan, Haoyu Wu, and Ifeanyi Nzegwu Edochie for comments received 
+on earlier versions of this code. Special thanks to Tefera Bekele Degefu for his
+priceless contributions to the development of this package.
 
 {p 40 20 2}(Go up to {it:{help pip##sections:Sections Menu}}){p_end}
 {marker authors}{...}
 {title:Authors}
 {pstd}
-R.Andres Castaneda and Tefera Bekele Degefu
+R.Andres Castaneda
 
 {title:Maintainer}
 {p 4 4 4}R.Andres Castaneda, The World Bank{p_end}
