@@ -641,14 +641,17 @@ Note, No. 9, World Bank, Washington, DC
 The authors would like to thank Tony Fujs, Dean Jolliffe, Daniel Mahler, Minh
 Cong Nguyen, Christoph Lakner, Martha Viveros, Marta Schoch, Samuel Kofi Tetteh
 Baah, Nishan Yonzan, Haoyu Wu, and Ifeanyi Nzegwu Edochie for comments received 
-on earlier versions of this code. Special thanks to Tefera Bekele Degefu for his
-priceless contributions to the development of this package.
+on earlier versions of this code. 
 
 {p 40 20 2}(Go up to {it:{help pip##sections:Sections Menu}}){p_end}
 {marker authors}{...}
-{title:Authors}
+{title:Author}
 {pstd}
-R.Andres Castaneda
+R.Andres Castaneda 
+
+{title:Contributor}
+{pstd}
+Tefera Bekele Degefu
 
 {title:Maintainer}
 {p 4 4 4}R.Andres Castaneda, The World Bank{p_end}
