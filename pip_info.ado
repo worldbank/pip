@@ -236,8 +236,8 @@ qui {
 			local current_line = 0
 			foreach cccc of local countries{
 				local current_line = `current_line' + 1 
-				local display_this = "{stata pip_info, country(`cccc') clear version(`version'): `cccc'} "
-				if (`current_line' < 10) noi display in y `"`display_this'"' _continue 
+				local display_this = "{stata pip_info, country(`cccc') clear server(`server') version(`version'): `cccc'} "
+				if (`current_line' < 8) noi display in y `"`display_this'"' _continue 
 				else{
 					noi display in y `"`display_this'"' 
 					local current_line = 0
@@ -291,7 +291,7 @@ qui {
 				foreach ind_y of local years_current {
 					local current_line = `current_line' + 1 
 					local ind_y_c=substr("`ind_y'",1,4)
-					local display_this = "{stata  pip, country(`country') year(`ind_y') coverage(`coverage')   clear: `ind_y_c'}"		
+					local display_this = "{stata  pip, country(`country') year(`ind_y') server(`server') coverage(`coverage')   clear: `ind_y_c'}"		
 					if (`current_line' < 10) noi display in y `"`display_this'"' _continue 
 					
 					else {
