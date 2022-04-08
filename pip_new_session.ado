@@ -33,7 +33,7 @@ else                      pause off
 
 * mata: povcalnet_source("povcalnet") // creates local src
 local cmd pip
-local username "pip-technical-team"  // to modify
+local username "worldbank"  // to modify
 
 _pip_find_src `cmd'
 local src = "`r(src)'"
@@ -107,7 +107,7 @@ if (!regexm("`src'", "repec")) {
 	
 	* force installation 
 	if ("`crrtversion'" == "") {
-		local username "pip-technical-team"  // to modify
+		local username "worldbank"  // to modify
 		github install `username'/`cmd', replace version(`latestversion')
 		cap window stopbox note "pip command has been reinstalled to " ///
 		"keep record of new updates. Please type discard and retry."
