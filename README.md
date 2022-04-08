@@ -1,4 +1,4 @@
-[![](https://img.shields.io/badge/devel%20version-0.3.0-blue.svg)](https://github.com/PIP-Technical-Team/pip)
+[![](https://img.shields.io/badge/devel%20version-0.3.1-blue.svg)](https://github.com/worldbank/pip)
 
 
 `pip` : Poverty and Inequality Platform Stata wrapper
@@ -25,7 +25,7 @@ We recommend installing the [github](https://github.com/haghish/github) Stata co
 
 ```stata
 net install github, from("https://haghish.github.io/github/")
-github install PIP-Technical-Team/pip
+github install worldbank/pip
 ```
 
 If you get an error similar to the image below, it might be the case that downloading from Github is not available in your computer due to firewall restrictions. Try disconnecting from the VPN and installing `pip` again.
