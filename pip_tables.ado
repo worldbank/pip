@@ -34,7 +34,6 @@ version 16
 qui {
 	
 	*---------- API defaults
-	local server "dev"
 	qui pip_versions,                      ///
 	      server(`server')                 ///
 	      version(`version')               ///
