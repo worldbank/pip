@@ -165,6 +165,17 @@ qui {
 	/*==================================================
 	Defaults
 	==================================================*/
+	// --- timer
+	if ("`timer'" != "") {
+		local i_on = `i'
+		scalar tt = tt + "`crlf' `i': Set server"
+		local i_off = `i++'
+	}	
+	// --- timer
+	
+	// --- timer
+	if ("`timer'" != "") timer on `i_on'
+	// --- timer
 	
 	*---------- API defaults
 	pip_set_server  `server', `pause'
@@ -174,10 +185,27 @@ qui {
 	local base      = "`r(base)'"
 	local base_grp  = "`r(base_grp)'"
 	
+	// --- timer
+	if ("`timer'" != "") timer off `i_off'
+	// --- timer
 	
 	//========================================================
 	// versions
 	//========================================================
+	
+	// --- timer
+	if ("`timer'" != "") {
+		local i_on = `i'
+		scalar tt = tt + "`crlf' `i': Get version"
+		local i_off = `i++'
+	}	
+	// --- timer
+	
+	// --- timer
+	if ("`timer'" != "") timer on `i_on'
+	// --- timer
+	
+	
 	if regexm("`subcommand'", "^version") {
 		noi pip_versions, server(`server') availability
 		return add
@@ -196,6 +224,11 @@ qui {
 	local identity   = "`r(identity)'"
 	
 	return local pip_version = "`version'"
+	
+	// --- timer
+	if ("`timer'" != "") timer off `i_off'
+	// --- timer
+	
 	
 	//========================================================
 	// conditions
@@ -373,11 +406,30 @@ qui {
 	pause pip - before execution
 	
 	*---------- Information
+	// --- timer
+	if ("`timer'" != "") {
+		local i_on = `i'
+		scalar tt = tt + "`crlf' `i': Get info"
+		local i_off = `i++'
+	}	
+	// --- timer
+	
+	// --- timer
+	if ("`timer'" != "") timer on `i_on'
+	// --- timer
+	
+	
 	if ("`information'" != ""){
 		noi pip_info, `clear' `pause' server(`server') version(`version')
 		return add 
 		exit
 	}	
+	
+	// --- timer
+	if ("`timer'" != "") timer off `i_off'
+	// --- timer
+	
+	
 	
 	*---------- Country Level (one-on-one query)
 	if ("`subcommand'" == "cl") {
@@ -425,18 +477,22 @@ qui {
 	if ("`pcall'" == "povline") 	loc i_call "i_povline"
 	else 							loc i_call "i_popshare"
 	
+	
+	// --- timer
+	if ("`timer'" != "") {
+		local j = `i++'
+		local k = `i++'
+		local h = `i++'
+		scalar tt = tt + "`crlf' `j': bulding query"
+		scalar tt = tt + "`crlf' `k': downloading data"
+		scalar tt = tt + "`crlf' `h': cleaning data"
+	}	
+	// --- timer		
+	
 	foreach `i_call' of local `pcall' {	
 		
 		// --- timer
-		if ("`timer'" != "") {
-			local i_on = `i'
-			scalar tt = tt + "`crlf' `i': pip_query loop"
-			local i_off = `i++'
-		}	
-		// --- timer
-		
-		// --- timer
-		if ("`timer'" != "") timer on `i_on'
+		if ("`timer'" != "") timer on `j'
 		// --- timer
 		
 		local ++f 
@@ -503,25 +559,17 @@ qui {
 		return local queryfull_`f' = "`queryfull'"
 		
 		// --- timer
-		if ("`timer'" != "") timer off `i_off'
+		if ("`timer'" != "") timer off `j'
 		// --- timer
-		
-		// --- timer
-		if ("`timer'" != "") {
-			local i_on = `i'
-			scalar tt = tt + "`crlf' `i': download loop"
-			local i_off = `i++'
-		}	
-		// --- timer
-		
-		// --- timer
-		if ("`timer'" != "") timer on `i_on'
-		// --- timer
-		
 		
 		/*==================================================
 		Download  and clean data
 		==================================================*/
+		
+		
+		// --- timer
+		if ("`timer'" != "") timer on `k'
+		// --- timer
 		
 		*---------- download data
 		cap import delimited  "`queryfull'", `clear' varn(1)
@@ -544,7 +592,7 @@ qui {
 		
 		
 		// --- timer
-		if ("`timer'" != "") timer off `i_off'
+		if ("`timer'" != "") timer off `k'
 		// --- timer
 		
 		* global qr = `qr'
@@ -559,15 +607,7 @@ qui {
 		pause after download
 		
 		// --- timer
-		if ("`timer'" != "") {
-			local i_on = `i'
-			scalar tt = tt + "`crlf' `i': data clean loop"
-			local i_off = `i++'
-		}	
-		// --- timer
-		
-		// --- timer
-		if ("`timer'" != "") timer on `i_on'
+		if ("`timer'" != "") timer on `h'
 		// --- timer
 		
 		*---------- Clean data
@@ -576,7 +616,7 @@ qui {
 		
 		pause after cleaning
 		// --- timer
-		if ("`timer'" != "") timer off `i_off'
+		if ("`timer'" != "") timer off `h'
 		// --- timer
 		
 		/*==================================================
@@ -626,13 +666,6 @@ qui {
 		
 	} // end of povline loop
 	
-	// --- timer
-	if ("`timer'" != "") {
-		noi disp tt
-		noi timer list
-	}
-	// --- timer
-	
 	return local npl = `f'
 	
 	// ------------------------------
@@ -680,7 +713,7 @@ qui {
 		}
 		
 		noi list `v2d' in 1/`n2disp',  abbreviate(12)  sepby(`sepby')
-			
+		
 	}	
 	
 	//========================================================
@@ -732,16 +765,40 @@ qui {
 	// Convert to povcalnet format
 	//========================================================
 	
+	if ("`timer'" != "") {
+		local i_on = `i'
+		scalar tt = tt + "`crlf' `i': formating to povcalnet"
+		local i_off = `i++'
+	}	
+	// --- timer
+	
+	// --- timer
+	if ("`timer'" != "") timer on `i_on'
+	// --- timer
 	
 	if ("`povcalnet_format'" != "") {
 		pause before povcalnet format
 		pip_povcalnet_format  `rtype', `pause'
 	}
 	
+	// --- timer
+	if ("`timer'" != "") timer off `i_off'
+	// --- timer
+	
 	//========================================================
 	//  Drop frames created in the middle of the process
 	//========================================================
 	
+	if ("`timer'" != "") {
+		local i_on = `i'
+		scalar tt = tt + "`crlf' `i': remove frames"
+		local i_off = `i++'
+	}	
+	// --- timer
+	
+	// --- timer
+	if ("`timer'" != "") timer on `i_on'
+	// --- timer
 	
 	frame dir
 	local av_frames "`r(frames)'"
@@ -763,7 +820,22 @@ qui {
 		}
 		
 	} // condition to keep frames
+	
+	// --- timer
+	if ("`timer'" != "") timer off `i_on'
+	// --- timer
+	
+	
 	* set trace off
+	
+	
+	
+	// --- timer
+	if ("`timer'" != "") {
+		noi disp tt
+		noi timer list
+	}
+	// --- timer
 	
 } // end of qui
 end
