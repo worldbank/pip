@@ -77,7 +77,8 @@ See{help pip##typesq: below} for a detailed explanation.{p_end}
 
 
 {pstd}
-{err:Note}: {cmd:server()} and {cmd:identity()} options are available internally only for the Bank staff via the Bank’s intranet.
+{err:Note}: {cmd:server()} and {cmd:identity()} options are available internally only for the Bank staff via the Bank’s intranet. 
+For detail {cmd:server()} and {cmd:identity()} options description see {bf:{help pip_note:here}}.
 
 {pstd}
 {bf:Note}: {cmd:pip} requires Internet connection.
@@ -202,36 +203,6 @@ Poverty lines are expressed in 2011 PPP-adjusted USD per capita per day.
 {opt popshare(#)} The desired population share (headcount) for which the poverty lines as poverty measures will be calculated. 
 This has not default, and should not be combined with {opt povline}.
 The resulting poverty lines are expressed in 2011 PPP-adjusted USD per capita per day.
-
-{phang}
-{opt server(string)} Three server options (prod, dev, and qa) are available for this parameter depending on access requirement.
-
-{p 8 8 2}{bf:1) PROD (Production)}: It contains everything that is available outside the Bank’s intranet. 
-To access data in the PROD server we should provide this option as {cmd:server(prod)}. 
-
-{p 8 8 2}{bf:2) QA (Quality Assurance)}: This server is available within the intranet to check new version of pip data before it is available outside the Bank’s intranet. 
-This option can be provided in the pip command call as {cmd:server(qa)}. 
-
-{p 8 8 2}{bf:3) DEV (Development)}: This serve is used for testing new features and improvements in the API or wrappers, and it is also the server where you will work in for special projects like the PSPR. 
-This option can be provided in the pip command call as {cmd:server(dev)}.
-
-{p 8 8 2}{bf:Note:} We can see all the versions available in a server using {cmd:versions} option as {stata pip versions, server(prod)}
-
-{phang}
-{opt identity(string)} PIP commands allows us to specify which version of the data we want to make a query on. 
-To specify the version of the data, we can include optional parameter as {cmd:identity()} with three possible values (prod, int, and test). 
-Here are descriptions of each of the values: 
-
-{p 8 8 2}{bf: PROD} : Refers to production. Only the folders with this suffix will be considered by the API as production folders that will be deploy in the main API and website. 
-You Could find this kind of folder in the in any of the three servers explained above.
-
-{p 8 8 2}{bf: INT} : Refers to folders that will be used internally by specific people for specific purposes. 
-These folders won’t be ever sent to production. Also, these folders are static and should not be modified by the PIP technical team for any reason. 
-If the contents of an INT folder are needed to be sent to production, the PROD folder has to be recreated and tested to guarantee full transparency in the process.  
-These folders available only in the DEV server.
-
-{p 8 8 2}{bf: TEST} : Refers to testing folders that could vary and be modified as needed by the PIP technical team, but they are still understood by the PIP API. 
-These folders available only in the DEV server.
 
 {marker options}{...}
 {p 40 20 2}(Go up to {it:{help pip##sections:Sections Menu}}){p_end}
