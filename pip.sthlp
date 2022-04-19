@@ -19,8 +19,8 @@
 {title:Title}
 
 {p2colset 9 24 22 2}{...}
-{p2col :{hi:pip} {hline 2}}Access World Bank Global Poverty and Inequality Platform (PIP). PIP is a new platform that allows Stata users to estimate poverty and inequality indicators. The platform has more indicators than its predecessor(povcalnet). However, to make the platform compatible with povcalnet, the PIP allows to estimate same indicators that are available in povcalnet. See {help pip##list: below} the list of pip and povcalnet indicators. {p_end}
-{p2col :{hi:Website: }}{browse "https://worldbank.github.io/pip/"}{err: (temporally disabled)}{p_end}
+{p2col :{hi:pip} {hline 2}}Access Global Poverty and Inequality measures from the World Bank's new {browse "https://pip.worldbank.org/":Poverty and Inequality Platform (PIP)}. The {cmd:pip} command allows Stata users to estimate the poverty and inequality indicators available in the PIP platform. PIP contains more indicators than its predecessor(povcalnet). However, to make the platform compatible with povcalnet, the same indicators are also available in {cmd:pip}. See {help pip##list: below} the list comparing pip and povcalnet indicators. {p_end}
+{p2col :{hi:Website: }}{browse "https://worldbank.github.io/pip/"}{p_end}
 {p2colreset}{...}
 {title:Syntax}
 
@@ -40,7 +40,7 @@ Cannot be used with option {it:region()}{p_end}
 Cannot be used with option {it:country()}{p_end}
 {synopt :{opt coverage(string)}}Loads coverage level ("national", "urban", "rural", "all"). Default "all".{p_end}
 {synopt :{opt year:}(numlist|string)}List of years (accepts up to 10),  or {it:all}, or {it:last}. Default "all".{p_end}
-{synopt :{opt pov:line:}(#)}List of poverty lines (in 2011 PPP-adjusted USD) to calculate
+{synopt :{opt pov:line:}(#)}List of poverty lines (in 2011 PPP-adjusted USD) to calculate 
  poverty measures (accepts up to 5). Default is 1.9.{p_end}
 {synopt :{opt pops:hare:}(#)}List of population shares to calculate poverty lines (in 2011 PPP-adjusted USD) and poverty measures. No default. Do not combine with {opt pov:line:}{p_end}
 {synopt :{opt fill:gaps}}Loads all countries used to create regional aggregates.{p_end}
@@ -49,10 +49,10 @@ Cannot be used with option {it:country()}{p_end}
 {synoptset 27 tabbed}{...}
 {synopthdr:Version}
 {synoptline}
-{synopt :{opt server(string)}}Name of a server to query on (e.g, prod, dev, qa). See description of each of the server here{p_end}
-{synopt :{opt identity(string)}}Version of data to run the query on (e.g., prod, int, test).{p_end}
+{synopt :{opt server(string)}{err:*}}Name of a server to query on (e.g, prod, dev, qa). See description of each server {bf:{help pip_note:here}}.{p_end}
+{synopt :{opt identity(string)}{err:*}}Version of data to run the query on (e.g., prod, int, test).{p_end}
 {synopt :{opt ppp:_year:}(#)}PPP round (eg., 2005, 2011, 2017).{p_end}
-{synopt :{opt release(numlist)}}PIP data released date.{p_end}
+{synopt :{opt release(numlist)}}PIP data release date.{p_end}
 
 {synoptset 27 tabbed}{...}
 {synopthdr:Operational}
@@ -60,8 +60,8 @@ Cannot be used with option {it:country()}{p_end}
 {synopt :{opt info:rmation}}Presents a clickable version of the available surveys, countries and regions.{p_end}
 {synopt :{opt clear}}Replaces data in memory.{p_end}
 {synopt :{opt querytimes(integer)}}Number of times the API is hit before defaulting to failure. 
-Default is 5. {it:Advance option. Just use it if Internet connection is poor}{p_end}
-{synopt :{opt table(string)}}Loads one auxiliary table, this option is used along with {cmd:tables} subcommand.{p_end}
+Default is 5. {it:Advance option. Use only if Internet connection is poor}.{p_end}
+{synopt :{opt table(string)}}Loads one auxiliary table, this option is used along with the {cmd:tables} subcommand.{p_end}
 
 {synoptset 27 tabbed}{...}
 {synopthdr:subcommands}
@@ -69,16 +69,16 @@ Default is 5. {it:Advance option. Just use it if Internet connection is poor}{p_
 {synopt :{opt info:rmation}}Presents a clickable version of the available surveys, 
 countries and regions. Same as option {it:information}{p_end}
 {synopt :{opt cl}}{err:(temporally disabled)} {it:country-level} query that changes the default combinatorial 
-arrangement of parameters for a one-on-one correspondence.  
-See{help pip##typesq: below} for a detailed explanation.{p_end}
+arrangement of parameters for a one-on-one correspondence. 
+See a detailed explanation {help pip##typesq: below}.{p_end}
 {synopt :{opt wb}}Downloads World Bank's regional and global aggregation.{p_end}
 {synopt :{opt tables}}Provides clickable list of auxiliary tables for download.{p_end}
 {synopt :{opt cleanup}}Deletes all pip data from current stata memory.{p_end}
 
 
 {pstd}
-{err:Note}: {cmd:server()} and {cmd:identity()} options are available internally only for the Bank staff via the Bank’s intranet. 
-For detail {cmd:server()} and {cmd:identity()} options description see {bf:{help pip_note:here}}.
+{err:*Note}: The {cmd:server()} and {cmd:identity()} options are available internally only for the Bank staff via the Bank’s intranet. 
+For detailed description of the {cmd:server()} and {cmd:identity()} options see {bf:{help pip_note:here}}.
 
 {pstd}
 {bf:Note}: {cmd:pip} requires Internet connection.
@@ -109,14 +109,14 @@ Sections are presented under the following headings:
 {title:Description}
 
 {pstd}
-The {cmd:pip} commands allows Stata users to compute poverty and inequality
- indicators for more than 160 countries and regions in the World Bank's database of household
- surveys. It has the same functionality as the pip website. pip is a 
- computational tool that allows users to estimate poverty rates for regions, sets of 
+The {cmd:pip} command allows Stata users to compute poverty and inequality
+ indicators for over 160 countries and regions in the World Bank's database of household
+ surveys. It has the same functionality as the {browse "https://pip.worldbank.org/":PIP website}.
+ PIP is a computational tool that allows users to estimate poverty rates for regions, sets of 
  countries or individual countries, over time and at any poverty line.
  
 {pstd}
-PIP is managed jointly by the Data and Research Group in the World Bank's
+PIP is managed jointly by the Data and Research Groups in the World Bank's
  Development Economics Division. It draws heavily upon a strong collaboration with the 
  Poverty and Equity Global Practice, which is responsible for the gathering and 
  harmonization of the underlying survey data. 
@@ -135,7 +135,7 @@ PIP is managed jointly by the Data and Research Group in the World Bank's
 		{hline 43}
 
 {pstd}
-The underlying welfare aggregate is per capita household income or consumption
+The underlying welfare aggregate is the per capita household income or consumption
  expressed in 2011 PPP-adjusted USD. Poverty lines are expressed in daily amounts, while 
  means and medians are monthly. For more information on the definition of the indicators,
  {browse "http://iresearch.worldbank.org/pip/Docs/dictionary.html": click here}. 
