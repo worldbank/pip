@@ -18,6 +18,7 @@ Output:
 program define pip_cache, rclass
 syntax [anything(name=subcmd)],         [ ///
 STime(integer 100) /// Sleep Time
+server(string)     ///
 ]
 version 16
 
@@ -40,8 +41,8 @@ qui {
 	if (inlist("`subcmd'"), "all", "global") {
 		timer clear 1
 		timer on 1
-		pip, povline(`pp') clear
-		pip wb, povline(`pp') clear
+		pip, povline(`pp') clear server(`server')
+		pip wb, povline(`pp') clear  server(`server')
 		timer off 1
 		timer list 1
 		
@@ -84,9 +85,9 @@ qui {
 			local ++i
 			
 			cap {
-				pip wb,  povline(`pv') clear 
+				pip wb,  povline(`pv') clear  server(`server')
 				sleep `stime'
-				pip,  povline(`pv') clear 
+				pip,  povline(`pv') clear  server(`server')
 				sleep `stime'
 			}
 			if (_rc) {
@@ -108,9 +109,9 @@ qui {
 		foreach pv of local pvdollar {
 			local ++i
 			cap {
-				pip wb,  povline(`pv') clear 
+				pip wb,  povline(`pv') clear  server(`server')
 				sleep `stime'
-				pip,  povline(`pv') clear 
+				pip,  povline(`pv') clear  server(`server')
 				sleep `stime'
 			}
 			if (_rc) {
@@ -135,9 +136,9 @@ qui {
 		
 		timer clear 3
 		timer on 3
-		pip, countr(COL) povline(`pp') clear // to initiate 
-		pip, countr(COL) povline(`=`pp'+.01') clear // to initiate 
-		pip, countr(COL) povline(`=`pp'+.01') clear // to initiate 
+		pip, countr(COL) povline(`pp') clear         server(`server') // to initiate 
+		pip, countr(COL) povline(`=`pp'+.01') clear  server(`server') // to initiate 
+		pip, countr(COL) povline(`=`pp'+.01') clear  server(`server') // to initiate 
 		timer off 3
 		timer list 3
 		
@@ -176,11 +177,11 @@ qui {
 			local ++i
 			
 			cap {
-				pip, countr(`country') clear
+				pip, countr(`country') clear  server(`server')
 				sleep `stime'
-				pip, countr(`country') povline(3.2)  clear
+				pip, countr(`country') povline(3.2)  clear  server(`server')
 				sleep `stime'
-				pip, countr(`country') povline(5.5)  clear
+				pip, countr(`country') povline(5.5)  clear  server(`server')
 				sleep `stime'
 			}
 			if (_rc) {

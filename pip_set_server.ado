@@ -35,10 +35,14 @@ version 16.0
 //------------ If shortcut used
 local current_server "https://api.worldbank.org/pip/v1" // production
 
-if (inlist(lower("`server'"), "qa", "dev", "prod"))  {
+if (inlist(lower("`server'"), "qa", "dev"))  {
 		local url "${pip_svr_`server'}"
 }
 
+else if (lower("`server'") == "prod") {
+	local url "`current_server'"
+	local server "prod"
+}
 
 /*==================================================
 2:  Server not defined
