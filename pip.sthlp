@@ -19,7 +19,12 @@
 {title:Title}
 
 {p2colset 9 24 22 2}{...}
-{p2col :{hi:pip} {hline 2}}Access Global Poverty and Inequality measures from the World Bank's new {browse "https://pip.worldbank.org/":Poverty and Inequality Platform (PIP)}. The {cmd:pip} command allows Stata users to estimate the poverty and inequality indicators available in the PIP platform. PIP contains more indicators than its predecessor(povcalnet). However, to make the platform compatible with povcalnet, the same indicators are also available in {cmd:pip}. See {help pip##list: below} the list comparing pip and povcalnet indicators. {p_end}
+{p2col :{hi:pip} {hline 2}}Access Global Poverty and Inequality measures from the 
+World Bank's new {browse "https://pip.worldbank.org/":Poverty and Inequality Platform (PIP)}. 
+The {cmd:pip} command allows Stata users to estimate the poverty and inequality indicators 
+available in the PIP platform. PIP contains more indicators than its predecessor(povcalnet). 
+However, to make the platform compatible with povcalnet, the same indicators are also 
+available in {cmd:pip}. See {help pip##list:below} the list comparing pip and povcalnet indicators. {p_end}
 {p2col :{hi:Website: }}{browse "https://worldbank.github.io/pip/"}{p_end}
 {p2colreset}{...}
 {title:Syntax}
@@ -112,8 +117,9 @@ Sections are presented under the following headings:
 The {cmd:pip} command allows Stata users to compute poverty and inequality
  indicators for over 160 countries and regions in the World Bank's database of household
  surveys. It has the same functionality as the {browse "https://pip.worldbank.org/":PIP website}.
- PIP is a computational tool that allows users to estimate poverty rates for regions, sets of 
- countries or individual countries, over time and at any poverty line.
+ PIP is a computational tool that allows users to conduct country-specific, 
+ cross-country, as well as global and regional poverty analyses. Users are able estimate rates 
+ over time and at any poverty line specified.
  
 {pstd}
 PIP is managed jointly by the Data and Research Groups in the World Bank's
@@ -122,24 +128,16 @@ PIP is managed jointly by the Data and Research Groups in the World Bank's
  harmonization of the underlying survey data. 
 
 {pstd}
-    In addition to the mean and median, {cmd:pip} reports the following measures
-		for poverty (at chosen poverty line) and inequality:
-
-		{hline 43}
-		Poverty measures{col 40}Inequality measures
-		{hline 20}{col 40}{hline 20}
-		Headcount ratio  {col 40}Gini index
-		Poverty gap      {col 40}Mean log deviations
-		Poverty severity {col 40}Decile shares
-		Watts index      {col 40}
-		{hline 43}
+ {cmd:pip} reports an ample range of measures for poverty (at chosen poverty line) 
+ and inequality, including the mean and median welfare (see full list of indicators
+ {help pip##list:below}).
 
 {pstd}
 The underlying welfare aggregate is the per capita household income or consumption
- expressed in 2011 PPP-adjusted USD. Poverty lines are expressed in daily amounts, while 
- means and medians are monthly. For more information on the definition of the indicators,
- {browse "http://iresearch.worldbank.org/pip/Docs/dictionary.html": click here}. 
- For more information on the methodology,{browse "http://iresearch.worldbank.org/pip/methodology.aspx": click here}
+ expressed in 2011 PPP-adjusted USD. Poverty lines are expressed in daily amounts, as well as 
+ the means and medians. For more information on the definition of the indicators,
+ {browse "http://iresearch.worldbank.org/pip/Docs/dictionary.html":click here}. 
+ For more information on the methodology,{browse "https://worldbank.github.io/PIP-Methodology/": click here}.
 
 {marker typesc}{...}
 {title:Type of calculations}:
@@ -150,7 +148,7 @@ The pip API allows two types of calculations:
 {phang}
 {opt Survey-year}: Will load poverty measures for a reference year that is common
 across countries. Regional and global aggregates are calculated only for
-reference-years. Countries without a survey in the
+reference-years. Countries without a survey in the ....
 
 {phang}
 {opt reference-year}: are extrapolated or interpolated using national accounts growth
@@ -158,12 +156,12 @@ rates, and assuming distribution-neutrality. {cmd: pip wb} returns the global an
 regional poverty aggregates used by the World Bank. 
 
 {pin}
-{err:Important}: Option {it:fillgaps} reports the
-underlying lined-up country estimates for a reference-year. Poverty measures 
-calculated for both survey-years and reference-years  include Headcount ratio, 
-Poverty Gap, Squared Poverty Gap.  Inequality measures, including the Gini index, 
-mean log deviation and decile shares, are calculated only in survey-years where 
-micro data is available. Inequality measures are not reported for reference-years.
+{err:Important}: the Option {it:fillgaps} reports the underlying lined-up country 
+estimates for a reference-year. Poverty measures calculated for both survey-years 
+and reference-years  include Headcount ratio, Poverty Gap, and Squared Poverty Gap.  
+Inequality measures, including the Gini index, mean log deviation and decile shares,
+ are calculated only in survey-years where microdata is available. Inequality 
+ measures are not reported for reference-years.
 
 
 {marker param}{...}
@@ -271,7 +269,7 @@ We may have seen the message below before closing Stata.
 That is perfectly normal and should not cause any concern. Just click “Exist without saving.” 
 However, you can delete all PIP data in memory using command {stata pip cleanup}
 
-{cmd:pip}. It makes use of the global "${pip_query}".
+{cmd:pip} makes use of the global "${pip_query}".
 
 
 {marker return}{...}
@@ -306,7 +304,7 @@ poverty lines included in {it:povlines()}:
 {title:List of pip and povcalnet variables}{p 50 20 2}{p_end}
 
 {pstd}
-Here are the list of pip and povcalnet variables. 
+The following is a comparative list of variables available in pip and povcalnet: 
 
 		{hline 43}
 		PIP variables    {col 40}povcalnet variables
@@ -314,7 +312,11 @@ Here are the list of pip and povcalnet variables.
 		country_code     {col 40}countrycode
 		country_name     {col 40}countryname
 		region_code      {col 40}regioncode
-		survey_coverage  {col 40}coveragetype		
+		region_name      {col 40}
+		survey_coverage  {col 40}coveragetype
+		survey_comparability {col 40}
+		survey_acronym   {col 40}
+		survey_time      {col 40}		
 		year             {col 40}year
 		welfare_time     {col 40}datayear
 		welfare_type     {col 40}datatype
@@ -343,13 +345,11 @@ Here are the list of pip and povcalnet variables.
 		ppp              {col 40}ppp
 		gdp              {col 40}
 		hfce             {col 40}
-		survey_comparability {col 40}
-		survey_acronym   {col 40}
-		survey_time      {col 40}
 		is_interpolated  {col 40}isinterpolated
 		distribution_type {col 40}usemicrodata
 		reporting_level   {col 40}
 		comparable_spell   {col 40}
+		pop_in_poverty   {col 40}
 		{hline 43}
 
 
@@ -600,7 +600,7 @@ We would especially warn that estimates of the densities near the bottom and top
 {p 40 20 2}(Go up to {it:{help pip##sections:Sections Menu}}){p_end}
 
 {p 4 8 2}Castaneda Aguilar, R. A., C. Lakner, E. B. Prydz, J. Soler Lopez, R. Wu and Q. Zhao (2019)
-"Estimating Global Poverty in Stata: The pip command", Global Poverty Monitoring Technical 
+"Estimating Global Poverty in Stata: The povcalnet command", Global Poverty Monitoring Technical 
 Note, No. 9, World Bank, Washington, DC 
 {browse "http://documents.worldbank.org/curated/en/docsearch/collection-title/Global%2520Poverty%2520Monitoring%2520Technical%2520Note?colT=Global%2520Poverty%2520Monitoring%2520Technical%2520Note":Link}{p_end}
 

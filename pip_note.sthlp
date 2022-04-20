@@ -1,9 +1,10 @@
 {smcl}
 {* *! version 1.0.0 20 sep 2019}{...}
-{title:Description of {cmd:server()} and {cmd:identity()} options}
+{title:Description of the {cmd:server()} and {cmd:identity()} options}
 
 {phang}
-{opt server(string)} Three servers (PROD, QA, and DEC) are available to run pip stata commands. Here are descriptions of each of the servers:
+{opt server(string)} Three servers (PROD, QA, and DEC) are available to run pip stata commands. 
+These options are {err:only available internally} for the World Bank's staff. The following are descriptions for each of these servers:
 
 {p 8 8 2}{bf:1) PROD (Production)}: This server contains everything that is available outside the Bank’s intranet. 
 Use {cmd:server(prod)} option to access pip data in the PROD server. 
@@ -30,6 +31,8 @@ These folders available only in the DEV server.
 {p 8 8 2}{bf: TEST} : Refers to testing folders that could vary and be modified as needed by the PIP technical team, but they are still understood by the PIP API. 
 These folders available only in the DEV server.
 
+{title:Description of the Data Versioning components}
+
 {phang}
 {bf:Data Versioning} : One of the main features of the PIP is providing the user with the ability to use any vintage of the PIP data. 
 The vintage control has the following form, {it: {bf: %Y%m%d_YYYY_RV_AV_SSS}}. Each component of the folder structure/ form separated by “_” described as follows: 
@@ -47,17 +50,19 @@ This happens when there are major revisions implemented for the ICP team.
 
 {p 8 8 2}{it:{bf:SSS}} : Refers to the {ul:identity} of the folder. See above {cmd:identity()} option for the description of the identity folder.
 
-{phang}
-Here are examples that show the use of {cmd:server()} and {cmd:identity()} optional commands in pip stata command call.
+{title:Examples}
 
 {phang}
-1) {stata pip versions, server(prod)} to display all the versions in PROD server.
+Here are some examples that show the use of the {cmd:server()} and {cmd:identity()} optional commands in pip stata command calls:
 
 {phang}
-2) {stata pip, country(PRY) year(2012) server(dev) clear} use of {cmd:server()} country estimation in 2015 using DEV server
+1) {stata pip versions, server(prod)} -> displays all the versions in PROD server.
 
 {phang}
-3) {stata pip, country(PRY) year(2012) server(dev) identity(INT) clear} use of {cmd:server()} country estimation in 2015 using DEV server from INT data version.
+2) {stata pip, country(PRY) year(2012) server(dev) clear} -> {cmd:server()} option for countrycountry estimation in 2012 using the DEV server
+
+{phang}
+3) {stata pip, country(PRY) year(2012) server(dev) identity(INT) clear} -> {cmd:server()} option for country estimation in 2012 using the DEV server from INT data version.
 
 {phang}
 {help pip:Go back to pip help page}
