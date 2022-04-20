@@ -147,32 +147,6 @@ qui {
 		
 	}
 	
-	//------------ interpolated means frame
-	
-	local frpipim "_pip_imns`_version'"
-	if (!regexm("`frpipim'", "`av_frames'")) {
-		
-		frame create `frpipim'
-		
-		frame `frpipim' {
-			
-			local csvfile  = "`url'/aux?table=interpolated_means`version_qr'&format=csv"
-			cap import delim using "`csvfile'", clear varn(1)
-			
-		}
-		
-		if (_rc != 0 ) {
-			
-			noi disp in red "There is a problem accessing the information file." 
-			noi disp in red "to check your connection, copy and paste in your browser the following address:" _n /* 
-			*/	_col(4) in w `"`csvfile'"'
-			frame drop `frpipim'
-			error 
-		} 
-		*/
-		
-	}
-	
 	*if ("`justdata'" != "") exit
 	
 	//========================================================
