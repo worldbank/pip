@@ -37,7 +37,7 @@ available in {cmd:pip}. See {help pip##list:below} the list comparing pip and po
 Description of parameter options
 
 {synoptset 27 tabbed}{...}
-{synopthdr:Estimations}
+{synopthdr:Parameters}
 {synoptline}
 {synopt :{opt coun:try:}(3-letter code)}List of country code (accepts multiples) or {it:all}. 
 Cannot be used with option {it:region()}{p_end}
@@ -52,12 +52,20 @@ Cannot be used with option {it:country()}{p_end}
 {synopt :{opt ppp}{cmd:(#)}}Allows the selection of PPP. {p_end}
 
 {synoptset 27 tabbed}{...}
-{synopthdr:Version}
+{synopthdr:Options}
 {synoptline}
-{synopt :{opt server(string)}{err:*}}Name of a server to query on (e.g, prod, dev, qa). See description of each server {bf:{help pip_note:here}}.{p_end}
-{synopt :{opt identity(string)}{err:*}}Version of data to run the query on (e.g., prod, int, test).{p_end}
+{synopt :{opt version(string)}}Combination of numbers in the format %Y%m%d_YYYY_RV_AV_SSS 
+(click {bf:{help pip_note:here}} for explanation of each component). This {it:version()} option supersedes 
+the next 3 options {it:ppp_year()}, {it:release()} & {it:identity()}, as the combination of any of those 
+three allow users to obtain any version of the data needed.{p_end}
 {synopt :{opt ppp:_year:}(#)}PPP round (eg., 2005, 2011, 2017).{p_end}
-{synopt :{opt release(numlist)}}PIP data release date.{p_end}
+{synopt :{opt release(numlist)}}8 digit number with the PIP data release date in the format {it:YYYYMMDD}.{p_end}
+{synopt :{opt identity(string)}{err:*}}Version of data to run the query on (e.g., prod, int, test).{p_end}
+{synopt :{opt server(string)}{err:*}}Name of a server to query on (e.g, prod, dev, qa). See description of each server {bf:{help pip_note:here}}.{p_end}
+
+{pstd}
+{err:*Note}: The {cmd:server()} and {cmd:identity()} options are available internally only for the Bank staff via the Bank's intranet.
+For detailed description of the {cmd:server()} and {cmd:identity()} options see {bf:{help pip_note:here}}.
 
 {synoptset 27 tabbed}{...}
 {synopthdr:Operational}
@@ -69,7 +77,7 @@ Default is 5. {it:Advance option. Use only if Internet connection is poor}.{p_en
 {synopt :{opt table(string)}}Loads one auxiliary table, this option is used along with the {cmd:tables} subcommand.{p_end}
 
 {synoptset 27 tabbed}{...}
-{synopthdr:subcommands}
+{synopthdr:Subcommands}
 {synoptline}
 {synopt :{opt info:rmation}}Presents a clickable version of the available surveys, 
 countries and regions. Same as option {it:information}{p_end}
@@ -79,11 +87,6 @@ See a detailed explanation {help pip##typesq: below}.{p_end}
 {synopt :{opt wb}}Downloads World Bank's regional and global aggregation.{p_end}
 {synopt :{opt tables}}Provides clickable list of auxiliary tables for download.{p_end}
 {synopt :{opt cleanup}}Deletes all pip data from current stata memory.{p_end}
-
-
-{pstd}
-{err:*Note}: The {cmd:server()} and {cmd:identity()} options are available internally only for the Bank staff via the Bank’s intranet. 
-For detailed description of the {cmd:server()} and {cmd:identity()} options see {bf:{help pip_note:here}}.
 
 {pstd}
 {bf:Note}: {cmd:pip} requires Internet connection.
@@ -97,7 +100,8 @@ Sections are presented under the following headings:
 		{it:{help pip##desc:Command description}}
 		{it:{help pip##param:Parameters description}}
 		{it:{help pip##options:Options description}}
-		{it:{help pip##subcommands:Subcommands}}
+		{it:{help pip##operational:Operational description}}
+		{it:{help pip##subcommands:Subcommands description}}
 		{it:{help pip##list:List of pip and povcalnet variables}}
 		{it:{help pip##return:Stored results}}
 		{it:{help pip##Examples:Examples}}
@@ -114,12 +118,11 @@ Sections are presented under the following headings:
 {title:Description}
 
 {pstd}
-The {cmd:pip} command allows Stata users to compute poverty and inequality
- indicators for over 160 countries and regions in the World Bank's database of household
- surveys. It has the same functionality as the {browse "https://pip.worldbank.org/":PIP website}.
- PIP is a computational tool that allows users to conduct country-specific, 
- cross-country, as well as global and regional poverty analyses. Users are able estimate rates 
- over time and at any poverty line specified.
+The {cmd:pip} command has the same functionality as the {browse "https://pip.worldbank.org/":PIP website}. 
+It allows Stata users to compute poverty and inequality indicators for over 160 countries and 
+regions in the World Bank's database of household surveys. PIP is a computational tool that allows 
+users to conduct country-specific, cross-country, as well as global and regional poverty analyses. 
+Users are able estimate rates  over time and at any poverty line specified.
  
 {pstd}
 PIP is managed jointly by the Data and Research Groups in the World Bank's
@@ -129,8 +132,7 @@ PIP is managed jointly by the Data and Research Groups in the World Bank's
 
 {pstd}
  {cmd:pip} reports an ample range of measures for poverty (at chosen poverty line) 
- and inequality, including the mean and median welfare (see full list of indicators
- {help pip##list:below}).
+ and inequality. See full list of indicators available in {cmd:pip} {help pip##list:below}.
 
 {pstd}
 The underlying welfare aggregate is the per capita household income or consumption
@@ -186,6 +188,11 @@ by spaces. The  option {it:all} is a shorthand for calling all regions, which is
 equivalent to  calling all countries.
 
 {phang}
+{opt coverage(string)} Selects coverage level of estimates. By default, all coverage
+levels are loaded, but the user may select "national", "urban", or "rural". 
+Only one level of coverage can be selected per query. 
+
+{phang}
 {opt year(#)} Four digit years are accepted. When selecting multiple years, use 
 spaced to separate them. The option {it:all} is a shorthand for calling all 
 possible years, while the {it:last} option will download the latest available year 
@@ -201,10 +208,6 @@ Poverty lines are expressed in 2011 PPP-adjusted USD per capita per day.
 {opt popshare(#)} The desired population share (headcount) for which the poverty lines as poverty measures will be calculated. 
 This has not default, and should not be combined with {opt povline}.
 The resulting poverty lines are expressed in 2011 PPP-adjusted USD per capita per day.
-
-{marker options}{...}
-{p 40 20 2}(Go up to {it:{help pip##sections:Sections Menu}}){p_end}
-{title:Options description}
 
 {phang}
 {opt fillgaps} Loads all country-level estimates that are used to create the  
@@ -222,10 +225,28 @@ to be interpreted carefully and may not be the result of a new household survey.
 {opt PPP}{cmd:(#)} Allows the selection of PPP exchange rate. This option only 
 works if one, and only one, country is selected.
 
+{marker options}{...}
+{p 40 20 2}(Go up to {it:{help pip##sections:Sections Menu}}){p_end}
+{title:Options description}
+
 {phang}
-{opt coverage(string)} Selects coverage level of estimates. By default, all coverage
-levels are loaded, but the user may select "national", "urban", or "rural". 
-Only one level of coverage can be selected per query. 
+{opt version} 
+
+{phang}
+{opt ppp_year} 
+
+{phang}
+{opt release} 
+
+{phang}
+{opt identity}
+
+{phang}
+{opt server}  
+
+{marker operational}{...}
+{p 40 20 2}(Go up to {it:{help pip##sections:Sections Menu}}){p_end}
+{title:Operational description}
 
 {marker optinfo}{...}
 {phang}
@@ -239,22 +260,30 @@ with a pip guidance database. If option {it:clear} is {ul:not} included,
 availability in the results window.{p_end}
 
 {phang}
-{opt table} Allows us to load one auxiliary table, this option is used along with {cmd:tables} subcommand. {stata pip tables, table(countries)}
+{opt clear} replaces data in memory.
 
 {phang}
-{opt clear} replaces data in memory.
+{opt querytimes} 
+
+{phang}
+{opt table} Allows us to load one auxiliary table, this option is used along with {cmd:tables} subcommand. {stata pip tables, table(countries)}
+
+
 
 {marker subcommands}{...}
 {p 40 20 2}(Go up to {it:{help pip##sections:Sections Menu}}){p_end}
 {title:Subcommands}
 
 {phang}
-{opt info} Same as option {it:info} {help pip##optinfo:above}. 
+{opt information} Same as option {it:info} {help pip##optinfo:above}. 
 
 {phang}
 {opt cl} Stands for {it:country-level} queries. It changes combinatorial query of parameters 
 for one-on-one correspondence of parameters. See {help pip##typesq:above} 
 for a detailed explanation. 
+
+{phang}
+{opt wb} 
 
 {phang}
 {opt tables} Allows us to download any auxiliary table of the PIP project. 
@@ -266,8 +295,9 @@ We can also specify the server, version of the data, and PPP year as {stata  pip
 The pip wrapper makes use of the `frames` feature—available since Stata 16—to store a lot of information in memory.   
 This is in part the reason why the first call of pip in a Stata new session is relatively slower to subsequent calls. 
 We may have seen the message below before closing Stata. 
-That is perfectly normal and should not cause any concern. Just click “Exist without saving.” 
+That is perfectly normal and should not cause any concern. Just click "Exist without saving." 
 However, you can delete all PIP data in memory using command {stata pip cleanup}
+
 
 {cmd:pip} makes use of the global "${pip_query}".
 
