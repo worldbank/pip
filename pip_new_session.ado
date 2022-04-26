@@ -81,7 +81,8 @@ if (!regexm("`src'", "repec")) {
 		}
 	}
 	
-	github query `repo'
+	* github query `repo'
+	_tmp_githubquery `repo'
 	local latestversion = "`r(latestversion)'"
 	* disp "`latestversion'"
 	if regexm("`latestversion'", "([0-9]+)\.([0-9]+)\.([0-9]+)\.?([0-9]*)") {
@@ -244,10 +245,44 @@ qui {
 } // end of qui
 end 
 
+//========================================================
+// Temporal github query
+//========================================================
 
+program drop _tmp_githubquery
+program define _tmp_githubquery, rclass 
+syntax anything
 
+qui {
+	
+	preserve
+	drop _all
+	
+	local page "https://api.github.com/repos/`anything'/releases"
+	scalar page = fileread(`"`page'"')
+	mata {
+		lines = st_strscalar("page")
+		lines = ustrsplit(lines, ",")'
+		lines = strtrim(lines)
+		lines = stritrim(lines)
+		
+		lines =  subinstr(lines, `"":""', "->")
+		lines =  subinstr(lines, `"""', "")
+	}
+	getmata lines, replace
+	
+	split lines, parse ("->")
+	rename lines? (code url)
+	
+	keep if regexm(url, "releases/tag")
+	gen tag  = regexs(2) if regexm(url, "(releases/tag/)(.*)")
+	local latestversion = tag[1]
+	
+}
 
+return local latestversion `latestversion' 
 
+end 
 exit
 /* End of do-file */
 
