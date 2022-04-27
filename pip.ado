@@ -40,7 +40,7 @@ SERver(string)                 ///
 pause                          /// 
 FILLgaps                       /// 
 N2disp(integer 15)             /// 
-noDIPSQuery                    ///
+DISPQuery                      ///
 querytimes(integer 5)          ///
 TIMEr                          ///
 POVCALNET_format               ///
@@ -133,7 +133,6 @@ qui {
 		timer clear
 		local i = 1
 	}
-	
 	//========================================================
 	// Conditions (Defenses)
 	//========================================================
@@ -540,13 +539,13 @@ qui {
 		
 		*---------- Query
 		if ("`popshare'" == ""){
-			local query = "`query_ys'&`query_ct'&`query_cv'&`query_pl'`query_pp'`query_ds'&`version_qr'&format=csv"
+			local query = "`query_ys'&`query_ct'&`query_cv'&`query_pl'`query_pp'`query_ds'&`version_qr'"
 		}
 		else{
-			local query = "`query_ys'&`query_ct'&`query_cv'&`query_ps'`query_pp'`query_ds'&`version_qr'&format=csv"
+			local query = "`query_ys'&`query_ct'&`query_cv'&`query_ps'`query_pp'`query_ds'&`version_qr'"
 		}
 		return local query_`f' "`query'"
-		global pip_query = "`query'"
+		global pip_query = "`query'&format=csv"
 		
 		*---------- Base + query
 		if ("`aggregate'" != "" | "`subcommand'" == "wb"){
@@ -572,7 +571,7 @@ qui {
 		// --- timer
 		
 		*---------- download data
-		cap import delimited  "`queryfull'", `clear' varn(1)
+		cap import delimited  "`queryfull'&format=csv", `clear' varn(1)
 		if (_rc) {
 			noi dis ""
 			noi dis in red "It was not possible to download data from the PIP API."
@@ -623,9 +622,10 @@ qui {
 		Display Query
 		==================================================*/
 		
-		if ("`dipsquery'" == "" & "`rc'" == "0") {
+		if ("`dispquery'" != "") {
 			noi di as res _n "{ul: Query at \$`i_povline' poverty line}"
 			noi di as res "{hline}"
+			
 			
 			if ("`query_ys'" != "") {
 				noi di as res "Year:" as txt "{p 4 6 2} `query_ys' {p_end}"
@@ -650,6 +650,15 @@ qui {
 			if ("`query_pp'" != "") {
 				noi di as res "PPP:" as txt "{p 4 6 2} `query_pp' {p_end}"
 			}
+			
+			if ("`'&`version_qr''" != "") {
+				noi di as res "Version:" as txt "{p 4 6 2} `version_qr' {p_end}"
+			}
+			
+			noi di as res "full query:" as txt "{p 4 6 2} `queryfull' {p_end}" _n
+			noi di as res "See in browser: "  `"{browse "`queryfull'":here}"'  _n 
+			noi di as res "Download .csv: "  `"{browse "`queryfull'&format=csv":here}"' 
+			
 			noi di as res _dup(20) "-"
 			noi di as res "No. Obs:"      as txt _col(20) c(N)
 			noi di as res "{hline}"
@@ -895,6 +904,7 @@ Notes:
 
 Version Control:
 
+*! version 0.3.1.9002   <2022apr20>
 *! version 0.3.1        <2022apr08>
 *! version 0.3.0        <2022apr07>
 *! version 0.2.2.9002   <2022apr07>
