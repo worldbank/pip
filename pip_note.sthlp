@@ -44,7 +44,8 @@ pip stata command as {cmd:server(qa)}.
 
 {phang}
 {err: IMPORTANT!:} In order to access data from the 3 servers you need to {cmd:REQUEST} the paths to them.
-Contact {err:xxxxxx@worldbank.org} and include the paths in your do-file as globals in the following way:
+Contact {browse "acastanedaa@worldbank.org":acastanedaa@worldbank.org} and include the paths to your profile.do, 
+which is usually placed in c:\ado\.
 
  
 {phang}
