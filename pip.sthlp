@@ -70,7 +70,6 @@ For detailed description of the {cmd:server()} and {cmd:identity()} options see 
 {synoptset 27 tabbed}{...}
 {synopthdr:Operational}
 {synoptline}
-{synopt :{opt info:rmation}}Presents a clickable version of the available surveys, countries and regions.{p_end}
 {synopt :{opt clear}}Replaces data in memory.{p_end}
 {synopt :{opt querytimes(integer)}}Number of times the API is hit before defaulting to failure. 
 Default is 5. {it:Advance option. Use only if Internet connection is poor}.{p_end}
@@ -80,7 +79,7 @@ Default is 5. {it:Advance option. Use only if Internet connection is poor}.{p_en
 {synopthdr:Subcommands}
 {synoptline}
 {synopt :{opt info:rmation}}Presents a clickable version of the available surveys, 
-countries and regions. Same as option {it:information}{p_end}
+countries and regions.{p_end}
 {synopt :{opt cl}}{err:(temporally disabled)} {it:country-level} query that changes the default combinatorial 
 arrangement of parameters for a one-on-one correspondence. 
 See a detailed explanation {help pip##typesq: below}.{p_end}
@@ -165,6 +164,22 @@ Inequality measures, including the Gini index, mean log deviation and decile sha
  are calculated only in survey-years where microdata is available. Inequality 
  measures are not reported for reference-years.
 
+{marker typesq}{...}
+{title:Combinatorial and one-on-one queries}:
+
+{pstd}
+Be default, {cmd:pip} creates a combinatorial query of the parameters selected, 
+so that the output contains all the possible combinations between {it:country()}, 
+{it:povline()}, {it:year()}, and {it:coverage()}. Option {it:ppp()} is not part of the 
+combinatorial query. Alternatively, the user may select the subcommand {it:cl} to 
+parse a one-on-one (i.e., country by country) request. In this case, the first 
+country listed in {it:country()} will be combined with the first year in 
+{it:year()}, the first poverty lines in {it:povline()}, the first coverage area 
+in {it:coverage()}, and similarly for subsequent elements in the parameter
+{it:country()}. If only one element is added to parameters {it:povline()}, 
+{it:year()}, or {it:coverage()}, it would be applied to all the elements in the
+parameter {it:countr()}. {err:caution}: if only one element is added 
+to option {it:ppp()}, it would be applied to all the countries listed in {it:country()}.
 
 {marker param}{...}
 {p 40 20 2}(Go up to {it:{help pip##sections:Sections Menu}}){p_end}
@@ -230,19 +245,19 @@ works if one, and only one, country is selected.
 {title:Options description}
 
 {phang}
-{opt version} 
+{opt version} A detailed description of {bf:version} option is available {bf:{help pip_note:here}}.
 
 {phang}
-{opt ppp_year} 
+{opt ppp_year} Allows to specify PPP round (version) that will be used to calculate estimates. Default PPP round year is 2011.
 
 {phang}
-{opt release} 
+{opt release} Allows to specify PIP data release date in the format  YYYYMMDD.
 
 {phang}
-{opt identity}
+{opt identity} A detailed description of {bf:identity} option is available {bf:{help pip_note:here}}.
 
 {phang}
-{opt server}  
+{opt server} A detailed description of {bf:server} option is available {bf:{help pip_note:here}}.  
 
 {marker operational}{...}
 {p 40 20 2}(Go up to {it:{help pip##sections:Sections Menu}}){p_end}
@@ -250,23 +265,13 @@ works if one, and only one, country is selected.
 
 {marker optinfo}{...}
 {phang}
-{opt information} Presents a clickable version of the available surveys, countries 
-and regions. Selecting countries from the menu loads the survey-year estimates.
-Choosing regions loads the regional aggregates in the reference years. 
-
-{p 8 8 2}{err:Note}: If option {it:clear} is added, data in memory is replaced 
-with a pip guidance database. If option {it:clear} is {ul:not} included,
-{cmd:pip} preserves data in memory  but displays a clickable interface of survey
-availability in the results window.{p_end}
-
-{phang}
 {opt clear} replaces data in memory.
 
 {phang}
-{opt querytimes} 
+{opt querytimes} Number of times the API is hit before defaulting to failure.  Default is 5. Advance option. Use only if Internet connection is poor.
 
 {phang}
-{opt table} Allows us to load one auxiliary table, this option is used along with {cmd:tables} subcommand. {stata pip tables, table(countries)}
+{opt table} Allows to load one auxiliary table, this option is used along with {cmd:tables} subcommand. {stata pip tables, table(countries)}
 
 
 
@@ -275,7 +280,14 @@ availability in the results window.{p_end}
 {title:Subcommands}
 
 {phang}
-{opt information} Same as option {it:info} {help pip##optinfo:above}. 
+{opt information} Presents a clickable version of the available surveys, countries 
+and regions. Selecting countries from the menu loads the survey-year estimates.
+Choosing regions loads the regional aggregates in the reference years. 
+
+{p 8 8 2}{err:Note}: If option {it:clear} is added, data in memory is replaced 
+with a pip guidance database. If option {it:clear} is {ul:not} included,
+{cmd:pip} preserves data in memory  but displays a clickable interface of survey
+availability in the results window.{p_end} 
 
 {phang}
 {opt cl} Stands for {it:country-level} queries. It changes combinatorial query of parameters 
@@ -283,7 +295,7 @@ for one-on-one correspondence of parameters. See {help pip##typesq:above}
 for a detailed explanation. 
 
 {phang}
-{opt wb} 
+{opt wb} Downloada World Bank's regional and global aggregation. It can be combined with {it:year()} option to filter the aggregate data.
 
 {phang}
 {opt tables} Allows us to download any auxiliary table of the PIP project. 
@@ -450,30 +462,30 @@ The following is a comparative list of variables available in pip and povcalnet:
 	. pip, clear
 
 	* keep only national
-	. bysort countrycode datatype year: egen _ncover = count(coveragetype)
-	. gen _tokeepn = ( (inlist(coveragetype, 3, 4) & _ncover > 1) | _ncover == 1)
+	. bysort country_code welfare_type year: egen _ncover = count(survey_coverage)
+	. gen _tokeepn = ( (inlist(survey_coverage, 3, 4) & _ncover > 1) | _ncover == 1)
 
 	. keep if _tokeepn == 1
 
 	* Keep longest series per country
-	. by countrycode datatype, sort:  gen _ndtype = _n == 1
-	. by countrycode : replace _ndtype = sum(_ndtype)
-	. by countrycode : replace _ndtype = _ndtype[_N] // number of datatype per country
+	. by country_code welfare_type, sort:  gen _ndtype = _n == 1
+	. by country_code : replace _ndtype = sum(_ndtype)
+	. by country_code : replace _ndtype = _ndtype[_N] // number of welfare_type per country
 
-	. duplicates tag countrycode year, gen(_yrep)  // duplicate year
+	. duplicates tag country_code year, gen(_yrep)  // duplicate year
 
-	.bysort countrycode datatype: egen _type_length = count(year) // length of type series
-	.bysort countrycode: egen _type_max = max(_type_length)   // longest type series
+	.bysort country_code welfare_type: egen _type_length = count(year) // length of type series
+	.bysort country_code: egen _type_max = max(_type_length)   // longest type series
 	.replace _type_max = (_type_max == _type_length)
 
 	* in case of same length in series, keep consumption
-	. by countrycode _type_max, sort:  gen _ntmax = _n == 1
-	. by countrycode : replace _ntmax = sum(_ntmax)
-	. by countrycode : replace _ntmax = _ntmax[_N]  // number of datatype per country
+	. by country_code _type_max, sort:  gen _ntmax = _n == 1
+	. by country_code : replace _ntmax = sum(_ntmax)
+	. by country_code : replace _ntmax = _ntmax[_N]  // number of welfare_type per country
 
 
 	. gen _tokeepl = ((_type_max == 1 & _ntmax == 2) | ///
-	.                (datatype == 1 & _ntmax == 1 & _ndtype == 2) | ///
+	.                (welfare_type == 1 & _ntmax == 1 & _ndtype == 2) | ///
 	.                _yrep == 0)
 	. 
 	. keep if _tokeepl == 1
@@ -486,28 +498,28 @@ The following is a comparative list of variables available in pip and povcalnet:
 
 {cmd}
 	. pip, clear
-	. bysort countrycode datatype year: egen _ncover = count(coveragetype)
-	. gen _tokeepn = ( (inlist(coveragetype, 3, 4) & _ncover > 1) | _ncover == 1)
+	. bysort country_code welfare_type year: egen _ncover = count(survey_coverage)
+	. gen _tokeepn = ( (inlist(survey_coverage, 3, 4) & _ncover > 1) | _ncover == 1)
 
 	. keep if _tokeepn == 1
 	* Keep longest series per country
-	. by countrycode datatype, sort:  gen _ndtype = _n == 1
-	. by countrycode : replace _ndtype = sum(_ndtype)
-	. by countrycode : replace _ndtype = _ndtype[_N] // number of datatype per country
+	. by country_code welfare_type, sort:  gen _ndtype = _n == 1
+	. by country_code : replace _ndtype = sum(_ndtype)
+	. by country_code : replace _ndtype = _ndtype[_N] // number of welfare_type per country
 
 
-	. bysort countrycode datatype: egen _type_length = count(year)
-	. bysort countrycode: egen _type_max = max(_type_length)
+	. bysort country_code welfare_type: egen _type_length = count(year)
+	. bysort country_code: egen _type_max = max(_type_length)
 	. replace _type_max = (_type_max == _type_length)
 
 	* in case of same length in series, keep consumption
-	. by countrycode _type_max, sort:  gen _ntmax = _n == 1
-	. by countrycode : replace _ntmax = sum(_ntmax)
-	. by countrycode : replace _ntmax = _ntmax[_N]  // max 
+	. by country_code _type_max, sort:  gen _ntmax = _n == 1
+	. by country_code : replace _ntmax = sum(_ntmax)
+	. by country_code : replace _ntmax = _ntmax[_N]  // max 
 
 
 	. gen _tokeepl = ((_type_max == 1 & _ntmax == 2) | ///
-	.               (datatype == 1 & _ntmax == 1 & _ndtype == 2)) | ///
+	.               (welfare_type == 1 & _ntmax == 1 & _ndtype == 2)) | ///
 	.               _ndtype == 1
 
 	. keep if _tokeepl == 1
@@ -524,8 +536,8 @@ The following is a comparative list of variables available in pip and povcalnet:
 	. pip wb,  clear
 
 	. keep if year > 1989
-	. keep if regioncode == "WLD"	
-	. gen poorpop = headcount*population 
+	. keep if region_code == "WLD"	
+	. gen poorpop = headcount*population / 1000000 
 	. gen hcpercent = round(headcount*100, 0.1) 
 	. gen poorpopround = round(poorpop, 1)
 
@@ -551,13 +563,13 @@ The following is a comparative list of variables available in pip and povcalnet:
 
 {cmd}	
 	. pip wb, povline(1.9 3.2 5.5) clear
-	. drop if inlist(regioncode, "OHI", "WLD") | year<1990 
-	. keep povertyline region year headcount
-	. replace povertyline = povertyline*100
+	. drop if inlist(region_code, "OHI", "WLD") | year<1990 
+	. keep poverty_line region_name year headcount
+	. replace poverty_line = poverty_line*100
 	. replace headcount = headcount*100
 	
-	. tostring povertyline, replace format(%12.0f) force
-	. reshape wide  headcount,i(year region) j(povertyline) string
+	. tostring poverty_line, replace format(%12.0f) force
+	. reshape wide  headcount,i(year region_name) j(poverty_line) string
 	
 	. local title "Poverty Headcount Ratio (1990-2015), by region"
 
@@ -578,20 +590,20 @@ The following is a comparative list of variables available in pip and povcalnet:
 
 {cmd}
 	. pip, region(lac) year(last) povline(3.2 5.5 15) clear 
-	. keep if datatype==2 & year>=2014             // keep income surveys
-	. keep povertyline countrycode countryname year headcount
-	. replace povertyline = povertyline*100
+	. keep if welfare_type==2 & year>=2014             // keep income surveys
+	. keep poverty_line country_code country_name year headcount
+	. replace poverty_line = poverty_line*100
 	. replace headcount = headcount*100
-	. tostring povertyline, replace format(%12.0f) force
-	. reshape wide  headcount,i(year countrycode countryname ) j(povertyline) string
+	. tostring poverty_line, replace format(%12.0f) force
+	. reshape wide  headcount,i(year country_code country_name ) j(poverty_line) string
 	
 	. gen percentage_0 = headcount320
 	. gen percentage_1 = headcount550 - headcount320
 	. gen percentage_2 = headcount1500 - headcount550
 	. gen percentage_3 = 100 - headcount1500
 	
-	. keep countrycode countryname year  percentage_*
-	. reshape long  percentage_,i(year countrycode countryname ) j(category) 
+	. keep country_code country_name year  percentage_*
+	. reshape long  percentage_,i(year country_code country_name ) j(category) 
 	. la define category 0 "Poor LMI (< $3.2)" 1 "Poor UMI ($3.2-$5.5)" ///
 		                 2 "Vulnerable ($5.5-$15)" 3 "Middle class (> $15)"
 	. la val category category
@@ -601,7 +613,7 @@ The following is a comparative list of variables available in pip and povcalnet:
 	. local note "Source: pip, using the latest survey after 2014 for each country."
 	. local yti  "Population share in each income category (%)"
 
-	. graph bar (mean) percentage, inten(*0.7) o(category) o(countrycode, ///
+	. graph bar (mean) percentage, inten(*0.7) o(category) o(country_code, ///
 	.   lab(labsi(small) angle(vertical))) stack asy                      /// 
 	. 	blab(bar, pos(center) format(%3.1f) si(tiny))                     /// 
 	. 	ti("`title'", si(small)) note("`note'", si(*.7))                  ///
