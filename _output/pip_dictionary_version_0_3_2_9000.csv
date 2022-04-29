@@ -1,0 +1,50 @@
+variable,definition
+region_name,World Bank region name
+region_code,Three-letter World Bank abbreviation of world regions
+country_name,World Bank country name
+country_code,Three-letter ISO (alpha-3) country code system for international stardardization
+reporting_year,Reporting year
+reporting_level,Reporting level
+survey_acronym,Survey acronym
+survey_coverage,"Geographic coverage of the country survey (national, urban, rural)"
+survey_year,Welfare time
+welfare_type,Type of welfare vector used for estimates (income or consumption expenditure)
+survey_comparability,"Series comparability code where zero(0) is oldest comparable series in each country. When comparability is broken, the value changes to one (1) and so on."
+comparable_spell,Comparability over time at country level
+poverty_line,Minimum value representing the basic necessities an individual requires to live (per day).
+headcount,Proportion (%) of the population that live in households where the consumption or income per person is below the poverty line.
+poverty_gap,"Measures the ""intensity"" or ""depth"" of poverty, showing the average shortfall of the total population from the poverty line."
+poverty_severity,Averages the squares of the poverty gaps relative to the poverty line
+watts,"A distribution-sensitive poverty measure computed by dividing the poverty line by income (or consumption), taking logs, and taking the sum over the poor."
+mean,The average monthly household per capita income or consumption expenditure from the survey in 2011 PPP
+median,The median of monthly household per capita income or consumption expenditure from the survey in 2011 PPP
+mld,"Index of inequality, given by the mean across the population of the log of the overall mean divided by individual income"
+gini,Measure of inequality between 0 (everyone has the same income) and 100 (richest person has all the income)
+polarization,"Also known as the Wolfson polarization index, it measures the extent to which the distribution of welfare is âspread outâ.Â Â It ranges from 0 (no polarization) to 1 (complete polarization)."
+decile1,Income or Consumption share held by lowest/1st decile (%)
+decile2,Income or Consumption share held by the second/2nd decile (%)
+decile3,Income or Consumption share held by the third/3rd decile (%)
+decile4,Income or Consumption share held by the fourth decile (%)
+decile5,Income or Consumption share held by the fifth/5th decile (%)
+decile6,Income or Consumption share held by the 6th decile (%)
+decile7,Income or Consumption share held by the 7th decile (%)
+decile8,Income or Consumption share held by the 8th decile (%)
+decile9,Income or Consumption share held by the 9th decile (%)
+decile10,Income or Consumption share held by the highest/10th decile (%)
+survey_mean_lcu,Average monthly household per capita income or consumption expenditure from the survey in Local Currency Units
+survey_mean_ppp,Average monthly household per capita income or consumption expenditure from the survey in $ 2011 PPP
+predicted_mean_ppp,Interpolated mean welfare to reporting year
+cpi,Consumer Price Index
+cpi_data_level,"Geographical level of the Consumer Price Index (national, urban, rural)"
+ppp,Purchasing Power Parity (International Comparison Program - ICP 2011)
+ppp_data_level,"Geographical level of the Purchasing Power Parity (national, urban, rural)"
+reporting_pop,Total population
+pop_data_level,"Geographical level of the reported population (national, urban, rural)"
+reporting_gdp,Gross Domestic Product
+gdp_data_level,"Geographical level of the Gross Domestic Product (national, urban, rural)"
+reporting_pce,Household Final Consumption Expenditure
+pce_data_level,"Geographical level of the HFCE (national, urban, rural)"
+is_interpolated,TRUE if the data point has been filled
+is_used_for_aggregation,1 if datapoint is used for global and regional aggregations
+distribution_type,"Underlying distribution of welfare (aggretate, grouped, imputed, or micro data)"
+estimation_type,"Estimation type used to fill gaps for years wo/ survey estimates (extrapolated, interpolated, survey)"
