@@ -39,7 +39,7 @@ If none of the options above worked, you could still install `pip` manually foll
 
 ## Troubleshooting
 
-In case you `{pip}` is not working correctly, try the following steps in order
+In case `{pip}` is not working correctly, try the following steps in order
 
 1.	Uninstall `{pip}` by typing this
 ```stata
