@@ -53,7 +53,8 @@ which pip
 
 If it is installed, delete all the `{pip}` files from wherever they are in your computer until the command above returns error. The idea is to leave no trace of  `{pip}` in your computer. 
  
-3.	Install `{pip}` again with the following code and check the version number. It should be the same as the most recent release
+3.	Install `{pip}` again with the following code and check the version number. It should be the same as the most [recent release](https://github.com/worldbank/pip/releases)
+
 
 ```stata
 github install worldbank/pip
