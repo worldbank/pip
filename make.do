@@ -4,7 +4,7 @@
 // for more information visit http://github.com/haghish/github
 
 make pip, replace toc pkg                         ///  readme
-		version(0.3.2.9000)                          ///
+		version(0.3.3)                          ///
     license("MIT")                                                          ///
     author("R.Andres Castaneda")                                            ///
     affiliation("The World Bank")                                           ///
