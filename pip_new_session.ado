@@ -248,8 +248,6 @@ end
 //========================================================
 // Temporal github query
 //========================================================
-
-program drop _tmp_githubquery
 program define _tmp_githubquery, rclass 
 syntax anything
 
