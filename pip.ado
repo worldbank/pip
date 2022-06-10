@@ -155,11 +155,6 @@ qui {
 		local frame_prefix "pip_"
 	}
 	
-	if ("`region'" != "" & lower("`subcommand'") == "wb" ) {
-		noi disp in red "Option {it:region} has been disabled with subcommand {it:wb}"
-		error
-	}
-	
 	
 	/*==================================================
 	Defaults
@@ -328,6 +323,54 @@ qui {
 		error 
 	}
 	
+	//------------ Region
+	
+	if ("`region'" != "") {
+		local region = upper("`region'")
+		
+		if ("`country'" != "") {
+			noi disp in red "You must use either {it:country()} or {it:region()}."
+			error
+		}
+		
+		if (regexm("`region'", "SAR")) {
+			noi disp in red "Note: " in y "The official code of South Asia is" ///
+			"{it: SAS}, not {it:SAR}. We'll make the change for you"
+			local region: subinstr local region "SAR" "SAS", word
+		}
+	
+		tokenize "`version'", parse("_")
+		local _version   = "_`1'_`3'_`9'"
+		
+		frame dir 
+		local av_frames "`r(frames)'"
+		local av_frames: subinstr local  av_frames " " "|", all
+		local av_frames = "^(" + "`av_frames'" + ")"
+		
+		//------------ Regions frame
+		local frpiprgn "_pip_regions`_version'"
+		if (!regexm("`frpiprgn'", "`av_frames'")) {
+			pip_info, clear justdata `pause' server(`server') version(`version')
+		} 
+		frame `frpiprgn' {
+			levelsof region_code, local(av_regions)  clean
+		}
+		
+		// Add all to have the same functionality as in country(all)
+		local av_regions = "`av_regions'" + " ALL"
+		
+		local inregion: list region in av_regions
+		if (`inregion' == 0) {
+			
+			noi disp in red "region `region' is not available." _n ///
+			"Only the following are available:" _n "`av_regions'"
+			
+			error
+		}
+		
+	}
+	
+	
 	
 	*---------- One-on-one execution
 	if ("`subcommand'" == "cl" & lower("`country'") == "all") {
@@ -376,11 +419,6 @@ qui {
 		drop _all
 	}
 	
-	*---------- Country and region
-	if  ("`country'" != "") & ("`region'" != "") {
-		noi disp in r "options {it:country()} and {it:region()} are mutually exclusive"
-		error
-	}
 	
 	if ("`aggregate'" != "") {
 		if ("`ppp'" != ""){
@@ -391,8 +429,8 @@ qui {
 		local agg_display = "Aggregation in base year(s) `year'"
 	}
 	
-	if (wordcount("`country'")>2) {
-		if ("`ppp'" != ""){
+	if ("`ppp'" != "") {
+		if (wordcount("`country'")>2) {
 			noi di as err "Option PPP can only be used with one country."
 			error 198
 		}

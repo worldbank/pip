@@ -6,28 +6,28 @@ program def pip_query, rclass
 version 16.0
 
 syntax [anything(name=subcommand)]    ///
-[,                       ///
-YEAR(string)          ///
-COUntry(string)       ///
-REGion(string)         ///
-POVLine(string)        ///
-POPShare(string)	   ///
-PPP(string)            ///
-NOSUMmary              ///
-ISO                    ///
-CLEAR                  ///
-AUXiliary              ///
-ORIginal               ///
-INFOrmation            ///
-COESP(string)          ///
-SERVER(string)         ///
-version(string)        ///
-groupedby(string)      ///
-coverage(string)       ///
-pause                  /// 
-fillgaps               ///
-aggregate              ///
-wb                     ///
+[,                                    ///
+YEAR(string)                          ///
+COUntry(string)                       ///
+REGion(string)                        ///
+POVLine(string)                       ///
+POPShare(string)	                    ///
+PPP(string)                           ///
+NOSUMmary                             ///
+ISO                                   ///
+CLEAR                                 ///
+AUXiliary                             ///
+ORIginal                              ///
+INFOrmation                           ///
+COESP(string)                         ///
+SERVER(string)                        ///
+version(string)                       ///
+groupedby(string)                     ///
+coverage(string)                      ///
+pause                                 /// 
+fillgaps                              ///
+aggregate                             ///
+wb                                    ///
 ]
 
 if ("`pause'" == "pause") pause on
@@ -125,11 +125,14 @@ quietly {
 		
 		* If region is selected instead of countries
 		if  ("`region'" != "") {
+			if  ("`region'" == "WLD" | lower("`region'") == "all") {
+				replace keep_this = 1
+			}
+			else {			
+				local region_l: subinstr local region " " "|", all
+				replace keep_this = 1 if regexm(wb_region_code, "`region_l'")
+			}
 			
-			local region_l: subinstr local region " " "|", all
-			
-			replace keep_this = 1 if regexm(wb_region_code, "`region_l'")
-			if lower("`region'") == "all" replace keep_this = 1
 		}
 		
 		local touse "keep_this == 1"
@@ -201,7 +204,6 @@ quietly {
 		}
 		else  {
 			local disp_q = "&fill_gaps=true"
-			
 		}
 		
 		if ("`aggregate'" != "") {
@@ -217,15 +219,20 @@ quietly {
 		
 		*---------- Country query
 		
-		if ( inlist(lower("`country'"), "", "all") & "`region'" == "") {
+		if ( lower("`country'") == "all" | lower("`region'") == "all" | ///
+		     "`region'" == "WLD" /* To remove */ ) {
 			
 			local country_q = "country=all"
 			
 		}
 		else {
-			levelsof country_code if `touse', local(country_q) sep(&country=) clean
-			local country_q = "country=`country_q'"
-			
+			if ("`region'" != "") {
+				local country_q: subinstr local region " " ",", all
+			}
+			else {
+				levelsof country_code if `touse', local(country_q) sep(",") clean			
+			}
+			local country_q = "country=`country_q'"			
 		}
 		return local query_ct = "`country_q'"
 		
