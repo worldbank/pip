@@ -1,0 +1,16 @@
+theme: jekyll-theme-cayman
+title: PovcalNet Stata command
+description: "Estimating Global Poverty in Stata"
+baseurl: "/povcalnet" # the subpath of your site, e.g. "/blog"
+url: "https://worldbank.github.io" # the base hostname & protocol for your site e.g. "https://mmistakes.github.io"
+
+plugins:
+  - jekyll-relative-links
+relative_links:
+  enabled: true
+  collections: true
+include:
+  - index.md
+  - about.md
+  
+  
