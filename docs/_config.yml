@@ -1,4 +1,4 @@
-theme: jekyll-theme-cayman
+theme: jekyll-theme-minimal
 title: PovcalNet Stata command
 description: "Estimating Global Poverty in Stata"
 baseurl: "/povcalnet" # the subpath of your site, e.g. "/blog"
