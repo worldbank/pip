@@ -87,6 +87,13 @@ if (_rc) {
 }
 */
 
+* region 
+cap pip, region(EAP) year(all) ${options} 
+if (_rc) {
+	disp as err "pip, region(EAP) year(all) server(dev) clear  - not working"
+	exit
+}
+
 * auxilary tables
 cap pip tables, ${options} 
 if (_rc) {
@@ -103,3 +110,4 @@ foreach tbl of local tblist {
 	exit
 	}
 }
+
