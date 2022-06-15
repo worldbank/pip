@@ -800,8 +800,8 @@ qui {
 	label data "`datalabel' (`c(current_date)')"
 	
 	* citations
-	local cite `"Please cite as: XXXXX (2021) "pip: Stata module to access World Bank’s Global Poverty and Inequality data," Statistical Software Components 2022, Boston College Department of Economics."'
-	notes: `cite'
+	noi pip_cite, reg_cite
+	notes: `r(cite_data)'
 	
 	noi disp in y _n `"`cite'"'
 	
