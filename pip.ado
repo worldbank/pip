@@ -888,50 +888,6 @@ qui {
 end
 
 
-// ------------------------------------------------------------------------
-// MATA functions
-// ------------------------------------------------------------------------
-
-
-* findfile stata.trk
-* local fn = "`r(fn)'"
-
-cap mata: mata drop pip_*()
-mata:
-
-// function to look for source of code
-void pip_source(string scalar cmd) {
-	
-	cmd =  cmd :+ "\.pkg"
-	
-	fh = _fopen("`fn'", "r")
-	
-	pos_a = ftell(fh)
-	pos_b = 0
-	while ((line=strtrim(fget(fh)))!=J(0,0,"")) {
-		if (regexm(strtrim(line), cmd)) {
-			fseek(fh, pos_b, -1)
-			break
-		}
-		pos_b = pos_a
-		pos_a = ftell(fh)
-	}
-	
-	src = strtrim(fget(fh))
-	if (rows(src) > 0) {
-		src = substr(src, 3)
-		st_local("src", src)
-	} 
-	else {
-		st_local("src", "NotFound")
-	}
-	
-	fclose(fh)
-}
-
-end 
-
-
 
 exit
 /* End of do-file */
