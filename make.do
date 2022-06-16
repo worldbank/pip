@@ -20,94 +20,46 @@ make pip, replace toc pkg                         ///  readme
 * Testing basic examples
 * ------------------------------------------------------------------------------
 global options = "server(dev) clear"
+cap frame drop tmpfr
+frame create tmpfr strL cmd
+frame post tmpfr ("pip versions")  // first command 
+frame post tmpfr ("pip, country(col arg) year(last) ${options}") // load latest available survey-year estimates for sampel countries
+frame post tmpfr ("pip, info ${options}") // load clickable menu
+frame post tmpfr ("pip, country(all) coverage('urban') ${options}") // load only urban coverage level
+frame post tmpfr ("pip, country(COL BRA ARG IND) year(2015) ${options}") // country estimation at $1.9 in 2015. Since there are no surveys in ARG and IND in 2015, results are loaded for COL and BRA
+frame post tmpfr ("pip, country(COL BRA ARG IND) year(2015) fillgaps ${options}") // filling gaps for ARG and IND. Only works for reference years
+frame post tmpfr ("pip wb, year(2015) ${options}") // World Bank aggregation
+frame post tmpfr ("pip wb, region(SAR LAC) ${options}") 
+frame post tmpfr ("pip wb, ${options}") 
+*frame post tmpfr ("pip cl, country(COL BRA ARG IND) year(2011) clear coverage('national national urban national') ${options}") 
+frame post tmpfr ("pip, region(EAP) year(all) ${options}")
+frame post tmpfr ("pip tables, ${options}")
+frame post tmpfr ("pip tables, table(countries) ${options}")
+frame post tmpfr ("pip tables, table(country_coverage) ${options}")
+frame post tmpfr ("pip tables, table(cpi) ${options}")
+frame post tmpfr ("pip tables, table(decomposition) ${options}")
+frame post tmpfr ("pip tables, table(dictionary) ${options}")
+frame post tmpfr ("pip tables, table(framework) ${options}")
+frame post tmpfr ("pip tables, table(gdp) ${options}")
+frame post tmpfr ("pip tables, table(incgrp_coverage) ${options}")
+frame post tmpfr ("pip tables, table(indicators) ${options}")
+frame post tmpfr ("pip tables, table(interpolated_means) ${options}")
+frame post tmpfr ("pip tables, table(pce) ${options}")
+frame post tmpfr ("pip tables, table(pop) ${options}")
+frame post tmpfr ("pip tables, table(pop_region) ${options}")
+frame post tmpfr ("pip tables, table(poverty_lines) ${options}")
+frame post tmpfr ("pip tables, table(ppp) ${options}")
+frame post tmpfr ("pip tables, table(region_coverage) ${options}")
+frame post tmpfr ("pip tables, table(regions) ${options}")
+frame post tmpfr ("pip tables, table(survey_means) ${options}")
 
-* display available versions of pip data 
-cap pip versions
-if (_rc) {
-	disp as err "pip versions - not working"
-	exit
-}
-* 1.1. Load latest available survey-year estimates for Colombia and Argentina
 
-cap pip, country(col arg) year(last) ${options}
-if (_rc) {
-	disp as err "pip, country(col arg) year(last) server(dev) clear - not working"
-	exit
-}
-* 1.2. Load clickable menu
-
-cap pip, info ${options}
-if (_rc) {
-	disp as err "pip, info server(dev) clear - not working"
-	exit
-}
-* 1.3. Load only urban coverage level
-
-cap pip, country(all) coverage("urban") ${options}
-if (_rc) {
-	disp as err "pip, country(all) coverage('urban') server(dev) clear - not working"
-	exit
-}
-* 2. inIllustration of differences between queries  
-* 2.1. Country estimation at $1.9 in 2015. Since there are no surveys in ARG and IND in 2015, results are loaded for COL and BRA
-cap pip, country(COL BRA ARG IND) year(2015) ${options}
-if (_rc) {
-	disp as err "pip, country(COL BRA ARG IND) year(2015) server(dev) clear - not working"
-	exit
-}
-* 2.2. fill-gaps. Filling gaps for ARG and IND. Only works for reference years.
-cap pip, country(COL BRA ARG IND) year(2015) fillgaps ${options}
-if (_rc) {
-	disp as err "pip, country(COL BRA ARG IND) year(2015) fillgaps server(dev) clear - not working"
-	exit
-}
-* 2.4. World Bank aggregation (country() is not available)
-cap pip wb, year(2015) ${options}
-if (_rc) {
-	disp as err "pip wb, year(2015) server(dev) clear - not working"
-	exit
+frame tmpfr {
+	global N = _N
 }
 
-cap pip wb, region(SAR LAC) ${options}
-if (_rc) {
-	disp as err "pip wb, region(SAR LAC) server(dev) clear - not working"
-	exit
-} 
-
-cap pip wb, ${options}
-if (_rc) {
-	disp as err "pip wb, server(dev) clear - not working"
-	exit
+forvalues i = 1/$N {
+	local cmd = _frval(tmpfr, cmd, `i')
+	cap `cmd'
+	if _rc noi disp "`cmd' - NOT WORKING"
 }
-
-/* 2.5. One-on-one query.
-cap pip cl, country(COL BRA ARG IND) year(2011) clear coverage("national national urban national")
-if (_rc) {
-	disp as err "cap pip versions - not working"
-}
-*/
-
-* region 
-cap pip, region(EAP) year(all) ${options} 
-if (_rc) {
-	disp as err "pip, region(EAP) year(all) server(dev) clear  - not working"
-	exit
-}
-
-* auxilary tables
-cap pip tables, ${options} 
-if (_rc) {
-	disp as err "pip tables, server(dev) clear  - not working"
-	exit
-}
-
-* check individual auxilary tables
-local tblist "countries country_coverage cpi decomposition dictionary framework gdp incgrp_coverage indicators interpolated_means pce pop pop_region poverty_lines ppp region_coverage regions survey_means"
-foreach tbl of local tblist {
-	cap pip tables, ${options} table(`tbl')
-	if (_rc) {
-		disp as err "pip tables, server(dev) clear table(`tbl') - not working"
-	exit
-	}
-}
-
