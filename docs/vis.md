@@ -259,12 +259,13 @@ egen tot2014 = sum(pop_in_poverty) if year == 2014
 gen pop = (pop_in_poverty /tot1990) * 100
 replace pop = (pop_in_poverty /tot2014) * 100 if pop ==.
 drop pop_in_poverty tot1990 tot2014
+reshape wide pop , i(region_name ) j( year)
 
-graph bar (asis) pop, over(region_name, sort(pop) descending) ///
-by(, title(Population in Poverty by Region (%))) by(year, graphregion(color(white)) note(""))  ///
+la var pop1990 "1990"
+la var pop2014 "2014"
+graph hbar (asis) pop1990 pop2014, over(region_name, sort(1) descending) ///
 blab(bar, pos(outside) format(%2.1f) size(5.5pt)) graphregion(color(white)) ///
-ylabel(, nogrid) asyvars legend(size(small)) 
-graph export popinpoverty.png, as(png) hei(1000) replace
+ylabel(, nogrid) legend(size(small)) title(Population in Poverty by Region (%))
 ```
 
 <center>
