@@ -248,3 +248,26 @@ alt="Gini&GDP" width="550" height="500" />
 </center>
 
 
+## Population in poverty by region for 1990 and 2014
+
+```stata
+pip wb, year(1990 2014) clear
+drop if region_code=="WLD"
+keep region_name year pop_in_poverty
+egen tot1990 = sum(pop_in_poverty) if year == 1990
+egen tot2014 = sum(pop_in_poverty) if year == 2014
+gen pop = (pop_in_poverty /tot1990) * 100
+replace pop = (pop_in_poverty /tot2014) * 100 if pop ==.
+drop pop_in_poverty tot1990 tot2014
+
+graph bar (asis) pop, over(region_name, sort(pop) descending) ///
+by(, title(Population in Poverty by Region (%))) by(year, graphregion(color(white)) note(""))  ///
+blab(bar, pos(outside) format(%2.1f) size(5.5pt)) graphregion(color(white)) ///
+ylabel(, nogrid) asyvars legend(size(small)) 
+graph export popinpoverty.png, as(png) hei(1000) replace
+```
+
+<center>
+<img src="/pip/img/popinpoverty.png" 
+alt="Gini&GDP" width="550" height="500" />
+</center>
