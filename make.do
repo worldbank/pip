@@ -4,16 +4,16 @@
 // for more information visit http://github.com/haghish/github
 
 make pip, replace toc pkg                         ///  readme
-		version(0.3.3)                          ///
-    license("MIT")                                                          ///
-    author("R.Andres Castaneda")                                            ///
-    affiliation("The World Bank")                                           ///
-    email("acastanedaa@worldbank.org")                                      ///
-    url("")                                                                 ///
-    title("Poverty and Inequality Platform Stata wrapper")                  ///
-    description("World Bank PIP API Stata wrapper")                         ///
-    install("pip.ado;pip.sthlp;pip_cl.ado;pip_clean.ado;pip_countries.sthlp;pip_drop.ado;pip_examples.ado;pip_info.ado;pip_new_session.ado;pip_povcalnet_format.ado;pip_query.ado;pip_set_server.ado;pip_cache.ado;pip_versions.ado;pip_tables.ado;pip_cleanup.ado") ///
-    ancillary("")                                                         
+version(0.3.3)                          ///
+license("MIT")                                                          ///
+author("R.Andres Castaneda")                                            ///
+affiliation("The World Bank")                                           ///
+email("acastanedaa@worldbank.org")                                      ///
+url("")                                                                 ///
+title("Poverty and Inequality Platform Stata wrapper")                  ///
+description("World Bank PIP API Stata wrapper")                         ///
+install("pip.ado;pip.sthlp;pip_cl.ado;pip_clean.ado;pip_countries.sthlp;pip_drop.ado;pip_examples.ado;pip_info.ado;pip_new_session.ado;pip_povcalnet_format.ado;pip_query.ado;pip_set_server.ado;pip_cache.ado;pip_versions.ado;pip_tables.ado;pip_cleanup.ado") ///
+ancillary("")                                                         
 
 
 * ------------------------------------------------------------------------------
@@ -70,12 +70,71 @@ forvalues i = 1/$N {
 
 cap clear all 
 cap pip cleanup
-	
+
 // Version 
 pip version
 
 // setup dev options	
 global options = "server(dev)"
+
+
+// Function to avoid errors and scale up check
+*##s
+cap program drop pip_prod_dev
+program define pip_prod_dev
+syntax , ///
+cmd(string) ///
+sorting_vars(string) ///
+[ ///
+test_label(string) ///
+test_server(string) ///
+main_server(string)  ///
+* /// pip options
+]
+
+// Conditions
+qui {
+	if ("`test_label'" == "") {
+		local test_label "Unknown"
+	}
+	
+	if ("`test_server'" == "") {
+		local test_server "dev"
+	}
+	
+	if ("`main_server'" == "") {
+		local main_server "prod"
+		
+	}
+	// tests
+	pip `cmd' `options' server(`main_server')
+	sort `sorting_vars'
+	duplicates report `sorting_vars'
+	cap assert r(unique_value)==r(N)
+	if _rc noi disp as err "Duplicate records in `test_label' (`main_server') data"
+	
+	tempfile main_data
+	save `main_data'
+	
+	pip `cmd' `options' server(`test_server') 
+	sort `sorting_vars'
+	duplicates report `sorting_vars'
+	cap assert r(unique_value)==r(N)
+	if _rc noi disp as err "Duplicate records in `test_label' (`test_server') data"
+	
+	cap cf _all using `main_data'
+	if _rc noi disp as err "`test_label' of `main_server' and `test_server' don't match"
+}
+
+end 
+
+// 1- compare country level estimates for ppp 2011
+qui pip_prod_dev, ///
+cmd(", povline(1.9 3.2 5.5) ppp_year(2011) clear") ///
+sorting_vars("country_code region_code year welfare_type poverty_line reporting_level") ///
+test_label("Country estimate") 
+
+*##e
 
 // 1- compare country level estimates for ppp 2011
 * ppp 2011
@@ -89,7 +148,7 @@ qui {
 	
 	tempfile prod_data
 	save `prod_data', replace
-
+	
 	pip, `cmd' ${options} 
 	sort country_code region_code year welfare_type poverty_line reporting_level
 	duplicates report country_code region_code year welfare_type poverty_line reporting_level
@@ -97,7 +156,7 @@ qui {
 	if _rc noi disp as err "Duplicate records in country estimate (DEV) data"
 	
 	cap cf _all using `prod_data'
-
+	
 	if _rc noi disp as err "Country level estimates of PROD and DEV don't match"
 }
 
@@ -116,7 +175,7 @@ qui {
 	
 	tempfile prod_data
 	save `prod_data', replace
-
+	
 	pip `cmd' ${options} 
 	sort region_name year poverty_line
 	duplicates report region_name year poverty_line
@@ -139,10 +198,10 @@ qui {
 	duplicates report country_code region_code year welfare_type poverty_line reporting_level
 	cap assert r(unique_value)==r(N)
 	if _rc noi disp as err "Duplicate records in fillgaps data (PROD) data"
-
+	
 	tempfile prod_data
 	save `prod_data', replace
-
+	
 	pip, `cmd' ${options} 
 	sort country_code region_code year welfare_type poverty_line reporting_level
 	duplicates report country_code region_code year welfare_type poverty_line reporting_level
@@ -164,18 +223,18 @@ qui {
 	duplicates report country_code
 	cap assert r(unique_value)==r(N)
 	if _rc noi disp as err "Duplicate records in auxilary tables - countries data (PROD) data"
-
+	
 	tempfile prod_data
 	save `prod_data', replace
-
+	
 	pip `cmd' ${options}
 	sort country_code
 	duplicates report country_code
 	cap assert r(unique_value)==r(N)
 	if _rc noi disp as err "Duplicate records in auxilary tables - countries data (DEV) data"
-
+	
 	cap cf _all using `prod_data'
-		
+	
 	if _rc noi disp as err "Auxilary tables - countries data of PROD and DEV don't match"
 }
 
@@ -188,18 +247,18 @@ qui {
 	duplicates report country_code reporting_year pop_data_level
 	cap assert r(unique_value)==r(N)
 	if _rc noi disp as err "Duplicate records in auxilary tables - country_coverage data (PROD) data"
-
+	
 	tempfile prod_data
 	save `prod_data', replace
-
+	
 	pip `cmd' ${options}
 	sort country_code reporting_year pop_data_level
 	duplicates report country_code reporting_year pop_data_level
 	cap assert r(unique_value)==r(N)
 	if _rc noi disp as err "Duplicate records in auxilary tables - country_coverage data (DEV) data"
-
+	
 	cap cf _all using `prod_data'
-
+	
 	if _rc noi disp as err "Auxilary tables - country_coverage data of PROD and DEV don't match" 
 }
 
@@ -212,18 +271,18 @@ qui {
 	duplicates report country_code data_level
 	cap assert r(unique_value)==r(N)
 	if _rc noi disp as err "Duplicate records in auxilary tables - cpi data (PROD) data"
-
+	
 	tempfile prod_data
 	cap save `prod_data', replace
-
+	
 	pip `cmd' ${options}
 	sort country_code data_level
 	duplicates report country_code data_level
 	cap assert r(unique_value)==r(N)
 	if _rc noi disp as err "Duplicate records in auxilary tables - cpi data (DEV) data"
-
+	
 	cap cf _all using `prod_data'
-
+	
 	if _rc noi disp as err "Auxilary tables - cpi data of PROD and DEV don't match" 
 }
 
@@ -236,18 +295,18 @@ qui {
 	duplicates report variable_code variable_values
 	cap assert r(unique_value)==r(N)
 	if _rc noi disp as err "Duplicate records in auxilary tables - decomposition data (PROD) data"
-
+	
 	tempfile prod_data
 	cap save `prod_data', replace
-
+	
 	pip `cmd' ${options}
 	sort variable_code variable_values
 	duplicates report variable_code variable_values
 	cap assert r(unique_value)==r(N)
 	if _rc noi disp as err "Duplicate records in auxilary tables - decomposition data (DEV) data"
-
+	
 	cap cf _all using  `prod_data'
-
+	
 	if _rc noi disp as err "Auxilary tables - decomposition data of PROD and DEV don't match"
 }
 
@@ -258,10 +317,10 @@ qui {
 	pip `cmd'
 	tempfile prod_data
 	save `prod_data', replace
-
+	
 	pip `cmd' ${options}
 	cap cf _all using `prod_data'
-
+	
 	if _rc noi disp as err "Auxilary tables - dictionary data of PROD and DEV don't match"
 }
 
@@ -275,18 +334,18 @@ qui {
 	duplicates report country_code year survey_coverage welfare_type
 	cap assert r(unique_value)==r(N)
 	if _rc noi disp as err "Duplicate records in auxilary tables - framework data (PROD) data"
-
+	
 	tempfile prod_data
 	cap save `prod_data', replace
-
+	
 	pip `cmd' ${options}
 	sort country_code year survey_coverage welfare_type
 	duplicates report country_code year survey_coverage welfare_type
 	cap assert r(unique_value)==r(N)
 	if _rc noi disp as err "Duplicate records in auxilary tables - framework data (DEV) data"
-
+	
 	cap cf _all using  `prod_data'
-
+	
 	if _rc noi disp as err "Auxilary tables - framework data of PROD and DEV don't match"
 }
 
@@ -300,18 +359,18 @@ qui {
 	duplicates report country_code data_level
 	cap assert r(unique_value)==r(N)
 	if _rc noi disp as err "Duplicate records in auxilary tables - gdp data (PROD) data"
-
+	
 	tempfile prod_data
 	cap save `prod_data', replace
-
+	
 	pip `cmd' ${options}
 	sort country_code data_level
 	duplicates report country_code data_level
 	cap assert r(unique_value)==r(N)
 	if _rc noi disp as err "Duplicate records in auxilary tables - gdp data (DEV) data"
-
+	
 	cap cf _all using  `prod_data'
-
+	
 	if _rc noi disp as err "Auxilary tables - gdp data of PROD and DEV don't match"
 }
 
@@ -324,18 +383,18 @@ qui {
 	duplicates report reporting_year
 	cap assert r(unique_value)==r(N)
 	if _rc noi disp as err "Duplicate records in auxilary tables - incgrp_coverage data (PROD) data"
-
+	
 	tempfile prod_data
 	cap save `prod_data', replace
-
+	
 	pip `cmd' ${options}
 	sort reporting_year
 	duplicates report reporting_year
 	cap assert r(unique_value)==r(N)
 	if _rc noi disp as err "Duplicate records in auxilary tables - incgrp_coverage data (DEV) data"
-
+	
 	cap cf _all using  `prod_data'
-
+	
 	if _rc noi disp as err "Auxilary tables - incgrp_coverage data of PROD and DEV don't match"
 }
 
@@ -346,10 +405,10 @@ qui {
 	pip `cmd'
 	tempfile prod_data
 	save `prod_data', replace
-
+	
 	pip `cmd' ${options}
 	cap cf _all using `prod_data'
-
+	
 	if _rc noi disp as err "Auxilary tables - indicators data of PROD and DEV don't match"
 }
 
@@ -362,18 +421,18 @@ qui {
 	duplicates report survey_id interpolation_id
 	cap assert r(unique_value)==r(N)
 	if _rc noi disp as err "Duplicate records in auxilary tables - interpolated_means data (PROD) data"
-
+	
 	tempfile prod_data
 	cap save `prod_data', replace
-
+	
 	pip `cmd' ${options}
 	sort survey_id interpolation_id
 	duplicates report survey_id interpolation_id
 	cap assert r(unique_value)==r(N)
 	if _rc noi disp as err "Duplicate records in auxilary tables - interpolated_means data (DEV) data"
-
+	
 	cap cf _all using  `prod_data'
-
+	
 	if _rc noi disp as err "Auxilary tables - interpolated_means data of PROD and DEV don't match"
 }
 
@@ -386,18 +445,18 @@ qui {
 	duplicates report country_code data_level
 	cap assert r(unique_value)==r(N)
 	if _rc noi disp as err "Duplicate records in auxilary tables - pce data (PROD) data"
-
+	
 	tempfile prod_data
 	cap save `prod_data', replace
-
+	
 	pip `cmd' ${options}
 	sort country_code data_level
 	duplicates report country_code data_level
 	cap assert r(unique_value)==r(N)
 	if _rc noi disp as err "Duplicate records in auxilary tables - pce data (DEV) data"
-
+	
 	cap cf _all using  `prod_data'
-
+	
 	if _rc noi disp as err "Auxilary tables - pce data of PROD and DEV don't match"
 }
 
@@ -410,18 +469,18 @@ qui {
 	duplicates report country_code data_level
 	cap assert r(unique_value)==r(N)
 	if _rc noi disp as err "Duplicate records in auxilary tables - pop data (PROD) data"
-
+	
 	tempfile prod_data
 	cap save `prod_data', replace
-
+	
 	pip `cmd' ${options}
 	sort country_code data_level
 	duplicates report country_code data_level
 	cap assert r(unique_value)==r(N)
 	if _rc noi disp as err "Duplicate records in auxilary tables - pop data (DEV) data"
-
+	
 	cap cf _all using  `prod_data'
-
+	
 	if _rc noi disp as err "Auxilary tables - pop data of PROD and DEV don't match"
 }
 
@@ -434,18 +493,18 @@ qui {
 	duplicates report region_code reporting_year
 	cap assert r(unique_value)==r(N)
 	if _rc noi disp as err "Duplicate records in auxilary tables - pop_region data (PROD) data"
-
+	
 	tempfile prod_data
 	cap save `prod_data', replace
-
+	
 	pip `cmd' ${options}
 	sort region_code reporting_year
 	duplicates report region_code reporting_year
 	cap assert r(unique_value)==r(N)
 	if _rc noi disp as err "Duplicate records in auxilary tables - pop_region data (DEV) data"
-
+	
 	cap cf _all using  `prod_data'
-
+	
 	if _rc noi disp as err "Auxilary tables - pop_region data of PROD and DEV don't match"
 }
 
@@ -458,18 +517,18 @@ qui {
 	duplicates report name
 	cap assert r(unique_value)==r(N)
 	if _rc noi disp as err "Duplicate records in auxilary tables - poverty_lines data (PROD) data"
-
+	
 	tempfile prod_data
 	cap save `prod_data', replace
-
+	
 	pip `cmd' ${options}
 	sort name
 	duplicates report name
 	cap assert r(unique_value)==r(N)
 	if _rc noi disp as err "Duplicate records in auxilary tables - poverty_lines data (DEV) data"
-
+	
 	cap cf _all using  `prod_data'
-
+	
 	if _rc noi disp as err "Auxilary tables - poverty_lines data of PROD and DEV don't match"
 }
 
@@ -482,18 +541,18 @@ qui {
 	duplicates report country_code data_level
 	cap assert r(unique_value)==r(N)
 	if _rc noi disp as err "Duplicate records in auxilary tables - ppp data (PROD) data"
-
+	
 	tempfile prod_data
 	cap save `prod_data', replace
-
+	
 	pip `cmd' ${options}
 	sort country_code data_level
 	duplicates report country_code data_level
 	cap assert r(unique_value)==r(N)
 	if _rc noi disp as err "Duplicate records in auxilary tables - ppp data (DEV) data"
-
+	
 	cap cf _all using  `prod_data'
-
+	
 	if _rc noi disp as err "Auxilary tables - ppp data of PROD and DEV don't match"
 }
 
@@ -506,18 +565,18 @@ qui {
 	duplicates report region_code
 	cap assert r(unique_value)==r(N)
 	if _rc noi disp as err "Duplicate records in auxilary tables - regions data (PROD) data"
-
+	
 	tempfile prod_data
 	cap save `prod_data', replace
-
+	
 	pip `cmd' ${options}
 	sort region_code
 	duplicates report region_code
 	cap assert r(unique_value)==r(N)
 	if _rc noi disp as err "Duplicate records in auxilary tables - regions data (DEV) data"
-
+	
 	cap cf _all using  `prod_data'
-
+	
 	if _rc noi disp as err "Auxilary tables - regions data of PROD and DEV don't match"
 }
 
@@ -530,17 +589,17 @@ qui {
 	duplicates report reporting_year pcn_region_code
 	cap assert r(unique_value)==r(N)
 	if _rc noi disp as err "Duplicate records in auxilary tables - regions_coverage data (PROD) data"
-
+	
 	tempfile prod_data
 	cap save `prod_data', replace
-
+	
 	pip `cmd' ${options}
 	sort reporting_year pcn_region_code
 	duplicates report reporting_year pcn_region_code
 	cap assert r(unique_value)==r(N)
 	if _rc noi disp as err "Duplicate records in auxilary tables - regions_coverage data (DEV) data"
-
+	
 	cap cf _all using  `prod_data'
-
+	
 	if _rc noi disp as err "Auxilary tables - regions_coverage data of PROD and DEV don't match"
-}
+}													
