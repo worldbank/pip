@@ -97,6 +97,7 @@ See a detailed explanation {help pip##typesq: below}.{p_end}
 Sections are presented under the following headings:
 
 		{it:{help pip##desc:Command description}}
+		{it:{help pip##memory:Memory use and frames}}
 		{it:{help pip##param:Parameters description}}
 		{it:{help pip##options:Options description}}
 		{it:{help pip##operational:Operational description}}
@@ -140,6 +141,23 @@ The underlying welfare aggregate is the per capita household income or consumpti
  {browse "http://iresearch.worldbank.org/pip/Docs/dictionary.html":click here}. 
  For more information on the methodology,{browse "https://worldbank.github.io/PIP-Methodology/": click here}.
 
+
+{marker memory}{...}
+{title:Memory use and frames}:
+
+{pstd}
+{cmd:pip} makes use of the `frames` feature--available since Stata 16--to store
+a lot of information in memory.   
+This is in part the reason why the first call of pip in a new Stata session is
+relatively slower to subsequent calls.When closing Stata, you may see a pop-up
+message reading {bf:"Frame in memory have changed"}.
+That is perfectly normal and should not cause any concern. However, make sure
+the frames created by you have been properly saved. You can do that by typing 
+{stata frames dir}. Frames created by {cmd:pip} are prefixed by {it:_pip} and
+are marked by an {it:*}, meaning they have not been saved. Make sure your frames
+are saved before closing Stata. If you don't have any frame in used, just click "Exist without saving." However, you can delete all PIP data in memory using command {stata pip cleanup}
+
+
 {marker typesc}{...}
 {title:Type of calculations}:
 
@@ -172,7 +190,7 @@ Be default, {cmd:pip} creates a combinatorial query of the parameters selected,
 so that the output contains all the possible combinations between {it:country()}, 
 {it:povline()}, {it:year()}, and {it:coverage()}. Option {it:ppp()} is not part of the 
 combinatorial query. Alternatively, the user may select the subcommand {it:cl} to 
-parse a one-on-one (i.e., country by country) request. In this case, the first 
+parse a one-on-one (i.e., country by country) request ({err:this option is temporally disabled}). In this case, the first 
 country listed in {it:country()} will be combined with the first year in 
 {it:year()}, the first poverty lines in {it:povline()}, the first coverage area 
 in {it:coverage()}, and similarly for subsequent elements in the parameter
@@ -292,7 +310,7 @@ availability in the results window.{p_end}
 {phang}
 {opt cl} Stands for {it:country-level} queries. It changes combinatorial query of parameters 
 for one-on-one correspondence of parameters. See {help pip##typesq:above} 
-for a detailed explanation. 
+for a detailed explanation ({err:temporally disabled}). 
 
 {phang}
 {opt wb} Downloada World Bank's regional and global aggregation. It can be combined with {it:year()} option to filter the aggregate data.
@@ -304,15 +322,11 @@ We can also specify the server, version of the data, and PPP year as {stata  pip
 
 {phang}
 {opt cleanup} Allows us to delete all PIP data from Stata's memory. 
-The pip wrapper makes use of the `frames` feature—available since Stata 16—to store a lot of information in memory.   
-This is in part the reason why the first call of pip in a Stata new session is relatively slower to subsequent calls. 
-We may have seen the message below before closing Stata. 
-That is perfectly normal and should not cause any concern. Just click "Exist without saving." 
-However, you can delete all PIP data in memory using command {stata pip cleanup}
 
-
-{cmd:pip} makes use of the global "${pip_query}".
-
+{phang}
+{opt test} By typing {stata pip test}, {cmd:pip} makes use of the global
+"${pip_query}" to query your browser directly and test whether the data is
+downloadable. 
 
 {marker return}{...}
 {title:Stored results}{p 50 20 2}{p_end}

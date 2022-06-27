@@ -1,14 +1,15 @@
-v 0.3.3
+v 0.3.4.9001
 d 'PIP': Poverty and Inequality Platform Stata wrapper
 d 
 d World Bank PIP API Stata wrapper
 d 
-d Distribution-Date:   20220525
+d Distribution-Date:   20220615
 d License: MIT
 d 
 F pip.ado
 F pip.sthlp
 F pip_cache.ado
+F pip_cite.ado
 F pip_cl.ado
 F pip_clean.ado
 F pip_cleanup.ado

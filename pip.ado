@@ -155,11 +155,6 @@ qui {
 		local frame_prefix "pip_"
 	}
 	
-	if ("`region'" != "" & lower("`subcommand'") == "wb" ) {
-		noi disp in red "Option {it:region} has been disabled with subcommand {it:wb}"
-		error
-	}
-	
 	
 	/*==================================================
 	Defaults
@@ -328,6 +323,54 @@ qui {
 		error 
 	}
 	
+	//------------ Region
+	
+	if ("`region'" != "") {
+		local region = upper("`region'")
+		
+		if ("`country'" != "") {
+			noi disp in red "You must use either {it:country()} or {it:region()}."
+			error
+		}
+		
+		if (regexm("`region'", "SAR")) {
+			noi disp in red "Note: " in y "The official code of South Asia is" ///
+			"{it: SAS}, not {it:SAR}. We'll make the change for you"
+			local region: subinstr local region "SAR" "SAS", word
+		}
+	
+		tokenize "`version'", parse("_")
+		local _version   = "_`1'_`3'_`9'"
+		
+		frame dir 
+		local av_frames "`r(frames)'"
+		local av_frames: subinstr local  av_frames " " "|", all
+		local av_frames = "^(" + "`av_frames'" + ")"
+		
+		//------------ Regions frame
+		local frpiprgn "_pip_regions`_version'"
+		if (!regexm("`frpiprgn'", "`av_frames'")) {
+			pip_info, clear justdata `pause' server(`server') version(`version')
+		} 
+		frame `frpiprgn' {
+			levelsof region_code, local(av_regions)  clean
+		}
+		
+		// Add all to have the same functionality as in country(all)
+		local av_regions = "`av_regions'" + " ALL"
+		
+		local inregion: list region in av_regions
+		if (`inregion' == 0) {
+			
+			noi disp in red "region `region' is not available." _n ///
+			"Only the following are available:" _n "`av_regions'"
+			
+			error
+		}
+		
+	}
+	
+	
 	
 	*---------- One-on-one execution
 	if ("`subcommand'" == "cl" & lower("`country'") == "all") {
@@ -376,11 +419,6 @@ qui {
 		drop _all
 	}
 	
-	*---------- Country and region
-	if  ("`country'" != "") & ("`region'" != "") {
-		noi disp in r "options {it:country()} and {it:region()} are mutually exclusive"
-		error
-	}
 	
 	if ("`aggregate'" != "") {
 		if ("`ppp'" != ""){
@@ -391,8 +429,8 @@ qui {
 		local agg_display = "Aggregation in base year(s) `year'"
 	}
 	
-	if (wordcount("`country'")>2) {
-		if ("`ppp'" != ""){
+	if ("`ppp'" != "") {
+		if (wordcount("`country'")>2) {
 			noi di as err "Option PPP can only be used with one country."
 			error 198
 		}
@@ -762,8 +800,8 @@ qui {
 	label data "`datalabel' (`c(current_date)')"
 	
 	* citations
-	local cite `"Please cite as: XXXXX (2021) "pip: Stata module to access World Bank’s Global Poverty and Inequality data," Statistical Software Components 2022, Boston College Department of Economics."'
-	notes: `cite'
+	noi pip_cite, reg_cite
+	notes: `r(cite_data)'
 	
 	noi disp in y _n `"`cite'"'
 	
@@ -850,50 +888,6 @@ qui {
 end
 
 
-// ------------------------------------------------------------------------
-// MATA functions
-// ------------------------------------------------------------------------
-
-
-* findfile stata.trk
-* local fn = "`r(fn)'"
-
-cap mata: mata drop pip_*()
-mata:
-
-// function to look for source of code
-void pip_source(string scalar cmd) {
-	
-	cmd =  cmd :+ "\.pkg"
-	
-	fh = _fopen("`fn'", "r")
-	
-	pos_a = ftell(fh)
-	pos_b = 0
-	while ((line=strtrim(fget(fh)))!=J(0,0,"")) {
-		if (regexm(strtrim(line), cmd)) {
-			fseek(fh, pos_b, -1)
-			break
-		}
-		pos_b = pos_a
-		pos_a = ftell(fh)
-	}
-	
-	src = strtrim(fget(fh))
-	if (rows(src) > 0) {
-		src = substr(src, 3)
-		st_local("src", src)
-	} 
-	else {
-		st_local("src", "NotFound")
-	}
-	
-	fclose(fh)
-}
-
-end 
-
-
 
 exit
 /* End of do-file */
@@ -904,6 +898,9 @@ Notes:
 
 Version Control:
 
+*! version 0.3.4.9001   <2022Jun15>
+*! version 0.3.4.9000   <2022Jun15>
+*! version 0.3.4        <2022Jun10>
 *! version 0.3.3        <2022may25>
 *! version 0.3.2.9000   <2022apr26>
 *! version 0.3.2        <2022apr26>
