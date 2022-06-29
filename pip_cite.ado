@@ -58,13 +58,25 @@ if ("`version'" == "") {
 	local version = "`r(version)'"
 }
 
+
+//------------ display data bibtext
+local data_date = substr("`version'", 1, 8)
+local data_year = substr("`version'", 1, 4)
+local data_date = date("`data_date'", "YMD")
+local data_date: disp %tdCCYY-NN-DD `data_date'
+local data_date = trim("`data_date'")
+
+local _version: subinstr local version "_" "\_", all 
+
+
+
 if ("`reg_cite'" != "") {
-	local cite_ado = `"Castañeda, R.Andres. (${pip_adoyear}) "{pip}: Stata Module to Access World Bank’s Global Poverty and Inequality Data" (version ${pip_ado_version}). Stata. Washington, DC: World Bank Group. https://worldbank.github.io/pip/"'
+	local cite_ado = `"Castañeda, R.Andrés. (${pip_adoyear}) "pip: Stata Module to Access World Bank’s Global Poverty and Inequality Data" (version ${pip_ado_version}). Stata. Washington, DC: World Bank Group. https://worldbank.github.io/pip/"'
 	noi disp in y "Please cite this Stata tool as:" 
 	noi disp as text in smcl `" {phang}`cite_ado'{p_end}"'
 	noi disp _n "{stata pip_cite, ado_bibtext:bibtext}"
 	
-	local cite_data = `"World Bank. (2022). Poverty and Inequality Platform (version `version') [Data set]. World Bank Group. https://doi.org/10.0000/XXX/XXXXX"'
+	local cite_data = `"World Bank. (`data_year'). Poverty and Inequality Platform (version `version') [Data set]. World Bank Group. https://pip.worldbank.org/"'
 	noi disp in y _n "Please cite the PIP data as:" 
 	noi disp as text in smcl `" {phang}`cite_data'{p_end}"'
 	noi disp _n "{stata pip_cite, data_bibtext version(`version'):bibtext}"
@@ -101,7 +113,7 @@ if ("${pip_cite_ado}" == "") {
 	"{p 4 8 2}@software{castaneda${pip_adoyear},{p_end}"                                                                             + /// 
 	"{p 8 12 2}title = {\{pip\}: {{Stata}} Module to Access {{World Bank}}’s {{Global Poverty}} and {{Inequality}} Data},{p_end}"    + /// 
 	"{p 8 12 2}shorttitle = {PIP},{p_end}"                                                                                           + /// 
-	"{p 8 12 2}author = {Castañeda, R.Andres},{p_end}"                                                                               + /// 
+	"{p 8 12 2}author = {Castañeda, R.Andrés},{p_end}"                                                                               + /// 
 	"{p 8 12 2}date = {`ado_date'},{p_end}"                                                                                          + /// 
 	"{p 8 12 2}location = {{Washington, DC}},{p_end}"                                                                                + /// 
 	"{p 8 12 2}url = {https://worldbank.github.io/pip/},{p_end}"                                                                     + /// 
@@ -121,24 +133,13 @@ if ("`ado_bibtext'" != "") {
 	exit
 }
 
-
-//------------ display data bibtext
-local data_date = substr("`version'", 1, 8)
-local data_date = date("`data_date'", "YMD")
-local data_date: disp %tdCCYY-NN-DD `data_date'
-local data_date = trim("`data_date'")
-
-
-local _version: subinstr local version "_" "\_", all 
-
 local pip_cite_data = ///
-"{p 4 8 2}@dataset{worldbank${pip_adoyear},{p_end}" + ///
+"{p 4 8 2}@dataset{worldbank`data_year',{p_end}" + ///
 "{p 8 12 2}title = {Poverty and {{Inequality Platform}}},{p_end}" + ///
-"{p 8 12 2}shorttitle = {{{PIP}} Database},{p_end}" + ///
+"{p 8 12 2}shorttitle = {{PIP} Database},{p_end}" + ///
 "{p 8 12 2}author = {{World Bank}},{p_end}" + ///
-"{p 8 12 2}date = {`data_date'},{p_end}" + ///
+"{p 8 12 2}date = {`data_year'},{p_end}" + ///
 "{p 8 12 2}publisher = {{World Bank Group}},{p_end}" + ///
-"{p 8 12 2}doi = {10.0000/XXX/XXXXX},{p_end}" + ///
 "{p 8 12 2}url = {https://pip.worldbank.org/},{p_end}" + ///
 "{p 8 12 2}urldate = {`dateHRF'},{p_end}" + ///
 "{p 8 12 2}langid = {english},{p_end}" + ///
