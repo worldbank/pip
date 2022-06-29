@@ -84,6 +84,7 @@ sorting_vars(string) ///
 test_label(string) ///
 test_server(string) ///
 main_server(string)  ///
+disp                 ///
 * /// pip options
 ]
 
@@ -103,40 +104,56 @@ qui {
 	}
 	// tests
 	pip `cmd' `options' server(`main_server')
-	sort `sorting_vars'
 	duplicates report `sorting_vars'
 	cap assert r(unique_value)==r(N)
-	if _rc noi disp as err "Duplicate records in `test_label' (`main_server') data"
+	if _rc {
+		noi disp as err "Duplicate records in `test_label' (server `main_server') data"
+		exit
+	}
 	
+	sort `sorting_vars'
 	tempfile main_data
 	save `main_data'
 	
 	pip `cmd' `options' server(`test_server') 
-	sort `sorting_vars'
 	duplicates report `sorting_vars'
 	cap assert r(unique_value)==r(N)
-	if _rc noi disp as err "Duplicate records in `test_label' (`test_server') data"
+	if _rc {
+		noi disp as err "Duplicate records in `test_label' (server `test_server') data"
+		exit
+	}
 	
-	cap cf _all using `main_data'
-	if _rc noi disp as err "`test_label' of `main_server' and `test_server' don't match"
+	sort `sorting_vars'
+	if ("`disp'" == "") {
+		cap cf _all using `main_data'
+		if _rc {
+			noi disp as err "`test_label' of `main_server' and `test_server' don't match"
+			
+			noi disp "Display details " `"{stata `"pip_prod_dev `0' disp"':here}"'
+		}
+		
+	}
+	else {
+		noi cf _all using `main_data', verbose all
+	}
 }
 
-end 
+end  
 
 // 1- compare country level estimates for ppp 2011
-qui pip_prod_dev, ///
+pip_prod_dev, ///
 cmd(", povline(1.9 3.2 5.5) ppp_year(2011) clear") ///
 sorting_vars("country_code region_code year welfare_type poverty_line reporting_level") ///
 test_label("Country estimate") 
 
 // 2- wb aggregate estimates for poverty line 1.9, 3.2, and 5.5
-qui pip_prod_dev, ///
+pip_prod_dev, ///
 cmd("wb, povline(1.9 3.2 5.5) ppp_year(2011) clear") ///
 sorting_vars("region_name year poverty_line") ///
 test_label("WB aggregate") 
 
 // 3- filling gap data for all countries
-qui pip_prod_dev, ///
+pip_prod_dev, ///
 cmd(", fillgaps povline(1.9 3.2 5.5) ppp_year(2011) clear") ///
 sorting_vars("country_code region_code year welfare_type poverty_line reporting_level") ///
 test_label("Fillgaps data") 
@@ -144,103 +161,103 @@ test_label("Fillgaps data")
 *******************************************************************************
 * auxilary tables
 // 1) countries
-qui pip_prod_dev, ///
+pip_prod_dev, ///
 cmd("tables, table(countries) clear") ///
 sorting_vars("country_code") ///
 test_label("Auxilary table - countries") 
 
 // 2) country coverage
-qui pip_prod_dev, ///
+pip_prod_dev, ///
 cmd("tables, table(country_coverage) clear") ///
 sorting_vars("country_code reporting_year pop_data_level") ///
 test_label("Auxilary table - country_coverage") 
 
 // 3) cpi
-qui pip_prod_dev, ///
+pip_prod_dev, ///
 cmd("tables, table(cpi) clear") ///
 sorting_vars("country_code data_level") ///
 test_label("Auxilary table - cpi") 
 
 // 4) decomposition
-qui pip_prod_dev, ///
+pip_prod_dev, ///
 cmd("tables, table(decomposition) clear") ///
 sorting_vars("variable_code variable_values") ///
 test_label("Auxilary table - decomposition") 
 
 // 5) dictionary
-qui pip_prod_dev, ///
+pip_prod_dev, ///
 cmd("tables, table(dictionary) clear") ///
 sorting_vars("variable") ///
 test_label("Auxilary table - dictionary") 
 
 // 6) framework
-qui pip_prod_dev, ///
+pip_prod_dev, ///
 cmd("tables, table(framework) clear") ///
 sorting_vars("country_code year survey_coverage welfare_type") ///
 test_label("Auxilary table - framework") 
 
 // 7) gdp
-qui pip_prod_dev, ///
+pip_prod_dev, ///
 cmd("tables, table(gdp) clear") ///
 sorting_vars("country_code data_level") ///
 test_label("Auxilary table - gdp") 
 
 // 8) incgrp_coverage
-qui pip_prod_dev, ///
+pip_prod_dev, ///
 cmd("tables, table(incgrp_coverage) clear") ///
 sorting_vars("reporting_year") ///
 test_label("Auxilary table - incgrp_coverage") 
 
 // 9) indicators
-qui pip_prod_dev, ///
+pip_prod_dev, ///
 cmd("tables, table(indicators) clear") ///
 sorting_vars("indicator_code page") ///
 test_label("Auxilary table - indicators") 
 
 // 10) interpolated_means
-qui pip_prod_dev, ///
+pip_prod_dev, ///
 cmd("tables, table(interpolated_means) clear") ///
 sorting_vars("survey_id interpolation_id") ///
 test_label("Auxilary table - interpolated_means") 
 
 // 11) pce
-qui pip_prod_dev, ///
+pip_prod_dev, ///
 cmd("tables, table(pce) clear") ///
 sorting_vars("country_code data_level") ///
 test_label("Auxilary table - pce") 
 
 // 12) pop
-qui pip_prod_dev, ///
+pip_prod_dev, ///
 cmd("tables, table(pop) clear") ///
 sorting_vars("country_code data_level") ///
 test_label("Auxilary table - pop") 
 
 // 13) pop_region
-qui pip_prod_dev, ///
+pip_prod_dev, ///
 cmd("tables, table(pop_region) clear") ///
 sorting_vars("region_code reporting_year") ///
 test_label("Auxilary table - pop_region") 
 
 // 14) poverty_lines
-qui pip_prod_dev, ///
+pip_prod_dev, ///
 cmd("tables, table(poverty_lines) clear") ///
 sorting_vars("name") ///
 test_label("Auxilary table - poverty_lines") 
 
 // 15) ppp
-qui pip_prod_dev, ///
+pip_prod_dev, ///
 cmd("tables, table(ppp) clear") ///
 sorting_vars("country_code data_level") ///
 test_label("Auxilary table - ppp") 
 
 // 16) regions
-qui pip_prod_dev, ///
+pip_prod_dev, ///
 cmd("tables, table(regions) clear") ///
 sorting_vars("region_code") ///
 test_label("Auxilary table - regions") 
 
 // 17) regions_coverage
-qui pip_prod_dev, ///
+pip_prod_dev, ///
 cmd("tables, table(region_coverage) clear") ///
 sorting_vars("reporting_year pcn_region_code") ///
 test_label("Auxilary table - regions_coverage") 
