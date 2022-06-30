@@ -119,6 +119,9 @@ alt="LAC" width="550" height="500" />
 
 ```stata
  pip, country(chl gha tgo) year(all)  clear
+ keep if (country_code == "CHL" & survey_comparability == 1) | ///
+ (country_code == "GHA" & survey_comparability == 1) | ///
+ (country_code == "TGO" & survey_comparability == 0) 
  reshape long decile, i(country_code welfare_time) j(dec)
  egen panelid = group(country_code dec)
  replace welfare_time = int(welfare_time)
@@ -135,7 +138,7 @@ alt="LAC" width="550" height="500" />
  		(sc g dec if welfare_time == 2015 & country_code == "TGO", c(l)),   ///
  		yti("Annual growth in decile average income (%)" " ",      ///
  		size(small))  xlabel(0(10)100,labs(small))                 ///
- 		xtitle("Decile group", size(small)) graphregion(c(white))  ///
+ 		xtitle("Decile group", size(small)) graphregion(c(white)) ///
  		legend(order(1 "Chile (2011-2017)"                      ///
  		2 "Ghana(1998-2005)" 3 "Togo (2011-2015)")              ///
  		si(vsmall) row(1)) scheme(s2color)
@@ -183,12 +186,15 @@ drop if gini == -1
 merge m:1 country_code year using `PerCapitaGDP', keep(match)
 replace gini = gini * 100
 drop if ny_gdp_pcap_pp_kd == .
-replace ny_gdp_pcap_pp_kd = log(ny_gdp_pcap_pp_kd)
-twoway (scatter gini ny_gdp_pcap_pp_kd, mfcolor(%0) ///
-msize(vsmall)) (lfit gini ny_gdp_pcap_pp_kd), ///
+
+gen loggdp = log10(ny_gdp_pcap_pp_kd)
+
+twoway (scatter gini loggdp, mfcolor(%0) ///
+msize(vsmall)) (lfit gini loggdp), ///
 ylabel(, format(%2.0f)) ///
 ytitle("Gini Index" " ", size(small))  ///
-xtitle(" " "GDP per Capita per Year in log scale (in 2011 USD PPP)", size(small))  ///
+xtitle(" " "GDP per Capita per Year (in 2011 USD PPP, log scale)", size(small))  ///
+xlab(3 "1,000" 3.3 "2,000" 3.7 "5,000" 4 "10,000" 4.3 "20,000" 4.7 "50,000" 5 "100,000") ///
 graphregion(c(white)) ysize(5) xsize(7)  ///
 ylabel(,labs(small) nogrid angle(verticle)) xlabel(,labs(small)) ///
 legend(order(1 "Gini Index" 2 "Fitted Value") si(small)) scheme(s2color)
