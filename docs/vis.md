@@ -158,6 +158,7 @@ pip,  country(chl gha tgo) year(all) clear
 	twoway (connected gini welfare_time if country_code == "CHL")  ///
 		(connected gini welfare_time if country_code == "GHA")       ///
 		(connected gini welfare_time if country_code == "TGO"),      /// 
+		ylabel(, format(%2.0f)) ///
 		ytitle("Gini Index" " ", size(small))                   ///
 		xtitle(" " "", size(small)) ylabel(,labs(small) nogrid  ///
 		angle(verticle)) xlabel(,labs(small))                   ///
