@@ -609,7 +609,7 @@ qui {
 		// --- timer
 		
 		*---------- download data
-		cap import delimited  "`queryfull'&format=csv", `clear' varn(1)
+		cap import delimited  "`queryfull'&format=csv", `clear' varn(1) asdouble
 		if (_rc) {
 			noi dis ""
 			noi dis in red "It was not possible to download data from the PIP API."
@@ -621,11 +621,13 @@ qui {
 			noi dis in white  "you should be able to download the data."
 			noi dis in white `"(3) Please consider adjusting your Stata timeout parameters. For more details see {help netio}"'
 			noi dis in white `"(4) Please send us an email to:"'
-			noi dis in white _col(8) `"email: data@worldbank.org"'
+			noi dis in white _col(8) `"email: pip@worldbank.org"'
 			noi dis in white _col(8) `"subject: pip query error on `c(current_date)' `c(current_time)'"'
 			noi di ""
 			error 673
 		}
+		* noi disp "`queryfull'&format=csv"
+		* exit 
 		
 		
 		// --- timer
