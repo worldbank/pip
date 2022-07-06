@@ -85,7 +85,7 @@ qui {
 	
 	frame _pip_versions_`server' {
 
-		import delimited using "`url'/versions?format=csv", clear varn(1)
+		import delimited using "`url'/versions?format=csv", clear varn(1) asdouble
 		
 		//------------* Split and rename 
 		split version, parse("_") generate(sp)

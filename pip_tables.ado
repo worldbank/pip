@@ -52,7 +52,7 @@ qui {
 	
 	if ("`table'" != "") {
 		local table_call = "`url'/aux?table=`table'&`version_qr'&format=csv"
-		import delimit "`table_call'", varn(1) `clear'
+		import delimit "`table_call'", varn(1) `clear' asdouble
 		return local table_call = "`table_call'"
 		exit
 	}
@@ -63,7 +63,7 @@ qui {
 	if ("`table'" == "") {
 		preserve
 		local table_call = "`url'/aux?`version_qr'&format=csv"
-		import delimit "`table_call'", varn(1) clear
+		import delimit "`table_call'", varn(1) clear asdouble
 		return local table_call = "`table_call'"
 		
 		noi disp in y "Auxiliary tables available for `version':"
