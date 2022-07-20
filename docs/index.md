@@ -71,16 +71,16 @@ github uninstall pip
 ```stata
 which pip 
 ```
-If it is installed, delete all the `pip` files from wherever they are in your computer until the command above returns error. The idea is to leave no trace of {pip} in your computer.
+If it is installed, delete all the `pip` files from wherever they are in your computer until the command above returns error. The idea is to leave no trace of `pip` in your computer.
 
-3. Install {pip} again with the following code and check the version number. It should be the same as the most [recent release](https://github.com/worldbank/pip/releases)
+3. Install `pip` again with the following code and check the version number. It should be the same as the most [recent release](https://github.com/worldbank/pip/releases)
 ```stata
 github install worldbank/pip
 which pip
 ```
 4. Try to run it again and see if `pip` fails.
-5. If it is still failing, please run the code below--making sure your replace the commented line--and send the test.log file to [pip@worldbank.org](https://github.com/worldbank/pip/blob/main/pip@worldbank.org)
 
+5. If it is still failing, please run the code below--making sure your replace the commented line--and send the test.log file to [pip@worldbank.org](https://github.com/worldbank/pip/blob/main/pip@worldbank.org)
 ```stata
 log using "test.log", name(test) text replace // this is in your cd
 cret list
