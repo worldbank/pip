@@ -68,7 +68,10 @@ qui {
 			local rc1 = _rc
 			
 			if (`rc1' == 0) {
-				drop iso2_code
+				cap confirm new var iso2_code
+				if (_rc) {
+					drop iso2_code
+				}
 				sort country_code
 			}
 		}
