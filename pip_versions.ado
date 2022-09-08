@@ -86,6 +86,7 @@ qui {
 	frame _pip_versions_`server' {
 
 		import delimited using "`url'/versions?format=csv", clear varn(1) asdouble
+		keep version
 		
 		//------------* Split and rename 
 		split version, parse("_") generate(sp)
@@ -100,9 +101,9 @@ qui {
 	
 	if ("`availability'" != "") {
 		frame _pip_versions_`server' {
-			levelsof versions, local(versions) clean
+			levelsof version, local(versions) clean
 			return local versions = "`versions'"
-			noi list versions // fast list
+			noi list version // fast list
 		}
 		exit
 	}
@@ -121,11 +122,11 @@ qui {
 			* check availability
 			* local server "http://wzlxdpip01.worldbank.org/api/v1"
 			* local version "20220408_2011_02_02_PROD"
-			count if versions == "`version'"
+			count if version == "`version'"
 			
 			if (r(N) == 0) {
 			
-				levelsof versions, local(vers) clean
+				levelsof version, local(vers) clean
 				local ver_avlb: list version in vers
 				noi disp in red "version {it:`version'} is not available in this server" _n ///
 				"Versions available are: "
@@ -223,7 +224,7 @@ qui {
 			// this guarantees only one version 
 			sort release ppp_year ppp_rv ppp_av
 			keep in l
-			local version   = versions[1]
+			local version = version[1]
 			local version_qr = "version=`version'"  
 			
 		} // end of version not specified
