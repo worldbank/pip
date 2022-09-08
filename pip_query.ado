@@ -222,7 +222,7 @@ quietly {
 		if ( lower("`country'") == "all" | lower("`region'") == "all" | ///
 		     "`region'" == "WLD" /* To remove */ ) {
 			
-			local country_q = "country=all"
+			local country_q = "country=ALL"   // to modify
 			
 		}
 		else {

@@ -397,10 +397,10 @@ qui {
 	
 	
 	*---------- Country
-	if ("`country'" == "" & "`region'" == "") local country "all"
+	if ("`country'" == "" & "`region'" == "") local country "ALL" // to modify
 	if ("`country'" != "") {
 		if (lower("`country'") != "all") local country = upper("`country'")
-		else                             local country "all"
+		else                             local country "ALL" // to modify
 	}
 	
 	
