@@ -617,7 +617,7 @@ qui {
 			noi dis in white `"(1) Please check your Internet connection by "' _c 
 			noi dis in white  `"{browse "`url'/health-check" :clicking here}"'
 			noi dis in white `"(2) Test that the data is retrievable. By"' _c
-		  noi dis in white  `"{stata pip test: clicking here }"' _c
+		  noi dis in white  `"{stata pip test, server(`server'): clicking here }"' _c
 			noi dis in white  "you should be able to download the data."
 			noi dis in white `"(3) Please consider adjusting your Stata timeout parameters. For more details see {help netio}"'
 			noi dis in white `"(4) Please send us an email to:"'
@@ -900,6 +900,7 @@ Notes:
 
 Version Control:
 
+*! version 0.3.5.9000   <2022Sep08>
 *! version 0.3.5        <2022Jul06>
 *! version 0.3.4.9005   <2022Jul06>
 *! version 0.3.4.9004   <2022Jul01>
