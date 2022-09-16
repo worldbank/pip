@@ -4,7 +4,7 @@
 // for more information visit http://github.com/haghish/github
 
 make pip, replace toc pkg                         ///  readme
-		version(0.3.5.9000)                          ///
+		version(0.3.6)                          ///
     license("MIT")                                                          ///
     author("R.Andres Castaneda")                                            ///
     affiliation("The World Bank")                                           ///
@@ -18,13 +18,13 @@ make pip, replace toc pkg                         ///  readme
 * ------------------------------------------------------------------------------
 * Testing basic examples
 * ------------------------------------------------------------------------------
-global options = "server(dev) clear"
+global options = "server(qa) clear"
 cap frame drop tmpfr
 frame create tmpfr strL cmd
 frame post tmpfr ("pip versions")  // first command 
 frame post tmpfr ("pip, country(col arg) year(last) ${options}") // load latest available survey-year estimates for sampel countries
 frame post tmpfr ("pip, info ${options}") // load clickable menu
-frame post tmpfr ("pip, country(all) coverage('urban') ${options}") // load only urban coverage level
+frame post tmpfr ("pip, country(all) coverage(urban) ${options}") // load only urban coverage level
 frame post tmpfr ("pip, country(COL BRA ARG IND) year(2015) ${options}") // country estimation at $1.9 in 2015. Since there are no surveys in ARG and IND in 2015, results are loaded for COL and BRA
 frame post tmpfr ("pip, country(COL BRA ARG IND) year(2015) fillgaps ${options}") // filling gaps for ARG and IND. Only works for reference years
 frame post tmpfr ("pip wb, year(2015) ${options}") // World Bank aggregation
@@ -71,7 +71,7 @@ forvalues i = 1/$N {
 pip version
 
 // setup dev options	
-global options = "server(dev)"
+global options = "server(qa)"
 
 // Function to avoid errors and scale up check
 *##s
