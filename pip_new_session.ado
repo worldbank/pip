@@ -223,7 +223,7 @@ qui {
 	copy "`r(fn)'" "`statatrk'"
 	
 	// import copy into stata
-	import delimited using `statatrk',  bindquote(nobind)
+	import delimited using `statatrk',  bindquote(nobind) asdouble
 	
 	gen n = _n    // line number
 	

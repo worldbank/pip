@@ -167,6 +167,7 @@ all other economies are included in geographic regions, as defined by the World 
 {synopt:{opt  SVK }} Slovak Republic{p_end}
 {synopt:{opt  SVN }} Slovenia{p_end}
 {synopt:{opt  SLB }} Solomon Islands{p_end}
+{synopt:{opt  SOM }} Somalia{p_end}
 {synopt:{opt  ZAF }} South Africa{p_end}
 {synopt:{opt  SSD }} South Sudan{p_end}
 {synopt:{opt  ESP }} Spain{p_end}

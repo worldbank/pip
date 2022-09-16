@@ -37,7 +37,7 @@ available in {cmd:pip}. See {help pip##list:below} the list comparing pip and po
 Description of parameter options
 
 {synoptset 27 tabbed}{...}
-{synopthdr:Estimations}
+{synopthdr:Parameters}
 {synoptline}
 {synopt :{opt coun:try:}(3-letter code)}List of country code (accepts multiples) or {it:all}. 
 Cannot be used with option {it:region()}{p_end}
@@ -52,38 +52,40 @@ Cannot be used with option {it:country()}{p_end}
 {synopt :{opt ppp}{cmd:(#)}}Allows the selection of PPP. {p_end}
 
 {synoptset 27 tabbed}{...}
-{synopthdr:Version}
+{synopthdr:Options}
 {synoptline}
-{synopt :{opt server(string)}{err:*}}Name of a server to query on (e.g, prod, dev, qa). See description of each server {bf:{help pip_note:here}}.{p_end}
-{synopt :{opt identity(string)}{err:*}}Version of data to run the query on (e.g., prod, int, test).{p_end}
+{synopt :{opt version(string)}}Combination of numbers in the format %Y%m%d_YYYY_RV_AV_SSS 
+(click {bf:{help pip_note:here}} for explanation of each component). This {it:version()} option supersedes 
+the next 3 options {it:ppp_year()}, {it:release()} & {it:identity()}, as the combination of any of those 
+three allow users to obtain any version of the data needed.{p_end}
 {synopt :{opt ppp:_year:}(#)}PPP round (eg., 2005, 2011, 2017).{p_end}
-{synopt :{opt release(numlist)}}PIP data release date.{p_end}
+{synopt :{opt release(numlist)}}8 digit number with the PIP data release date in the format {it:YYYYMMDD}.{p_end}
+{synopt :{opt identity(string)}{err:*}}Version of data to run the query on (e.g., prod, int, test).{p_end}
+{synopt :{opt server(string)}{err:*}}Name of a server to query on (e.g, prod, dev, qa). See description of each server {bf:{help pip_note:here}}.{p_end}
+
+{pstd}
+{err:*Note}: The {cmd:server()} and {cmd:identity()} options are available internally only for the Bank staff via the Bank's intranet.
+For detailed description of the {cmd:server()} and {cmd:identity()} options see {bf:{help pip_note:here}}.
 
 {synoptset 27 tabbed}{...}
 {synopthdr:Operational}
 {synoptline}
-{synopt :{opt info:rmation}}Presents a clickable version of the available surveys, countries and regions.{p_end}
 {synopt :{opt clear}}Replaces data in memory.{p_end}
 {synopt :{opt querytimes(integer)}}Number of times the API is hit before defaulting to failure. 
 Default is 5. {it:Advance option. Use only if Internet connection is poor}.{p_end}
 {synopt :{opt table(string)}}Loads one auxiliary table, this option is used along with the {cmd:tables} subcommand.{p_end}
 
 {synoptset 27 tabbed}{...}
-{synopthdr:subcommands}
+{synopthdr:Subcommands}
 {synoptline}
 {synopt :{opt info:rmation}}Presents a clickable version of the available surveys, 
-countries and regions. Same as option {it:information}{p_end}
+countries and regions.{p_end}
 {synopt :{opt cl}}{err:(temporally disabled)} {it:country-level} query that changes the default combinatorial 
 arrangement of parameters for a one-on-one correspondence. 
 See a detailed explanation {help pip##typesq: below}.{p_end}
 {synopt :{opt wb}}Downloads World Bank's regional and global aggregation.{p_end}
 {synopt :{opt tables}}Provides clickable list of auxiliary tables for download.{p_end}
 {synopt :{opt cleanup}}Deletes all pip data from current stata memory.{p_end}
-
-
-{pstd}
-{err:*Note}: The {cmd:server()} and {cmd:identity()} options are available internally only for the Bank staff via the Bank’s intranet. 
-For detailed description of the {cmd:server()} and {cmd:identity()} options see {bf:{help pip_note:here}}.
 
 {pstd}
 {bf:Note}: {cmd:pip} requires Internet connection.
@@ -95,9 +97,11 @@ For detailed description of the {cmd:server()} and {cmd:identity()} options see 
 Sections are presented under the following headings:
 
 		{it:{help pip##desc:Command description}}
+		{it:{help pip##memory:Memory use and frames}}
 		{it:{help pip##param:Parameters description}}
 		{it:{help pip##options:Options description}}
-		{it:{help pip##subcommands:Subcommands}}
+		{it:{help pip##operational:Operational description}}
+		{it:{help pip##subcommands:Subcommands description}}
 		{it:{help pip##list:List of pip and povcalnet variables}}
 		{it:{help pip##return:Stored results}}
 		{it:{help pip##Examples:Examples}}
@@ -114,12 +118,11 @@ Sections are presented under the following headings:
 {title:Description}
 
 {pstd}
-The {cmd:pip} command allows Stata users to compute poverty and inequality
- indicators for over 160 countries and regions in the World Bank's database of household
- surveys. It has the same functionality as the {browse "https://pip.worldbank.org/":PIP website}.
- PIP is a computational tool that allows users to conduct country-specific, 
- cross-country, as well as global and regional poverty analyses. Users are able estimate rates 
- over time and at any poverty line specified.
+The {cmd:pip} command has the same functionality as the {browse "https://pip.worldbank.org/":PIP website}. 
+It allows Stata users to compute poverty and inequality indicators for over 160 countries and 
+regions in the World Bank's database of household surveys. PIP is a computational tool that allows 
+users to conduct country-specific, cross-country, as well as global and regional poverty analyses. 
+Users are able estimate rates  over time and at any poverty line specified.
  
 {pstd}
 PIP is managed jointly by the Data and Research Groups in the World Bank's
@@ -129,8 +132,7 @@ PIP is managed jointly by the Data and Research Groups in the World Bank's
 
 {pstd}
  {cmd:pip} reports an ample range of measures for poverty (at chosen poverty line) 
- and inequality, including the mean and median welfare (see full list of indicators
- {help pip##list:below}).
+ and inequality. See full list of indicators available in {cmd:pip} {help pip##list:below}.
 
 {pstd}
 The underlying welfare aggregate is the per capita household income or consumption
@@ -138,6 +140,23 @@ The underlying welfare aggregate is the per capita household income or consumpti
  the means and medians. For more information on the definition of the indicators,
  {browse "http://iresearch.worldbank.org/pip/Docs/dictionary.html":click here}. 
  For more information on the methodology,{browse "https://worldbank.github.io/PIP-Methodology/": click here}.
+
+
+{marker memory}{...}
+{title:Memory use and frames}:
+
+{pstd}
+{cmd:pip} makes use of the `frames` feature--available since Stata 16--to store
+a lot of information in memory.   
+This is in part the reason why the first call of pip in a new Stata session is
+relatively slower to subsequent calls.When closing Stata, you may see a pop-up
+message reading {bf:"Frame in memory have changed"}.
+That is perfectly normal and should not cause any concern. However, make sure
+the frames created by you have been properly saved. You can do that by typing 
+{stata frames dir}. Frames created by {cmd:pip} are prefixed by {it:_pip} and
+are marked by an {it:*}, meaning they have not been saved. Make sure your frames
+are saved before closing Stata. If you don't have any frame in used, just click "Exist without saving." However, you can delete all PIP data in memory using command {stata pip cleanup}
+
 
 {marker typesc}{...}
 {title:Type of calculations}:
@@ -163,6 +182,22 @@ Inequality measures, including the Gini index, mean log deviation and decile sha
  are calculated only in survey-years where microdata is available. Inequality 
  measures are not reported for reference-years.
 
+{marker typesq}{...}
+{title:Combinatorial and one-on-one queries}:
+
+{pstd}
+Be default, {cmd:pip} creates a combinatorial query of the parameters selected, 
+so that the output contains all the possible combinations between {it:country()}, 
+{it:povline()}, {it:year()}, and {it:coverage()}. Option {it:ppp()} is not part of the 
+combinatorial query. Alternatively, the user may select the subcommand {it:cl} to 
+parse a one-on-one (i.e., country by country) request ({err:this option is temporally disabled}). In this case, the first 
+country listed in {it:country()} will be combined with the first year in 
+{it:year()}, the first poverty lines in {it:povline()}, the first coverage area 
+in {it:coverage()}, and similarly for subsequent elements in the parameter
+{it:country()}. If only one element is added to parameters {it:povline()}, 
+{it:year()}, or {it:coverage()}, it would be applied to all the elements in the
+parameter {it:countr()}. {err:caution}: if only one element is added 
+to option {it:ppp()}, it would be applied to all the countries listed in {it:country()}.
 
 {marker param}{...}
 {p 40 20 2}(Go up to {it:{help pip##sections:Sections Menu}}){p_end}
@@ -186,6 +221,11 @@ by spaces. The  option {it:all} is a shorthand for calling all regions, which is
 equivalent to  calling all countries.
 
 {phang}
+{opt coverage(string)} Selects coverage level of estimates. By default, all coverage
+levels are loaded, but the user may select "national", "urban", or "rural". 
+Only one level of coverage can be selected per query. 
+
+{phang}
 {opt year(#)} Four digit years are accepted. When selecting multiple years, use 
 spaced to separate them. The option {it:all} is a shorthand for calling all 
 possible years, while the {it:last} option will download the latest available year 
@@ -201,10 +241,6 @@ Poverty lines are expressed in 2011 PPP-adjusted USD per capita per day.
 {opt popshare(#)} The desired population share (headcount) for which the poverty lines as poverty measures will be calculated. 
 This has not default, and should not be combined with {opt povline}.
 The resulting poverty lines are expressed in 2011 PPP-adjusted USD per capita per day.
-
-{marker options}{...}
-{p 40 20 2}(Go up to {it:{help pip##sections:Sections Menu}}){p_end}
-{title:Options description}
 
 {phang}
 {opt fillgaps} Loads all country-level estimates that are used to create the  
@@ -222,12 +258,45 @@ to be interpreted carefully and may not be the result of a new household survey.
 {opt PPP}{cmd:(#)} Allows the selection of PPP exchange rate. This option only 
 works if one, and only one, country is selected.
 
+{marker options}{...}
+{p 40 20 2}(Go up to {it:{help pip##sections:Sections Menu}}){p_end}
+{title:Options description}
+
 {phang}
-{opt coverage(string)} Selects coverage level of estimates. By default, all coverage
-levels are loaded, but the user may select "national", "urban", or "rural". 
-Only one level of coverage can be selected per query. 
+{opt version} A detailed description of {bf:version} option is available {bf:{help pip_note:here}}.
+
+{phang}
+{opt ppp_year} Allows to specify PPP round (version) that will be used to calculate estimates. Default PPP round year is 2011.
+
+{phang}
+{opt release} Allows to specify PIP data release date in the format  YYYYMMDD.
+
+{phang}
+{opt identity} A detailed description of {bf:identity} option is available {bf:{help pip_note:here}}.
+
+{phang}
+{opt server} A detailed description of {bf:server} option is available {bf:{help pip_note:here}}.  
+
+{marker operational}{...}
+{p 40 20 2}(Go up to {it:{help pip##sections:Sections Menu}}){p_end}
+{title:Operational description}
 
 {marker optinfo}{...}
+{phang}
+{opt clear} replaces data in memory.
+
+{phang}
+{opt querytimes} Number of times the API is hit before defaulting to failure.  Default is 5. Advance option. Use only if Internet connection is poor.
+
+{phang}
+{opt table} Allows to load one auxiliary table, this option is used along with {cmd:tables} subcommand. {stata pip tables, table(countries)}
+
+
+
+{marker subcommands}{...}
+{p 40 20 2}(Go up to {it:{help pip##sections:Sections Menu}}){p_end}
+{title:Subcommands}
+
 {phang}
 {opt information} Presents a clickable version of the available surveys, countries 
 and regions. Selecting countries from the menu loads the survey-year estimates.
@@ -236,25 +305,15 @@ Choosing regions loads the regional aggregates in the reference years.
 {p 8 8 2}{err:Note}: If option {it:clear} is added, data in memory is replaced 
 with a pip guidance database. If option {it:clear} is {ul:not} included,
 {cmd:pip} preserves data in memory  but displays a clickable interface of survey
-availability in the results window.{p_end}
-
-{phang}
-{opt table} Allows us to load one auxiliary table, this option is used along with {cmd:tables} subcommand. {stata pip tables, table(countries)}
-
-{phang}
-{opt clear} replaces data in memory.
-
-{marker subcommands}{...}
-{p 40 20 2}(Go up to {it:{help pip##sections:Sections Menu}}){p_end}
-{title:Subcommands}
-
-{phang}
-{opt info} Same as option {it:info} {help pip##optinfo:above}. 
+availability in the results window.{p_end} 
 
 {phang}
 {opt cl} Stands for {it:country-level} queries. It changes combinatorial query of parameters 
 for one-on-one correspondence of parameters. See {help pip##typesq:above} 
-for a detailed explanation. 
+for a detailed explanation ({err:temporally disabled}). 
+
+{phang}
+{opt wb} Downloada World Bank's regional and global aggregation. It can be combined with {it:year()} option to filter the aggregate data.
 
 {phang}
 {opt tables} Allows us to download any auxiliary table of the PIP project. 
@@ -263,14 +322,11 @@ We can also specify the server, version of the data, and PPP year as {stata  pip
 
 {phang}
 {opt cleanup} Allows us to delete all PIP data from Stata's memory. 
-The pip wrapper makes use of the `frames` feature—available since Stata 16—to store a lot of information in memory.   
-This is in part the reason why the first call of pip in a Stata new session is relatively slower to subsequent calls. 
-We may have seen the message below before closing Stata. 
-That is perfectly normal and should not cause any concern. Just click “Exist without saving.” 
-However, you can delete all PIP data in memory using command {stata pip cleanup}
 
-{cmd:pip} makes use of the global "${pip_query}".
-
+{phang}
+{opt test} By typing {stata pip test}, {cmd:pip} makes use of the global
+"${pip_query}" to query your browser directly and test whether the data is
+downloadable. 
 
 {marker return}{...}
 {title:Stored results}{p 50 20 2}{p_end}
@@ -420,30 +476,30 @@ The following is a comparative list of variables available in pip and povcalnet:
 	. pip, clear
 
 	* keep only national
-	. bysort countrycode datatype year: egen _ncover = count(coveragetype)
-	. gen _tokeepn = ( (inlist(coveragetype, 3, 4) & _ncover > 1) | _ncover == 1)
+	. bysort country_code welfare_type year: egen _ncover = count(survey_coverage)
+	. gen _tokeepn = ( (inlist(survey_coverage, 3, 4) & _ncover > 1) | _ncover == 1)
 
 	. keep if _tokeepn == 1
 
 	* Keep longest series per country
-	. by countrycode datatype, sort:  gen _ndtype = _n == 1
-	. by countrycode : replace _ndtype = sum(_ndtype)
-	. by countrycode : replace _ndtype = _ndtype[_N] // number of datatype per country
+	. by country_code welfare_type, sort:  gen _ndtype = _n == 1
+	. by country_code : replace _ndtype = sum(_ndtype)
+	. by country_code : replace _ndtype = _ndtype[_N] // number of welfare_type per country
 
-	. duplicates tag countrycode year, gen(_yrep)  // duplicate year
+	. duplicates tag country_code year, gen(_yrep)  // duplicate year
 
-	.bysort countrycode datatype: egen _type_length = count(year) // length of type series
-	.bysort countrycode: egen _type_max = max(_type_length)   // longest type series
+	.bysort country_code welfare_type: egen _type_length = count(year) // length of type series
+	.bysort country_code: egen _type_max = max(_type_length)   // longest type series
 	.replace _type_max = (_type_max == _type_length)
 
 	* in case of same length in series, keep consumption
-	. by countrycode _type_max, sort:  gen _ntmax = _n == 1
-	. by countrycode : replace _ntmax = sum(_ntmax)
-	. by countrycode : replace _ntmax = _ntmax[_N]  // number of datatype per country
+	. by country_code _type_max, sort:  gen _ntmax = _n == 1
+	. by country_code : replace _ntmax = sum(_ntmax)
+	. by country_code : replace _ntmax = _ntmax[_N]  // number of welfare_type per country
 
 
 	. gen _tokeepl = ((_type_max == 1 & _ntmax == 2) | ///
-	.                (datatype == 1 & _ntmax == 1 & _ndtype == 2) | ///
+	.                (welfare_type == 1 & _ntmax == 1 & _ndtype == 2) | ///
 	.                _yrep == 0)
 	. 
 	. keep if _tokeepl == 1
@@ -456,28 +512,28 @@ The following is a comparative list of variables available in pip and povcalnet:
 
 {cmd}
 	. pip, clear
-	. bysort countrycode datatype year: egen _ncover = count(coveragetype)
-	. gen _tokeepn = ( (inlist(coveragetype, 3, 4) & _ncover > 1) | _ncover == 1)
+	. bysort country_code welfare_type year: egen _ncover = count(survey_coverage)
+	. gen _tokeepn = ( (inlist(survey_coverage, 3, 4) & _ncover > 1) | _ncover == 1)
 
 	. keep if _tokeepn == 1
 	* Keep longest series per country
-	. by countrycode datatype, sort:  gen _ndtype = _n == 1
-	. by countrycode : replace _ndtype = sum(_ndtype)
-	. by countrycode : replace _ndtype = _ndtype[_N] // number of datatype per country
+	. by country_code welfare_type, sort:  gen _ndtype = _n == 1
+	. by country_code : replace _ndtype = sum(_ndtype)
+	. by country_code : replace _ndtype = _ndtype[_N] // number of welfare_type per country
 
 
-	. bysort countrycode datatype: egen _type_length = count(year)
-	. bysort countrycode: egen _type_max = max(_type_length)
+	. bysort country_code welfare_type: egen _type_length = count(year)
+	. bysort country_code: egen _type_max = max(_type_length)
 	. replace _type_max = (_type_max == _type_length)
 
 	* in case of same length in series, keep consumption
-	. by countrycode _type_max, sort:  gen _ntmax = _n == 1
-	. by countrycode : replace _ntmax = sum(_ntmax)
-	. by countrycode : replace _ntmax = _ntmax[_N]  // max 
+	. by country_code _type_max, sort:  gen _ntmax = _n == 1
+	. by country_code : replace _ntmax = sum(_ntmax)
+	. by country_code : replace _ntmax = _ntmax[_N]  // max 
 
 
 	. gen _tokeepl = ((_type_max == 1 & _ntmax == 2) | ///
-	.               (datatype == 1 & _ntmax == 1 & _ndtype == 2)) | ///
+	.               (welfare_type == 1 & _ntmax == 1 & _ndtype == 2)) | ///
 	.               _ndtype == 1
 
 	. keep if _tokeepl == 1
@@ -494,8 +550,8 @@ The following is a comparative list of variables available in pip and povcalnet:
 	. pip wb,  clear
 
 	. keep if year > 1989
-	. keep if regioncode == "WLD"	
-	. gen poorpop = headcount*population 
+	. keep if region_code == "WLD"	
+	. gen poorpop = headcount*population / 1000000 
 	. gen hcpercent = round(headcount*100, 0.1) 
 	. gen poorpopround = round(poorpop, 1)
 
@@ -521,13 +577,13 @@ The following is a comparative list of variables available in pip and povcalnet:
 
 {cmd}	
 	. pip wb, povline(1.9 3.2 5.5) clear
-	. drop if inlist(regioncode, "OHI", "WLD") | year<1990 
-	. keep povertyline region year headcount
-	. replace povertyline = povertyline*100
+	. drop if inlist(region_code, "OHI", "WLD") | year<1990 
+	. keep poverty_line region_name year headcount
+	. replace poverty_line = poverty_line*100
 	. replace headcount = headcount*100
 	
-	. tostring povertyline, replace format(%12.0f) force
-	. reshape wide  headcount,i(year region) j(povertyline) string
+	. tostring poverty_line, replace format(%12.0f) force
+	. reshape wide  headcount,i(year region_name) j(poverty_line) string
 	
 	. local title "Poverty Headcount Ratio (1990-2015), by region"
 
@@ -548,20 +604,20 @@ The following is a comparative list of variables available in pip and povcalnet:
 
 {cmd}
 	. pip, region(lac) year(last) povline(3.2 5.5 15) clear 
-	. keep if datatype==2 & year>=2014             // keep income surveys
-	. keep povertyline countrycode countryname year headcount
-	. replace povertyline = povertyline*100
+	. keep if welfare_type==2 & year>=2014             // keep income surveys
+	. keep poverty_line country_code country_name year headcount
+	. replace poverty_line = poverty_line*100
 	. replace headcount = headcount*100
-	. tostring povertyline, replace format(%12.0f) force
-	. reshape wide  headcount,i(year countrycode countryname ) j(povertyline) string
+	. tostring poverty_line, replace format(%12.0f) force
+	. reshape wide  headcount,i(year country_code country_name ) j(poverty_line) string
 	
 	. gen percentage_0 = headcount320
 	. gen percentage_1 = headcount550 - headcount320
 	. gen percentage_2 = headcount1500 - headcount550
 	. gen percentage_3 = 100 - headcount1500
 	
-	. keep countrycode countryname year  percentage_*
-	. reshape long  percentage_,i(year countrycode countryname ) j(category) 
+	. keep country_code country_name year  percentage_*
+	. reshape long  percentage_,i(year country_code country_name ) j(category) 
 	. la define category 0 "Poor LMI (< $3.2)" 1 "Poor UMI ($3.2-$5.5)" ///
 		                 2 "Vulnerable ($5.5-$15)" 3 "Middle class (> $15)"
 	. la val category category
@@ -571,7 +627,7 @@ The following is a comparative list of variables available in pip and povcalnet:
 	. local note "Source: pip, using the latest survey after 2014 for each country."
 	. local yti  "Population share in each income category (%)"
 
-	. graph bar (mean) percentage, inten(*0.7) o(category) o(countrycode, ///
+	. graph bar (mean) percentage, inten(*0.7) o(category) o(country_code, ///
 	.   lab(labsi(small) angle(vertical))) stack asy                      /// 
 	. 	blab(bar, pos(center) format(%3.1f) si(tiny))                     /// 
 	. 	ti("`title'", si(small)) note("`note'", si(*.7))                  ///

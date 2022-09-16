@@ -135,7 +135,7 @@ qui {
 	} // end of temp frame
 	
 	
-	cap import delimited  "`queryfull'", `clear'
+	cap import delimited  "`queryfull'", `clear' asdouble
 	if (_rc) {
 		noi dis ""
 		noi dis in red "It was not possible to download data from the PIP API."

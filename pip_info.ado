@@ -68,7 +68,10 @@ qui {
 			local rc1 = _rc
 			
 			if (`rc1' == 0) {
-				drop iso2_code
+				cap confirm new var iso2_code
+				if (_rc) {
+					drop iso2_code
+				}
 				sort country_code
 			}
 		}
@@ -147,32 +150,6 @@ qui {
 		
 	}
 	
-	//------------ interpolated means frame
-	
-	local frpipim "_pip_imns`_version'"
-	if (!regexm("`frpipim'", "`av_frames'")) {
-		
-		frame create `frpipim'
-		
-		frame `frpipim' {
-			
-			local csvfile  = "`url'/aux?table=interpolated_means`version_qr'&format=csv"
-			cap import delim using "`csvfile'", clear varn(1)
-			
-		}
-		
-		if (_rc != 0 ) {
-			
-			noi disp in red "There is a problem accessing the information file." 
-			noi disp in red "to check your connection, copy and paste in your browser the following address:" _n /* 
-			*/	_col(4) in w `"`csvfile'"'
-			frame drop `frpipim'
-			error 
-		} 
-		*/
-		
-	}
-	
 	*if ("`justdata'" != "") exit
 	
 	//========================================================
@@ -182,14 +159,12 @@ qui {
 	local frlkupb "_pip_lkupb`_version'"
 	if (!regexm("`frlkupb'", "`av_frames'")) {
 		
-		frame copy `frpipim' `frlkupb'
+		frame copy `frpipfw' `frlkupb'
+		
 		
 		frame `frlkupb' {
 			
-			frlink m:1 country_code, frame(_pip_cts`_version') generate(ctry)
-			frget country_name income_group, from(ctry)
-			
-			keep country_code country_name wb_region_code pcn_region_code income_group survey_coverage surveyid_year
+			keep country_code country_name wb_region_code pcn_region_code survey_coverage surveyid_year
 			
 			local orgvar survey_coverage surveyid_year
 			local newvar coverage_level reporting_year 
@@ -204,14 +179,14 @@ qui {
 			gen year = reporting_year
 			duplicates drop
 			
-			reshape wide year, i( wb_region_code pcn_region_code country_code coverage_level country_name income_group ) j(reporting_year) string
+			reshape wide year, i( wb_region_code pcn_region_code country_code coverage_level country_name) j(reporting_year) string
 			
 			egen year    = concat(year*), p(" ")
 			replace year = stritrim(year)
 			replace year = subinstr(year," ", ",",.)
 			
-			keep country_code country_name wb_region_code pcn_region_code income_group coverage_level year
-			order country_code country_name wb_region_code pcn_region_code income_group coverage_level year
+			keep country_code country_name wb_region_code pcn_region_code coverage_level year
+			order country_code country_name wb_region_code pcn_region_code coverage_level year
 			
 		}
 	}
