@@ -29,15 +29,15 @@ program define pip_example01
 
 	pip wb,  clear
 
-	keep if reporting_year > 1989
+	keep if year > 1989
 	keep if region_code == "WLD"	
-  gen poorpop = headcount*reporting_pop 
+  gen poorpop = headcount * population/ 1000000
   gen hcpercent = round(headcount*100, 0.1) 
   gen poorpopround = round(poorpop, 1)
 
-  twoway (sc hcpercent reporting_year, yaxis(1) mlab(hcpercent)           ///
+  twoway (sc hcpercent year, yaxis(1) mlab(hcpercent)           ///
            mlabpos(7) mlabsize(vsmall) c(l))                    ///
-         (sc poorpopround reporting_year, yaxis(2) mlab(poorpopround)     ///
+         (sc poorpopround year, yaxis(2) mlab(poorpopround)     ///
            mlabsize(vsmall) mlabpos(1) c(l)),                   ///
          yti("Poverty Rate (%)" " ", size(small) axis(1))       ///
          ylab(0(10)40, labs(small) nogrid angle(0) axis(1))     ///
@@ -56,31 +56,31 @@ end
 *  ----------------------------------------------------------------------------
 program define pip_example02
 	pip wb, clear
-	keep if reporting_year > 1989
-	gen poorpop = headcount * population 
+	keep if year > 1989
+	gen poorpop = headcount * population /1000000
 	gen hcpercent = round(headcount*100, 0.1) 
 	gen poorpopround = round(poorpop, 1)
-	encode region, gen(rid)
+	encode region_name, gen(rid)
 
 	levelsof rid, local(regions)
 	foreach region of local regions {
 		local legend = `"`legend' `region' "`: label rid `region''" "'
 	}
 
-	keep reporting_year rid poorpop
-	reshape wide poorpop,i(reporting_year) j(rid)
+	keep year rid poorpop
+	reshape wide poorpop,i(year) j(rid)
 	foreach i of numlist 2(1)7{
 		egen poorpopacc`i'=rowtotal(poorpop1 - poorpop`i')
 	}
 
-	twoway (area poorpop1 reporting_year)                              ///
-		(rarea poorpopacc2 poorpop1 reporting_year)                      ///
-		(rarea poorpopacc3 poorpopacc2 reporting_year)                   ///
-		(rarea poorpopacc4 poorpopacc3 reporting_year)                   ///
-		(rarea poorpopacc5 poorpopacc4 reporting_year)                   ///
-		(rarea poorpopacc6 poorpopacc5 reporting_year)                   ///
-		(rarea poorpopacc7 poorpopacc6 reporting_year)                   ///
-		(line poorpopacc7 reporting_year, lwidth(midthick) lcolor(gs0)), ///
+	twoway (area poorpop1 year)                              ///
+		(rarea poorpopacc2 poorpop1 year)                      ///
+		(rarea poorpopacc3 poorpopacc2 year)                   ///
+		(rarea poorpopacc4 poorpopacc3 year)                   ///
+		(rarea poorpopacc5 poorpopacc4 year)                   ///
+		(rarea poorpopacc6 poorpopacc5 year)                   ///
+		(rarea poorpopacc7 poorpopacc6 year)                   ///
+		(line poorpopacc7 year, lwidth(midthick) lcolor(gs0)), ///
 		ytitle("Millions of Poor" " ", size(small))            ///
 		xtitle(" " "", size(small)) scheme(s2color)            ///
 		graphregion(c(white)) ysize(7) xsize(8)                ///
@@ -93,20 +93,20 @@ end
 *  ----------------------------------------------------------------------------
 program pip_example03
 	pip, region(lac) year(last) povline(3.2 5.5 15) clear 
-	keep if welfare_type ==2 & reporting_year>=2014             // keep income surveys
-	keep poverty_line country_code countryname reporting_year headcount
+	keep if welfare_type ==2 & year>=2014             // keep income surveys
+	keep poverty_line country_code country_name year headcount
 	replace poverty_line = poverty_line*100
 	replace headcount = headcount*100
 	tostring poverty_line, replace format(%12.0f) force
-	reshape wide  headcount,i(reporting_year country_code countryname ) j(poverty_line) string
+	reshape wide  headcount,i(year country_code country_name ) j(poverty_line) string
 	
 	gen percentage_0 = headcount320
 	gen percentage_1 = headcount550 - headcount320
 	gen percentage_2 = headcount1500 - headcount550
 	gen percentage_3 = 100 - headcount1500
 	
-	keep country_code countryname reporting_year  percentage_*
-	reshape long  percentage_,i(reporting_year country_code countryname ) j(category) 
+	keep country_code country_name year  percentage_*
+	reshape long  percentage_,i(year country_code country_name ) j(category) 
 	la define category 0 "Poor LMI (< $3.2)" 1 "Poor UMI ($3.2-$5.5)" ///
 		                 2 "Vulnerable ($5.5-$15)" 3 "Middle class (> $15)"
 	la val category category
@@ -131,10 +131,10 @@ end
 program pip_example04
 pip, country(arg gha tha) year(all) clear
 	replace gini = gini * 100
-	keep if survey_year  > 1989
-	twoway (connected gini survey_year  if country_code == "ARG")  ///
-		(connected gini survey_year  if country_code == "GHA")       ///
-		(connected gini survey_year  if country_code == "THA"),      /// 
+	keep if welfare_time  > 1989
+	twoway (connected gini welfare_time  if country_code == "ARG")  ///
+		(connected gini welfare_time  if country_code == "GHA")       ///
+		(connected gini welfare_time  if country_code == "THA"),      /// 
 		ytitle("Gini Index" " ", size(small))                   ///
 		xtitle(" " "", size(small)) ylabel(,labs(small) nogrid  ///
 		angle(verticle)) xlabel(,labs(small))                   ///
@@ -148,11 +148,11 @@ end
 *  ----------------------------------------------------------------------------
 program pip_example05
   pip, country(arg gha tha) year(all)  clear
-	reshape long decile, i(country_code survey_year ) j(dec)
+	reshape long decile, i(country_code welfare_time) j(dec)
 	
 	egen panelid=group(country_code dec)
-	replace survey_year =int(survey_year )
-	xtset panelid survey_year 
+	replace welfare_time =int(welfare_time)
+	xtset panelid welfare_time 
 	
 	replace decile=10*decile*mean
 	gen g=(((decile/L5.decile)^(1/5))-1)*100
@@ -160,9 +160,9 @@ program pip_example05
 	replace g=(((decile/L7.decile)^(1/7))-1)*100 if country_code=="GHA"
 	replace dec=10*dec
 	
-	twoway (sc g dec if survey_year ==2016 & country_code=="ARG", c(l)) ///
-			(sc g dec if survey_year ==2005 & country_code=="GHA", c(l))    ///
-			(sc g dec if survey_year ==2015 & country_code=="THA", c(l)),   ///
+	twoway (sc g dec if welfare_time ==2016 & country_code=="ARG", c(l)) ///
+			(sc g dec if welfare_time ==2005 & country_code=="GHA", c(l))    ///
+			(sc g dec if welfare_time ==2015 & country_code=="THA", c(l)),   ///
 			yti("Annual growth in decile average income (%)" " ",      ///
 			size(small))  xlabel(0(10)100,labs(small))                 ///
 			xtitle("Decile group", size(small)) graphregion(c(white))  ///
@@ -178,14 +178,15 @@ end
 program pip_example06
 	set checksum off
 	wbopendata, indicator(NY.GDP.PCAP.PP.KD) long clear
+	rename countrycode country_code
 	tempfile PerCapitaGDP
 	save `PerCapitaGDP', replace
 	
 	pip, povline(1.9) country(all) year(last) clear iso
-	keep country_code countryname reporting_year gini
+	keep country_code country_name year gini
 	drop if gini == -1
 	* Merge Gini coefficient with per capita GDP
-	merge m:1 country_code reporting_year using `PerCapitaGDP', keep(match)
+	merge m:1 country_code year using `PerCapitaGDP', keep(match)
 	replace gini = gini * 100
 	drop if ny_gdp_pcap_pp_kd == .
 	twoway (scatter gini ny_gdp_pcap_pp_kd, mfcolor(%0)       ///
@@ -206,19 +207,19 @@ end
 *  ----------------------------------------------------------------------------
 program define pip_example07
 	pip wb, povline(1.9 3.2 5.5) clear
-	drop if inlist(region_code, "OHI", "WLD") | reporting_year<1990 
-	keep poverty_line region reporting_year headcount
+	drop if inlist(region_code, "OHI", "WLD") | year<1990 
+	keep poverty_line region_name year headcount
 	replace poverty_line = poverty_line*100
 	replace headcount = headcount*100
 	
 	tostring poverty_line, replace format(%12.0f) force
-	reshape wide  headcount,i(reporting_year region) j(poverty_line) string
+	reshape wide  headcount,i(year region_name) j(poverty_line) string
 	
 	local title "Poverty Headcount Ratio (1990-2015), by region"
 
-	twoway (sc headcount190 reporting_year, c(l) msiz(small))  ///
-	       (sc headcount320 reporting_year, c(l) msiz(small))  ///
-	       (sc headcount550 reporting_year, c(l) msiz(small)), ///
+	twoway (sc headcount190 year, c(l) msiz(small))  ///
+	       (sc headcount320 year, c(l) msiz(small))  ///
+	       (sc headcount550 year, c(l) msiz(small)), ///
 	       by(reg,  title("`title'", si(med))        ///
 	       	note("Source: PIP", si(vsmall)) graphregion(c(white))) ///
 	       xlab(1990(5)2015 , labsi(vsmall)) xti("Year", si(vsmall))     ///
@@ -241,7 +242,7 @@ program define pip_example08
 pip, clear
 
 * keep only national
-bysort country_code welfare_type  reporting_year: egen _ncover = count(survey_coverage )
+bysort country_code welfare_type  year: egen _ncover = count(survey_coverage )
 gen _tokeepn = ( (inlist(survey_coverage , 3, 4) & _ncover > 1) | _ncover == 1)
 
 keep if _tokeepn == 1
@@ -251,9 +252,9 @@ by country_code welfare_type , sort:  gen _ndtype = _n == 1
 by country_code : replace _ndtype = sum(_ndtype)
 by country_code : replace _ndtype = _ndtype[_N] // number of welfare_type  per country
 
-duplicates tag country_code reporting_year, gen(_yrep)  // duplicate year
+duplicates tag country_code year, gen(_yrep)  // duplicate year
 
-bysort country_code welfare_type : egen _type_length = count(reporting_year) // length of type series
+bysort country_code welfare_type : egen _type_length = count(year) // length of type series
 bysort country_code: egen _type_max = max(_type_length)   // longest type series
 replace _type_max = (_type_max == _type_length)
 
@@ -281,7 +282,7 @@ program define pip_example09
 pip, clear
 
 * keep only national
-bysort country_code welfare_type  reporting_year: egen _ncover = count(survey_coverage )
+bysort country_code welfare_type  year: egen _ncover = count(survey_coverage )
 gen _tokeepn = ( (inlist(survey_coverage , 3, 4) & _ncover > 1) | _ncover == 1)
 
 keep if _tokeepn == 1
@@ -291,7 +292,7 @@ by country_code : replace _ndtype = sum(_ndtype)
 by country_code : replace _ndtype = _ndtype[_N] // number of welfare_type  per country
 
 
-bysort country_code welfare_type : egen _type_length = count(reporting_year)
+bysort country_code welfare_type : egen _type_length = count(year)
 bysort country_code: egen _type_max = max(_type_length)
 replace _type_max = (_type_max == _type_length)
 
