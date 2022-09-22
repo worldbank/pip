@@ -27,8 +27,8 @@ twoway (sc hcpercent year, ///
   graphregion(c(white)) ysize(5) xsize(5)  ///
 xlabel(1990(5)2020) xscale(range(1990 2020) noextend)  ///
   legend(order( ///
-  1 "Poverty Rate (% of people living below $1.90)"  ///
-  2 "Number of people who live below $1.90") si(vsmall) row(2)) scheme(s2color)
+  1 "Poverty Rate (% of people living below $2.15)"  ///
+  2 "Number of people who live below $2.15") si(vsmall) row(2)) scheme(s2color)
 ```
 
 <center>
@@ -107,7 +107,7 @@ ti("Distribution of Income in Latin America and Caribbean, by country", si(small
 note("Source: PIP, using the latest survey after 2014 for each country. ", si(*.7)) ///
 graphregion(c(white)) ysize(6) xsize(6.5) legend(si(vsmall) r(3))  ///
 yti("Population share in each income category (%)", si(small)) ///
-ylab(,labs(small) nogrid angle(0)) scheme(s2color))
+ylab(,labs(small) nogrid angle(0)) scheme(s2color)
 ```
 <center>
 <img src="/pip/img/LAC.png" 
@@ -194,7 +194,7 @@ twoway (scatter gini loggdp, mfcolor(%0) ///
 msize(vsmall)) (lfit gini loggdp), ///
 ylabel(, format(%2.0f)) ///
 ytitle("Gini Index" " ", size(small))  ///
-xtitle(" " "GDP per Capita per Year (in 2011 USD PPP, log scale)", size(small))  ///
+xtitle(" " "GDP per Capita per Year (in 2017 USD PPP, log scale)", size(small))  ///
 xlab(3 "1,000" 3.3 "2,000" 3.7 "5,000" 4 "10,000" 4.3 "20,000" 4.7 "50,000" 5 "100,000") ///
 graphregion(c(white)) ysize(5) xsize(7)  ///
 ylabel(,labs(small) nogrid angle(verticle)) xlabel(,labs(small)) ///
