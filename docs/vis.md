@@ -5,7 +5,7 @@
 ## Global Poverty Trends 1990-2020 (reference year)
 
 ```stata
-pip wb,  clear 
+pip wb,  clear
 	
 local years = "1991|1993|1996|1999|2002|2005|2008|2010|2011|2012|2013|2015|2017|2019|2020"
 keep if regexm(strofreal(year), "`years'")
@@ -82,21 +82,21 @@ alt="Millionsofpoor" width="550" height="500" />
 ## Distribution of Income in Latin America and Caribbean, by country
 
 ```stata
-pip, region(lac) year(last) povline(1.9 3.2 5.5) ppp_year(2011) fillgaps clear  
+pip, region(lac) year(last) povline(2.15 3.65 6.85) fillgaps clear  
 keep if welfare_type==2 & year>=2014 // keep income surveys
 keep poverty_line country_code country_name year headcount
 replace poverty_line = poverty_line*100
 replace headcount = headcount*100
 tostring poverty_line, replace format(%12.0f) force
 reshape wide  headcount,i(year country_code country_name ) j(poverty_line) string
-gen percentage_0 = headcount190
-gen percentage_1 = headcount320 - headcount190 
-gen percentage_2 = headcount550 - headcount320
-gen percentage_3 = 100 - headcount550
+gen percentage_0 = headcount215
+gen percentage_1 = headcount365 - headcount215 
+gen percentage_2 = headcount685 - headcount365
+gen percentage_3 = 100 - headcount685
 keep country_code country_name year  percentage_*
 reshape long  percentage_,i(year country_code country_name ) j(category) 
-la define category 0 "Poor IPL (<$1.9)" 1 "Poor LMI ($1.9-$3.2)" 2 "Poor UMI ($3.2-$5.5)" ///
-3 "Non-poor (>$5.5)"
+la define category 0 "Poor IPL (<$2.15)" 1 "Poor LMI ($2.15-$3.65)" 2 "Poor UMI ($3.65-$6.85)" ///
+3 "Non-poor (>$6.85)"
 la val category category
 la var category ""
 
@@ -180,7 +180,7 @@ rename countrycode country_code
 tempfile PerCapitaGDP
 save `PerCapitaGDP', replace
 
-pip, povline(1.9) country(all) year(last) clear
+pip, country(all) year(last) clear
 keep country_code country_name year gini
 drop if gini == -1
 * Merge Gini coefficient with per capita GDP
@@ -209,21 +209,21 @@ alt="Gini&GDP" width="550" height="500" />
 ## Distribution of Income in Sub-Saharan Africa and East Asia and Pacific over time
 
 ```stata
-pip wb, ppp_year(2011) povline(1.9 3.2 5.5) clear
+pip wb, povline(2.15 3.65 6.85) clear
 keep if year >= 2000 
 keep poverty_line region_code region_name year headcount
 replace poverty_line = poverty_line*100
 replace headcount = headcount*100
 tostring poverty_line, replace format(%12.0f) force
 reshape wide  headcount,i(year region_code region_name) j(poverty_line) string
-gen percentage_0 = headcount190
-gen percentage_1 = headcount320 - headcount190 
-gen percentage_2 = headcount550 - headcount320
-gen percentage_3 = 100 - headcount550
+gen percentage_0 = headcount215
+gen percentage_1 = headcount365 - headcount215 
+gen percentage_2 = headcount685 - headcount365
+gen percentage_3 = 100 - headcount685
 keep region_code region_name year  percentage_*
 reshape long  percentage_,i(year region_code region_name) j(category) 
-la define category 0 "Poor IPL (<$1.9)" 1 "Poor LMI ($1.9-$3.2)" 2 "Poor UMI ($3.2-$5.5)" ///
-3 "Non-poor (>$5.5)"
+la define category 0 "Poor IPL (<$2.15)" 1 "Poor LMI ($2.15-$3.65)" 2 "Poor UMI ($3.65-$6.85)" ///
+3 "Non-poor (>$6.85)"
 la val category category
 la var category ""
 

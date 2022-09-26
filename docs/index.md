@@ -19,7 +19,7 @@ It also reports these inequality measures:
 - Mean log deviation
 - Decile shares
 
-The underlying welfare aggregate is per capita household income or consumption expressed in 2011 PPP-adjusted USD. Poverty lines are expressed in daily amounts, while means and medians are monthly.
+The underlying welfare aggregate is per capita household income or consumption expressed in 2017 PPP USD. Poverty lines are expressed in daily amounts, while means and medians are monthly.
 
 For more information on the definition of the indicators, click [here](http://iresearch.worldbank.org/PovcalNet/Docs/dictionary.html)
 For more information on the methodology, click [here](https://worldbank.github.io/PIP-Methodology/)
