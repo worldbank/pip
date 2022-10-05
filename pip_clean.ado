@@ -38,6 +38,7 @@ if ("`version'" != "") {
 	local version_qr = "&version=`version'"
 	tokenize "`version'", parse("_")
 	local _version   = "_`1'_`3'_`9'"
+	local ppp_version = `3'
 }
 else {
 	local version_qr = ""
@@ -116,28 +117,28 @@ if ("`type'" == "1") {
 	label define welfare_type 1 "Consumption" 2 "Income", modify
 	label values welfare_type welfare_type
 	
-	label var country_code		"Country/Economy code"
-	label var country_name 		"Country/Economy name"
-	label var region_code 		"Region code"
-	label var region_name 		"Region name"
-	label var survey_coverage 	"Survey coverage"
-	label var reporting_year	"Year"
-	label var survey_year 		"Survey year"
-	label var welfare_type 		"Welfare measured by income or consumption"
+	label var country_code		  "Country/Economy code"
+	label var country_name 		  "Country/Economy name"
+	label var region_code 		  "Region code"
+	label var region_name 		  "Region name"
+	label var survey_coverage   "Survey coverage"
+	label var reporting_year	  "Year"
+	label var survey_year 		  "Survey year"
+	label var welfare_type 		  "Welfare measured by income or consumption"
 	label var is_interpolated 	"Data is interpolated"
 	label var distribution_type "Data comes from grouped or microdata"
-	label var ppp 				"2011 Purchasing Power Parity"
-	label var poverty_line 		"Poverty line in PPP$ (per capita per day)"
-	label var mean				"Average daily per capita income/consumption PPP$"
-	label var headcount 		"Poverty Headcount"
-	label var poverty_gap 		"Poverty Gap"
+	label var ppp 				      "`ppp_version' Purchasing Power Parity"
+	label var poverty_line 		  "Poverty line in `ppp_version' PPP prices (per capita per day)"
+	label var mean				      "Average daily per capita income/consumption `ppp_version' PPP prices"
+	label var headcount 		    "Poverty Headcount"
+	label var poverty_gap 		  "Poverty Gap"
 	label var poverty_severity 	"Squared poverty gap"
-	label var watts 			"Watts index"
-	label var gini 				"Gini index"
-	label var median 			"Median daily income or expenditure in PPP$"
-	label var mld 				"Mean Log Deviation"
-	label var polarization 		"Polarization"
-	label var population 		"Population in year"
+	label var watts 			      "Watts index"
+	label var gini 				      "Gini index"
+	label var median 			      "Median daily income or expenditure in `ppp_version' PPP prices"
+	label var mld 				      "Mean Log Deviation"
+	label var polarization 		  "Polarization"
+	label var population 		    "Population in year"
 	
 	ds decile*
 	local vardec = "`r(varlist)'"
@@ -146,13 +147,13 @@ if ("`type'" == "1") {
 		label var `var' "Decile `q' welfare share"
 	}
 	
-	label var reporting_level 	"Reporting data level"
-	label var survey_acronym 	"Survey acronym"     
+	label var reporting_level 	   "Reporting data level"
+	label var survey_acronym 	     "Survey acronym"     
 	label var survey_comparability "Survey comparability"
-	label var comparable_spell 	"Comparability over time at country level"   
-	label var cpi 				"Consumer Price Index (CPI)"
-	label var reporting_gdp 	"Reported GDP"
-	label var reporting_hfce 	"Reported per capita"
+	label var comparable_spell 	   "Comparability over time at country level"   
+	label var cpi 				         "Consumer Price Index (CPI) in `ppp_version' base"
+	label var reporting_gdp 	     "Reported GDP"
+	label var reporting_hfce 	     "Reported per capita"
 	
 	sort country_code reporting_year survey_coverage 
 	
@@ -227,8 +228,8 @@ if ("`type'" == "2") {
 	
 	label var region_code      "Region code"
 	label var reporting_year   "Year"
-	label var poverty_line     "Poverty line in PPP$ (per capita per day)"
-	label var mean             "Average daily per capita income/consumption in PPP$"
+	label var poverty_line     "Poverty line in `ppp_version' PPP prices (per capita per day)"
+	label var mean             "Average daily per capita income/consumption in `ppp_version' PPP prices"
 	label var headcount        "Poverty Headcount"
 	label var poverty_gap      "Poverty Gap"
 	label var poverty_severity "Squared poverty gap"
