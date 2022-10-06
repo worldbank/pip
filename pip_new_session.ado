@@ -38,140 +38,20 @@ local username "worldbank"  // to modify
 _pip_find_src `cmd'
 local src = "`r(src)'"
 
-
-* If PIP was installed from github
+//------------  If PIP was installed from github
 if (!regexm("`src'", "repec")) {
 	
-	* Check repository of files 
-	* local cmd pip
-	cap findfile github.dta, path("`c(sysdir_plus)'g/")
-	if (_rc) {
-		github install `username'/`cmd', replace
-		cap window stopbox note "pip command has been reinstalled to " ///
-		"keep record of new updates. Please type discard and retry."
-		global pip_cmds_ssc = ""
-		exit 
-	}
-	local ghfile "`r(fn)'"
-	* use "`ghfile'", clear
-	
-	tempname ghdta 
-	frame create `ghdta'
-	frame `ghdta' {
-		use "`ghfile'", clear
-		qui keep if name == "`cmd'"  
-		if _N == 0 {
-			di in red "`cmd' package was not found"
-			github install `username'/`cmd', replace
-			cap window stopbox note "pip command has been reinstalled to " ///
-			"keep record of new updates. Please type discard and retry."
-			global pip_cmds_ssc = ""
-			exit 
-		}
-		if _N > 1 {
-			di as err "{p}multiple packages with this name are found!"      ///
-			"this can be caused if you had installed multiple "     ///
-			"packages from different repositories, but with an "    ///
-			"identical name..." _n
-			noi list
-		}
-		if _N == 1 {
-			local repo        : di address[1]
-			local crrtversion : di version[1]
-		}
-	}
-	
-	* github query `repo'
-	_tmp_githubquery `repo'
-	local latestversion = "`r(latestversion)'"
-	* disp "`latestversion'"
-	if regexm("`latestversion'", "([0-9]+)\.([0-9]+)\.([0-9]+)\.?([0-9]*)") {
-		local lastMajor = regexs(1)
-		local lastMinor = regexs(2)
-		local lastPatch = regexs(3)		 
-		local lastDevel = regexs(4)		 
-	}
-	if ("`lastDevel'" == "") local lastDevel 0
-	local last    = `lastMajor'`lastMinor'`lastPatch'.`lastDevel'
-	
-	* github version `cmd'
-	* local crrtversion =  "`r(version)'"
-	if regexm("`crrtversion'", "([0-9]+)\.([0-9]+)\.([0-9]+)\.?([0-9]*)"){
-		local crrMajor = regexs(1)
-		local crrMinor = regexs(2)
-		local crrPatch = regexs(3)
-		local crrDevel = regexs(4)		 
-	}
-	if ("`crrDevel'" == "") local crrDevel 0
-	local current = `crrMajor'`crrMinor'`crrPatch'.`crrDevel'
-	disp "`current'"
-	
-	* force installation 
-	if ("`crrtversion'" == "") {
-		local username "worldbank"  // to modify
-		github install `username'/`cmd', replace version(`latestversion')
-		cap window stopbox note "pip command has been reinstalled to " ///
-		"keep record of new updates. Please type discard and retry."
-		global pip_cmds_ssc = ""
-		exit 
-	}
-	
-	if (`last' > `current' ) {
-		cap window stopbox rusure "There is a new version of `cmd' in Github (`latestversion')." ///
-		"Would you like to install it now?"
-		
-		if (_rc == 0) {
-			cap github install `repo', replace version(`latestversion')
-			if (_rc == 0) {
-				cap window stopbox note "Installation complete. please type" ///
-				"discard in your command window to finish"
-				local bye "exit"
-			}
-			else {
-				noi disp as err "there was an error in the installation. " _n ///
-				"please run the following to retry, " _n(2) ///
-				"{stata github install `repo', replace}"
-				local bye "error"
-			}
-		}	
-		else local bye ""
-		
-	}  // end of checking github update
-	
-	else {
-		noi disp as result "Github version of {cmd:`cmd'} is up to date."
-		local bye ""
-	}
+	pip_gh update, username(`username') cmd(`cmd') `pause'
+	local bye = "`r(bye)'"
+	local pip_source = "gh"
 	
 } // end if installed from github 
 
-else {  // if pip was installed from SSC
-	
-	qui adoupdate pip, ssconly
-	if ("`r(pkglist)'" == "pip") {
-		cap window stopbox rusure "There is a new version of pip in SSC." ///
-		"Would you like to install it now?"
-		
-		if (_rc == 0) {
-			cap ado update pip, ssconly update
-			if (_rc == 0) {
-				cap window stopbox note "Installation complete. please type" ///
-				"discard in your command window to finish"
-				local bye "exit"
-			}
-			else {
-				noi disp as err "there was an error in the installation. " _n ///
-				"please run the following to retry, " _n(2) ///
-				"{stata ado update pip, ssconly update}"
-				local bye "error"
-			}
-		}
-		else local bye ""
-	}  // end of checking SSC update
-	else {
-		noi disp as result "SSC version of {cmd:pip} is up to date."
-		local bye ""
-	}
+//------------ if pip was installed from SSC
+else {  
+	pip_ssc update, `pause'
+	local bye = "`r(bye)'"
+	local pip_source = "ssc"
 }  // Finish checking pip update 
 
 
@@ -197,7 +77,10 @@ foreach cmd of local ssc_cmds {
 adoupdate `ssc_cmds', ssconly
 if ("`r(pkglist)'" != "") adoupdate `r(pkglist)', update ssconly
 
+
+* ----- Globals
 global pip_cmds_ssc = 1  // make sure it does not execute again per session
+global pip_source   = "`pip_source'"
 `bye'
 
 end 
@@ -245,43 +128,8 @@ qui {
 } // end of qui
 end 
 
-//========================================================
-// Temporal github query
-//========================================================
-program define _tmp_githubquery, rclass 
-syntax anything
-
-qui {
-	
-	preserve
-	drop _all
-	
-	local page "https://api.github.com/repos/`anything'/releases"
-	scalar page = fileread(`"`page'"')
-	mata {
-		lines = st_strscalar("page")
-		lines = ustrsplit(lines, ",")'
-		lines = strtrim(lines)
-		lines = stritrim(lines)
-		
-		lines =  subinstr(lines, `"":""', "->")
-		lines =  subinstr(lines, `"""', "")
-	}
-	getmata lines, replace
-	
-	split lines, parse ("->")
-	rename lines? (code url)
-	
-	keep if regexm(url, "releases/tag")
-	gen tag  = regexs(2) if regexm(url, "(releases/tag/)(.*)")
-	local latestversion = tag[1]
-	
-}
-
-return local latestversion `latestversion' 
-
-end 
 exit
+
 /* End of do-file */
 
 ><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><

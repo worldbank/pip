@@ -801,6 +801,10 @@ qui {
 	
 	label data "`datalabel' (`c(current_date)')"
 	
+	//========================================================
+	// Final messages
+	//========================================================
+	
 	* citations
 	noi pip_cite, reg_cite
 	notes: `r(cite_data)'
@@ -809,6 +813,9 @@ qui {
 	
 	return local cite `"`cite'"'
 	
+	* Install alternative version
+	
+	noi pip_${pip_source} msg
 	
 	//========================================================
 	// Convert to povcalnet format
@@ -900,40 +907,33 @@ Notes:
 
 Version Control:
 
+*! version 0.3.7        <2022Oct06>
+*! -- Add new routines to install and update pip
+*! -- Fix bug in `pip wb, region(WLD)`, which used to return all regions, rather than just WLD.
+*! -- Labels for variables `icp` and `ppp` now depend on the PPP year of the data.
 *! version 0.3.6        <2022Sep08>
+*! -- make it work with new API specifications
+*! -- Fix problem with variable name version
+*! -- Fix problem with variable name version
 *! version 0.3.5.9000   <2022Sep08>
 *! version 0.3.5        <2022Jul06>
-*! version 0.3.4.9005   <2022Jul06>
-*! version 0.3.4.9004   <2022Jul01>
-*! version 0.3.4.9003   <2022Jun29>
-*! version 0.3.4.9002   <2022Jun29>
-*! version 0.3.4.9001   <2022Jun15>
-*! version 0.3.4.9000   <2022Jun15>
+*! -- Add `asdouble` in all calls of `import delimited`
 *! version 0.3.4        <2022Jun10>
 *! version 0.3.3        <2022may25>
-*! version 0.3.2.9000   <2022apr26>
 *! version 0.3.2        <2022apr26>
-*! version 0.3.1.9002   <2022apr20>
 *! version 0.3.1        <2022apr08>
 *! version 0.3.0        <2022apr07>
-*! version 0.2.2.9002   <2022apr07>
 *! version 0.2.2        <2022apr06>
-*! version 0.2.1.9001   <2022apr06>
 *! version 0.2.1        <2022apr04>
-*! version 0.2.0.9002   <2022apr04>
 *! version 0.2.0        <2022apr01>
 *! version 0.1.7        <2022mar30>
 *! version 0.1.6        <2022mar28>
-*! version 0.1.5.9001   <2022mar28>
 *! version 0.1.5        <2022mar25>
 *! version 0.1.4        <2022mar18>
 *! version 0.1.3        <2022mar18>
-*! version 0.1.2.9000   <2022mar17>
 *! version 0.1.2        <2022feb07>
 *! version 0.1.1        <2022feb01>
-*! version 0.1.0.9010   <2022feb01>
 *! version 0.1.0        <2022feb01>
-*! version 0.0.2.9000   <2022jan19>
 *! version 0.0.2        <2022jan12>
 *! version 0.0.1        <2021dec01>
 
