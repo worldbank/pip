@@ -907,6 +907,8 @@ Notes:
 
 Version Control:
 
+*! version 0.3.7.9000        <2022Oct06>
+*! -- Fix bugs
 *! version 0.3.7        <2022Oct06>
 *! -- Add new routines to install and update pip
 *! -- Fix bug in `pip wb, region(WLD)`, which used to return all regions, rather than just WLD.
