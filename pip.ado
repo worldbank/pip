@@ -801,6 +801,10 @@ qui {
 	
 	label data "`datalabel' (`c(current_date)')"
 	
+	//========================================================
+	// Final messages
+	//========================================================
+	
 	* citations
 	noi pip_cite, reg_cite
 	notes: `r(cite_data)'
@@ -809,6 +813,9 @@ qui {
 	
 	return local cite `"`cite'"'
 	
+	* Install alternative version
+	
+	noi pip_${pip_source} msg
 	
 	//========================================================
 	// Convert to povcalnet format
@@ -900,9 +907,9 @@ Notes:
 
 Version Control:
 
-*! version 0.3.6.9001   <2022Oct06>
+*! version 0.3.7        <2022Oct06>
+*! -- Add new routines to install and update pip
 *! -- Fix bug in `pip wb, region(WLD)`, which used to return all regions, rather than just WLD.
-*! version 0.3.6.9000   <2022Oct05>
 *! -- Labels for variables `icp` and `ppp` now depend on the PPP year of the data.
 *! version 0.3.6        <2022Sep08>
 *! -- make it work with new API specifications
