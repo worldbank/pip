@@ -97,7 +97,12 @@ else {
 	cap noi ssc install pip, `replace'
 }
 if (_rc) {
-	noi disp as error _n "Something went wrong with the installation from `source'"
+	noi disp as error _n "Something went wrong with the installation from `source'."
+	
+	if ("`src'" == "gh") {
+		noi disp `"For troubleshooting, you can follow the instructions {browse "https://github.com/worldbank/pip#from-github":here}"'
+	}
+	
 	noi disp "Alternatively, you could install {cmd:pip} from `alt_source'. Just type {stata pip_install `alt_src', replace}"
 	error
 }

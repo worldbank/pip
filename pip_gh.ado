@@ -157,7 +157,7 @@ if ("`subcommand'" == "update") {
 ==================================================*/
 if (inlist("`subcommand'", "msg", "message")) {
 	noi disp "You're using Github as the host of the {cmd:pip} Stata package." 
-	noi disp _n "If you want to use install the SSC version type {stata pip_install ssc}" 
+	noi disp "If you want to install the SSC version type {stata pip_install ssc}" 
 }
 
 //========================================================
