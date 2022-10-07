@@ -51,7 +51,7 @@ if ("`subcommand'" == "update") {
 	if (_rc) {
 		github install `username'/`cmd', replace
 		cap window stopbox note "pip command has been reinstalled to " ///
-		"keep record of new updates. Please type discard and retry."
+		"keep record of new updates. Please type {stata discard} and retry."
 		global pip_cmds_ssc = ""
 		exit 
 	}
