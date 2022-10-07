@@ -814,8 +814,9 @@ qui {
 	return local cite `"`cite'"'
 	
 	* Install alternative version
-	
-	noi pip_${pip_source} msg
+	if ("${pip_cmds_ssc}" == "") {
+		noi pip_${pip_source} msg
+	}
 	
 	//========================================================
 	// Convert to povcalnet format
@@ -918,7 +919,6 @@ Version Control:
 *! -- make it work with new API specifications
 *! -- Fix problem with variable name version
 *! -- Fix problem with variable name version
-*! version 0.3.5.9000   <2022Sep08>
 *! version 0.3.5        <2022Jul06>
 *! -- Add `asdouble` in all calls of `import delimited`
 *! version 0.3.4        <2022Jun10>
