@@ -26,7 +26,7 @@ For more information on the methodology, click [here](https://worldbank.github.i
 
 [This note](http://documents.worldbank.org/curated/en/836101568994246528/) provides more detail on the Stata command and summarizes key features of the PIP methodology
 
-To download `pip` R package click [here](https://worldbank.github.io/pipr/)
+To download `pipr` R package click [here](https://worldbank.github.io/pipr/)
 
 ## Installation 
 
@@ -39,21 +39,20 @@ ssc install pip
 ### From GitHub 
 
 #### Recommended installation (Might not be available in your computer due to firewall restriction of your organization. In this case, see alternative installation below.):
-We recommend installing `pip` using the [`github`](https://github.com/haghish/github) Stata command by [E. F. Haghish](https://github.com/haghish)
+We recommend installing the [`github`](https://github.com/haghish/github) Stata command by [E. F. Haghish](https://github.com/haghish)
 
 ```stata
 net install github, from("https://haghish.github.io/github/")
 github install worldbank/pip
 ```
 
-Alternatively you can install the package by typing the followinf line, 
+If you get an error similar to the image below, it might be the case that downloading from Github is not available in your computer due to firewall restrictions. Try disconnecting from the VPN and installing `pip` again.
 
-```stata
-THIS OPTION IS NOT YET AVAILABLE
-net install pip, from("https://raw.githubusercontent.com/worldbank/pip/master/")
-```
+<center>
+<img src="/pip/img/error_message.png"/>
+</center>
 
-#### Alternative installation from GitHub in case the options above do not work due to firewall restrictions:
+If none of the options above worked, you could still install pip manually following these steps,
 
 1. In the [GitHub repository](https://github.com/worldbank/pip) of the `pip` Stata command, click on the green icon "Clone or Download" at the top. 
 2. Download the package as a zip file. 
