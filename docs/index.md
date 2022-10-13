@@ -38,7 +38,6 @@ ssc install pip
 
 ### From GitHub 
 
-#### Recommended installation (Might not be available in your computer due to firewall restriction of your organization. In this case, see alternative installation below.):
 We recommend installing the [`github`](https://github.com/haghish/github) Stata command by [E. F. Haghish](https://github.com/haghish)
 
 ```stata
