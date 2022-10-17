@@ -45,9 +45,9 @@ Cannot be used with option {it:region()}{p_end}
 Cannot be used with option {it:country()}{p_end}
 {synopt :{opt coverage(string)}}Loads coverage level ("national", "urban", "rural", "all"). Default "all".{p_end}
 {synopt :{opt year:}(numlist|string)}List of years (accepts up to 10),  or {it:all}, or {it:last}. Default "all".{p_end}
-{synopt :{opt pov:line:}(#)}List of poverty lines (in 2011 PPP-adjusted USD) to calculate 
- poverty measures (accepts up to 5). Default is 1.9.{p_end}
-{synopt :{opt pops:hare:}(#)}List of population shares to calculate poverty lines (in 2011 PPP-adjusted USD) and poverty measures. No default. Do not combine with {opt pov:line:}{p_end}
+{synopt :{opt pov:line:}(#)}List of poverty lines (in 2017 PPP USD) to calculate 
+ poverty measures (accepts up to 5). Default is 2.15.{p_end}
+{synopt :{opt pops:hare:}(#)}List of population shares to calculate poverty lines (in 2017 PPP USD) and poverty measures. No default. Do not combine with {opt pov:line:}{p_end}
 {synopt :{opt fill:gaps}}Loads all countries used to create regional aggregates.{p_end}
 {synopt :{opt ppp}{cmd:(#)}}Allows the selection of PPP. {p_end}
 
@@ -58,7 +58,7 @@ Cannot be used with option {it:country()}{p_end}
 (click {bf:{help pip_note:here}} for explanation of each component). This {it:version()} option supersedes 
 the next 3 options {it:ppp_year()}, {it:release()} & {it:identity()}, as the combination of any of those 
 three allow users to obtain any version of the data needed.{p_end}
-{synopt :{opt ppp:_year:}(#)}PPP round (eg., 2005, 2011, 2017).{p_end}
+{synopt :{opt ppp:_year:}(#)}PPP round (eg., 2011, 2017).{p_end}
 {synopt :{opt release(numlist)}}8 digit number with the PIP data release date in the format {it:YYYYMMDD}.{p_end}
 {synopt :{opt identity(string)}{err:*}}Version of data to run the query on (e.g., prod, int, test).{p_end}
 {synopt :{opt server(string)}{err:*}}Name of a server to query on (e.g, prod, dev, qa). See description of each server {bf:{help pip_note:here}}.{p_end}
@@ -136,10 +136,8 @@ PIP is managed jointly by the Data and Research Groups in the World Bank's
 
 {pstd}
 The underlying welfare aggregate is the per capita household income or consumption
- expressed in 2011 PPP-adjusted USD. Poverty lines are expressed in daily amounts, as well as 
- the means and medians. For more information on the definition of the indicators,
- {browse "http://iresearch.worldbank.org/pip/Docs/dictionary.html":click here}. 
- For more information on the methodology,{browse "https://worldbank.github.io/PIP-Methodology/": click here}.
+ expressed in 2017 PPP USD. Poverty lines are expressed in daily amounts, as well as 
+ the means and medians. For more information on the methodology,{browse "https://worldbank.github.io/PIP-Methodology/": click here}.
 
 
 {marker memory}{...}
@@ -167,7 +165,7 @@ The pip API allows two types of calculations:
 {phang}
 {opt Survey-year}: Will load poverty measures for a reference year that is common
 across countries. Regional and global aggregates are calculated only for
-reference-years. Countries without a survey in the ....
+reference-years.
 
 {phang}
 {opt reference-year}: are extrapolated or interpolated using national accounts growth
@@ -234,13 +232,13 @@ for each country.
 {phang}
 {opt povline(#)} The poverty lines for which the poverty measures will be calculated. 
 When selecting multiple poverty lines, use less than 4 decimals and separate 
-each value with spaces. If left empty, the default poverty line of $1.9 is used.
-Poverty lines are expressed in 2011 PPP-adjusted USD per capita per day.
+each value with spaces. If left empty, the default poverty line of $2.15 is used.
+Poverty lines are expressed in 2017 PPP USD per capita per day.
 
 {phang}
 {opt popshare(#)} The desired population share (headcount) for which the poverty lines as poverty measures will be calculated. 
 This has not default, and should not be combined with {opt povline}.
-The resulting poverty lines are expressed in 2011 PPP-adjusted USD per capita per day.
+The resulting poverty lines are expressed in 2017 PPP USD per capita per day.
 
 {phang}
 {opt fillgaps} Loads all country-level estimates that are used to create the  
@@ -266,7 +264,7 @@ works if one, and only one, country is selected.
 {opt version} A detailed description of {bf:version} option is available {bf:{help pip_note:here}}.
 
 {phang}
-{opt ppp_year} Allows to specify PPP round (version) that will be used to calculate estimates. Default PPP round year is 2011.
+{opt ppp_year} Allows to specify PPP round (version) that will be used to calculate estimates. Default PPP round year is 2017.
 
 {phang}
 {opt release} Allows to specify PIP data release date in the format  YYYYMMDD.
@@ -317,8 +315,8 @@ for a detailed explanation ({err:temporally disabled}).
 
 {phang}
 {opt tables} Allows us to download any auxiliary table of the PIP project. 
-Default tables command {stata pip tables} provides us list of auxiliary tables for download from PROD server in INT folder based on PPP 2011. 
-We can also specify the server, version of the data, and PPP year as {stata  pip tables, server(prod) identity(int) ppp_year(2011)}
+Default tables command {stata pip tables} provides us list of auxiliary tables for download from PROD server in INT folder based on PPP 2017. 
+We can also specify the server, version of the data, and PPP year as {stata  pip tables, server(prod) identity(int) ppp_year(2017)}
 
 {phang}
 {opt cleanup} Allows us to delete all PIP data from Stata's memory. 
@@ -438,7 +436,7 @@ The following is a comparative list of variables available in pip and povcalnet:
 {dlgtab: 2. inIllustration of differences between queries }
 
 {phang}
-2.1. Country estimation at $1.9 in 2015. Since there are no surveys in ARG and IND in 
+2.1. Country estimation at $2.15 in 2015. Since there are no surveys in ARG and IND in 
 2015, results are loaded for COL and BRA
 
 {phang2}
@@ -464,7 +462,7 @@ The following is a comparative list of variables available in pip and povcalnet:
 2.5. One-on-one query. 
 
 {phang2}
-{stata pip cl, country(COL BRA ARG IND) year(2011) clear coverage("national national urban national")}
+{stata pip cl, country(COL BRA ARG IND) year(2017) clear coverage("national national urban national")}
 
 {dlgtab: 3. Samples uniquely identified by country/year}
 
@@ -566,17 +564,17 @@ The following is a comparative list of variables available in pip and povcalnet:
 	.        xlabel(,labs(small)) xtitle("Year", size(small))       ///
 	.        graphregion(c(white)) ysize(5) xsize(5)                ///
 	.        legend(order(                                          ///
-	.        1 "Poverty Rate (% of people living below $1.90)"      ///
-	.        2 "Number of people who live below $1.90") si(vsmall)  ///
+	.        1 "Poverty Rate (% of people living below $2.15)"      ///
+	.        2 "Number of people who live below $2.15") si(vsmall)  ///
 	.        row(2)) scheme(s2color)
 	
 {txt}      ({stata "pip_examples pip_example01":click to run})
 
 {phang2}
-{ul:4.2} Graph of trends in poverty headcount ratio by region, multiple poverty lines ($1.9, $3.2, $5.5)
+{ul:4.2} Graph of trends in poverty headcount ratio by region, multiple poverty lines ($2.15, $3.65, $6.85)
 
 {cmd}	
-	. pip wb, povline(1.9 3.2 5.5) clear
+	. pip wb, povline(2.15 3.65 6.85) clear
 	. drop if inlist(region_code, "OHI", "WLD") | year<1990 
 	. keep poverty_line region_name year headcount
 	. replace poverty_line = poverty_line*100
@@ -585,17 +583,18 @@ The following is a comparative list of variables available in pip and povcalnet:
 	. tostring poverty_line, replace format(%12.0f) force
 	. reshape wide  headcount,i(year region_name) j(poverty_line) string
 	
-	. local title "Poverty Headcount Ratio (1990-2015), by region"
+	. local title "Poverty Headcount Ratio (1990-2019), by region"
 
-	. twoway (sc headcount190 year, c(l) msiz(small))  ///
-	.        (sc headcount320 year, c(l) msiz(small))  ///
-	.        (sc headcount550 year, c(l) msiz(small)), ///
+	. twoway (sc headcount215 year, c(l) msiz(small))  ///
+	.        (sc headcount365 year, c(l) msiz(small))  ///
+	.        (sc headcount685 year, c(l) msiz(small)), ///
 	.        by(reg,  title("`title'", si(med))        ///
 	.        	note("Source: pip", si(vsmall)) graphregion(c(white))) ///
-	.        xlab(1990(5)2015 , labsi(vsmall)) xti("Year", si(vsmall))     ///
+	.        ylabel(, format(%2.0f)) ///
+	.        xlab(1990(5)2019 , labsi(vsmall)) xti("Year", si(vsmall))     ///
 	.        ylab(0(25)100, labsi(vsmall) angle(0))                        ///
 	.        yti("Poverty headcount (%)", si(vsmall))                      ///
-	.        leg(order(1 "$1.9" 2 "$3.2" 3 "$5.5") r(1) si(vsmall))        ///
+	.        leg(order(1 "$2.15" 2 "$3.65" 3 "$6.85") r(1) si(vsmall))        ///
 	.        sub(, si(small))	scheme(s2color)
 {txt}      ({stata "pip_examples pip_example07":click to run})
 
@@ -603,7 +602,7 @@ The following is a comparative list of variables available in pip and povcalnet:
 {ul:4.3} Graph of population distribution across income categories in Latin America, by country
 
 {cmd}
-	. pip, region(lac) year(last) povline(3.2 5.5 15) clear 
+	. pip, region(lac) year(last) povline(3.65 6.85 15) clear 
 	. keep if welfare_type==2 & year>=2014             // keep income surveys
 	. keep poverty_line country_code country_name year headcount
 	. replace poverty_line = poverty_line*100
@@ -611,15 +610,15 @@ The following is a comparative list of variables available in pip and povcalnet:
 	. tostring poverty_line, replace format(%12.0f) force
 	. reshape wide  headcount,i(year country_code country_name ) j(poverty_line) string
 	
-	. gen percentage_0 = headcount320
-	. gen percentage_1 = headcount550 - headcount320
-	. gen percentage_2 = headcount1500 - headcount550
+	. gen percentage_0 = headcount365
+	. gen percentage_1 = headcount685 - headcount365
+	. gen percentage_2 = headcount1500 - headcount685
 	. gen percentage_3 = 100 - headcount1500
 	
 	. keep country_code country_name year  percentage_*
 	. reshape long  percentage_,i(year country_code country_name ) j(category) 
-	. la define category 0 "Poor LMI (< $3.2)" 1 "Poor UMI ($3.2-$5.5)" ///
-		                 2 "Vulnerable ($5.5-$15)" 3 "Middle class (> $15)"
+	. la define category 0 "Poor LMI (< $3.65)" 1 "Poor UMI ($3.65-$6.85)" ///
+		                 2 "Vulnerable ($6.85-$15)" 3 "Middle class (> $15)"
 	. la val category category
 	. la var category ""
 
@@ -642,7 +641,7 @@ The following is a comparative list of variables available in pip and povcalnet:
 {title:Disclaimer}
 {p 40 20 2}(Go up to {it:{help pip##sections:Sections Menu}}){p_end}
 
-{p 4 4 2}pip was developed for the sole purpose of public replication of the World Bank’s poverty measures for its widely used international poverty lines, including $1.90 a day and $3.20 a day in 2011 PPP. 
+{p 4 4 2}pip was developed for the sole purpose of public replication of the World Bank’s poverty measures for its widely used international poverty lines, including $2.15 a day and $3.65 a day in 2017 PPP. 
 The methods built into pip are considered reliable for that purpose. 
 {p_end}
 {p 4 4 2}However, we cannot be confident that the methods work well for other purposes, including tracing out the entire distribution of income. 

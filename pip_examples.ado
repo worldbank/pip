@@ -46,8 +46,8 @@ program define pip_example01
          xlabel(,labs(small)) xtitle("Year", size(small))       ///
          graphregion(c(white)) ysize(5) xsize(5)                ///
          legend(order(                                          ///
-         1 "Poverty Rate (% of people living below $1.90)"      ///
-         2 "Number of people who live below $1.90") si(vsmall)  ///
+         1 "Poverty Rate (% of people living below $2.15)"      ///
+         2 "Number of people who live below $2.15") si(vsmall)  ///
          row(2)) scheme(s2color)
 
 end
@@ -92,7 +92,7 @@ end
 *  Categories of income and poverty in LAC
 *  ----------------------------------------------------------------------------
 program pip_example03
-	pip, region(lac) year(last) povline(3.2 5.5 15) clear 
+	pip, region(lac) year(last) povline(3.60 6.85 15) clear 
 	keep if welfare_type ==2 & year>=2014             // keep income surveys
 	keep poverty_line country_code country_name year headcount
 	replace poverty_line = poverty_line*100
@@ -100,15 +100,15 @@ program pip_example03
 	tostring poverty_line, replace format(%12.0f) force
 	reshape wide  headcount,i(year country_code country_name ) j(poverty_line) string
 	
-	gen percentage_0 = headcount320
-	gen percentage_1 = headcount550 - headcount320
-	gen percentage_2 = headcount1500 - headcount550
+	gen percentage_0 = headcount360
+	gen percentage_1 = headcount685 - headcount360
+	gen percentage_2 = headcount1500 - headcount685
 	gen percentage_3 = 100 - headcount1500
 	
 	keep country_code country_name year  percentage_*
 	reshape long  percentage_,i(year country_code country_name ) j(category) 
-	la define category 0 "Poor LMI (< $3.2)" 1 "Poor UMI ($3.2-$5.5)" ///
-		                 2 "Vulnerable ($5.5-$15)" 3 "Middle class (> $15)"
+	la define category 0 "Poor LMI (< $3.60)" 1 "Poor UMI ($3.60-$6.85)" ///
+		                 2 "Vulnerable ($6.85-$15)" 3 "Middle class (> $15)"
 	la val category category
 	la var category ""
 
@@ -182,7 +182,7 @@ program pip_example06
 	tempfile PerCapitaGDP
 	save `PerCapitaGDP', replace
 	
-	pip, povline(1.9) country(all) year(last) clear iso
+	pip, povline(2.15) country(all) year(last) clear iso
 	keep country_code country_name year gini
 	drop if gini == -1
 	* Merge Gini coefficient with per capita GDP
@@ -191,8 +191,9 @@ program pip_example06
 	drop if ny_gdp_pcap_pp_kd == .
 	twoway (scatter gini ny_gdp_pcap_pp_kd, mfcolor(%0)       ///
 		msize(vsmall)) (lfit gini ny_gdp_pcap_pp_kd),           ///
+		ylabel(, format(%2.0f)) ///
 		ytitle("Gini Index" " ", size(small))                   ///
-		xtitle(" " "GDP per Capita per Year (in 2011 USD PPP)", ///
+		xtitle(" " "GDP per Capita per Year (in 2017 USD PPP)", ///
 		size(small))  graphregion(c(white)) ysize(5) xsize(7)   ///
 		ylabel(,labs(small) nogrid angle(verticle))             ///
 		xlabel(,labs(small)) scheme(s2color)                    ///
@@ -206,7 +207,7 @@ end
 *  Regional Poverty Evolution
 *  ----------------------------------------------------------------------------
 program define pip_example07
-	pip wb, povline(1.9 3.2 5.5) clear
+	pip wb, povline(2.15 3.65 6.85) clear
 	drop if inlist(region_code, "OHI", "WLD") | year<1990 
 	keep poverty_line region_name year headcount
 	replace poverty_line = poverty_line*100
@@ -215,17 +216,18 @@ program define pip_example07
 	tostring poverty_line, replace format(%12.0f) force
 	reshape wide  headcount,i(year region_name) j(poverty_line) string
 	
-	local title "Poverty Headcount Ratio (1990-2015), by region"
+	local title "Poverty Headcount Ratio (1990-2019), by region"
 
-	twoway (sc headcount190 year, c(l) msiz(small))  ///
-	       (sc headcount320 year, c(l) msiz(small))  ///
-	       (sc headcount550 year, c(l) msiz(small)), ///
+	twoway (sc headcount215 year, c(l) msiz(small))  ///
+	       (sc headcount365 year, c(l) msiz(small))  ///
+	       (sc headcount685 year, c(l) msiz(small)), ///
 	       by(reg,  title("`title'", si(med))        ///
 	       	note("Source: PIP", si(vsmall)) graphregion(c(white))) ///
-	       xlab(1990(5)2015 , labsi(vsmall)) xti("Year", si(vsmall))     ///
+			ylabel(, format(%2.0f)) ///
+	       xlab(1990(5)2019 , labsi(vsmall)) xti("Year", si(vsmall))     ///
 	       ylab(0(25)100, labsi(vsmall) angle(0))                        ///
 	       yti("Poverty headcount (%)", si(vsmall))                      ///
-	       leg(order(1 "$1.9" 2 "$3.2" 3 "$5.5") r(1) si(vsmall))        ///
+	       leg(order(1 "$2.15" 2 "$3.65" 3 "$6.85") r(1) si(vsmall))        ///
 	       sub(, si(small))	scheme(s2color)
 end
 
