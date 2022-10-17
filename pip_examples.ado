@@ -92,7 +92,7 @@ end
 *  Categories of income and poverty in LAC
 *  ----------------------------------------------------------------------------
 program pip_example03
-	pip, region(lac) year(last) povline(3.60 6.85 15) clear 
+	pip, region(lac) year(last) povline(3.65 6.85 15) clear 
 	keep if welfare_type ==2 & year>=2014             // keep income surveys
 	keep poverty_line country_code country_name year headcount
 	replace poverty_line = poverty_line*100
@@ -100,14 +100,14 @@ program pip_example03
 	tostring poverty_line, replace format(%12.0f) force
 	reshape wide  headcount,i(year country_code country_name ) j(poverty_line) string
 	
-	gen percentage_0 = headcount360
-	gen percentage_1 = headcount685 - headcount360
+	gen percentage_0 = headcount365
+	gen percentage_1 = headcount685 - headcount365
 	gen percentage_2 = headcount1500 - headcount685
 	gen percentage_3 = 100 - headcount1500
 	
 	keep country_code country_name year  percentage_*
 	reshape long  percentage_,i(year country_code country_name ) j(category) 
-	la define category 0 "Poor LMI (< $3.60)" 1 "Poor UMI ($3.60-$6.85)" ///
+	la define category 0 "Poor LMI (< $3.65)" 1 "Poor UMI ($3.65-$6.85)" ///
 		                 2 "Vulnerable ($6.85-$15)" 3 "Middle class (> $15)"
 	la val category category
 	la var category ""
