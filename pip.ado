@@ -908,6 +908,8 @@ Notes:
 
 Version Control:
 
+*! version 0.3.8.9000        <2022Oct20>
+*! -- Update help file
 *! version 0.3.8             <2022Oct06>
 *! -- Testing version change
 *! -- Fix bugs
