@@ -22,7 +22,7 @@ syntax anything(name=type),      ///
 year(string)     ///
 region(string)   ///
 iso              ///
-wb				       ///
+fillgaps			   ///
 nocensor			   ///
 pause			       ///
 version(string)  ///
@@ -203,7 +203,12 @@ if ("`type'" == "1") {
 	label var survey_time  "Time of survey in the field"
 	
 	//------------drop unnecesary variables
-	cap drop estimation_type	
+	cap drop estimation_type
+	
+	if ("`fillgaps'" != "") {
+		drop ppp survey_time distribution_type gini mld polarization decile* median
+	}
+	
 	qui missings dropvars, force
 	
 }
