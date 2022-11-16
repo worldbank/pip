@@ -672,17 +672,17 @@ on earlier versions of this code.
 {p 40 20 2}(Go up to {it:{help pip##sections:Sections Menu}}){p_end}
 {marker authors}{...}
 {title:Author}
-{pstd}
-R.Andres Castaneda 
+{p 4 4 4}R.Andres Castaneda, The World Bank{p_end}
+{p 6 6 4}Email: {browse "acastanedaa@worldbank.org":  acastanedaa@worldbank.org}{p_end}
+{p 6 6 4}GitHub:{browse "https://github.com/randrescastaneda": randrescastaneda }{p_end}
 
 {title:Contributor}
 {pstd}
 Tefera Bekele Degefu
 
 {title:Maintainer}
-{p 4 4 4}R.Andres Castaneda, The World Bank{p_end}
-{p 6 6 4}Email: {browse "acastanedaa@worldbank.org":  acastanedaa@worldbank.org}{p_end}
-{p 6 6 4}GitHub:{browse "https://github.com/randrescastaneda": randrescastaneda }{p_end}
+{p 4 4 4}PIP Technical Team, The World Bank{p_end}
+{p 6 6 4}Email: {browse "pip@worldbank.org":  pip@worldbank.org}{p_end}
 
 {marker contact}{...}
 {title:Contact}
@@ -692,15 +692,26 @@ Any comments, suggestions, or bugs can be reported in the
 All the files are available in the {browse "https://github.com/worldbank/pip":GitHub repository}
 
 {marker howtocite}{...}
-{title:Thanks for citing {cmd:pip} as follows}
-{p 40 20 2}(Go up to {it:{help pip##sections:Sections Menu}}){p_end}
+{title:Thanks for citing this Stata command as follows}
 
-{p 4 8 2}XXXXX (2022) 
-"pip: Stata module to access World Bank’s Global Poverty and Inequality data," 
-Statistical Software Components 2022, Boston College Department of Economics.{p_end}
+{p 4 8 2}Castañeda, R.Andrés. (2022) 
+"pip: Stata Module to Access World Bank’s Global Poverty and Inequality Data" 
+				(version 1.0.0). Stata. Washington, DC: World Bank Group.
+        https://worldbank.github.io/pip/ {p_end}
+
+{title:Thanks for citing {cmd:pip} data as follows}
+
+{p 4 8 2} World Bank. (2022). Poverty and Inequality Platform (version {version_ID}) 
+[Data set]. World Bank Group. www.pip.worldbank.org. Accessed  {date}{p_end}
+
+{p 4 8 2}Available version_IDs:{p_end}
+{p 4 8 2}2017 PPPs: 20220909_2017_01_02_PROD{p_end}
+{p 4 8 2}2011 PPPs: 20220909_2011_02_02_PROD{p_end}
 
 {pstd}
 Please make reference to the date when the database was downloaded, as statistics may change
+
+{p 40 20 2}(Go up to {it:{help pip##sections:Sections Menu}}){p_end}
 
 
 
