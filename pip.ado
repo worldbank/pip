@@ -39,7 +39,7 @@ ISO                            ///
 SERver(string)                 /// 
 pause                          /// 
 FILLgaps                       /// 
-N2disp(integer 15)             /// 
+N2disp(integer 1)             /// 
 DISPQuery                      ///
 querytimes(integer 5)          ///
 TIMEr                          ///
@@ -722,7 +722,16 @@ qui {
 	// ------------------------------
 	
 	local n2disp = min(`c(N)', `n2disp')
-	noi di as res _n "{ul: first `n2disp' observations}"
+	
+	if (`n2disp' > 1) {
+		noi di as res _n "{ul: first `n2disp' observations}"
+	} 
+	else	if (`n2disp' == 1) {
+		noi di as res _n "{ul: first observation}"
+	}
+	else {
+		noi di as res _n "{ul: No observations available}"
+	}
 	
 	if ("`subcommand'" == "wb") {
 		sort region_code year 
@@ -907,6 +916,9 @@ exit
 Notes:
 
 Version Control:
+
+*! version 0.3.8.9001        <2022Nov16>
+*! -- Display only one observation
 
 *! version 0.3.8.9000        <2022Oct20>
 *! -- Update help file
