@@ -190,12 +190,12 @@ if ("`type'" == "1") {
 	frget survey_time, from(`frfw')
 	
 	
-	order country_code country_name region_code region_name survey_coverage ///
+	order country_code country_name region_code region_name reporting_level  ///
 	year welfare_time welfare_type poverty_line mean headcount ///
 	poverty_gap  poverty_severity watts gini    ///
 	median mld polarization population decile? decile10 cpi ppp gdp hfce ///
 	survey_comparability   ///
-	survey_acronym  survey_time  is_interpolated distribution_type
+	survey_acronym  survey_time  is_interpolated distribution_type survey_coverage
 	
 	
 	//------------remaining labels
