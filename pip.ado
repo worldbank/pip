@@ -30,7 +30,7 @@ REGion(string)                 ///
 YEAR(string)                   /// 
 POVLine(numlist)               /// 
 POPShare(numlist)	   		       /// 
-PPP(numlist)                   /// 
+PPP_year(numlist)              ///
 AGGregate                      /// 
 CLEAR                          /// 
 INFOrmation                    /// 
@@ -49,7 +49,6 @@ KEEPFrames                     ///
 frame_prefix(string)           ///
 replace                        ///
 VERsion(string)                ///
-PPP_year(numlist)              ///
 IDEntity(string)               ///
 RELease(numlist)               ///
 TABle(string)                  ///
@@ -379,7 +378,7 @@ qui {
 	}
 	
 	*---------- PPP
-	if (lower("`country'") == "all" & "`ppp'" != "") {
+	if (lower("`country'") == "all" & "`ppp_year'" != "") {
 		noi disp as err "Option {it:ppp()} is not allowed with {it:country(all)}"
 		error
 	}
@@ -421,7 +420,7 @@ qui {
 	
 	
 	if ("`aggregate'" != "") {
-		if ("`ppp'" != ""){
+		if ("`ppp_year'" != ""){
 			noi di  as err "Option PPP cannot be combined with aggregate."
 			error 198
 		}
@@ -429,7 +428,7 @@ qui {
 		local agg_display = "Aggregation in base year(s) `year'"
 	}
 	
-	if ("`ppp'" != "") {
+	if ("`ppp_year'" != "") {
 		if (wordcount("`country'")>2) {
 			noi di as err "Option PPP can only be used with one country."
 			error 198
@@ -477,7 +476,7 @@ qui {
 		noi pip_cl, country("`country'")  /// this needs to accommodate to new structure
 		year("`year'")                    ///
 		povline("`povline'")              ///
-		ppp("`ppp'")                      ///
+		ppp("`ppp_year'")                      ///
 		server("`server'")                ///
 		handle("`handle'")                ///
 		coverage(`coverage')              /// 
@@ -542,7 +541,7 @@ qui {
 		year("`year'")                          ///
 		povline("`i_povline'")                  ///
 		popshare("`i_popshare'")	   					  ///
-		ppp("`ppp'")                            ///
+		ppp("`ppp_year'")                            ///
 		coverage(`coverage')                    ///
 		server(`server')                        ///
 		version(`version')                      ///
@@ -919,6 +918,7 @@ Version Control:
 
 *! version 0.3.8.9001        <2022Nov16>
 *! -- Display only one observation
+*! -- Fix big with options ppp and ppp_year. Only ppp_year remained.
 
 *! version 0.3.8.9000        <2022Oct20>
 *! -- Update help file
