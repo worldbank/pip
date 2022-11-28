@@ -418,12 +418,6 @@ qui {
 		local agg_display = "Aggregation in base year(s) `year'"
 	}
 	
-	if (wordcount("`country'") > 2) {
-		noi di as err "Option PPP can only be used with one country."
-		error 198
-	}
-	
-	
 	/*==================================================
 	Execution 
 	==================================================*/
