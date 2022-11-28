@@ -378,7 +378,7 @@ qui {
 	}
 	
 	*---------- PPP
-	if (lower("`country'") == "all" & "`ppp_year'" != "") {
+	if (lower("`country'") == "all" & "`ppp_year'" != "" & "`ppp_year'" != "2017") {
 		noi disp as err "Option {it:ppp()} is not allowed with {it:country(all)}"
 		error
 	}
@@ -428,7 +428,7 @@ qui {
 		local agg_display = "Aggregation in base year(s) `year'"
 	}
 	
-	if ("`ppp_year'" != "") {
+	if ("`ppp_year'" != "" & "`ppp_year'" != "2017") {
 		if (wordcount("`country'")>2) {
 			noi di as err "Option PPP can only be used with one country."
 			error 198
