@@ -92,7 +92,7 @@ end
 *  Categories of income and poverty in LAC
 *  ----------------------------------------------------------------------------
 program pip_example03
-	pip, region(lac) year(last) povline(3.65 6.85 15) clear 
+	pip, region(lac) year(last) povline(2.15 3.65 6.85) clear 
 	keep if welfare_type ==2 & year>=2014             // keep income surveys
 	keep poverty_line country_code country_name year headcount
 	replace poverty_line = poverty_line*100
@@ -107,8 +107,8 @@ program pip_example03
 	
 	keep country_code country_name year  percentage_*
 	reshape long  percentage_,i(year country_code country_name ) j(category) 
-	la define category 0 "Poor LMI (< $3.65)" 1 "Poor UMI ($3.65-$6.85)" ///
-		                 2 "Vulnerable ($6.85-$15)" 3 "Middle class (> $15)"
+	la define category 0 "Extreme poor (< $2.15)" 1 "Poor LIMIC ($2.15-$3.65)" ///
+		               2 "Poor UMIC ($3.65-$6.85)" 3 "Non-poor (> $6.85)"
 	la val category category
 	la var category ""
 
@@ -208,7 +208,7 @@ end
 *  ----------------------------------------------------------------------------
 program define pip_example07
 	pip wb, povline(2.15 3.65 6.85) clear
-	drop if inlist(region_code, "OHI", "WLD") | year<1990 
+	drop if inlist(region_code, "OHI", "WLD") | year<1990
 	keep poverty_line region_name year headcount
 	replace poverty_line = poverty_line*100
 	replace headcount = headcount*100
@@ -243,9 +243,13 @@ program define pip_example08
 
 pip, clear
 
+* Prepare reporting_level variable
+label define level 3 "national" 2 "urban" 1 "rural"
+encode reporting_level, gen(reporting_level_2) label(level)
+		  
 * keep only national
-bysort country_code welfare_type  year: egen _ncover = count(survey_coverage )
-gen _tokeepn = ( (inlist(survey_coverage , 3, 4) & _ncover > 1) | _ncover == 1)
+bysort country_code welfare_type  year: egen _ncover = count(reporting_level_2 )
+gen _tokeepn = ( (inlist(reporting_level_2 , 3, 4) & _ncover > 1) | _ncover == 1)
 
 keep if _tokeepn == 1
 
@@ -283,9 +287,13 @@ program define pip_example09
 
 pip, clear
 
+* Prepare reporting_level variable
+label define level 3 "national" 2 "urban" 1 "rural"
+encode reporting_level, gen(reporting_level_2) label(level)
+
 * keep only national
-bysort country_code welfare_type  year: egen _ncover = count(survey_coverage )
-gen _tokeepn = ( (inlist(survey_coverage , 3, 4) & _ncover > 1) | _ncover == 1)
+bysort country_code welfare_type  year: egen _ncover = count(reporting_level_2 )
+gen _tokeepn = ( (inlist(reporting_level_2 , 3, 4) & _ncover > 1) | _ncover == 1)
 
 keep if _tokeepn == 1
 * Keep longest series per country
