@@ -377,12 +377,6 @@ qui {
 		error 197
 	}
 	
-	*---------- PPP
-	if (lower("`country'") == "all" & "`ppp_year'" != "") {
-		noi disp as err "Option {it:ppp()} is not allowed with {it:country(all)}"
-		error
-	}
-	
 	*---------- WB aggregate
 	
 	if ("`subcommand'" == "wb") {
@@ -420,21 +414,9 @@ qui {
 	
 	
 	if ("`aggregate'" != "") {
-		if ("`ppp_year'" != ""){
-			noi di  as err "Option PPP cannot be combined with aggregate."
-			error 198
-		}
 		noi disp as res "Note: " as text "Aggregation is only possible over reference years."
 		local agg_display = "Aggregation in base year(s) `year'"
 	}
-	
-	if ("`ppp_year'" != "") {
-		if (wordcount("`country'")>2) {
-			noi di as err "Option PPP can only be used with one country."
-			error 198
-		}
-	}
-	
 	
 	/*==================================================
 	Execution 
@@ -476,7 +458,7 @@ qui {
 		noi pip_cl, country("`country'")  /// this needs to accommodate to new structure
 		year("`year'")                    ///
 		povline("`povline'")              ///
-		ppp("`ppp_year'")                      ///
+		ppp_year("`ppp_year'")            ///
 		server("`server'")                ///
 		handle("`handle'")                ///
 		coverage(`coverage')              /// 

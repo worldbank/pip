@@ -212,6 +212,7 @@ program define pip_example07
 	keep poverty_line region_name year headcount
 	replace poverty_line = poverty_line*100
 	replace headcount = headcount*100
+	drop if headcount == .
 	
 	tostring poverty_line, replace format(%12.0f) force
 	reshape wide  headcount,i(year region_name) j(poverty_line) string
