@@ -899,12 +899,13 @@ Notes:
 Version Control:
 
 * version 0.3.9             <2022Dec01>
-*! version 0.3.8.9003        <2022Dec01>
+*! version 0.3.8.9004        <2022Dec01>
 *! -- Improve Help file
 *! -- fix bug with PPP_year  and ppp parameters
 *! -- Display only one observation
 *! -- Fix big with options ppp and ppp_year. Only ppp_year remained.
 *! -- Change order of returning variables. 
+*! -- change all labels to lower cases
 *! -- BREAKING Change: remove distribution estimates from line up estimates. 
 *! version 0.3.8             <2022Oct06>
 *! -- Testing version change
