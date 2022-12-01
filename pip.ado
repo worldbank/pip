@@ -384,8 +384,7 @@ qui {
 			noi disp as err "option {it:country()} is not allowed with subcommand {it:wb}"
 			error
 		}
-		noi disp as res "Note: " as txt "subcommand {it:wb} only accepts options " _n  /* 
-		*/ "{it:region()} and {it:year()}"
+		noi disp as res "Note: " as txt "subcommand {it:wb} only accepts options {it:region()} and {it:year()}"
 	}
 	
 	
@@ -631,7 +630,7 @@ qui {
 		// --- timer
 		
 		*---------- Clean data
-		pip_clean `rtype', year("`year'") `iso' server(`server') /* 
+		noi pip_clean `rtype', year("`year'") `iso' server(`server') /* 
 		*/ region(`region') `pause' `fillgaps' version(`version')
 		
 		pause after cleaning
@@ -712,7 +711,8 @@ qui {
 	}
 	else {
 		noi di as res _n "{ul: No observations available}"
-	}
+	}	
+	
 	
 	if ("`subcommand'" == "wb") {
 		sort region_code year 
@@ -728,7 +728,7 @@ qui {
 				keep if (region_code == "WLD")			
 			}
 			noi list region_code year poverty_line headcount mean ///
-			in 1/`n2disp',  abbreviate(12) 
+			in 1/`n2disp',  abbreviate(12) noobs
 		}
 		
 	}
@@ -751,9 +751,11 @@ qui {
 			local v2d "`v2d' `v'"
 		}
 		
-		noi list `v2d' in 1/`n2disp',  abbreviate(12)  sepby(`sepby')
+		noi list `v2d' in 1/`n2disp',  abbreviate(12)  sepby(`sepby') noobs
 		
-	}	
+	}
+	
+	
 	
 	//========================================================
 	//  Create notes
@@ -796,7 +798,15 @@ qui {
 	//========================================================
 	
 	* citations
-	noi pip_cite, reg_cite
+	if ("${pip_cmds_ssc}" == "1") {
+		local cnoi "noi"
+		global pip_cmds_ssc = ${pip_cmds_ssc} + 1
+	}
+	else {
+		local cnoi "qui"
+		noi disp `"Click {stata "pip_cite, reg_cite":here} to display how to cite"'
+	}
+	`cnoi' pip_cite, reg_cite
 	notes: `r(cite_data)'
 	
 	noi disp in y _n `"`cite'"'
@@ -899,6 +909,9 @@ Notes:
 Version Control:
 
 * version 0.3.9             <2022Dec01>
+*! version 0.3.8.9005        <2022Dec01>
+*! -- Drop obs with missing values in poverty line or headcount 
+*! -- Fix display of citations
 *! version 0.3.8.9004        <2022Dec01>
 *! -- Improve Help file
 *! -- fix bug with PPP_year  and ppp parameters

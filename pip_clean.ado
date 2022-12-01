@@ -176,7 +176,7 @@ if ("`type'" == "1") {
 	*/
 	
 	//------------survey_time
-
+	
 	local frpipfw "_pip_fw`_version'"
 	
 	tempname frfw
@@ -210,7 +210,6 @@ if ("`type'" == "1") {
 	}
 	
 	qui missings dropvars, force
-	
 }
 
 /*==================================================
@@ -259,9 +258,45 @@ if ("`type'" == "2") {
 	rename (`old') (`new')
 	
 	qui missings dropvars, force
-	
 } // end of type 2
 
+
+/*==================================================
+Delete Obs with no headcount or Poverty line
+==================================================*/
+
+qui {
+	cap confirm var country_code, exact
+	if (_rc) {
+		local geo region_code
+	}
+	else {
+		local geo country_code
+	}
+	
+	tempvar misspl
+	gen `misspl' = poverty_line == .
+	qui count if `misspl'
+	if (r(N) > 0) {
+		noi disp as err "Warning: The API returned an invalid poverty " ///
+		"line for the following combinations. Observations are deleted." ///
+		_n "Please, contact PIP Technical Team at "
+		
+		noi list `geo' year  if `misspl', clean noobs
+		drop if `misspl'
+	}
+	
+	tempvar misshc
+	gen `misshc' = headcount == .
+	qui count if `misshc'
+	if (r(N) > 0) {
+		noi disp as err "Warning: The following combinations do not " ///
+		"have valid poverty headcount. Obs will be deleted"
+		
+		noi list `geo' year poverty_line if `misshc', clean noobs
+		drop if `misshc'
+	}
+}
 
 
 end
