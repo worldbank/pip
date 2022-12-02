@@ -100,10 +100,10 @@ program pip_example03
 	tostring poverty_line, replace format(%12.0f) force
 	reshape wide  headcount,i(year country_code country_name ) j(poverty_line) string
 	
-	gen percentage_0 = headcount365
-	gen percentage_1 = headcount685 - headcount365
-	gen percentage_2 = headcount1500 - headcount685
-	gen percentage_3 = 100 - headcount1500
+    gen percentage_0 = headcount215
+    gen percentage_1 = headcount365 - headcount215
+    gen percentage_2 = headcount685 - headcount365
+    gen percentage_3 = 100 - headcount685
 	
 	keep country_code country_name year  percentage_*
 	reshape long  percentage_,i(year country_code country_name ) j(category) 
@@ -117,7 +117,7 @@ program pip_example03
 	local yti  "Population share in each income category (%)"
 
 	graph bar (mean) percentage, inten(*0.7) o(category) o(country_code, ///
-	  lab(labsi(small) angle(vertical))) stack asy                      /// 
+	  lab(labsi(small) angle(vertical)) sort(1) descending) stack asy    /// 
 		blab(bar, pos(center) format(%3.1f) si(tiny))                     /// 
 		ti("`title'", si(small)) note("`note'", si(*.7))                  ///
 		graphregion(c(white)) ysize(6) xsize(6.5)                         ///
@@ -189,8 +189,11 @@ program pip_example06
 	merge m:1 country_code year using `PerCapitaGDP', keep(match)
 	replace gini = gini * 100
 	drop if ny_gdp_pcap_pp_kd == .
-	twoway (scatter gini ny_gdp_pcap_pp_kd, mfcolor(%0)       ///
-		msize(vsmall)) (lfit gini ny_gdp_pcap_pp_kd),           ///
+	
+	gen loggdp = log10(ny_gdp_pcap_pp_kd)
+	
+	twoway (scatter gini loggdp, mfcolor(%0)       ///
+		msize(vsmall)) (lfit gini loggdp),           ///
 		ylabel(, format(%2.0f)) ///
 		ytitle("Gini Index" " ", size(small))                   ///
 		xtitle(" " "GDP per Capita per Year (in 2017 USD PPP)", ///

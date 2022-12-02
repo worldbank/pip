@@ -140,21 +140,21 @@ qui {
 
 end  
 
-// 1- compare country level estimates for ppp 2011
+// 1- compare country level estimates for ppp 2017
 pip_prod_dev, ///
-cmd(", povline(1.9 3.2 5.5) ppp_year(2011) clear") ///
+cmd(", povline(2.15 3.65 6.85) clear") ///
 sorting_vars("country_code region_code year welfare_type poverty_line reporting_level") ///
 test_label("Country estimate") 
 
-// 2- wb aggregate estimates for poverty line 1.9, 3.2, and 5.5
+// 2- wb aggregate estimates for poverty line 2.15, 3.65, and 6.85
 pip_prod_dev, ///
-cmd("wb, povline(1.9 3.2 5.5) ppp_year(2011) clear") ///
+cmd("wb, povline(2.15 3.65 6.85) clear") ///
 sorting_vars("region_name year poverty_line") ///
 test_label("WB aggregate") 
 
 // 3- filling gap data for all countries
 pip_prod_dev, ///
-cmd(", fillgaps povline(1.9 3.2 5.5) ppp_year(2011) clear") ///
+cmd(", fillgaps povline(2.15 3.65 6.85) clear") ///
 sorting_vars("country_code region_code year welfare_type poverty_line reporting_level") ///
 test_label("Fillgaps data") 
 
