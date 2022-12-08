@@ -19,7 +19,7 @@ qui {
 	if regexm("`subcommand'", "^frame") {
 			
 		if ("`frame_prefix'" == "") {
-			local frame_prefix "_pip"
+			local frame_prefix "pip_"
 		}
 		
 		//------------ Remove frames
