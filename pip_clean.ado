@@ -51,7 +51,7 @@ else {
 1: type 1
 ==================================================*/
 
-if ("`type'" == "1") {
+qui if ("`type'" == "1") {
 	
 	if  ("`year'" == "last"){
 		bys country_code: egen maximum_y = max(reporting_year)
@@ -215,7 +215,7 @@ if ("`type'" == "1") {
 /*==================================================
 2: for Aggregate requests
 ==================================================*/
-if ("`type'" == "2") {
+qui if ("`type'" == "2") {
 	
 	
 	if  ("`year'" == "last") {
