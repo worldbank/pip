@@ -864,12 +864,10 @@ Notes:
 
 Version Control:
 
-*! version 0.3.9.9006             <2022Dec15>
-*! -- Fix formating of aux tables
-*! version 0.3.8.9005        <2022Dec01>
+*! version 0.3.9                  <2022Dec16>
+*! -- BREAKING Change: Fix formating of aux tables. Rename some variables to make it consistent with other PIP outputs
 *! -- Drop obs with missing values in poverty line or headcount 
 *! -- Fix display of citations
-*! version 0.3.8.9004        <2022Dec01>
 *! -- Improve Help file
 *! -- fix bug with PPP_year  and ppp parameters
 *! -- Display only one observation
