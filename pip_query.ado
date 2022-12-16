@@ -219,8 +219,7 @@ quietly {
 		
 		*---------- Country query
 		
-		if ( lower("`country'") == "all" | lower("`region'") == "all" | ///
-		     "`region'" == "WLD" /* To remove */ ) {
+		if ( lower("`country'") == "all" | lower("`region'") == "all") {
 			
 			local country_q = "country=ALL"   // to modify
 			

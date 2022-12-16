@@ -46,8 +46,8 @@ program define pip_example01
          xlabel(,labs(small)) xtitle("Year", size(small))       ///
          graphregion(c(white)) ysize(5) xsize(5)                ///
          legend(order(                                          ///
-         1 "Poverty Rate (% of people living below $1.90)"      ///
-         2 "Number of people who live below $1.90") si(vsmall)  ///
+         1 "Poverty Rate (% of people living below $2.15)"      ///
+         2 "Number of people who live below $2.15") si(vsmall)  ///
          row(2)) scheme(s2color)
 
 end
@@ -92,7 +92,7 @@ end
 *  Categories of income and poverty in LAC
 *  ----------------------------------------------------------------------------
 program pip_example03
-	pip, region(lac) year(last) povline(3.2 5.5 15) clear 
+	pip, region(lac) year(last) povline(2.15 3.65 6.85) clear 
 	keep if welfare_type ==2 & year>=2014             // keep income surveys
 	keep poverty_line country_code country_name year headcount
 	replace poverty_line = poverty_line*100
@@ -100,15 +100,15 @@ program pip_example03
 	tostring poverty_line, replace format(%12.0f) force
 	reshape wide  headcount,i(year country_code country_name ) j(poverty_line) string
 	
-	gen percentage_0 = headcount320
-	gen percentage_1 = headcount550 - headcount320
-	gen percentage_2 = headcount1500 - headcount550
-	gen percentage_3 = 100 - headcount1500
+    gen percentage_0 = headcount215
+    gen percentage_1 = headcount365 - headcount215
+    gen percentage_2 = headcount685 - headcount365
+    gen percentage_3 = 100 - headcount685
 	
 	keep country_code country_name year  percentage_*
 	reshape long  percentage_,i(year country_code country_name ) j(category) 
-	la define category 0 "Poor LMI (< $3.2)" 1 "Poor UMI ($3.2-$5.5)" ///
-		                 2 "Vulnerable ($5.5-$15)" 3 "Middle class (> $15)"
+	la define category 0 "Extreme poor (< $2.15)" 1 "Poor LIMIC ($2.15-$3.65)" ///
+		               2 "Poor UMIC ($3.65-$6.85)" 3 "Non-poor (> $6.85)"
 	la val category category
 	la var category ""
 
@@ -117,7 +117,7 @@ program pip_example03
 	local yti  "Population share in each income category (%)"
 
 	graph bar (mean) percentage, inten(*0.7) o(category) o(country_code, ///
-	  lab(labsi(small) angle(vertical))) stack asy                      /// 
+	  lab(labsi(small) angle(vertical)) sort(1) descending) stack asy    /// 
 		blab(bar, pos(center) format(%3.1f) si(tiny))                     /// 
 		ti("`title'", si(small)) note("`note'", si(*.7))                  ///
 		graphregion(c(white)) ysize(6) xsize(6.5)                         ///
@@ -182,17 +182,21 @@ program pip_example06
 	tempfile PerCapitaGDP
 	save `PerCapitaGDP', replace
 	
-	pip, povline(1.9) country(all) year(last) clear iso
+	pip, povline(2.15) country(all) year(last) clear iso
 	keep country_code country_name year gini
 	drop if gini == -1
 	* Merge Gini coefficient with per capita GDP
 	merge m:1 country_code year using `PerCapitaGDP', keep(match)
 	replace gini = gini * 100
 	drop if ny_gdp_pcap_pp_kd == .
-	twoway (scatter gini ny_gdp_pcap_pp_kd, mfcolor(%0)       ///
-		msize(vsmall)) (lfit gini ny_gdp_pcap_pp_kd),           ///
+	
+	gen loggdp = log10(ny_gdp_pcap_pp_kd)
+	
+	twoway (scatter gini loggdp, mfcolor(%0)       ///
+		msize(vsmall)) (lfit gini loggdp),           ///
+		ylabel(, format(%2.0f)) ///
 		ytitle("Gini Index" " ", size(small))                   ///
-		xtitle(" " "GDP per Capita per Year (in 2011 USD PPP)", ///
+		xtitle(" " "GDP per Capita per Year (in 2017 USD PPP)", ///
 		size(small))  graphregion(c(white)) ysize(5) xsize(7)   ///
 		ylabel(,labs(small) nogrid angle(verticle))             ///
 		xlabel(,labs(small)) scheme(s2color)                    ///
@@ -206,26 +210,28 @@ end
 *  Regional Poverty Evolution
 *  ----------------------------------------------------------------------------
 program define pip_example07
-	pip wb, povline(1.9 3.2 5.5) clear
-	drop if inlist(region_code, "OHI", "WLD") | year<1990 
+	pip wb, povline(2.15 3.65 6.85) clear
+	drop if inlist(region_code, "OHI", "WLD") | year<1990
 	keep poverty_line region_name year headcount
 	replace poverty_line = poverty_line*100
 	replace headcount = headcount*100
+	drop if headcount == .
 	
 	tostring poverty_line, replace format(%12.0f) force
 	reshape wide  headcount,i(year region_name) j(poverty_line) string
 	
-	local title "Poverty Headcount Ratio (1990-2015), by region"
+	local title "Poverty Headcount Ratio (1990-2019), by region"
 
-	twoway (sc headcount190 year, c(l) msiz(small))  ///
-	       (sc headcount320 year, c(l) msiz(small))  ///
-	       (sc headcount550 year, c(l) msiz(small)), ///
+	twoway (sc headcount215 year, c(l) msiz(small))  ///
+	       (sc headcount365 year, c(l) msiz(small))  ///
+	       (sc headcount685 year, c(l) msiz(small)), ///
 	       by(reg,  title("`title'", si(med))        ///
 	       	note("Source: PIP", si(vsmall)) graphregion(c(white))) ///
-	       xlab(1990(5)2015 , labsi(vsmall)) xti("Year", si(vsmall))     ///
+			ylabel(, format(%2.0f)) ///
+	       xlab(1990(5)2019 , labsi(vsmall)) xti("Year", si(vsmall))     ///
 	       ylab(0(25)100, labsi(vsmall) angle(0))                        ///
 	       yti("Poverty headcount (%)", si(vsmall))                      ///
-	       leg(order(1 "$1.9" 2 "$3.2" 3 "$5.5") r(1) si(vsmall))        ///
+	       leg(order(1 "$2.15" 2 "$3.65" 3 "$6.85") r(1) si(vsmall))        ///
 	       sub(, si(small))	scheme(s2color)
 end
 
@@ -241,9 +247,13 @@ program define pip_example08
 
 pip, clear
 
+* Prepare reporting_level variable
+label define level 3 "national" 2 "urban" 1 "rural"
+encode reporting_level, gen(reporting_level_2) label(level)
+		  
 * keep only national
-bysort country_code welfare_type  year: egen _ncover = count(survey_coverage )
-gen _tokeepn = ( (inlist(survey_coverage , 3, 4) & _ncover > 1) | _ncover == 1)
+bysort country_code welfare_type  year: egen _ncover = count(reporting_level_2 )
+gen _tokeepn = ( (inlist(reporting_level_2 , 3, 4) & _ncover > 1) | _ncover == 1)
 
 keep if _tokeepn == 1
 
@@ -281,9 +291,13 @@ program define pip_example09
 
 pip, clear
 
+* Prepare reporting_level variable
+label define level 3 "national" 2 "urban" 1 "rural"
+encode reporting_level, gen(reporting_level_2) label(level)
+
 * keep only national
-bysort country_code welfare_type  year: egen _ncover = count(survey_coverage )
-gen _tokeepn = ( (inlist(survey_coverage , 3, 4) & _ncover > 1) | _ncover == 1)
+bysort country_code welfare_type  year: egen _ncover = count(reporting_level_2 )
+gen _tokeepn = ( (inlist(reporting_level_2 , 3, 4) & _ncover > 1) | _ncover == 1)
 
 keep if _tokeepn == 1
 * Keep longest series per country
@@ -311,3 +325,92 @@ drop _*
 
 end
 
+//========================================================
+// Longest series 
+//========================================================
+
+program pip_example10
+	pip, clear
+	*Series length by welfare type
+	bysort country_code welfare_type:  gen series = _N
+	*Longest 
+	bysort country_code : egen longest_series=max(series)
+	tab country_code if series !=longest_series
+	keep if series == longest_series
+
+	*2. If same length: keep most recent 
+	bys country_code welfare_type series: egen latest_year=max(year)
+	bysort country_code: egen most_recent=max(latest_year)
+
+	tab country_code if longest_series==series & latest_year!=most_recent 
+	drop if most_recent>latest_year 
+
+	*3. Not Applicable: if equal length and most recent: keep consumption
+	bys country_code: egen preferred_welfare=min(welfare_type)
+	drop if welfare_type != preferred_welfare 
+
+end
+
+//========================================================
+// replicate lineup estimates
+//========================================================
+
+program pip_example11
+
+ip cleanup 
+global country_code "NAM"
+
+//Load survey poverty estimates 
+tempname pip
+frame create `pip'
+frame `pip' {
+  pip, country(${country_code}) clear coverage(national)
+  decode welfare_type, gen(wt)
+}
+
+// merge with pip results
+pip tables, table(interpolated_means) clear   
+frlink m:1  country_code welfare_time welfare_type, ///
+  frame(`pip' country_code welfare_time wt)
+
+//Poverty line to query
+gen double pl_to_query = 2.15 * frval(`pip', mean)/predicted_mean_ppp
+keep if pl_to_query  < .
+
+//Weights for interpolated means
+gen double interpol_wt   = 1 / abs(welfare_time - year)
+egen double interpol_wtt = total(interpol_wt),by(year)
+gen double interpol_shr  = interpol_wt/interpol_wtt
+gen double survey_year   = floor(welfare_time)  
+sort country_code year welfare_time 
+
+keep if inrange(year, 2000, 2015)  // modify to take less time
+//Initialize empty data set to store results
+tempname results dtloop
+frame create `results' str3 country_code double(year hc wgt)
+frame copy `c(frame)' `dtloop'
+local N = _N
+forvalues row=1/`N' {
+  
+  loc ccc  = _frval(`dtloop', country_code, `row')
+  loc yy   = _frval(`dtloop', year, `row')
+  loc yyyy = _frval(`dtloop', survey_year, `row')
+  loc pl   = _frval(`dtloop', pl_to_query, `row')
+  loc wgt  = _frval(`dtloop', interpol_shr, `row')
+  
+  pip, clear country(`ccc') year(`yyyy') coverage(national) povline(`pl')
+  frame post `results' ("`ccc'") (`yy') (headcount[1]) (`wgt')
+}
+
+//Apply weights for interpolated poverty estimates
+frame `results': collapse  (mean) headcount=hc [w = wgt], by( country_code year)
+
+//Check results 
+pip, clear country(${country_code}) fillgaps
+keep country_code year headcount 
+frlink 1:1 country_code year, frame(`results')
+gen double d_hc = headcount/frval(`results', headcount, .a)
+sum d_hc 
+
+
+end 

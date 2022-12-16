@@ -22,7 +22,7 @@ syntax anything(name=type),      ///
 year(string)     ///
 region(string)   ///
 iso              ///
-wb				       ///
+fillgaps			   ///
 nocensor			   ///
 pause			       ///
 version(string)  ///
@@ -38,6 +38,7 @@ if ("`version'" != "") {
 	local version_qr = "&version=`version'"
 	tokenize "`version'", parse("_")
 	local _version   = "_`1'_`3'_`9'"
+	local ppp_version = `3'
 }
 else {
 	local version_qr = ""
@@ -50,7 +51,7 @@ else {
 1: type 1
 ==================================================*/
 
-if ("`type'" == "1") {
+qui if ("`type'" == "1") {
 	
 	if  ("`year'" == "last"){
 		bys country_code: egen maximum_y = max(reporting_year)
@@ -103,56 +104,56 @@ if ("`type'" == "1") {
 	replace survey_coverage = "4" if survey_coverage == "A" // not available in pip data
 	replace survey_coverage = "3" if survey_coverage == "national"
 	destring survey_coverage, force replace
-	label define survey_coverage 1 "Rural"     /* 
-	*/                       2 "Urban"     /* 
-	*/                       3 "National"  /* 
-	*/                       4 "National (Aggregate)", modify
+	label define survey_coverage 1 "rural"     /* 
+	*/                       2 "urban"     /* 
+	*/                       3 "national"  /* 
+	*/                       4 "national (aggregate)", modify
 	
 	label values survey_coverage survey_coverage
 	
 	replace welfare_type = "1" if welfare_type == "consumption"
 	replace welfare_type = "2" if welfare_type == "income"
 	destring welfare_type, force replace
-	label define welfare_type 1 "Consumption" 2 "Income", modify
+	label define welfare_type 1 "consumption" 2 "income", modify
 	label values welfare_type welfare_type
 	
-	label var country_code		"Country/Economy code"
-	label var country_name 		"Country/Economy name"
-	label var region_code 		"Region code"
-	label var region_name 		"Region name"
-	label var survey_coverage 	"Survey coverage"
-	label var reporting_year	"Year"
-	label var survey_year 		"Survey year"
-	label var welfare_type 		"Welfare measured by income or consumption"
-	label var is_interpolated 	"Data is interpolated"
-	label var distribution_type "Data comes from grouped or microdata"
-	label var ppp 				"2011 Purchasing Power Parity"
-	label var poverty_line 		"Poverty line in PPP$ (per capita per day)"
-	label var mean				"Average daily per capita income/consumption PPP$"
-	label var headcount 		"Poverty Headcount"
-	label var poverty_gap 		"Poverty Gap"
-	label var poverty_severity 	"Squared poverty gap"
-	label var watts 			"Watts index"
-	label var gini 				"Gini index"
-	label var median 			"Median daily income or expenditure in PPP$"
-	label var mld 				"Mean Log Deviation"
-	label var polarization 		"Polarization"
-	label var population 		"Population in year"
+	label var country_code		  "country/economy code"
+	label var country_name 		  "country/economy name"
+	label var region_code 		  "region code"
+	label var region_name 		  "region name"
+	label var survey_coverage   "survey coverage"
+	label var reporting_year	  "year"
+	label var survey_year 		  "survey year"
+	label var welfare_type 		  "welfare measured by income or consumption"
+	label var is_interpolated 	"data is interpolated"
+	label var distribution_type "data comes from grouped or microdata"
+	label var ppp 				      "`ppp_version' purchasing power parity"
+	label var poverty_line 		  "poverty line in `ppp_version' ppp prices (per capita per day)"
+	label var mean				      "average daily per capita income/consumption `ppp_version' ppp prices"
+	label var headcount 		    "poverty headcount"
+	label var poverty_gap 		  "poverty gap"
+	label var poverty_severity 	"squared poverty gap"
+	label var watts 			      "watts index"
+	label var gini 				      "gini index"
+	label var median 			      "median daily income or expenditure in `ppp_version' ppp prices"
+	label var mld 				      "mean log deviation"
+	label var polarization 		  "polarization"
+	label var population 		    "population in year"
 	
 	ds decile*
 	local vardec = "`r(varlist)'"
 	foreach var of local vardec {
 		if regexm("`var'", "([0-9]+)") local q = regexs(1)
-		label var `var' "Decile `q' welfare share"
+		label var `var' "decile `q' welfare share"
 	}
 	
-	label var reporting_level 	"Reporting data level"
-	label var survey_acronym 	"Survey acronym"     
-	label var survey_comparability "Survey comparability"
-	label var comparable_spell 	"Comparability over time at country level"   
-	label var cpi 				"Consumer Price Index (CPI)"
-	label var reporting_gdp 	"Reported GDP"
-	label var reporting_hfce 	"Reported per capita"
+	label var reporting_level 	   "reporting data level"
+	label var survey_acronym 	     "survey acronym"     
+	label var survey_comparability "survey comparability"
+	label var comparable_spell 	   "comparability over time at country level"   
+	label var cpi 				         "consumer price index (cpi) in `ppp_version' base"
+	label var reporting_gdp 	     "reported gdp"
+	label var reporting_hfce 	     "reported per capita"
 	
 	sort country_code reporting_year survey_coverage 
 	
@@ -175,7 +176,7 @@ if ("`type'" == "1") {
 	*/
 	
 	//------------survey_time
-
+	
 	local frpipfw "_pip_fw`_version'"
 	
 	tempname frfw
@@ -189,28 +190,32 @@ if ("`type'" == "1") {
 	frget survey_time, from(`frfw')
 	
 	
-	order country_code country_name region_code region_name survey_coverage ///
+	order country_code country_name region_code region_name reporting_level  ///
 	year welfare_time welfare_type poverty_line mean headcount ///
 	poverty_gap  poverty_severity watts gini    ///
 	median mld polarization population decile? decile10 cpi ppp gdp hfce ///
 	survey_comparability   ///
-	survey_acronym  survey_time  is_interpolated distribution_type
+	survey_acronym  survey_time  is_interpolated distribution_type survey_coverage
 	
 	
 	//------------remaining labels
-	label var welfare_time "Time income or consumption refers to"
-	label var survey_time  "Time of survey in the field"
+	label var welfare_time "time income or consumption refers to"
+	label var survey_time  "time of survey in the field"
 	
 	//------------drop unnecesary variables
-	cap drop estimation_type	
-	qui missings dropvars, force
+	cap drop estimation_type
 	
+	if ("`fillgaps'" != "") {
+		drop ppp survey_time distribution_type gini mld polarization decile* median
+	}
+	
+	qui missings dropvars, force
 }
 
 /*==================================================
 2: for Aggregate requests
 ==================================================*/
-if ("`type'" == "2") {
+qui if ("`type'" == "2") {
 	
 	
 	if  ("`year'" == "last") {
@@ -225,17 +230,17 @@ if ("`type'" == "2") {
 	
 	rename reporting_pop population
 	
-	label var region_code      "Region code"
-	label var reporting_year   "Year"
-	label var poverty_line     "Poverty line in PPP$ (per capita per day)"
-	label var mean             "Average daily per capita income/consumption in PPP$"
-	label var headcount        "Poverty Headcount"
-	label var poverty_gap      "Poverty Gap"
-	label var poverty_severity "Squared poverty gap"
-	label var population       "Population in year"
-	label var pop_in_poverty   "Population in poverty"
-	label var watts            "Watts index"
-	label var region_name      "World Bank Region"
+	label var region_code      "region code"
+	label var reporting_year   "year"
+	label var poverty_line     "poverty line in `ppp_version' ppp prices (per capita per day)"
+	label var mean             "average daily per capita income/consumption in `ppp_version' ppp prices"
+	label var headcount        "poverty headcount"
+	label var poverty_gap      "poverty gap"
+	label var poverty_severity "squared poverty gap"
+	label var population       "population in year"
+	label var pop_in_poverty   "population in poverty"
+	label var watts            "watts index"
+	label var region_name      "world bank region"
 	
 	order region_name region_code reporting_year  poverty_line ///
 	mean headcount poverty_gap  poverty_severity watts   ///
@@ -253,9 +258,45 @@ if ("`type'" == "2") {
 	rename (`old') (`new')
 	
 	qui missings dropvars, force
-	
 } // end of type 2
 
+
+/*==================================================
+Delete Obs with no headcount or Poverty line
+==================================================*/
+
+qui {
+	cap confirm var country_code, exact
+	if (_rc) {
+		local geo region_code
+	}
+	else {
+		local geo country_code
+	}
+	
+	tempvar misspl
+	gen `misspl' = poverty_line == .
+	qui count if `misspl'
+	if (r(N) > 0) {
+		noi disp as err "Warning: The API returned an invalid poverty " ///
+		"line for the following combinations. Observations are deleted." ///
+		_n "Please, contact PIP Technical Team at "
+		
+		noi list `geo' year  if `misspl', clean noobs
+		drop if `misspl'
+	}
+	
+	tempvar misshc
+	gen `misshc' = headcount == .
+	qui count if `misshc'
+	if (r(N) > 0) {
+		noi disp as err "Warning: The following combinations do not " ///
+		"have valid poverty headcount. Obs will be deleted"
+		
+		noi list `geo' year poverty_line if `misshc', clean noobs
+		drop if `misshc'
+	}
+}
 
 
 end

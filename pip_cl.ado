@@ -20,7 +20,7 @@ handle(string)        ///
 country(string)       ///
 year(string)          ///
 povline(numlist)      ///
-ppp(numlist)          ///
+ppp_year(numlist)          ///
 coverage(string)      /// 
 clear                 ///
 pause                 /// 
@@ -44,7 +44,7 @@ qui {
 	
 	
 	if ("`povline'" == "")  local povline  1.9
-	if ("`ppp'" == "")      local ppp      -1
+	if ("`ppp_year'" == "")      local ppp_year      -1
 	if ("`coverage'" == "") local coverage -1
 	
 	*---------- download guidance data

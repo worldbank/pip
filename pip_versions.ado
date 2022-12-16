@@ -237,7 +237,7 @@ qui {
 	return local version_qr = "`version_qr'"
 	return local version    = "`version'"
 	
-	noi disp in y "Version in use: " in w "`version'"
+	noi disp as res "Version in use:" as text " `version'"
 	
 } // end of qui
 

@@ -1,7 +1,7 @@
 [![](https://img.shields.io/badge/devel%20version-0.3.2-blue.svg)](https://github.com/worldbank/pip)
 
 
-# `{pip}` : Poverty and Inequality Platform Stata wrapper
+# `pip` : Stata module to access World Bank’s Global Poverty and Inequality data
 
 
 ## Description
