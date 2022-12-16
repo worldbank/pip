@@ -30,7 +30,7 @@ REGion(string)                 ///
 YEAR(string)                   /// 
 POVLine(numlist)               /// 
 POPShare(numlist)	   		       /// 
-PPP(numlist)                   /// 
+PPP_year(numlist)              ///
 AGGregate                      /// 
 CLEAR                          /// 
 INFOrmation                    /// 
@@ -39,7 +39,7 @@ ISO                            ///
 SERver(string)                 /// 
 pause                          /// 
 FILLgaps                       /// 
-N2disp(integer 15)             /// 
+N2disp(integer 1)             /// 
 DISPQuery                      ///
 querytimes(integer 5)          ///
 TIMEr                          ///
@@ -49,7 +49,6 @@ KEEPFrames                     ///
 frame_prefix(string)           ///
 replace                        ///
 VERsion(string)                ///
-PPP_year(numlist)              ///
 IDEntity(string)               ///
 RELease(numlist)               ///
 TABle(string)                  ///
@@ -109,7 +108,7 @@ qui {
 	//========================================================
 	// Auxiliary tables
 	//========================================================
-	if regexm("`subcommand'", "^table") {
+	if regexm("`subcommand'", "^tab") {
 		noi pip_tables `table', server(`server')        ///
 		version(`version')                ///
 		release(`release')                ///
@@ -200,7 +199,7 @@ qui {
 	// --- timer
 	
 	
-	if regexm("`subcommand'", "^version") {
+	if regexm("`subcommand'", "^ver") {
 		noi pip_versions, server(`server') availability
 		return add
 		exit
@@ -317,11 +316,6 @@ qui {
 		local subcommand  = "information"
 	}
 	
-	*---------- Subcommand consistency 
-	if !inlist("`subcommand'", "wb", "information", "cl", "") {
-		noi disp as err "subcommand must be either {it:wb}, {it:cl}, or {it:info}"
-		error 
-	}
 	
 	//------------ Region
 	
@@ -372,27 +366,15 @@ qui {
 	
 	
 	
-	*---------- One-on-one execution
-	if ("`subcommand'" == "cl" & lower("`country'") == "all") {
-		noi disp in red "you cannot use option {it:countr(all)} with subcommand {it:cl}"
-		error 197
-	}
-	
-	*---------- PPP
-	if (lower("`country'") == "all" & "`ppp'" != "") {
-		noi disp as err "Option {it:ppp()} is not allowed with {it:country(all)}"
-		error
-	}
-	
+
 	*---------- WB aggregate
 	
 	if ("`subcommand'" == "wb") {
 		if ("`country'" != "") {
 			noi disp as err "option {it:country()} is not allowed with subcommand {it:wb}"
+			noi disp as res "Note: " as txt "subcommand {it:wb} only accepts options {it:region()} and {it:year()}"
 			error
 		}
-		noi disp as res "Note: " as txt "subcommand {it:wb} only accepts options " _n  /* 
-		*/ "{it:region()} and {it:year()}"
 	}
 	
 	
@@ -414,28 +396,15 @@ qui {
 			
 			noi di as err "You must start with an empty dataset; or enable the option {it:clear}."
 			error 4
-		}
-		
+		}	
 		drop _all
 	}
 	
 	
 	if ("`aggregate'" != "") {
-		if ("`ppp'" != ""){
-			noi di  as err "Option PPP cannot be combined with aggregate."
-			error 198
-		}
 		noi disp as res "Note: " as text "Aggregation is only possible over reference years."
 		local agg_display = "Aggregation in base year(s) `year'"
 	}
-	
-	if ("`ppp'" != "") {
-		if (wordcount("`country'")>2) {
-			noi di as err "Option PPP can only be used with one country."
-			error 198
-		}
-	}
-	
 	
 	/*==================================================
 	Execution 
@@ -465,39 +434,6 @@ qui {
 	// --- timer
 	if ("`timer'" != "") timer off `i_off'
 	// --- timer
-	
-	
-	
-	*---------- Country Level (one-on-one query)
-	if ("`subcommand'" == "cl") {
-		
-		noi disp in red "Subcommand {it:cl} is temporary out of service."
-		exit
-		
-		noi pip_cl, country("`country'")  /// this needs to accommodate to new structure
-		year("`year'")                    ///
-		povline("`povline'")              ///
-		ppp("`ppp'")                      ///
-		server("`server'")                ///
-		handle("`handle'")                ///
-		coverage(`coverage')              /// 
-		`clear'                           ///
-		`iso'                             ///
-		`pause'
-		return add
-		
-		pip_clean 1, year("`year'") `iso' //rc(`rc')
-		
-		//========================================================
-		// Convert to povcalnet format
-		//========================================================
-		if ("`povcalnet_format'" != "") {
-			pip_povcalnet_format 1, `pause'
-		}
-		
-		exit
-	}
-	
 	
 	*---------- Regular query and Aggregate Query
 	if ("`subcommand'" == "wb") {
@@ -542,7 +478,7 @@ qui {
 		year("`year'")                          ///
 		povline("`i_povline'")                  ///
 		popshare("`i_popshare'")	   					  ///
-		ppp("`ppp'")                            ///
+		ppp("`ppp_year'")                            ///
 		coverage(`coverage')                    ///
 		server(`server')                        ///
 		version(`version')                      ///
@@ -650,8 +586,8 @@ qui {
 		// --- timer
 		
 		*---------- Clean data
-		pip_clean `rtype', year("`year'") `iso' server(`server') /* 
-		*/ region(`region') `pause' `wb' version(`version')
+		noi pip_clean `rtype', year("`year'") `iso' server(`server') /* 
+		*/ region(`region') `pause' `fillgaps' version(`version')
 		
 		pause after cleaning
 		// --- timer
@@ -722,7 +658,17 @@ qui {
 	// ------------------------------
 	
 	local n2disp = min(`c(N)', `n2disp')
-	noi di as res _n "{ul: first `n2disp' observations}"
+	
+	if (`n2disp' > 1) {
+		noi di as res _n "{ul: first `n2disp' observations}"
+	} 
+	else	if (`n2disp' == 1) {
+		noi di as res _n "{ul: first observation}"
+	}
+	else {
+		noi di as res _n "{ul: No observations available}"
+	}	
+	
 	
 	if ("`subcommand'" == "wb") {
 		sort region_code year 
@@ -738,7 +684,7 @@ qui {
 				keep if (region_code == "WLD")			
 			}
 			noi list region_code year poverty_line headcount mean ///
-			in 1/`n2disp',  abbreviate(12) 
+			in 1/`n2disp',  abbreviate(12) noobs
 		}
 		
 	}
@@ -761,9 +707,11 @@ qui {
 			local v2d "`v2d' `v'"
 		}
 		
-		noi list `v2d' in 1/`n2disp',  abbreviate(12)  sepby(`sepby')
+		noi list `v2d' in 1/`n2disp',  abbreviate(12)  sepby(`sepby') noobs
 		
-	}	
+	}
+	
+	
 	
 	//========================================================
 	//  Create notes
@@ -806,7 +754,15 @@ qui {
 	//========================================================
 	
 	* citations
-	noi pip_cite, reg_cite
+	if ("${pip_cmds_ssc}" == "1") {
+		local cnoi "noi"
+		global pip_cmds_ssc = ${pip_cmds_ssc} + 1
+	}
+	else {
+		local cnoi "qui"
+		noi disp `"Click {stata "pip_cite, reg_cite":here} to display how to cite"'
+	}
+	`cnoi' pip_cite, reg_cite
 	notes: `r(cite_data)'
 	
 	noi disp in y _n `"`cite'"'
@@ -814,8 +770,9 @@ qui {
 	return local cite `"`cite'"'
 	
 	* Install alternative version
-	
-	noi pip_${pip_source} msg
+	if ("${pip_cmds_ssc}" == "") {
+		noi pip_${pip_source} msg
+	}
 	
 	//========================================================
 	// Convert to povcalnet format
@@ -907,6 +864,17 @@ Notes:
 
 Version Control:
 
+*! version 0.3.9                  <2022Dec16>
+*! -- BREAKING Change: Fix formating of aux tables. Rename some variables to make it consistent with other PIP outputs
+*! -- Drop obs with missing values in poverty line or headcount 
+*! -- Fix display of citations
+*! -- Improve Help file
+*! -- fix bug with PPP_year  and ppp parameters
+*! -- Display only one observation
+*! -- Fix big with options ppp and ppp_year. Only ppp_year remained.
+*! -- Change order of returning variables. 
+*! -- change all labels to lower cases
+*! -- BREAKING Change: remove distribution estimates from line up estimates. 
 *! version 0.3.8             <2022Oct06>
 *! -- Testing version change
 *! -- Fix bugs
@@ -918,7 +886,6 @@ Version Control:
 *! -- make it work with new API specifications
 *! -- Fix problem with variable name version
 *! -- Fix problem with variable name version
-*! version 0.3.5.9000   <2022Sep08>
 *! version 0.3.5        <2022Jul06>
 *! -- Add `asdouble` in all calls of `import delimited`
 *! version 0.3.4        <2022Jun10>

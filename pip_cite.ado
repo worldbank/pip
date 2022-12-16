@@ -31,55 +31,56 @@ version 16.0
 ==================================================*/
 *------------------ Initial Parameters  ------------------
 
-
-if ("${pip_ado_version}" == "") {
+qui {
+	if ("${pip_ado_version}" == "") {
+		
+		findfile pip.ado
+		scalar pipado = fileread("`r(fn)'")
+		
+		mata: pip_ado()
+		
+		if regexm("`pipver'", "version +([0-9\.]+) +<([a-zA-Z0-9]+)>") {
+			global pip_ado_version = regexs(1)
+			global pip_ado_date    = regexs(2)
+		}
+		
+	} // if global is not found 
 	
-	findfile pip.ado
-	scalar pipado = fileread("`r(fn)'")
+	global pip_adoyear = substr("${pip_ado_date}", 1, 4)
 	
-	mata: pip_ado()
-
-	if regexm("`pipver'", "version +([0-9\.]+) +<([a-zA-Z0-9]+)>") {
-		global pip_ado_version = regexs(1)
-		global pip_ado_date    = regexs(2)
+	
+	/*==================================================
+	2: Regular citation
+	==================================================*/
+	*##s
+	if ("`version'" == "") {
+		qui cap pip_versions
+		local version = "`r(version)'"
 	}
 	
-} // if global is not found 
-
-global pip_adoyear = substr("${pip_ado_date}", 1, 4)
-
-
-/*==================================================
-2: Regular citation
-==================================================*/
-*##s
-if ("`version'" == "") {
-	qui cap pip_versions
-	local version = "`r(version)'"
+	
+	//------------ display data bibtext
+	local data_date = substr("`version'", 1, 8)
+	local data_year = substr("`version'", 1, 4)
+	local data_date = date("`data_date'", "YMD")
+	local data_date: disp %tdCCYY-NN-DD `data_date'
+	local data_date = trim("`data_date'")
+	
+	local _version: subinstr local version "_" "\_", all 
 }
-
-
-//------------ display data bibtext
-local data_date = substr("`version'", 1, 8)
-local data_year = substr("`version'", 1, 4)
-local data_date = date("`data_date'", "YMD")
-local data_date: disp %tdCCYY-NN-DD `data_date'
-local data_date = trim("`data_date'")
-
-local _version: subinstr local version "_" "\_", all 
-
-
 
 if ("`reg_cite'" != "") {
 	local cite_ado = `"Castañeda, R.Andrés. (${pip_adoyear}) "pip: Stata Module to Access World Bank’s Global Poverty and Inequality Data" (version ${pip_ado_version}). Stata. Washington, DC: World Bank Group. https://worldbank.github.io/pip/"'
-	noi disp in y "Please cite this Stata tool as:" 
-	noi disp as text in smcl `" {phang}`cite_ado'{p_end}"'
-	noi disp _n "{stata pip_cite, ado_bibtext:bibtext}"
+	noi disp _n "{hline 90}" ///
+	as res in  smcl "{p 2 8 2}Please cite this Stata tool as:{p_end}" /// 
+	as text `"{p 6 10 4 90}`cite_ado'{p_end}"' /// 
+	"{p 75 0 4}{stata pip_cite, ado_bibtext:bibtext}{p_end}"
+	
 	
 	local cite_data = `"World Bank. (`data_year'). Poverty and Inequality Platform (version `version') [Data set]. World Bank Group. https://pip.worldbank.org/"'
-	noi disp in y _n "Please cite the PIP data as:" 
-	noi disp as text in smcl `" {phang}`cite_data'{p_end}"'
-	noi disp _n "{stata pip_cite, data_bibtext version(`version'):bibtext}"
+	noi disp as res in smcl _n "{p 2 8 2}Please cite the PIP data as:{p_end}" ///
+	as text `"{p 6 10 4 100}`cite_data'{p_end}"' /// 
+	"{p 75 0 4}{stata pip_cite, data_bibtext version(`version'):bibtext}{p_end}"
 	
 	return local cite_ado   =  `"`cite_ado'"'
 	return local cite_data  =  `"`cite_data'"'
