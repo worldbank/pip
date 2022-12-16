@@ -351,3 +351,66 @@ program pip_example10
 
 end
 
+//========================================================
+// replicate lineup estimates
+//========================================================
+
+program pip_example11
+
+ip cleanup 
+global country_code "NAM"
+
+//Load survey poverty estimates 
+tempname pip
+frame create `pip'
+frame `pip' {
+  pip, country(${country_code}) clear coverage(national)
+  decode welfare_type, gen(wt)
+}
+
+// merge with pip results
+pip tables, table(interpolated_means) clear   
+frlink m:1  country_code welfare_time welfare_type, ///
+  frame(`pip' country_code welfare_time wt)
+
+//Poverty line to query
+gen double pl_to_query = 2.15 * frval(`pip', mean)/predicted_mean_ppp
+keep if pl_to_query  < .
+
+//Weights for interpolated means
+gen double interpol_wt   = 1 / abs(welfare_time - year)
+egen double interpol_wtt = total(interpol_wt),by(year)
+gen double interpol_shr  = interpol_wt/interpol_wtt
+gen double survey_year   = floor(welfare_time)  
+sort country_code year welfare_time 
+
+keep if inrange(year, 2000, 2015)  // modify to take less time
+//Initialize empty data set to store results
+tempname results dtloop
+frame create `results' str3 country_code double(year hc wgt)
+frame copy `c(frame)' `dtloop'
+local N = _N
+forvalues row=1/`N' {
+  
+  loc ccc  = _frval(`dtloop', country_code, `row')
+  loc yy   = _frval(`dtloop', year, `row')
+  loc yyyy = _frval(`dtloop', survey_year, `row')
+  loc pl   = _frval(`dtloop', pl_to_query, `row')
+  loc wgt  = _frval(`dtloop', interpol_shr, `row')
+  
+  pip, clear country(`ccc') year(`yyyy') coverage(national) povline(`pl')
+  frame post `results' ("`ccc'") (`yy') (headcount[1]) (`wgt')
+}
+
+//Apply weights for interpolated poverty estimates
+frame `results': collapse  (mean) headcount=hc [w = wgt], by( country_code year)
+
+//Check results 
+pip, clear country(${country_code}) fillgaps
+keep country_code year headcount 
+frlink 1:1 country_code year, frame(`results')
+gen double d_hc = headcount/frval(`results', headcount, .a)
+sum d_hc 
+
+
+end 
