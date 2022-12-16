@@ -18,6 +18,9 @@ make pip, replace toc pkg                         ///  readme
 * ------------------------------------------------------------------------------
 * Testing basic examples
 * ------------------------------------------------------------------------------
+clear all
+pip cleanup
+
 global options = "server(qa) clear"
 cap frame drop tmpfr
 frame create tmpfr strL cmd
@@ -169,7 +172,7 @@ test_label("Auxilary table - countries")
 // 2) country coverage
 pip_prod_dev, ///
 cmd("tables, table(country_coverage) clear") ///
-sorting_vars("country_code reporting_year pop_data_level") ///
+sorting_vars("country_code year pop_data_level") ///
 test_label("Auxilary table - country_coverage") 
 
 // 3) cpi
@@ -205,7 +208,7 @@ test_label("Auxilary table - gdp")
 // 8) incgrp_coverage
 pip_prod_dev, ///
 cmd("tables, table(incgrp_coverage) clear") ///
-sorting_vars("reporting_year") ///
+sorting_vars("year") ///
 test_label("Auxilary table - incgrp_coverage") 
 
 // 9) indicators
@@ -235,7 +238,7 @@ test_label("Auxilary table - pop")
 // 13) pop_region
 pip_prod_dev, ///
 cmd("tables, table(pop_region) clear") ///
-sorting_vars("region_code reporting_year") ///
+sorting_vars("region_code year") ///
 test_label("Auxilary table - pop_region") 
 
 // 14) poverty_lines
@@ -259,7 +262,7 @@ test_label("Auxilary table - regions")
 // 17) regions_coverage
 pip_prod_dev, ///
 cmd("tables, table(region_coverage) clear") ///
-sorting_vars("reporting_year pcn_region_code") ///
+sorting_vars("year pcn_region_code") ///
 test_label("Auxilary table - regions_coverage") 
 
 *##e

@@ -325,3 +325,29 @@ drop _*
 
 end
 
+//========================================================
+// Longest series 
+//========================================================
+
+program pip_example10
+	pip, clear
+	*Series length by welfare type
+	bysort country_code welfare_type:  gen series = _N
+	*Longest 
+	bysort country_code : egen longest_series=max(series)
+	tab country_code if series !=longest_series
+	keep if series == longest_series
+
+	*2. If same length: keep most recent 
+	bys country_code welfare_type series: egen latest_year=max(year)
+	bysort country_code: egen most_recent=max(latest_year)
+
+	tab country_code if longest_series==series & latest_year!=most_recent 
+	drop if most_recent>latest_year 
+
+	*3. Not Applicable: if equal length and most recent: keep consumption
+	bys country_code: egen preferred_welfare=min(welfare_type)
+	drop if welfare_type != preferred_welfare 
+
+end
+
