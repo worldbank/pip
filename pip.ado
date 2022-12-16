@@ -108,7 +108,7 @@ qui {
 	//========================================================
 	// Auxiliary tables
 	//========================================================
-	if regexm("`subcommand'", "^table") {
+	if regexm("`subcommand'", "^tab") {
 		noi pip_tables `table', server(`server')        ///
 		version(`version')                ///
 		release(`release')                ///
@@ -199,7 +199,7 @@ qui {
 	// --- timer
 	
 	
-	if regexm("`subcommand'", "^version") {
+	if regexm("`subcommand'", "^ver") {
 		noi pip_versions, server(`server') availability
 		return add
 		exit
@@ -316,11 +316,6 @@ qui {
 		local subcommand  = "information"
 	}
 	
-	*---------- Subcommand consistency 
-	if !inlist("`subcommand'", "wb", "information", "cl", "") {
-		noi disp as err "subcommand must be either {it:wb}, {it:cl}, or {it:info}"
-		error 
-	}
 	
 	//------------ Region
 	
@@ -371,20 +366,15 @@ qui {
 	
 	
 	
-	*---------- One-on-one execution
-	if ("`subcommand'" == "cl" & lower("`country'") == "all") {
-		noi disp in red "you cannot use option {it:countr(all)} with subcommand {it:cl}"
-		error 197
-	}
-	
+
 	*---------- WB aggregate
 	
 	if ("`subcommand'" == "wb") {
 		if ("`country'" != "") {
 			noi disp as err "option {it:country()} is not allowed with subcommand {it:wb}"
+			noi disp as res "Note: " as txt "subcommand {it:wb} only accepts options {it:region()} and {it:year()}"
 			error
 		}
-		noi disp as res "Note: " as txt "subcommand {it:wb} only accepts options {it:region()} and {it:year()}"
 	}
 	
 	
@@ -406,8 +396,7 @@ qui {
 			
 			noi di as err "You must start with an empty dataset; or enable the option {it:clear}."
 			error 4
-		}
-		
+		}	
 		drop _all
 	}
 	
@@ -445,39 +434,6 @@ qui {
 	// --- timer
 	if ("`timer'" != "") timer off `i_off'
 	// --- timer
-	
-	
-	
-	*---------- Country Level (one-on-one query)
-	if ("`subcommand'" == "cl") {
-		
-		noi disp in red "Subcommand {it:cl} is temporary out of service."
-		exit
-		
-		noi pip_cl, country("`country'")  /// this needs to accommodate to new structure
-		year("`year'")                    ///
-		povline("`povline'")              ///
-		ppp_year("`ppp_year'")            ///
-		server("`server'")                ///
-		handle("`handle'")                ///
-		coverage(`coverage')              /// 
-		`clear'                           ///
-		`iso'                             ///
-		`pause'
-		return add
-		
-		pip_clean 1, year("`year'") `iso' //rc(`rc')
-		
-		//========================================================
-		// Convert to povcalnet format
-		//========================================================
-		if ("`povcalnet_format'" != "") {
-			pip_povcalnet_format 1, `pause'
-		}
-		
-		exit
-	}
-	
 	
 	*---------- Regular query and Aggregate Query
 	if ("`subcommand'" == "wb") {

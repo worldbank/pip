@@ -79,10 +79,12 @@ Default is 5. {it:Advanced option. Use only if internet connection is poor}.{p_e
 {synopt :{opt info:rmation}}Presents a clickable version of the available surveys, 
 countries and regions.{p_end}
 {synopt :{opt wb}}Downloads World Bank's regional and global aggregation.{p_end}
-{synopt :{opt tables}}Provides clickable list of auxiliary tables for download.{p_end}
+{synopt :{opt tab:les}}Provides clickable list of auxiliary tables for download.{p_end}
 {synopt :{opt clean:up}}Deletes all pip data from current stata memory.{p_end}
 {synopt :{opt dropframe}}({it:Programmer's option}) Deletes auxiliary PIP frames in memory.{p_end}
 {synopt :{opt dropglobal}}({it:Programmer's option}) Deletes auxiliary PIP global macros in memory.{p_end}
+{synopt :{opt ver:sions}}Display available versions of PIP data.{p_end}
+{synopt :{opt test}}Open in browser last pip call. Type {cmd:disp "${pip_query}"} to see the parameters of the API query.{p_end}
 
 {pstd}
 {bf:Note}: {cmd:pip} requires an internet connection.
