@@ -864,6 +864,8 @@ Notes:
 
 Version Control:
 
+*! version 0.9.0                  <2023Feb09>
+*! -- Update help file
 *! version 0.3.9                  <2022Dec16>
 *! -- BREAKING Change: Fix formating of aux tables. Rename some variables to make it consistent with other PIP outputs
 *! -- Drop obs with missing values in poverty line or headcount 
