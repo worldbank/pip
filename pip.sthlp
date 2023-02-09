@@ -648,16 +648,17 @@ but refers to any territory for which authorities report separate social or econ
 {title:References}
 {p 40 20 2}(Go up to {it:{help pip##sections:Sections Menu}}){p_end}
 
-{p 4 8 2}Castaneda Aguilar, R. A., T.Fujs, C. Lakner, S.K. Tetteh Baah (XXXX)
-"Estimating Global Poverty in Stata: The PIP command", XXXX, World Bank, Washington, DC 
-{browse "http://":Link}{p_end}
+{p 4 8 2}Castaneda Aguilar, R.Andres, T. Fujs, C. Lakner, S. K. Tetteh-Baah(2023)
+"Estimating Global Poverty in Stata: The PIP command", 
+Global Poverty Monitoring Technical Notes, World Bank, Washington, DC{p_end}
 
 {marker acknowled}{...}
 {title:Acknowledgments}
 {p 40 20 2}(Go up to {it:{help pip##sections:Sections Menu}}){p_end}
 
 {pstd}
-The authors would like to thank Ifeanyi Nzegwu Edochie, Tony Fujs, Dean Jolliffe, Daniel Mahler, Minh
+The author would like to thank Tefera Bekele Degefu, Ifeanyi Nzegwu Edochie, Tony Fujs, 
+Dean Jolliffe, Daniel Mahler, Minh
 Cong Nguyen, Christoph Lakner, Marta Schoch, Samuel Kofi Tetteh Baah, Martha Viveros, Nishan Yonzan,
 and Haoyu Wu for comments received on earlier versions of this code. This command builds on the earlier
 povcalnet command, which was developed with the help of Espen Prydz, Jorge Soler Lopez, Ruoxuan Wu and Qinghua Zhao. 
@@ -687,9 +688,9 @@ All the files are available in the {browse "https://github.com/worldbank/pip":Gi
 {marker howtocite}{...}
 {title:Thanks for citing this Stata command as follows}
 
-{p 4 8 2}Castañeda, R.Andrés. (2022) 
+{p 4 8 2}Castaneda, R.Andres. (2023) 
 "pip: Stata Module to Access World Bank’s Global Poverty and Inequality Data" 
-				(version 1.0.0). Stata. Washington, DC: World Bank Group.
+				(version 0.9.0). Stata. Washington, DC: World Bank Group.
         https://worldbank.github.io/pip/ {p_end}
 
 {title:Thanks for citing {cmd:pip} data as follows}
