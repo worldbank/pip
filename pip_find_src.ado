@@ -24,7 +24,7 @@ version 16.0
 
 
 /*==================================================
-              1: 
+              1:  if not found
 ==================================================*/
 
 * This ado-file is inspired by the command `dependencies` by Diana Gold
@@ -36,16 +36,20 @@ capture findfile "stata.trk", path(`"`path'"') all
 local stata_trk_list `"`r(fn)'"'
 
 if _rc != 0 {
-	noi dis as text "{cmd: pip} has not been installed from either SSC or " ///
-	"GitHub in directory `path'. You could," ///
+	noi dis as res "{cmd: pip} has not been installed from either SSC or " ///
+	"GitHub in directory `path'. You could," as text ///
 	"{p 6 6 2} 1. Search for {cmd:pip} in a different directory using {it:path()} option {p_end}" ///
 	"{p 6 6 2} 2. Install stable version from SSC, {stata pip install ssc} {p_end}" ///
 	"{p 6 6 2} 3. Install development version from  Github {stata pip install gh} {p_end}"
 		// return info 
-	noi disp in red "Return {it:NotInstalled} in r(src)"
+	noi disp in res "Return {it:NotInstalled} in r(src)"
 	return local src = "NotInstalled"
 	exit
 }
+
+/*==================================================
+              2:  If found
+==================================================*/
 
 qui else {
 	
@@ -59,9 +63,7 @@ qui else {
 	
 	* First character marks: S (source) N (name) D (installation date) d (description) f (files) U(stata tracker) e(end)
 	gen marker = substr(v1, 1, 1)
-	drop if inlist(marker, "*", " ", "U", "d") // not useful at all
-	
-	* Making sense of stata.trk means tagging which lines refer to which pkg (N)
+	keep if inlist(marker, "S", "N") 
 	gen pkg_name = substr(v1, 3, .) if marker == "N"
 	
 	local p = 0
@@ -80,32 +82,22 @@ qui else {
 		replace pkg_code = `p' in `i'
 	} // end of for loop by obs
 	
+	// get those lines with pip package
 	keep if regexm(pkg_name, "^pip") & marker == "S"
-	if regexm(v1[_N], "repec") local src = "ssc"
-	else local src "gh"
-	noi disp "`src'"
+	levelsof pkg_code, clean local(trk_code)
+	return local trk_code = "`trk_code'"
 	
+	levelsof v1 if marker == "S",  local(trk_sources)
+	local trk_sources: subinstr local trk_sources "S " "", all
+	
+	return local trk_sources = `"`trk_sources'"'
+	
+	// get last source
+	if regexm(v1[_N], "repec") local src = "ssc" 
+	else if (v1[_N] == "") local src = "NotInstalled"
+	else local src "gh"
+	return local src = "`src'"
 }	// end of condition
-
-
-*----------1.1:
-
-
-*----------1.2:
-
-
-/*==================================================
-              2: 
-==================================================*/
-
-
-*----------2.1:
-
-
-*----------2.2:
-
-
-
 
 
 end

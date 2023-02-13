@@ -20,6 +20,7 @@ version 16.0
 
 syntax [anything(name=subcommand)]  ///
 [,                             	    /// 
+path(string)                        ///
 pause                             /// 
 ] 
 
@@ -35,11 +36,11 @@ else                      pause off
 local cmd pip
 local username "worldbank"  // to modify
 
-_pip_find_src `cmd'
+pip_find_src , path(`path')
 local src = "`r(src)'"
 
 //------------  If PIP was installed from github
-if (!regexm("`src'", "repec")) {
+if (!regexm("`src'", "ssc")) {
 	
 	pip_gh update, username(`username') cmd(`cmd') `pause'
 	local bye = "`r(bye)'"
@@ -83,49 +84,6 @@ global pip_cmds_ssc = 1  // make sure it does not execute again per session
 global pip_source   = "`pip_source'"
 `bye'
 
-end 
-
-
-//========================================================
-// Aux programs
-//========================================================
-
-program define _pip_find_src, rclass 
-syntax anything(name=cmd id="Package name")
-
-qui {
-	preserve
-	drop _all
-	
-	// find stata.trk file 
-	findfile stata.trk
-	local fn = "`r(fn)'"
-	
-	// create copy
-	tempfile statatrk
-	copy "`r(fn)'" "`statatrk'"
-	
-	// import copy into stata
-	import delimited using `statatrk',  bindquote(nobind) asdouble
-	
-	gen n = _n    // line number
-	
-	// find line where the package is used
-	levelsof n if regexm(v1, "`cmd'.pkg"), sep(,) loca(pklines)
-	
-	if (`"`pklines'"' == `""') local src = "NotInstalled"
-	else {
-		
-		// the latest source and subtract which refers to the source 
-		local sourceline = max(0, `pklines') - 1 
-		
-		// get the source without the initial S
-		if regexm(v1[`sourceline'], "S (.*)") local src = regexs(1)
-	}
-	
-	// return info 
-	return local src = "`src'"
-} // end of qui
 end 
 
 exit
