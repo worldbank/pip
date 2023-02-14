@@ -32,29 +32,9 @@ else                      pause off
 1: Update PIP
 ==================================================*/
 
-* mata: povcalnet_source("povcalnet") // creates local src
-local cmd pip
-local username "worldbank"  // to modify
-
-pip_find_src , path(`path')
-local src = "`r(src)'"
-
-//------------  If PIP was installed from github
-if (!regexm("`src'", "ssc")) {
-	
-	pip_gh update, username(`username') cmd(`cmd') `pause'
-	local bye = "`r(bye)'"
-	local pip_source = "gh"
-	
-} // end if installed from github 
-
-//------------ if pip was installed from SSC
-else {  
-	pip_ssc update, `pause'
-	local bye = "`r(bye)'"
-	local pip_source = "ssc"
-}  // Finish checking pip update 
-
+pip_update, path(`path')
+local pip_source = "`r(src)'"
+local bye        = "`r(bye)'"
 
 /*==================================================
 2: Dependencies         
