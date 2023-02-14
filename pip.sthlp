@@ -293,6 +293,62 @@ Users can also specify PPP year as {stata  pip tables, ppp_year(2017)}.
 "${pip_query}" to query your browser directly and test whether the data is
 downloadable. 
 
+{p 4 8 2}
+{opt install} Install the stamble version of {cmd:pip} from SSC ({cmd:pip install ssc}) or
+the development version from GitHub ({cmd:pip install gh}). the {it:install} subcommand 
+is intended to keep your {help sysdir:search path} clean. Say that you install the 
+dev version from GitHub in the regular way and then 
+you install the stable from SSC. By doing that, you are creating 
+two entries in the {it:stata.trk} file, making Stata believe that you have {cmd:pip} 
+installed twice, which in fact you do. You can confirm this by typing the following, {p_end}
+{cmd}
+	github install worldbank/pip  {text:// development}
+	ssc install pip, replace      {text:// stable}
+	
+	* {text:You can't uninstall pip directly}
+	ado uninstall pip
+	{err:criterion matches more than one package}
+	
+	* {text:This is because you have two versions of {cmd:pip} installed}
+	ado dir pip
+{result}
+	[318] package pip from https://raw.githubusercontent.com/worldbank/pip/master
+	'PIP': Poverty and Inequality Platform Stata wrapper
+
+	[319] package pip from http://fmwww.bc.edu/repec/bocode/p
+	'PIP': module to access poverty and inequality data from the World Bank's Poverty and 
+	Inequality Platform (PIP)
+{text}
+{p 8 8 2}
+By using the {it:install} subcommand, {cmd:pip} makes sure all the conflicting installations
+are solved. You can install {cmd:pip} from SSC and from GitHub, one after the other, and you 
+won't have conflicting installations. 
+Be aware that if you have more than one version installed in your search path, 
+{cmd:pip} is going to request you to confirm that you want to uninstall both versions by type 
+{it:yes} in the conosole and hitting enter.
+{p_end}
+
+	{cmd:pip install ssc}
+{err}
+	There is more than one version of PIP installed in the same search path, PLUS.
+	You need to uninstall pip in PLUS or change installation path with option path()
+	Type yes in the console and hit enter to confirm you agree to uninstall pip. 
+{text}
+{p 4 8 2}
+{opt uninstall} You can uninstall any version of {cmd:pip} in your search path by typing, 
+{cmd:pip uninstall}. In this way, you can install {cmd:pip} from scratch from either SSC
+of GitHub.
+{p_end}
+
+{p 4 8 2}
+{opt update} This subcommand makes sure your {cmd:pip} version is up to date. By default, 
+the first time that you use {cmd:pip} in a session, it will search for any new available versions 
+available on the either SSC of GitHub, depending on where you installed it from (this is 
+why the first time takes longer than the others). However, it could be the 
+case that you're using an old version on purpose and now want to get the newer version 
+without leaving your Stata session. Just type {cmd:pip update}.
+{p_end}
+
 {marker return}{...}
 {title:Stored results}{p 50 20 2}{p_end}
 
