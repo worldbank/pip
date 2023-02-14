@@ -20,12 +20,13 @@ version 16.0
 
 
 syntax [anything(name=src)]  ///
-[,                             	    ///
-username(string)                   ///
-cmd(string)                        ///
-version(string)                    ///
-pause                             /// 
-replace                           ///
+[,                           ///
+username(string)             ///
+cmd(string)                  ///
+version(string)              ///
+pause                        /// 
+replace                      ///
+path(string)                 ///
 ] 
 
 if ("`pause'" == "pause") pause on
@@ -43,18 +44,59 @@ if ("`username'" == "") {
 /*==================================================
 1: Search source
 ==================================================*/
-if ("`src'" == "") {
+qui pip_find_src, path(`path')
+if ("`src'" == "") {	
+	local src      = "`r(src)'"
+}
+
+//========================================================
+//  Uninstall
+//========================================================
+
+// number of pip versions installed
+local trk_code =  "`r(trk_code)'"
+local trk_srcs = `"`r(trk_sources)'"'
+
+local ncodes: list sizeof trk_code
+
+if ("`src'" == "uninstall" | `ncodes' > 1) {
 	
-	if ("${pip_source}" == "") {
-		pip_new_session, `pause'
+	if (`ncodes' > 1) {
+	
+		noi disp as err "There is more than one version of PIP installed in the same search path, `path'." _n ///
+		as res "You need to uninstall {cmd:pip} in `path' or change installation path" ///
+		" with option {it:path()}" _n ///
+		"Type {it:yes} in the console and hitting enter to confirm uninstall of {cmd:pip}" _request(_confirm)
+		if ("`confirm'" != "yes") {	
+			error 
+		}
+	}
+	while ("`trk_code'" != "") {
+		local srcs : word 1 of `trk_srcs'
+		if regexm(`"`srcs'"', "repec") {
+			ado uninstall [`: word 1 of `trk_code'']
+		}
+		else {
+			github uninstall [`: word 1 of `trk_code'']
+		}
+		qui pip_find_src, path(`path')
+		local trk_code =  "`r(trk_code)'"
+		local trk_srcs = `"`r(trk_sources)'"'
 	}
 	
-	local src = "${pip_source}"
+	if ("`trk_code'" == "") {
+		noi disp as res "{cmd:pip} was successfully uninstalled"
+		if ("`src'" == "uninstall") exit
+	}
+	else {
+		error
+	}
 }
 
 
+
 /*==================================================
-2: Install
+Install
 ==================================================*/
 
 if (inlist(lower("`src'"), "github", "gh")) {
@@ -74,11 +116,15 @@ else {
 	error 
 }
 
-
-cap ado uninstall pip
+if ("`src'" == "ssc") {
+	cap ado uninstall pip
+}
+else {
+	cap github uninstall pip
+}
 if (_rc) {
 	if (_rc == 111) {
-		noi disp "package pip does not seems to be installed"
+		noi disp "package pip does not seems to be installed" // this should not ever happen
 	}
 	else {
 		error _rc
@@ -109,7 +155,6 @@ if (_rc) {
 global pip_source   = "`src'"
 
 noi disp "You have successfully installed {cmd:pip} from `source'. Please type {stata discard} to load the recently installed version"
-
 
 end
 exit
