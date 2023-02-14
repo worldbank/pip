@@ -882,6 +882,8 @@ Notes:
 
 Version Control:
 
+*! version 0.9.1                  <2023Feb14>
+*! -- improve installation and update features
 *! version 0.9.0                  <2023Feb09>
 *! -- Update help file
 *! version 0.3.9                  <2022Dec16>
