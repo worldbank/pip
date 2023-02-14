@@ -37,6 +37,7 @@ else                      pause off
 if ("`path'" == "") {
 	local path = "PLUS"
 }
+return local path = "`path'"
 capture findfile "stata.trk", path(`"`path'"') all
 local stata_trk_list `"`r(fn)'"'
 
