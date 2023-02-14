@@ -52,6 +52,7 @@ VERsion(string)                ///
 IDEntity(string)               ///
 RELease(numlist)               ///
 TABle(string)                  ///
+path(string)                   ///
 ] 
 
 if ("`pause'" == "pause") pause on
@@ -60,7 +61,7 @@ set checksum off
 
 qui {
 	//========================================================
-	// Frames
+	// housekeeping
 	//========================================================
 	local curframe = c(frame)
 	
@@ -77,6 +78,22 @@ qui {
 	
 	if regexm("`subcommand'", "^dropglobal") {
 		pip_drop global
+		exit
+	}
+	
+	if regexm("`subcommand'", "^install") {
+		local sscmd: word 2 of `subcommand'
+		pip_install `sscmd', path(`path')
+		exit
+	}
+	
+	if regexm("`subcommand'", "^uninstall") {
+		pip_install uninstall, path(`path')
+		exit
+	}
+	
+	if regexm("`subcommand'", "^update") {
+		pip_update, path(`path')
 		exit
 	}
 	
