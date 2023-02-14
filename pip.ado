@@ -83,17 +83,17 @@ qui {
 	
 	if regexm("`subcommand'", "^install") {
 		local sscmd: word 2 of `subcommand'
-		pip_install `sscmd', path(`path')
+		pip_install `sscmd', path(`path') `pause'
 		exit
 	}
 	
 	if regexm("`subcommand'", "^uninstall") {
-		pip_install uninstall, path(`path')
+		pip_install uninstall, path(`path') `pause'
 		exit
 	}
 	
 	if regexm("`subcommand'", "^update") {
-		pip_update, path(`path')
+		noi pip_update, path(`path') `pause'
 		exit
 	}
 	
