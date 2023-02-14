@@ -45,8 +45,9 @@ if ("`username'" == "") {
 1: Search source
 ==================================================*/
 qui pip_find_src, path(`path')
-if ("`src'" == "") {	
-	local src      = "`r(src)'"
+local osrc      = "`r(src)'"  // original or installed source
+if ("`src'" == "") {
+	local src = "`osrc'"
 }
 
 //========================================================
@@ -56,6 +57,7 @@ if ("`src'" == "") {
 // number of pip versions installed
 local trk_code =  "`r(trk_code)'"
 local trk_srcs = `"`r(trk_sources)'"'
+local path     = "`r(path)'"
 
 local ncodes: list sizeof trk_code
 
@@ -63,10 +65,11 @@ if ("`src'" == "uninstall" | `ncodes' > 1) {
 	
 	if (`ncodes' > 1) {
 	
-		noi disp as err "There is more than one version of PIP installed in the same search path, `path'." _n ///
-		as res "You need to uninstall {cmd:pip} in `path' or change installation path" ///
+		noi disp as err "There is more than one version of PIP installed" ///
+		" in the same search path, `path'." _n ///
+		"You need to uninstall {cmd:pip} in `path' or change installation path" ///
 		" with option {it:path()}" _n ///
-		"Type {it:yes} in the console and hitting enter to confirm uninstall of {cmd:pip}" _request(_confirm)
+		"Type {it:yes} in the console and hit enter to confirm you agree to uninstall {cmd:pip}" _request(_confirm)
 		if ("`confirm'" != "yes") {	
 			error 
 		}
@@ -79,14 +82,14 @@ if ("`src'" == "uninstall" | `ncodes' > 1) {
 		else {
 			github uninstall [`: word 1 of `trk_code'']
 		}
-		qui pip_find_src, path(`path')
+		pip_find_src, path(`path')
 		local trk_code =  "`r(trk_code)'"
 		local trk_srcs = `"`r(trk_sources)'"'
 	}
 	
 	if ("`trk_code'" == "") {
-		noi disp as res "{cmd:pip} was successfully uninstalled"
-		if ("`src'" == "uninstall") exit
+		noi disp as text "{cmd:pip} was successfully uninstalled"
+		if ("`src'" == "uninstall") exit	
 	}
 	else {
 		error
@@ -116,7 +119,7 @@ else {
 	error 
 }
 
-if ("`src'" == "ssc") {
+if ("`osrc'" == "ssc") {
 	cap ado uninstall pip
 }
 else {
@@ -154,7 +157,8 @@ if (_rc) {
 }
 global pip_source   = "`src'"
 
-noi disp "You have successfully installed {cmd:pip} from `source'. Please type {stata discard} to load the recently installed version"
+noi disp "You have successfully installed {cmd:pip} from `source'. " ///
+"Please type {stata discard} to load the recently installed version"
 
 end
 exit

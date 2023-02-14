@@ -59,7 +59,6 @@ if ("`pause'" == "pause") pause on
 else                      pause off
 set checksum off
 
-qui {
 	//========================================================
 	// housekeeping
 	//========================================================
@@ -83,7 +82,7 @@ qui {
 	
 	if regexm("`subcommand'", "^install") {
 		local sscmd: word 2 of `subcommand'
-		pip_install `sscmd', path(`path') `pause'
+		noi pip_install `sscmd', path(`path') `pause'
 		exit
 	}
 	
@@ -100,6 +99,8 @@ qui {
 	// ------------------------------------------------------------------------
 	// New session procedure
 	// ------------------------------------------------------------------------
+	
+qui {
 	
 	if ("${pip_cmds_ssc}" == "") {
 		pip_new_session , `pause'
