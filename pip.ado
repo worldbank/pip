@@ -882,7 +882,7 @@ Notes:
 
 Version Control:
 
-*! version 0.9.1                  <2023Feb14>
+*! version 0.9.2                 <2023Feb14>
 *! -- improve installation and update features
 *! version 0.9.0                  <2023Feb09>
 *! -- Update help file
