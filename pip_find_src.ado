@@ -19,8 +19,13 @@ program define pip_find_src, rclass
 syntax [anything(name=scmd)]  ///
 [,                             	    ///
 path(string) ///
+pause        ///
 ]
 version 16.0
+
+
+if ("`pause'" == "pause") pause on
+else                      pause off
 
 
 /*==================================================

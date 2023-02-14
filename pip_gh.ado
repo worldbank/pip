@@ -72,7 +72,7 @@ if ("`subcommand'" == "update") {
 			exit 
 		}
 		if _N > 1 {
-			di as err "{p}multiple packages with this name are found!"      ///
+			di as err "{p}multiple {cmd:pip} packages found!"      ///
 			"this can be caused if you had installed multiple "     ///
 			"packages from different repositories, but with an "    ///
 			"identical name..." _n
@@ -107,7 +107,7 @@ if ("`subcommand'" == "update") {
 	}
 	if ("`crrDevel'" == "") local crrDevel 0
 	local current = `crrMajor'`crrMinor'`crrPatch'.`crrDevel'
-	disp "`current'"
+	* disp "`current'"
 	
 	* force installation 
 	if ("`crrtversion'" == "") {
