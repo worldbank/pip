@@ -4,6 +4,8 @@
 // for more information visit http://github.com/haghish/github
 
 *##s
+
+cd "c:/Users/`c(username)'/OneDrive - WBG/WorldBank/DECDG/PIP/pip"
 local ados: dir . files "*.ado", respectcase
 
 foreach a of local ados {
@@ -21,12 +23,14 @@ foreach h of local helps {
 }
 local hs = trim("`hs'")
 local hs: subinstr local hs " " ";", all
-disp "`hs'"
+
+local toins  "`as';`hs'"
+disp "`toins'"
 
 
 
 make pip, replace toc pkg                         ///  readme
-		version(0.9.3)                          ///
+		version(0.9.4)                          ///
     license("MIT")                                                          ///
     author("R.Andres Castaneda")                                            ///
     affiliation("The World Bank")                                           ///
