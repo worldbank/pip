@@ -3,8 +3,30 @@
 // DO NOT FORGET to update the version of the package, if changed!
 // for more information visit http://github.com/haghish/github
 
+*##s
+local ados: dir . files "*.ado", respectcase
+
+foreach a of local ados {
+	local as "`as' `a'"
+}
+local as = trim("`as'")
+local as: subinstr local as " " ";", all
+disp "`as'"
+
+
+local helps: dir . files "*.sthlp", respectcase
+
+foreach h of local helps {
+	local hs "`hs' `h'"
+}
+local hs = trim("`hs'")
+local hs: subinstr local hs " " ";", all
+disp "`hs'"
+
+
+
 make pip, replace toc pkg                         ///  readme
-		version(0.9.2)                          ///
+		version(0.9.3)                          ///
     license("MIT")                                                          ///
     author("R.Andres Castaneda")                                            ///
     affiliation("The World Bank")                                           ///
@@ -12,9 +34,10 @@ make pip, replace toc pkg                         ///  readme
     url("")                                                                 ///
     title("Poverty and Inequality Platform Stata wrapper")                  ///
     description("World Bank PIP API Stata wrapper")                         ///
-    install("pip.ado;pip.sthlp;pip_cl.ado;pip_clean.ado;pip_countries.sthlp;pip_note.sthlp;pip_drop.ado;pip_examples.ado;pip_info.ado;pip_new_session.ado;pip_povcalnet_format.ado;pip_query.ado;pip_set_server.ado;pip_cache.ado;pip_versions.ado;pip_tables.ado;pip_cleanup.ado;pip_cite.ado;pip_gh.ado;pip_ssc.ado;pip_install.ado;pip_update.ado:pip_find_src.ado") ///
+    install("`as';`hs'") ///
     ancillary("")                                                         
 
+*##e
 * ------------------------------------------------------------------------------
 * Testing basic examples
 * ------------------------------------------------------------------------------
@@ -77,7 +100,7 @@ pip version
 global options = "server(qa)"
 
 // Function to avoid errors and scale up check
-*##s
+
 cap program drop pip_prod_dev
 program define pip_prod_dev
 syntax , ///
@@ -265,4 +288,4 @@ cmd("tables, table(region_coverage) clear") ///
 sorting_vars("year pcn_region_code") ///
 test_label("Auxilary table - regions_coverage") 
 
-*##e
+

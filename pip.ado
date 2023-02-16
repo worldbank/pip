@@ -882,6 +882,8 @@ Notes:
 
 Version Control:
 
+*! version 0.9.3                 <2023Feb14>
+*! -- fix writing error in pip.pkg file that did not allow the installation of pip_update
 *! version 0.9.2                 <2023Feb14>
 *! -- improve installation and update features
 *! version 0.9.0                  <2023Feb09>
