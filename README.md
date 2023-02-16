@@ -10,7 +10,7 @@ World Bank PIP API Stata wrapper
 
 ## Installation
 
-### From SSC (NOT AVAILABLE YET)
+### From SSC 
 
 ```stata
 ssc install pip
