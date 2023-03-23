@@ -1,3 +1,4 @@
 /pip-*/
 test_ssc.do
 *.zip
+*.undefined
