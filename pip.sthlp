@@ -85,6 +85,8 @@ countries and regions.{p_end}
 {synopt :{opt dropglobal}}({it:Programmer's option}) Deletes auxiliary PIP global macros in memory.{p_end}
 {synopt :{opt ver:sions}}Display available versions of PIP data.{p_end}
 {synopt :{opt test}}Open in browser last pip call. Type {cmd:disp "${pip_query}"} to see the parameters of the API query.{p_end}
+{synopt :{opt install}}Installs the stable version of pip from SSC 
+({cmd:pip install ssc}) or the development version from GitHub ({cmd:pip install gh}){p_end}
 
 {pstd}
 {bf:Note}: {cmd:pip} requires an internet connection.
@@ -261,10 +263,11 @@ to be interpreted carefully and may not be the result of a new household survey.
 {opt table} Allows to load one auxiliary table, this option is used along with {cmd:tables} subcommand.
 
 
-
 {marker subcommands}{...}
 {p 40 20 2}(Go up to {it:{help pip##sections:Sections Menu}}){p_end}
 {title:Subcommands}
+
+{dlgtab: MISC}
 
 {phang}
 {opt information} Presents a clickable version of the available surveys, countries 
@@ -293,61 +296,54 @@ Users can also specify PPP year as {stata  pip tables, ppp_year(2017)}.
 "${pip_query}" to query your browser directly and test whether the data is
 downloadable. 
 
+{dlgtab: Installation}
+
 {p 4 8 2}
-{opt install} Install the stamble version of {cmd:pip} from SSC ({cmd:pip install ssc}) or
+{opt install} Installs the stable version of {cmd:pip} from SSC ({cmd:pip install ssc}) or
 the development version from GitHub ({cmd:pip install gh}). the {it:install} subcommand 
-is intended to keep your {help sysdir:search path} clean. Say that you install the 
-dev version from GitHub in the regular way and then 
-you install the stable from SSC. By doing that, you are creating 
-two entries in the {it:stata.trk} file, making Stata believe that you have {cmd:pip} 
-installed twice, which in fact you do. You can confirm this by typing the following, {p_end}
-{cmd}
-	github install worldbank/pip  {text:// development}
-	ssc install pip, replace      {text:// stable}
-	
-	* {text:You can't uninstall pip directly}
-	ado uninstall pip
-	{err:criterion matches more than one package}
-	
-	* {text:This is because you have two versions of {cmd:pip} installed}
-	ado dir pip
-{result}
-	[318] package pip from https://raw.githubusercontent.com/worldbank/pip/master
-	'PIP': Poverty and Inequality Platform Stata wrapper
+prevents issues from duplicate, and potentially conflicting, installations 
+of the command. Using this subcommand it is possible to install pip from SSC 
+and from GitHub, one after the other.  If a version is already installed, 
+the command will request a deinstallation or a different installation path.
+Further details are provided in the examples section 
+{it:{help pip##installation_ex:below}}. {p_end}
 
-	[319] package pip from http://fmwww.bc.edu/repec/bocode/p
-	'PIP': module to access poverty and inequality data from the World Bank's Poverty and 
-	Inequality Platform (PIP)
-{text}
-{p 8 8 2}
-By using the {it:install} subcommand, {cmd:pip} makes sure all the conflicting installations
-are solved. You can install {cmd:pip} from SSC and from GitHub, one after the other, and you 
-won't have conflicting installations. 
-Be aware that if you have more than one version installed in your search path, 
-{cmd:pip} is going to request you to confirm that you want to uninstall both versions by type 
-{it:yes} in the conosole and hitting enter.
-{p_end}
-
-	{cmd:pip install ssc}
-{err}
-	There is more than one version of PIP installed in the same search path, PLUS.
-	You need to uninstall pip in PLUS or change installation path with option path()
-	Type yes in the console and hit enter to confirm you agree to uninstall pip. 
-{text}
 {p 4 8 2}
-{opt uninstall} You can uninstall any version of {cmd:pip} in your search path by typing, 
-{cmd:pip uninstall}. In this way, you can install {cmd:pip} from scratch from either SSC
-of GitHub.
+{opt uninstall} Uninstalls any version of pip in the installation path.
+This is useful before a new installation from either SSC of GitHub. 
+Once you have executed {cmd:pip uninstall}, you cannot use {cmd:pip install}
+again because you won't have any version of {cmd:pip} installed locally. 
+You will need to install {cmd:pip} directly from either SSC 
+({cmd:ssc install pip}) or from GitHub ({cmd:github install worldbank/pip})
 {p_end}
 
 {p 4 8 2}
-{opt update} This subcommand makes sure your {cmd:pip} version is up to date. By default, 
-the first time that you use {cmd:pip} in a session, it will search for any new available versions 
-available on the either SSC of GitHub, depending on where you installed it from (this is 
-why the first time takes longer than the others). However, it could be the 
-case that you're using an old version on purpose and now want to get the newer version 
-without leaving your Stata session. Just type {cmd:pip update}.
+{opt update} This subcommand makes sure the {cmd:pip} version is up-to-date. By
+default, the first time that {cmd:pip} is used in a session, it will search for 
+any new versions available from either SSC or GitHub, depending on where it 
+was originally installed from (for this reason the first time {cmd:pip} is 
+used in a session takes longer than subsequently). If you want to get the 
+latest version without leaving your Stata session, type {cmd:pip update}.
 {p_end}
+
+{marker installation_process}{...}
+{p 4 6 2}{ul:Installation process}{p_end}
+
+{p 4 4 2}
+In case of conflicting installation issues, this is the recommended process to install {cmd:pip} properly{p_end}
+{p 8 8 2}1. Uninstall {cmd:pip} by typing {cmd:pip uninstall}{p_end}
+{p 8 8 2}2. Install the stable version of {cmd:pip} from SSS 
+({cmd:ssc install pip}) or the development version from GitHub 
+({cmd:github install worldbank/pip}){p_end}
+{p 8 8 2}3. from now on, {res:always} install pip using the {cmd:install}
+subcommand: {cmd:pip install ssc} for SSC or {cmd:pip install gh} for 
+GitHub{p_end}
+{p 8 8 2}4. In rare occasions, when you don't want to restart your Stata 
+session but want to update the version of {cmd:pip}, use {cmd:pip update}.
+{it:Note}: this subcommand was intended for the members of the core PIP team,
+who constantly need to update their version of {cmd:pip}{p_end}
+{p 8 8 2}5. If {cmd:pip} fails, start this process over.{p_end}
+
 
 {marker return}{...}
 {title:Stored results}{p 50 20 2}{p_end}
@@ -679,6 +675,59 @@ Not necessarily the latest
 	  		legend(si(vsmall) r(3))  yti("`yti'", si(small))                ///
 	  	ylab(,labs(small) nogrid angle(0)) scheme(s2color)
 {txt}      ({stata "pip_examples pip_example03":click to run})
+
+
+{marker installation_ex}{...}
+{dlgtab: 5. Installation issues}
+
+{p 8 8 2}
+Installing the same Stata command from two different sources may result in 
+conflicting issues in your {help sysdir:search path} if the installation is 
+not {it:{help net:done properly}}. 
+The subcommand {cmd:install} is helpful to keep your 
+{help sysdir:search path} clean. Say, for example, that you install the 
+dev version from GitHub in the regular way and then 
+you install the stable version from SSC. By doing that, you are creating 
+two entries in the {it:stata.trk} file, making Stata believe that you 
+have installed {cmd:pip} twice, but in reality you don't because you used 
+the same location to install both packages. You can confirm this 
+by typing the following, {p_end}
+{cmd}
+	github install worldbank/pip  {text:// development}
+	ssc install pip, replace      {text:// stable}
+	
+	* {text:You can't uninstall pip directly}
+	ado uninstall pip
+	{err:criterion matches more than one package}
+	
+	* {text:This is because you have two versions of {cmd:pip} installed}
+	ado dir pip
+{result}
+	[318] package pip from https://raw.githubusercontent.com/worldbank/pip/master
+	'PIP': Poverty and Inequality Platform Stata wrapper
+
+	[319] package pip from http://fmwww.bc.edu/repec/bocode/p
+	'PIP': module to access poverty and inequality data from the World Bank's Poverty and 
+	Inequality Platform (PIP)
+{text}
+{p 8 8 2}
+By using the {it:install} subcommand, {cmd:pip} makes sure all the conflicting installations
+are solved. You can install {cmd:pip} from SSC and from GitHub, one after the other, and you 
+won't have conflicting installations. 
+Be aware that if you have more than one version installed in your {help sysdir:search path}, 
+{cmd:pip} is going to request you to confirm that you want to uninstall both versions by type 
+{it:yes} in the conosole and hitting enter.
+{p_end}
+
+	{cmd:pip install ssc}
+{err}
+	There is more than one version of PIP installed in the same search path, PLUS.
+	You need to uninstall pip in PLUS or change installation path with option path()
+	Type yes in the console and hit enter to confirm you agree to uninstall pip. 
+{text}
+{p 8 8 2}To troubleshoot, follow the installation process 
+{it:{help pip##installation_process:above}}.{p_end}
+
 
 {marker disclaimer}{...}
 {title:Disclaimer}
