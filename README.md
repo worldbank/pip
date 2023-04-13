@@ -64,7 +64,7 @@ which pip
 5.	If it is still failing, please run the code below--making sure your replace the commented line--and send the test.log file to [pip@worldbank.org](pip@worldbank.org)
 
 ```stata
-log using "test.log", name(test) text replace // this is in your cd
+log using "test.log", name(pip_test) text replace // this is in your cd
 cret list
 clear all
 which pip
@@ -73,8 +73,10 @@ set traceexpand on
 set traceindent on 
 set tracenumber on
 set trace on
-// Insert here the pip directive that is failing
+cap noi // pip command that is not working
 set trace off
+log close pip_test
+
 ```
 
 ## License
