@@ -16,6 +16,9 @@
 {viewerjumpto "Authors"   "pip##authors"}{...}
 {viewerjumpto "Regions" "pip_countries##regions"}{...}
 {viewerjumpto "Countries" "pip_countries##countries"}{...}
+{hline}
+help for {cmd:pip}{right:R.Andrés Castañeda}
+{hline}
 {title:Title}
 
 {p2colset 9 24 22 2}{...}
