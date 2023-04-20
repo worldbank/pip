@@ -882,6 +882,8 @@ Notes:
 
 Version Control:
 
+*! version 0.9.5.9001            <2023Apr20>
+*! -- Change some variable labels for clarity
 *! version 0.9.5.9000            <2023Mar23>
 *! -- Update help file with installation instructions.
 *! version 0.9.5                 <2023Feb14>
