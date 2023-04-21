@@ -135,7 +135,7 @@ qui if ("`type'" == "1") {
 	label var poverty_severity 	"squared poverty gap"
 	label var watts 			      "watts index"
 	label var gini 				      "gini index"
-	label var median 			      "median daily income or expenditure in `ppp_version' PPP US\$"
+	label var median 			      "median daily per capita income/consumption in `ppp_version' PPP US\$"
 	label var mld 				      "mean log deviation"
 	label var polarization 		  "polarization"
 	label var population 		    "population in year"
