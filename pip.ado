@@ -882,6 +882,8 @@ Notes:
 
 Version Control:
 
+*! version 0.9.5.9003            <2023Apr27>
+*! -- Add general troubleshooting to documentation.
 *! version 0.9.5.9002            <2023Apr21>
 *! -- Change some variable labels for clarity
 *! version 0.9.5.9000            <2023Mar23>
