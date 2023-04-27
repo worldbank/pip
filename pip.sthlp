@@ -136,7 +136,7 @@ The underlying welfare aggregate is the per capita household income or consumpti
  the means and medians. For more information on the methodology,{browse "https://worldbank.github.io/PIP-Methodology/": click here}.
  
 {pstd}
-PIP is the result of a close collaboration between World Bank staff accross the Development Data Group, the Development Research Group, and the Poverty and Inequality Global Practice. 
+PIP is the result of a close collaboration between World Bank staff across the Development Data Group, the Development Research Group, and the Poverty and Inequality Global Practice. 
 
 
 {marker memory}{...}
@@ -680,8 +680,13 @@ Not necessarily the latest
 {txt}      ({stata "pip_examples pip_example03":click to run})
 
 
+
+{marker troubleshooting}{...}
+{title:Troubleshooting}{p 50 20 2}{p_end}
+{p 40 20 2}(Go up to {it:{help pip##sections:Sections Menu}}){p_end}
+
 {marker installation_ex}{...}
-{dlgtab: 5. Installation issues}
+{dlgtab: 1. Installation issues}
 
 {p 8 8 2}
 Installing the same Stata command from two different sources may result in 
@@ -730,6 +735,51 @@ Be aware that if you have more than one version installed in your {help sysdir:s
 {text}
 {p 8 8 2}To troubleshoot, follow the installation process 
 {it:{help pip##installation_process:above}}.{p_end}
+
+
+{marker general_troubleshooting}{...}
+{dlgtab: 2. General troubleshooting}
+
+{p 4 4 2} 
+In case {cmd:pip} is not working correctly, try the following steps in order
+{p_end}
+
+{pmore} 1. Uninstall {cmd:pip} by typing  {cmd: pip uninstall}
+	
+{pmore} 2. Execute {cmd:which pip}. If {cmd:pip} is still installed, delete all
+the {cmd:pip} files from wherever they are in your computer until the command above returns error. The idea is to leave no trace of {cmd:pip} in your computer. 
+ 
+{pmore} 3. Install {cmd:pip} again with the following code and check the version number. It should be the same as the most {browse "https://github.com/worldbank/pip/releases":recent release}
+
+	{cmd}
+		github install worldbank/pip
+		discard
+		which pip
+	{txt}
+
+{pmore} 4. Try to run it again and see if {cmd:pip} fails. 
+
+{pmore} 5. If it is still failing, open a new issue in the {browse "https://github.com/worldbank/pip/issues":GitHub issues page}, making sure 
+you're adding all the necessary steps to reproduce the problem. 
+
+{pmore} 6. Once the issue is created, run the code below--making sure you replace the commented line--and send the test.log file, along with the issue
+number created in the previous step, to {browse "pip@worldbank.org":pip@worldbank.org}. 
+
+	{cmd}
+		log using "test.log", name(pip_test) text replace {result:// this is in your cd}
+		cret list
+		clear all
+		which pip
+		set tracedepth 4
+		set traceexpand on 
+		set traceindent on 
+		set tracenumber on
+		set trace on
+		{result} /* the pip command that is failing. e.g.,
+		cap noi pip, region(EAP) year(last) clear */
+		{cmd}set trace off
+		log close pip_test
+	{txt}
 
 
 {marker disclaimer}{...}
