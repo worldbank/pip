@@ -882,6 +882,8 @@ Notes:
 
 Version Control:
 
+*! version 0.9.5.9004            <2023May02>
+*! -- Fix link of country info in pip_info
 *! version 0.9.5.9003            <2023Apr27>
 *! -- Add general troubleshooting to documentation.
 *! version 0.9.5.9002            <2023Apr21>
