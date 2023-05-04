@@ -53,6 +53,10 @@ IDEntity(string)               ///
 RELease(numlist)               ///
 TABle(string)                  ///
 path(string)                   ///
+noCACHE                        ///
+cachedir(string)               ///
+cachedelete                    ///
+cacheforce                     ///
 ] 
 
 if ("`pause'" == "pause") pause on
@@ -93,6 +97,13 @@ set checksum off
 	
 	if regexm("`subcommand'", "^update") {
 		noi pip_update, path(`path') `pause'
+		exit
+	}
+	
+	if regexm("`subcommand'", "cache") {
+		if ("`cachedelete'" != "") {
+			pip_cache delete, cachedir("`cachedir'")
+		}
 		exit
 	}
 	
@@ -334,7 +345,6 @@ qui {
 		local subcommand  = "information"
 	}
 	
-	
 	//------------ Region
 	
 	if ("`region'" != "") {
@@ -382,9 +392,6 @@ qui {
 		
 	}
 	
-	
-	
-
 	*---------- WB aggregate
 	
 	if ("`subcommand'" == "wb") {
@@ -563,54 +570,84 @@ qui {
 		// --- timer
 		
 		*---------- download data
-		cap import delimited  "`queryfull'&format=csv", `clear' varn(1) asdouble
-		if (_rc) {
-			noi dis ""
-			noi dis in red "It was not possible to download data from the PIP API."
-			noi dis ""
-			noi dis in white `"(1) Please check your Internet connection by "' _c 
-			noi dis in white  `"{browse "`url'/health-check" :clicking here}"'
-			noi dis in white `"(2) Test that the data is retrievable. By"' _c
-		  noi dis in white  `"{stata pip test, server(`server'): clicking here }"' _c
-			noi dis in white  "you should be able to download the data."
-			noi dis in white `"(3) Please consider adjusting your Stata timeout parameters. For more details see {help netio}"'
-			noi dis in white `"(4) Please send us an email to:"'
-			noi dis in white _col(8) `"email: pip@worldbank.org"'
-			noi dis in white _col(8) `"subject: pip query error on `c(current_date)' `c(current_time)'"'
-			noi di ""
-			error 673
+		if ("`cache'" == "") {
+			
+			if ("`cachedir'" == "") {
+				local dir "./_pip_cache"
+				cap mkdir "`cachedir'"
+			}
+				
+			pip_cache load, query("`queryfull'") cachedir("`cachedir'") ///
+				`cacheforce' `clear'
+			local pc_exists = "`r(pc_exists)'"
+			local piphash   = "`r(piphash)'"
+			
+			if (`pc_exists' == 1) {
+				noi disp "loading cache"
+			}
+			
 		}
-		* noi disp "`queryfull'&format=csv"
-		* exit 
-		
-		
-		// --- timer
-		if ("`timer'" != "") timer off `k'
-		// --- timer
-		
-		* global qr = `qr'
-		
-		if ("`aggregate'" == "" & "`wb'" == "") {
-			local rtype 1
-		}
-		else {
-			local rtype 2
-		}
-		
-		pause after download
-		
-		// --- timer
-		if ("`timer'" != "") timer on `h'
-		// --- timer
-		
-		*---------- Clean data
-		noi pip_clean `rtype', year("`year'") `iso' server(`server') /* 
-		*/ region(`region') `pause' `fillgaps' version(`version')
-		
-		pause after cleaning
-		// --- timer
-		if ("`timer'" != "") timer off `h'
-		// --- timer
+		// if not cached
+		if ("`pc_exists'" == "0" | "`cache'" == "nocache") {
+			cap import delimited  "`queryfull'&format=csv", `clear' varn(1) asdouble
+			if (_rc) {
+				noi dis ""
+				noi dis in red "It was not possible to download data from the PIP API."
+				noi dis ""
+				noi dis in white `"(1) Please check your Internet connection by "' _c 
+				noi dis in white  `"{browse "`url'/health-check" :clicking here}"'
+				noi dis in white `"(2) Test that the data is retrievable. By"' _c
+				noi dis in white  `"{stata pip test, server(`server'): clicking here }"' _c
+				noi dis in white  "you should be able to download the data."
+				noi dis in white `"(3) Please consider adjusting your Stata timeout parameters. For more details see {help netio}"'
+				noi dis in white `"(4) Please send us an email to:"'
+				noi dis in white _col(8) `"email: pip@worldbank.org"'
+				noi dis in white _col(8) `"subject: pip query error on `c(current_date)' `c(current_time)'"'
+				noi di ""
+				error 673
+			}
+			* noi disp "`queryfull'&format=csv"
+			* exit 
+			
+			
+			// --- timer
+			if ("`timer'" != "") timer off `k'
+			// --- timer
+			
+			* global qr = `qr'
+			
+			if ("`aggregate'" == "" & "`wb'" == "") {
+				local rtype 1
+			}
+			else {
+				local rtype 2
+			}
+			
+			pause after download
+			
+			// --- timer
+			if ("`timer'" != "") timer on `h'
+			// --- timer
+			
+			*---------- Clean data
+			noi pip_clean `rtype', year("`year'") `iso' server(`server') /* 
+			*/ region(`region') `pause' `fillgaps' version(`version')
+			
+			pause after cleaning
+			// --- timer
+			if ("`timer'" != "") timer off `h'
+			// --- timer
+			
+			//========================================================
+			// Caching
+			//========================================================
+			if ("`cache'" == "") {
+				if ("`cacheforce'" != "") local replace replace
+				pip_cache save, piphash("`piphash'") cachedir("`cachedir'") ///
+					query("`queryfull'") `replace'
+				noi disp "cache created"
+			}
+		}  // end of regular Download
 		
 		/*==================================================
 		Display Query
@@ -791,7 +828,9 @@ qui {
 	if ("${pip_cmds_ssc}" == "") {
 		noi pip_${pip_source} msg
 	}
+
 	
+
 	//========================================================
 	// Convert to povcalnet format
 	//========================================================
