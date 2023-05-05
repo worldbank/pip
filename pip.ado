@@ -20,6 +20,16 @@ Output:
 /*==================================================
 0: Program set up
 ==================================================*/
+
+
+
+findfile "pip_fun.mata"
+include "`r(fn)'"
+
+
+findfile "pip_setup.do"
+do "`r(fn)'"
+
 program define pip, rclass
 version 16.0
 
