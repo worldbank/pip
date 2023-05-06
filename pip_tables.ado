@@ -52,29 +52,57 @@ qui {
 	
 	if ("`table'" != "") {
 		local table_call = "`url'/aux?table=`table'&`version_qr'&format=csv"
-		import delimit "`table_call'", varn(1) `clear' asdouble
-		return local table_call = "`table_call'"
 		
-		* rename vars. Modify the following locals
-		local oldvars "reporting_year survey_year"
-		local newvars "year welfare_time"
+		// Caching 
+		if (${pip_cache} == 1) {
+			
+			if ("`cachedir'" == "") {
+				local dir "./_pip_cache"
+				cap mkdir "`cachedir'"
+			}
+				
+			pip_cache load, query("`table_call'") cachedir("`cachedir'") ///
+			${pip_cacheforce} `clear'
+			
+			local pc_exists = "`r(pc_exists)'"
+			local piphash   = "`r(piphash)'"
+		}
 		
-		gettoken old oldvars : oldvars
-		gettoken new newvars : newvars
-		qui while ("`old'" != "") {
-			cap confirm new var `old', exact
-			if (_rc) cap confirm var `new', exact
-			if (_rc) rename `old' `new' 
+		// Not caching
+		if ("`pc_exists'" == "0" | ${pip_cache} == 0) {
+		
+			import delimit "`table_call'", varn(1) `clear' asdouble
+			return local table_call = "`table_call'"
+			
+			* rename vars. Modify the following locals
+			local oldvars "reporting_year survey_year"
+			local newvars "year welfare_time"
 			
 			gettoken old oldvars : oldvars
 			gettoken new newvars : newvars
-		}
-		
-		* to lower cases
-		local tolvars "welfare_type"
-		foreach t of local tolvars {
-			cap confirm new var `t', exact
-			if (_rc) replace `t' = lower(`t')		
+			qui while ("`old'" != "") {
+				cap confirm new var `old', exact
+				if (_rc) cap confirm var `new', exact
+				if (_rc) rename `old' `new' 
+				
+				gettoken old oldvars : oldvars
+				gettoken new newvars : newvars
+			}
+			
+			* to lower cases
+			local tolvars "welfare_type"
+			foreach t of local tolvars {
+				cap confirm new var `t', exact
+				if (_rc) replace `t' = lower(`t')		
+			}
+			
+			//========================================================
+			// Caching
+			//========================================================
+			if (${pip_cache} == 1) {
+				pip_cache save, piphash("`piphash'") cachedir("`cachedir'") ///
+					query("`queryfull'") `replace' 
+			}
 		}
 		
 		exit

@@ -1,13 +1,18 @@
+
+
+
 //========================================================
 //  Globals
 //========================================================
 
 
-global pip_cmds_ssc ""
+global pip_pipmata_hash  = "1712092156"
 
-global pip_source ""
+global pip_lastupdate    = "20230505" 
 
-global pip_lastupdate "20230505" 
+global pip_source   = "ssc"
+
+
 
 
 

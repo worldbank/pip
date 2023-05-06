@@ -20,7 +20,8 @@ mata set matalnum  off // (on when debugging; off in production)
 // found
 real scalar pip_find_pattern_pos(string scalar filetoread, string scalar pattern) 
 {
-	real scalar    fh, pos_a, pos_b
+	real scalar    fh, pos_a, pos_b, found
+	string scalar  line
 	string matrix  EOF
 	 
 	// setup 
@@ -35,7 +36,6 @@ real scalar pip_find_pattern_pos(string scalar filetoread, string scalar pattern
 		if (regexm(line, pattern)) {
 			fseek(fh, pos_b, -1)
 			found = 1
-			printf("line text: %s\n", line)
 			break
 		}
 		pos_b = pos_a
@@ -51,13 +51,14 @@ real scalar pip_find_pattern_pos(string scalar filetoread, string scalar pattern
 	return(pos_a)
 } // end of pip_find_pattern_pos
 
-
 // Read and return the line in a file from a specific position
 // of the file
 string scalar pip_read_pos_file(string scalar filetoread, real scalar pos)
 {
 	// set up
 	real scalar    fh
+	string scalar  line
+	
 	fh = fopen(filetoread, "r")
 	
 	// display and return line
@@ -75,7 +76,7 @@ string scalar newline)
 {
 	
 	// set up
-	real scalar    fh
+	real scalar    fh, nchar, nnline 
 	string scalar  nl // new line
 	nl = char(13) + char(10)
 	
@@ -98,6 +99,20 @@ string scalar newline)
 	fclose(fh)
 
 	
+}
+
+
+void pip_replace_in_pattern(
+string scalar filetoread, 
+string scalar pattern,
+string scalar newline)
+{
+	real scalar pos
+	
+	pos = pip_find_pattern_pos(filetoread, pattern)
+	if (pos) pip_write_pos_file(filetoread, pos, newline)
+	else printf("Nothing to update")
+
 }
 
 end 

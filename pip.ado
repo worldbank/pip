@@ -17,18 +17,10 @@ References:
 Output: 
 =======================================================*/
 
+
 /*==================================================
 0: Program set up
 ==================================================*/
-
-
-
-findfile "pip_fun.mata"
-include "`r(fn)'"
-
-
-findfile "pip_setup.do"
-do "`r(fn)'"
 
 program define pip, rclass
 version 16.0
@@ -69,63 +61,75 @@ cachedelete                    ///
 cacheforce                     ///
 ] 
 
+
 if ("`pause'" == "pause") pause on
 else                      pause off
 set checksum off
 
-	//========================================================
-	// housekeeping
-	//========================================================
-	local curframe = c(frame)
-	
-	if regexm("`subcommand'", "^clean") {
-		noi pip_cleanup
-		exit
+//========================================================
+// housekeeping
+//========================================================
+local curframe = c(frame)
+
+pip_setup
+exit 
+
+if regexm("`subcommand'", "^clean") {
+	noi pip_cleanup
+	exit
+}
+
+
+if regexm("`subcommand'", "^dropframe") {
+	pip_drop frame, frame_prefix(`frame_prefix')
+	exit
+}
+
+if regexm("`subcommand'", "^dropglobal") {
+	pip_drop global
+	exit
+}
+
+if regexm("`subcommand'", "^install") {
+	local sscmd: word 2 of `subcommand'
+	noi pip_install `sscmd', path(`path') `pause'
+	exit
+}
+
+if regexm("`subcommand'", "^uninstall") {
+	pip_install uninstall, path(`path') `pause'
+	exit
+}
+
+if regexm("`subcommand'", "^update") {
+	noi pip_update, path(`path') `pause'
+	exit
+}
+
+// Cache
+if regexm("`subcommand'", "cache") {
+	if ("`cachedelete'" != "") {
+		pip_cache delete, cachedir("`cachedir'")
 	}
-	
-	
-	if regexm("`subcommand'", "^dropframe") {
-		pip_drop frame, frame_prefix(`frame_prefix')
-		exit
-	}
-	
-	if regexm("`subcommand'", "^dropglobal") {
-		pip_drop global
-		exit
-	}
-	
-	if regexm("`subcommand'", "^install") {
-		local sscmd: word 2 of `subcommand'
-		noi pip_install `sscmd', path(`path') `pause'
-		exit
-	}
-	
-	if regexm("`subcommand'", "^uninstall") {
-		pip_install uninstall, path(`path') `pause'
-		exit
-	}
-	
-	if regexm("`subcommand'", "^update") {
-		noi pip_update, path(`path') `pause'
-		exit
-	}
-	
-	if regexm("`subcommand'", "cache") {
-		if ("`cachedelete'" != "") {
-			pip_cache delete, cachedir("`cachedir'")
-		}
-		exit
-	}
-	
-	// ------------------------------------------------------------------------
-	// New session procedure
-	// ------------------------------------------------------------------------
-	
+	exit
+}
+
+if ("`cache'" == "") 	global pip_cache 1
+else                  global pip_cache 0
+
+if ("`cacheforce'" != "") 	{
+	global pip_cacheforce `cacheforce'
+	local replace replace
+}
+else global pip_cacheforce `cacheforce'
+
+// ------------------------------------------------------------------------
+// New session procedure
+// ------------------------------------------------------------------------
+
+pip_new_session , `pause'
+
 qui {
-	
-	if ("${pip_cmds_ssc}" == "") {
-		pip_new_session , `pause'
-	}
 	
 	//========================================================
 	// setup defaults
@@ -370,7 +374,7 @@ qui {
 			"{it: SAS}, not {it:SAR}. We'll make the change for you"
 			local region: subinstr local region "SAR" "SAS", word
 		}
-	
+		
 		tokenize "`version'", parse("_")
 		local _version   = "_`1'_`3'_`9'"
 		
@@ -491,7 +495,7 @@ qui {
 		local j = `i++'
 		local k = `i++'
 		local h = `i++'
-		scalar tt = tt + "`crlf' `j': bulding query"
+		scalar tt = tt + "`crlf' `j': building query"
 		scalar tt = tt + "`crlf' `k': downloading data"
 		scalar tt = tt + "`crlf' `h': cleaning data"
 	}	
@@ -580,15 +584,15 @@ qui {
 		// --- timer
 		
 		*---------- download data
-		if ("`cache'" == "") {
+		if (${pip_cache} == 1) {
 			
 			if ("`cachedir'" == "") {
 				local dir "./_pip_cache"
 				cap mkdir "`cachedir'"
 			}
-				
+			
 			pip_cache load, query("`queryfull'") cachedir("`cachedir'") ///
-				`cacheforce' `clear'
+			${pip_cacheforce} `clear'
 			local pc_exists = "`r(pc_exists)'"
 			local piphash   = "`r(piphash)'"
 			
@@ -598,7 +602,7 @@ qui {
 			
 		}
 		// if not cached
-		if ("`pc_exists'" == "0" | "`cache'" == "nocache") {
+		if ("`pc_exists'" == "0" | ${pip_cache} == 0) {
 			cap import delimited  "`queryfull'&format=csv", `clear' varn(1) asdouble
 			if (_rc) {
 				noi dis ""
@@ -651,10 +655,9 @@ qui {
 			//========================================================
 			// Caching
 			//========================================================
-			if ("`cache'" == "") {
-				if ("`cacheforce'" != "") local replace replace
+			if (${pip_cache} == 1) {
 				pip_cache save, piphash("`piphash'") cachedir("`cachedir'") ///
-					query("`queryfull'") `replace'
+				query("`queryfull'") `replace' ${pip_cacheforce}
 				noi disp "cache created"
 			}
 		}  // end of regular Download
@@ -838,9 +841,9 @@ qui {
 	if ("${pip_cmds_ssc}" == "") {
 		noi pip_${pip_source} msg
 	}
-
 	
-
+	
+	
 	//========================================================
 	// Convert to povcalnet format
 	//========================================================

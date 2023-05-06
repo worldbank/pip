@@ -18,6 +18,7 @@ Output:
 program define pip_cache, rclass
 syntax [anything(name=subcmd)], [   ///
         query(string)               ///
+				PREfix(string)              ///
         cachedir(string)            ///
         piphash(string)             ///
         clear                       ///
@@ -25,6 +26,14 @@ syntax [anything(name=subcmd)], [   ///
 				cacheforce                  ///
         ]
 version 16.0
+
+
+if ("`subcmd'" == "gethash") {
+	pip_cache_gethash, query(`query')
+	return add
+	exit
+}
+
 
 
 /*++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -38,13 +47,13 @@ if ("`cachedir'" == "") {
 
 
 /*==================================================
-              1:load
-							==================================================*/
+1:load
+==================================================*/
 
 if ("`subcmd'" == "load") {
-    mata:  st_numscalar("piphash", hash1(`"pip `query'"', ., 2)) 
-    local piphash = "_pc" + strofreal(piphash, "%12.0g")
-		
+		pip_cache gethash, query(`query')
+		local piphash = "`r(piphash)'"
+    
 		if ("`cacheforce'" != "") {
 			return local piphash = "`piphash'"
       return local pc_exists = 0 
@@ -98,6 +107,25 @@ if ("`subcmd'" == "delete") {
 
 
 end
+
+program define pip_cache_gethash, rclass
+syntax [anything(name=subcmd)], [   ///
+        query(string)               ///
+        PREfix(string)              ///
+        ]
+version 16.0
+
+if ("`prefix'" == "") local prefix = "pip"
+
+tempname spiphash
+
+mata:  st_numscalar("`spiphash'", hash1(`"`prefix'`query'"', ., 2)) 
+local piphash = strofreal(`spiphash', "%12.0g")
+return local piphash = `piphash'
+
+end
+
+
 exit
 /* End of do-file */
 
