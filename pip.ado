@@ -937,15 +937,15 @@ Notes:
 
 Version Control:
 
-*! version 0.9.5.9005            <2023May03>
+*! version 0.9.6            <2023May05>
+*! -- add caching to aux tables
+*! -- add pip_setup.do file... this should be created internally
+*! -- add mata functions to edit pip_setup.do
+*! --  add pip_setup.ado to run mata and pip_setup.do 
 *! -- First attempt of caching... not fully working
-*! version 0.9.5.9004            <2023May02>
 *! -- Fix link of country info in pip_info
-*! version 0.9.5.9003            <2023Apr27>
 *! -- Add general troubleshooting to documentation.
-*! version 0.9.5.9002            <2023Apr21>
 *! -- Change some variable labels for clarity
-*! version 0.9.5.9000            <2023Mar23>
 *! -- Update help file with installation instructions.
 *! version 0.9.5                 <2023Feb14>
 *! -- fix writing error in pip.pkg file that did not allow the installation of pip_update
