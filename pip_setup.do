@@ -13,6 +13,9 @@ global pip_lastupdate    = "20230505"
 global pip_source   = "ssc"
 
 
+global pip_cachedir = ""
+
+
 
 
 

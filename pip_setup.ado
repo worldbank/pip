@@ -63,8 +63,6 @@ qui {
 		
 		local pattern = "pip_pipmata_hash"
 		local newline = `"global pip_pipmata_hash  = "`pipmata_hash'""'
-		* findfile "pip_setup.do"
-	  * local pipsetup_file = "`r(fn)'"
 		
 		mata: pip_replace_in_pattern("`pipsetup_file'", "`pattern'", `"`newline'"')
 	}

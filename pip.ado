@@ -69,10 +69,13 @@ set checksum off
 //========================================================
 // housekeeping
 //========================================================
+pip_setup, `pause'
+if ("`subcommand'" == "setup") {
+	exit
+}
+
 local curframe = c(frame)
 
-pip_setup
-exit 
 
 if regexm("`subcommand'", "^clean") {
 	noi pip_cleanup
