@@ -50,7 +50,7 @@ make pip, replace toc pkg                         ///  readme
     url("")                                                                 ///
     title("Poverty and Inequality Platform Stata wrapper")                  ///
     description("World Bank PIP API Stata wrapper")                         ///
-    install("`as';`hs'") ///
+    install("`toins'") ///
     ancillary("")                                                         
 
 *##e
