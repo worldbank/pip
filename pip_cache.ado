@@ -13,37 +13,39 @@ Output:
 ==================================================*/
 
 /*==================================================
-              0: Program set up
+0: Program set up
 ==================================================*/
 program define pip_cache, rclass
 syntax [anything(name=subcmd)], [   ///
-        query(string)               ///
-				PREfix(string)              ///
-        cachedir(string)            ///
-        piphash(string)             ///
-        clear                       ///
-				replace                     ///
-				cacheforce                  ///
-        ]
+query(string)               ///
+PREfix(string)              ///
+cachedir(string)            ///
+piphash(string)             ///
+clear                       ///
+replace                     ///
+cacheforce                  ///
+]
+
 version 16.0
-
-
-if ("`subcmd'" == "gethash") {
-	pip_cache_gethash, query(`query')
-	return add
-	exit
-}
-
-
 
 /*++++++++++++++++++++++++++++++++++++++++++++++++++
 SET UP
 ++++++++++++++++++++++++++++++++++++++++++++++++++*/
 
-if ("`cachedir'" == "") {
-    local cachedir "./_pip_cache"
-    cap mkdir "`cachedir'"
+
+if ("`${pip_cachedir}'" == "0") {
+	return local piphash = "0"
+	return local pc_exists = 0 
+	exit
 }
+
+
+if ("`subcmd'" == "gethash") {
+	pip_cache_gethash, query(`"`query'"')
+	return add
+	exit
+}
+
 
 
 /*==================================================
@@ -51,39 +53,42 @@ if ("`cachedir'" == "") {
 ==================================================*/
 
 if ("`subcmd'" == "load") {
-		pip_cache gethash, query(`query')
-		local piphash = "`r(piphash)'"
-    
-		if ("`cacheforce'" != "") {
-			return local piphash = "`piphash'"
-      return local pc_exists = 0 
-      exit
-		}
-
-    // check if cache already pc_exists
-    local pc_file "`cachedir'/`piphash'.dta"
-    cap confirm file "`pc_file'"
-    if _rc {
-        return local piphash = "`piphash'"
-        return local pc_exists = 0 
-        exit
-    } 
-    else {
-        return local pc_exists = 1
-        use "`pc_file'", `clear'
-        exit
-    }
+	pip_cache gethash, query(`query')
+	local piphash = "`r(piphash)'"
+	return local piphash = "`piphash'"
+	
+	if ("`cacheforce'" != "") {
+		return local pc_exists = 0 
+		exit
+	}
+	
+	// check if cache already pc_exists
+	mata: st_local("pc_file", pathjoin("${pip_cachedir}", "`piphash'.dta"))
+	cap confirm file "`pc_file'"
+	if _rc {        
+		return local pc_exists = 0 
+		exit
+	} 
+	else {
+		return local pc_exists = 1
+		use "`pc_file'", `clear'
+		exit
+	}
 }
 
 /*==================================================
-              3: saves
+3: saves
 ==================================================*/
 
 if ("`subcmd'" == "save") {
-    local pc_file "`cachedir'/`piphash'.dta"
-    char _dta[piphash] `piphash'
-    char _dta[pipquery] `query'
-    save "`pc_file'", `replace'
+	mata: st_local("pc_file", pathjoin("${pip_cachedir}", "`piphash'.dta"))
+	cap confirm file "`pc_file'"
+	if (_rc == 0 | "`cacheforce'" != "") {
+		char _dta[piphash] `piphash'
+		char _dta[pipquery] `query'
+		save "`pc_file'", `replace'
+	}
+	exit
 }
 
 //========================================================
@@ -91,37 +96,40 @@ if ("`subcmd'" == "save") {
 //========================================================
 
 if ("`subcmd'" == "delete") {
-		local pc_files: dir "`cachedir'" files  "_pc*"
-		local nfiles: word count `pc_files'
-		
-		noi disp "{err:Warning:} you will delete `nfiles' cache files." _n ///
-		"Do you want to continue? (Y/n)", _request(_confirm)
-		
-		if (lower("`confirm'") == "y") {
-			foreach f of local pc_files {
-				erase "`cachedir'/`f'"
-			}
+	local pc_files: dir "`cachedir'" files  "_pc*"
+	local nfiles: word count `pc_files'
+	
+	noi disp "{err:Warning:} you will delete `nfiles' cache files." _n ///
+	"Do you want to continue? (Y/n)", _request(_confirm)
+	
+	if (lower("`confirm'") == "y") {
+		foreach f of local pc_files {
+			erase "`cachedir'/`f'"
 		}
-		
+	}
+	
 }
 
 
 end
 
+
 program define pip_cache_gethash, rclass
 syntax [anything(name=subcmd)], [   ///
-        query(string)               ///
-        PREfix(string)              ///
-        ]
+query(string)               ///
+PREfix(string)              ///
+]
+
 version 16.0
+
 
 if ("`prefix'" == "") local prefix = "pip"
 
 tempname spiphash
 
 mata:  st_numscalar("`spiphash'", hash1(`"`prefix'`query'"', ., 2)) 
-local piphash = strofreal(`spiphash', "%12.0g")
-return local piphash = `piphash'
+local piphash = "_pip" + strofreal(`spiphash', "%12.0g")
+return local piphash = "`piphash'"
 
 end
 

@@ -117,7 +117,8 @@ real scalar pip_mkdir_recursive(string scalar path, | real scalar pub)
 	
 	string rowvector mpath
 	real   rowvector direx
-	string scalar ppath
+	string scalar    ppath
+	real scalar      i
 	
 	if (args() == 1) pub = 0
 	

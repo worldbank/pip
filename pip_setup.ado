@@ -233,7 +233,8 @@ qui {
 	} // if cache dir is empty
 	
 	
-	if (!inlist(upper("`cachedir'"), "", "NO")) {
+	if (!inlist("`cachedir'", "")) {
+		if (lower("`cachedir'") == "no") local cachedir = 0
 		mata: st_numscalar("`direxist'", pip_check_folder("`cachedir'"))
 		if (`direxist' == 1 )  {
 			local pattern "pip_cachedir"

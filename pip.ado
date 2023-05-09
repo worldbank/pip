@@ -69,11 +69,15 @@ set checksum off
 //========================================================
 // housekeeping
 //========================================================
+
 pip_setup, `pause'
+
 if ("`subcommand'" == "setup") {
 	noi disp "{res:Setup done!}"
 	exit
 }
+
+
 
 local curframe = c(frame)
 
@@ -116,9 +120,6 @@ if regexm("`subcommand'", "cache") {
 	}
 	exit
 }
-
-if ("`cache'" == "") 	global pip_cache 1
-else                  global pip_cache 0
 
 if ("`cacheforce'" != "") 	{
 	global pip_cacheforce `cacheforce'
@@ -294,10 +295,10 @@ qui {
 		local subcommand "wb"
 		local wb_change  1
 		noi disp as err "Warning: " as text " {cmd:pip, country(all) aggregate} " /* 
-	  */	"is equivalent to {cmd:pip wb}. " _n /* 
-	  */  " if you want to aggregate all countries by survey years, " /* 
-	  */  "you need to parse the list of countries in {it:country()} option. See " /*
-	  */  "{help pip##options:aggregate option description} for an example on how to do it"
+		*/	"is equivalent to {cmd:pip wb}. " _n /* 
+		*/  " if you want to aggregate all countries by survey years, " /* 
+		*/  "you need to parse the list of countries in {it:country()} option. See " /*
+		*/  "{help pip##options:aggregate option description} for an example on how to do it"
 	}
 	else {
 		local wb_change 0
@@ -587,25 +588,14 @@ qui {
 		// --- timer
 		
 		*---------- download data
-		if (${pip_cache} == 1) {
+		
+		pip_cache load, query("`queryfull'") `cacheforce' `clear'
+		local pc_exists = "`r(pc_exists)'"
+		local piphash   = "`r(piphash)'"
+		
+		// if not cached because it war forced or because user does not want to
+		if ("`pc_exists'" == "0" | "`${pip_cachedir}'" == "0") {
 			
-			if ("`cachedir'" == "") {
-				local dir "./_pip_cache"
-				cap mkdir "`cachedir'"
-			}
-			
-			pip_cache load, query("`queryfull'") cachedir("`cachedir'") ///
-			${pip_cacheforce} `clear'
-			local pc_exists = "`r(pc_exists)'"
-			local piphash   = "`r(piphash)'"
-			
-			if (`pc_exists' == 1) {
-				noi disp "loading cache"
-			}
-			
-		}
-		// if not cached
-		if ("`pc_exists'" == "0" | ${pip_cache} == 0) {
 			cap import delimited  "`queryfull'&format=csv", `clear' varn(1) asdouble
 			if (_rc) {
 				noi dis ""
@@ -623,9 +613,6 @@ qui {
 				noi di ""
 				error 673
 			}
-			* noi disp "`queryfull'&format=csv"
-			* exit 
-			
 			
 			// --- timer
 			if ("`timer'" != "") timer off `k'
@@ -658,11 +645,8 @@ qui {
 			//========================================================
 			// Caching
 			//========================================================
-			if (${pip_cache} == 1) {
-				pip_cache save, piphash("`piphash'") cachedir("`cachedir'") ///
-				query("`queryfull'") `replace' ${pip_cacheforce}
-				noi disp "cache created"
-			}
+			pip_cache save, piphash("`piphash'") `replace' ///
+			query("`queryfull'") `cacheforce'
 		}  // end of regular Download
 		
 		/*==================================================
