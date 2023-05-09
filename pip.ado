@@ -17,9 +17,11 @@ References:
 Output: 
 =======================================================*/
 
+
 /*==================================================
 0: Program set up
 ==================================================*/
+
 program define pip, rclass
 version 16.0
 
@@ -53,58 +55,85 @@ IDEntity(string)               ///
 RELease(numlist)               ///
 TABle(string)                  ///
 path(string)                   ///
+noCACHE                        ///
+cachedir(string)               ///
+cachedelete                    ///
+cacheforce                     ///
 ] 
+
 
 if ("`pause'" == "pause") pause on
 else                      pause off
 set checksum off
 
-	//========================================================
-	// housekeeping
-	//========================================================
-	local curframe = c(frame)
-	
-	if regexm("`subcommand'", "^clean") {
-		noi pip_cleanup
-		exit
+//========================================================
+// housekeeping
+//========================================================
+
+pip_setup, `pause'
+
+if ("`subcommand'" == "setup") {
+	noi disp "{res:Setup done!}"
+	exit
+}
+
+
+
+local curframe = c(frame)
+
+if regexm("`subcommand'", "^clean") {
+	noi pip_cleanup
+	exit
+}
+
+
+if regexm("`subcommand'", "^dropframe") {
+	pip_drop frame, frame_prefix(`frame_prefix')
+	exit
+}
+
+if regexm("`subcommand'", "^dropglobal") {
+	pip_drop global
+	exit
+}
+
+if regexm("`subcommand'", "^install") {
+	local sscmd: word 2 of `subcommand'
+	noi pip_install `sscmd', path(`path') `pause'
+	exit
+}
+
+if regexm("`subcommand'", "^uninstall") {
+	pip_install uninstall, path(`path') `pause'
+	exit
+}
+
+if regexm("`subcommand'", "^update") {
+	noi pip_update, path(`path') `pause'
+	exit
+}
+
+// Cache
+if regexm("`subcommand'", "cache") {
+	if ("`cachedelete'" != "") {
+		pip_cache delete, cachedir("`cachedir'")
 	}
-	
-	
-	if regexm("`subcommand'", "^dropframe") {
-		pip_drop frame, frame_prefix(`frame_prefix')
-		exit
-	}
-	
-	if regexm("`subcommand'", "^dropglobal") {
-		pip_drop global
-		exit
-	}
-	
-	if regexm("`subcommand'", "^install") {
-		local sscmd: word 2 of `subcommand'
-		noi pip_install `sscmd', path(`path') `pause'
-		exit
-	}
-	
-	if regexm("`subcommand'", "^uninstall") {
-		pip_install uninstall, path(`path') `pause'
-		exit
-	}
-	
-	if regexm("`subcommand'", "^update") {
-		noi pip_update, path(`path') `pause'
-		exit
-	}
-	
-	// ------------------------------------------------------------------------
-	// New session procedure
-	// ------------------------------------------------------------------------
-	
+	exit
+}
+
+if ("`cacheforce'" != "") 	{
+	global pip_cacheforce `cacheforce'
+	local replace replace
+}
+else global pip_cacheforce `cacheforce'
+
+// ------------------------------------------------------------------------
+// New session procedure
+// ------------------------------------------------------------------------
+
+pip_new_session , `pause'
+
 qui {
-	
-	if ("${pip_cmds_ssc}" == "") {
-		pip_new_session , `pause'
-	}
 	
 	//========================================================
 	// setup defaults
@@ -266,10 +295,10 @@ qui {
 		local subcommand "wb"
 		local wb_change  1
 		noi disp as err "Warning: " as text " {cmd:pip, country(all) aggregate} " /* 
-	  */	"is equivalent to {cmd:pip wb}. " _n /* 
-	  */  " if you want to aggregate all countries by survey years, " /* 
-	  */  "you need to parse the list of countries in {it:country()} option. See " /*
-	  */  "{help pip##options:aggregate option description} for an example on how to do it"
+		*/	"is equivalent to {cmd:pip wb}. " _n /* 
+		*/  " if you want to aggregate all countries by survey years, " /* 
+		*/  "you need to parse the list of countries in {it:country()} option. See " /*
+		*/  "{help pip##options:aggregate option description} for an example on how to do it"
 	}
 	else {
 		local wb_change 0
@@ -334,7 +363,6 @@ qui {
 		local subcommand  = "information"
 	}
 	
-	
 	//------------ Region
 	
 	if ("`region'" != "") {
@@ -350,7 +378,7 @@ qui {
 			"{it: SAS}, not {it:SAR}. We'll make the change for you"
 			local region: subinstr local region "SAR" "SAS", word
 		}
-	
+		
 		tokenize "`version'", parse("_")
 		local _version   = "_`1'_`3'_`9'"
 		
@@ -382,9 +410,6 @@ qui {
 		
 	}
 	
-	
-	
-
 	*---------- WB aggregate
 	
 	if ("`subcommand'" == "wb") {
@@ -474,7 +499,7 @@ qui {
 		local j = `i++'
 		local k = `i++'
 		local h = `i++'
-		scalar tt = tt + "`crlf' `j': bulding query"
+		scalar tt = tt + "`crlf' `j': building query"
 		scalar tt = tt + "`crlf' `k': downloading data"
 		scalar tt = tt + "`crlf' `h': cleaning data"
 	}	
@@ -563,54 +588,66 @@ qui {
 		// --- timer
 		
 		*---------- download data
-		cap import delimited  "`queryfull'&format=csv", `clear' varn(1) asdouble
-		if (_rc) {
-			noi dis ""
-			noi dis in red "It was not possible to download data from the PIP API."
-			noi dis ""
-			noi dis in white `"(1) Please check your Internet connection by "' _c 
-			noi dis in white  `"{browse "`url'/health-check" :clicking here}"'
-			noi dis in white `"(2) Test that the data is retrievable. By"' _c
-		  noi dis in white  `"{stata pip test, server(`server'): clicking here }"' _c
-			noi dis in white  "you should be able to download the data."
-			noi dis in white `"(3) Please consider adjusting your Stata timeout parameters. For more details see {help netio}"'
-			noi dis in white `"(4) Please send us an email to:"'
-			noi dis in white _col(8) `"email: pip@worldbank.org"'
-			noi dis in white _col(8) `"subject: pip query error on `c(current_date)' `c(current_time)'"'
-			noi di ""
-			error 673
-		}
-		* noi disp "`queryfull'&format=csv"
-		* exit 
 		
+		pip_cache load, query("`queryfull'") `cacheforce' `clear'
+		local pc_exists = "`r(pc_exists)'"
+		local piphash   = "`r(piphash)'"
 		
-		// --- timer
-		if ("`timer'" != "") timer off `k'
-		// --- timer
-		
-		* global qr = `qr'
-		
-		if ("`aggregate'" == "" & "`wb'" == "") {
-			local rtype 1
-		}
-		else {
-			local rtype 2
-		}
-		
-		pause after download
-		
-		// --- timer
-		if ("`timer'" != "") timer on `h'
-		// --- timer
-		
-		*---------- Clean data
-		noi pip_clean `rtype', year("`year'") `iso' server(`server') /* 
-		*/ region(`region') `pause' `fillgaps' version(`version')
-		
-		pause after cleaning
-		// --- timer
-		if ("`timer'" != "") timer off `h'
-		// --- timer
+		// if not cached because it war forced or because user does not want to
+		if ("`pc_exists'" == "0" | "`${pip_cachedir}'" == "0") {
+			
+			cap import delimited  "`queryfull'&format=csv", `clear' varn(1) asdouble
+			if (_rc) {
+				noi dis ""
+				noi dis in red "It was not possible to download data from the PIP API."
+				noi dis ""
+				noi dis in white `"(1) Please check your Internet connection by "' _c 
+				noi dis in white  `"{browse "`url'/health-check" :clicking here}"'
+				noi dis in white `"(2) Test that the data is retrievable. By"' _c
+				noi dis in white  `"{stata pip test, server(`server'): clicking here }"' _c
+				noi dis in white  "you should be able to download the data."
+				noi dis in white `"(3) Please consider adjusting your Stata timeout parameters. For more details see {help netio}"'
+				noi dis in white `"(4) Please send us an email to:"'
+				noi dis in white _col(8) `"email: pip@worldbank.org"'
+				noi dis in white _col(8) `"subject: pip query error on `c(current_date)' `c(current_time)'"'
+				noi di ""
+				error 673
+			}
+			
+			// --- timer
+			if ("`timer'" != "") timer off `k'
+			// --- timer
+			
+			* global qr = `qr'
+			
+			if ("`aggregate'" == "" & "`wb'" == "") {
+				local rtype 1
+			}
+			else {
+				local rtype 2
+			}
+			
+			pause after download
+			
+			// --- timer
+			if ("`timer'" != "") timer on `h'
+			// --- timer
+			
+			*---------- Clean data
+			noi pip_clean `rtype', year("`year'") `iso' server(`server') /* 
+			*/ region(`region') `pause' `fillgaps' version(`version')
+			
+			pause after cleaning
+			// --- timer
+			if ("`timer'" != "") timer off `h'
+			// --- timer
+			
+			//========================================================
+			// Caching
+			//========================================================
+			pip_cache save, piphash("`piphash'") `replace' ///
+			query("`queryfull'") `cacheforce'
+		}  // end of regular Download
 		
 		/*==================================================
 		Display Query
@@ -792,6 +829,8 @@ qui {
 		noi pip_${pip_source} msg
 	}
 	
+	
+	
 	//========================================================
 	// Convert to povcalnet format
 	//========================================================
@@ -882,6 +921,18 @@ Notes:
 
 Version Control:
 
+*! version 0.9.7            <2023May09>
+*! -- several improvements to caching and setup.do 
+*! version 0.9.6            <2023May05>
+*! -- add caching to aux tables
+*! -- add pip_setup.do file... this should be created internally
+*! -- add mata functions to edit pip_setup.do
+*! --  add pip_setup.ado to run mata and pip_setup.do 
+*! -- First attempt of caching... not fully working
+*! -- Fix link of country info in pip_info
+*! -- Add general troubleshooting to documentation.
+*! -- Change some variable labels for clarity
+*! -- Update help file with installation instructions.
 *! version 0.9.5                 <2023Feb14>
 *! -- fix writing error in pip.pkg file that did not allow the installation of pip_update
 *! version 0.9.2                 <2023Feb14>

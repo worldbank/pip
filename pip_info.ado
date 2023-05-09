@@ -248,7 +248,8 @@ qui {
 			local country = upper("`country'")
 			keep if country_code == "`country'"
 			
-			local link_detail = "`url'/Docs/CountryDocs/`country'.htm"
+			local link_detail = "https://pip.worldbank.org/country-details/`country'"
+			
 			noi display `"{browse "`link_detail'" : Detailed information (browser)}"'
 			
 			local nobs = _N

@@ -27,6 +27,19 @@ pause                             ///
 if ("`pause'" == "pause") pause on
 else                      pause off
 
+*##s
+* ---- Initial time parameters
+global pip_cmds_ssc 1
+if ("${pip_lastupdate}" != "") {
+	local day_diff = date("${pip_date_file}","YMD") - ///
+	                 date("${pip_lastupdate}","YMD")
+	if (`day_diff' <= 31) {
+		noi disp "Check for updates will be done in `=31-`day_diff'' days"
+		exit
+	}
+}
+
+*##e
 
 /*==================================================
 1: Update PIP
@@ -60,8 +73,17 @@ if ("`r(pkglist)'" != "") adoupdate `r(pkglist)', update ssconly
 
 
 * ----- Globals
-global pip_cmds_ssc = 1  // make sure it does not execute again per session
-global pip_source   = "`pip_source'"
+
+local tgl = `"global pip_source   = "`pip_source'""'
+pip_setup replace, pattern("pip_lastupdate") /* 
+ */ new(`"global pip_lastupdate "${pip_date_file}""')
+pip_setup replace, pattern("pip_source") new(`"`tgl'"')
+
+pip_setup run 
+
+
+* global pip_cmds_ssc = 1  // make sure it does not execute again per session
+
 `bye'
 
 end 

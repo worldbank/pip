@@ -34,12 +34,12 @@ version 16
 qui {
 	
 	*---------- API defaults
-	qui pip_versions,                      ///
-	      server(`server')                 ///
-	      version(`version')               ///
-	      release(`release')               ///
-	      ppp_year(`ppp_year')             ///
-	      identity(`identity')             
+	qui pip_versions,      ///
+	server(`server')       ///
+	version(`version')     ///
+	release(`release')     ///
+	ppp_year(`ppp_year')   ///
+	identity(`identity')   
 	
 	local server     = "`r(server)'"
 	local url        = "`r(url)'"
@@ -52,29 +52,47 @@ qui {
 	
 	if ("`table'" != "") {
 		local table_call = "`url'/aux?table=`table'&`version_qr'&format=csv"
-		import delimit "`table_call'", varn(1) `clear' asdouble
-		return local table_call = "`table_call'"
 		
-		* rename vars. Modify the following locals
-		local oldvars "reporting_year survey_year"
-		local newvars "year welfare_time"
+		// Caching 
 		
-		gettoken old oldvars : oldvars
-		gettoken new newvars : newvars
-		qui while ("`old'" != "") {
-			cap confirm new var `old', exact
-			if (_rc) cap confirm var `new', exact
-			if (_rc) rename `old' `new' 
+		pip_cache load, query("`table_call'") ${pip_cacheforce} `clear'
+		local pc_exists = "`r(pc_exists)'"
+		local piphash   = "`r(piphash)'"
+		
+		// if not cached because it war forced or because user does not want to
+		if ("`pc_exists'" == "0" | "`${pip_cachedir}'" == "0") {
+			
+			import delimit "`table_call'", varn(1) `clear' asdouble
+			return local table_call = "`table_call'"
+			
+			* rename vars. Modify the following locals
+			local oldvars "reporting_year survey_year"
+			local newvars "year welfare_time"
 			
 			gettoken old oldvars : oldvars
 			gettoken new newvars : newvars
-		}
-		
-		* to lower cases
-		local tolvars "welfare_type"
-		foreach t of local tolvars {
-			cap confirm new var `t', exact
-			if (_rc) replace `t' = lower(`t')		
+			qui while ("`old'" != "") {
+				cap confirm new var `old', exact
+				if (_rc) cap confirm var `new', exact
+				if (_rc) rename `old' `new' 
+				
+				gettoken old oldvars : oldvars
+				gettoken new newvars : newvars
+			}
+			
+			* to lower cases
+			local tolvars "welfare_type"
+			foreach t of local tolvars {
+				cap confirm new var `t', exact
+				if (_rc) replace `t' = lower(`t')		
+			}
+			
+			//========================================================
+			// Caching
+			//========================================================
+			
+			pip_cache save, piphash("`piphash'") `replace' ///
+			query("`table_call'") ${pip_cacheforce}
 		}
 		
 		exit

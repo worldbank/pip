@@ -5,32 +5,44 @@
 
 *##s
 
-cd "c:/Users/`c(username)'/OneDrive - WBG/WorldBank/DECDG/PIP/pip"
-local ados: dir . files "*.ado", respectcase
+cap program drop getfiles
+program define getfiles, rclass
 
-foreach a of local ados {
+args mask
+
+local f2add: dir . files "`mask'", respectcase
+
+foreach a of local f2add {
 	local as "`as' `a'"
 }
 local as = trim("`as'")
 local as: subinstr local as " " ";", all
-disp "`as'"
+
+return local files = "`as'"
+end
 
 
-local helps: dir . files "*.sthlp", respectcase
+cd "c:/Users/`c(username)'/OneDrive - WBG/WorldBank/DECDG/PIP/pip"
+getfiles "*.ado"
+local as = "`r(files)'"
 
-foreach h of local helps {
-	local hs "`hs' `h'"
-}
-local hs = trim("`hs'")
-local hs: subinstr local hs " " ";", all
+getfiles "*.sthlp"
+local hs = "`r(files)'"
 
-local toins  "`as';`hs'"
+getfiles "*.mata"
+local ms = "`r(files)'"
+
+
+getfiles "pip*.do"
+local ds = "`r(files)'"
+
+
+local toins  "`as';`hs';`ms';`ds'"
 disp "`toins'"
 
 
-
 make pip, replace toc pkg                         ///  readme
-		version(0.9.5)                          ///
+		version(0.9.7)                          ///
     license("MIT")                                                          ///
     author("R.Andres Castaneda")                                            ///
     affiliation("The World Bank")                                           ///
@@ -38,10 +50,12 @@ make pip, replace toc pkg                         ///  readme
     url("")                                                                 ///
     title("Poverty and Inequality Platform Stata wrapper")                  ///
     description("World Bank PIP API Stata wrapper")                         ///
-    install("`as';`hs'") ///
+    install("`toins'") ///
     ancillary("")                                                         
 
 *##e
+
+
 * ------------------------------------------------------------------------------
 * Testing basic examples
 * ------------------------------------------------------------------------------

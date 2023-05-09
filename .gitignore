@@ -1,3 +1,8 @@
 /pip-*/
 test_ssc.do
 *.zip
+*.undefined
+tempCodeRunnerFile.do
+/_pip_cache/
+/_*/
+
