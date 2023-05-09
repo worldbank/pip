@@ -34,12 +34,12 @@ version 16
 qui {
 	
 	*---------- API defaults
-	qui pip_versions,                      ///
-	      server(`server')                 ///
-	      version(`version')               ///
-	      release(`release')               ///
-	      ppp_year(`ppp_year')             ///
-	      identity(`identity')             
+	qui pip_versions,      ///
+	server(`server')       ///
+	version(`version')     ///
+	release(`release')     ///
+	ppp_year(`ppp_year')   ///
+	identity(`identity')   
 	
 	local server     = "`r(server)'"
 	local url        = "`r(url)'"
@@ -54,23 +54,14 @@ qui {
 		local table_call = "`url'/aux?table=`table'&`version_qr'&format=csv"
 		
 		// Caching 
-		if (${pip_cache} == 1) {
-			
-			if ("`cachedir'" == "") {
-				local dir "./_pip_cache"
-				cap mkdir "`cachedir'"
-			}
-				
-			pip_cache load, query("`table_call'") cachedir("`cachedir'") ///
-			${pip_cacheforce} `clear'
-			
-			local pc_exists = "`r(pc_exists)'"
-			local piphash   = "`r(piphash)'"
-		}
 		
-		// Not caching
-		if ("`pc_exists'" == "0" | ${pip_cache} == 0) {
+		pip_cache load, query("`table_call'") ${pip_cacheforce} `clear'
+		local pc_exists = "`r(pc_exists)'"
+		local piphash   = "`r(piphash)'"
 		
+		// if not cached because it war forced or because user does not want to
+		if ("`pc_exists'" == "0" | "`${pip_cachedir}'" == "0") {
+			
 			import delimit "`table_call'", varn(1) `clear' asdouble
 			return local table_call = "`table_call'"
 			
@@ -99,10 +90,9 @@ qui {
 			//========================================================
 			// Caching
 			//========================================================
-			if (${pip_cache} == 1) {
-				pip_cache save, piphash("`piphash'") cachedir("`cachedir'") ///
-					query("`queryfull'") `replace' 
-			}
+			
+			pip_cache save, piphash("`piphash'") `replace' ///
+			query("`table_call'") ${pip_cacheforce}
 		}
 		
 		exit
