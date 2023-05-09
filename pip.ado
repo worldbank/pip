@@ -921,6 +921,8 @@ Notes:
 
 Version Control:
 
+*! version 0.9.7            <2023May09>
+*! -- several improvements to caching and setup.do 
 *! version 0.9.6            <2023May05>
 *! -- add caching to aux tables
 *! -- add pip_setup.do file... this should be created internally
