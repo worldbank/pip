@@ -56,6 +56,12 @@ if ("`subcmd'" == "run") {
 }
 
 
+// cche dir
+if ("`subcmd'" == "cachedir") {
+	pip_setup_cachedir, `options'
+	exit
+}
+
 
 qui {
 	/*==================================================
@@ -92,14 +98,21 @@ qui {
 		* local newline = `"global pip_pipmata_hash  = "1959982309""'
 		
 		pip_setup replace, pattern(`"`pattern'"') new(`"`newline'"')
-
+		
 		pip_setup run 
+	}
+	
+	//========================================================
+	// PIp cache directory
+	//========================================================
+	
+	if ("${pip_cachedir}" == "") {
+		noi pip_setup_cachedir
 	}
 	
 }
 
 end
-
 
 //========================================================
 //  Program to create pip_setup.do
@@ -112,14 +125,12 @@ qui {
 	// find folder to store setup.do
 	local pdirs `" "`c(sysdir_personal)'" "`c(sysdir_plus)'" "`c(pwd)'" "`c(sysdir_site)'" "'
 	
-	
-	mata: pip_check_folder("`c(sysdir_personal)'")
-	
 	tokenize `"`pdirs'"'
 	while ("`1'" != "") {
-		mata: st_numscalar("direxist", pip_check_folder("`1'", "p"))
+		mata: st_local("setup_dir", pathjoin("`1'", "p"))
+		mata: st_numscalar("direxist", pip_check_folder("`setup_dir'"))
 		if (direxist == 1 )  {
-			mata: st_local("setup_file", pathjoin("`1'", "p/pip_setup.do"))
+			mata: st_local("setup_file", pathjoin("`setup_dir'", "pip_setup.do"))
 			continue, break
 		}
 		macro shift
@@ -128,7 +139,7 @@ qui {
 	// it assumes that pip_setup.do does not exist
 	// because this program is called in a condition
 	
-	*##s
+	
 	tempfile dofile
 	tempname do
 	file open `do' using `dofile', write `replace'
@@ -153,7 +164,7 @@ qui {
 	
 	return local fn = "`setup_file'"
 	
-	*##e
+	
 }
 
 end
@@ -181,6 +192,62 @@ qui {
 }
 
 end
+
+
+program define pip_setup_cachedir, rclass
+version 16
+
+syntax [anything(name=subcmd)] , [ ///
+cachedir(string)                   ///  
+]
+
+qui {
+	
+	if ("`cachedir'" == "") {
+		// find folder to store setup.do
+		local pdirs `" "`c(sysdir_personal)'" "`c(sysdir_plus)'" "`c(pwd)'" "`c(sysdir_site)'" "'
+		
+		tokenize `"`pdirs'"'
+		tempname direxist
+		scalar `direxist' = 0
+		while ("`1'" != "") {
+			mata: st_local("cachedir", pathjoin("`1'", "pip_cache"))
+			mata: st_numscalar("`direxist'", pip_check_folder("`cachedir'"))
+			if (`direxist' == 1 )  {
+				capture window stopbox rusure ///
+				`"Do you want to use directory "`cachedir'" to store PIP cache data?"' ///
+				`"If not, click "No" and provide an alternative directory path in the console."' ///
+				`"If yo don't want to store any PIP cache, click "No" and type "NO" in the console"'
+				
+				if (_rc) {
+					noi disp "{res} provide an alternative directory path to store PIP cache data." _n ///
+					`" {res} If you don't want to store any PIP cache, type {txt}NO"', /// 
+					_request(_cachedir)
+				}
+				
+				continue, break // exit while
+			}
+			macro shift
+		} // end of while
+		
+	} // if cache dir is empty
+	
+	
+	if (!inlist(upper("`cachedir'"), "", "NO")) {
+		mata: st_numscalar("`direxist'", pip_check_folder("`cachedir'"))
+		if (`direxist' == 1 )  {
+			local pattern "pip_cachedir"
+			local newline `"global pip_cachedir = "`cachedir'""'
+			pip_setup replace, pattern(`"`pattern'"') new(`"`newline'"')
+			pip_setup run
+		}
+	}
+	
+	
+}
+
+end
+
 
 
 //========================================================
@@ -228,5 +295,6 @@ Notes:
 
 
 Version Control or old (new) ideas:
+
 
 
