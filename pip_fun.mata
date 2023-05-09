@@ -78,37 +78,24 @@ string scalar newline)
 // check whether a particular folder exist and 
 // is writable. Return 0 if there is an error. 
 // return 1 if everything is ok. 
-real scalar pip_check_folder(
-string scalar dir, 
-| string scalar subdir)
+real scalar pip_check_folder(string scalar dir)
 {
 	// check dir exists
 	// dir = "c:\ado\personal/" 
 	
 	real scalar de, md, fh
 	string scalar sdir, tfile
-	de = direxists(dir)
-	if (de == 0) {
-		return(0)
-	}
 	
-	// if check creation of subdir
-	if (args() == 2) sdir = pathjoin(dir, subdir)
-	else             sdir = dir
-	
-	// If subdir does not exist, create it.
-	de = direxists(sdir)
-	if (de == 0) {
-		// if can't be created, return 0
-		md = _mkdir(sdir, 1)
-		if (md != 0) {
-			printf("{err}Warning: {res}Subdirectory {text}%s {res}could not be created\n", sdir)
+	if (direxists(dir) == 0) {
+		if (pip_mkdir_recursive(dir, 1) != 0) {
+			printf("{err}Warning: {res}directory {text}%s {res}could not be created\n", dir)
 			return(0)
 		}
 	}
 	
+	
 	// test we can write in the folder
-	tfile = pathjoin(sdir, "testing.txt")
+	tfile = pathjoin(dir, "testing.txt")
 	fh    = fopen(tfile, "rw")
 	fput(fh, "this is a test")
 	fclose(fh)
@@ -124,6 +111,42 @@ string scalar dir,
 	
 }
 
+// create recursive folders
+real scalar pip_mkdir_recursive(string scalar path, | real scalar pub) 
+{
+	
+	string rowvector mpath
+	real   rowvector direx
+	string scalar ppath
+	
+	if (args() == 1) pub = 0
+	
+	mpath = path
+	ppath = pathgetparent(path)
+	while (ppath != "") {
+		mpath = (ppath\ mpath)
+		ppath = pathgetparent(ppath)
+	}
+	
+	// check whther dir exists
+	direx = J(rows(mpath), 1, 0)
+	for (i = 1; i <= rows(mpath); i++) {
+		direx[i] = (direxists(mpath[i]) ? 0 : 1)
+	}
+	
+	// filter matrix of not existing directories
+	mpath = select(mpath, direx)
+	direx = J(rows(mpath), 1, 0)
+	// loop over none existing dirs
+	for (i = 1; i <= rows(mpath); i++) {
+		if (_mkdir(mpath[i], pub) != 0) {
+			printf("{err}dir {res}%s {err}could not be created", mpath[i])
+			return(693)
+		}
+	}
+	return(0)
+	
+} // end of function
 
 
 //========================================================
