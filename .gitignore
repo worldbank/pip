@@ -4,3 +4,5 @@ test_ssc.do
 *.undefined
 tempCodeRunnerFile.do
 /_pip_cache/
+/_*/
+

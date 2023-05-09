@@ -71,11 +71,11 @@ set checksum off
 //========================================================
 pip_setup, `pause'
 if ("`subcommand'" == "setup") {
+	noi disp "{res:Setup done!}"
 	exit
 }
 
 local curframe = c(frame)
-
 
 if regexm("`subcommand'", "^clean") {
 	noi pip_cleanup
