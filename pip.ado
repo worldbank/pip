@@ -71,12 +71,12 @@ set checksum off
 
 pip_setup, `pause'
 
+if ("`subcommand'" == "") local subcommand "cl"  // country-level
+
 if ("`subcommand'" == "setup") {
 	noi disp "{res:Setup done!}"
 	exit
 }
-
-
 
 local curframe = c(frame)
 
@@ -668,9 +668,6 @@ qui {
 		/*==================================================
 		Append data
 		==================================================*/			
-		if (`wb_change' == 1) {
-			keep if regioncode == "WLD"
-		}
 		append using `povcalf'
 		save `povcalf', replace
 		
