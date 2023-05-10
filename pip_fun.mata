@@ -151,6 +151,28 @@ real scalar pip_mkdir_recursive(string scalar path, | real scalar pub)
 
 
 //========================================================
+//  Create locals using the macros in retlist
+//========================================================
+
+void pip_retlist2locals(string scalar optnames) 
+{
+	string rowvector optn
+	string scalar    gname
+	real scalar      i
+	
+	optn = tokens(optnames)
+	for (i = 1; i <= cols(optn); i++) {
+		gname = "r(" + optn[i] + ")"
+		st_local(optn[i], st_global(gname))
+		
+		/* printf("{res}name: {txt}%s\n{res}value: {txt}%s\n\n", 
+		optn[i], st_global(gname)) */
+	}
+}
+
+
+
+//========================================================
 // deprecated functions
 //========================================================
 
