@@ -24,6 +24,20 @@ Output:
 
 program define pip, rclass
 version 16.0
+pip_setup
+
+pip_parseopts `0'
+mata: pip_retlist2locals("`r(optnames)'")
+
+disp `"country: `country'"'
+disp `"year: `year'"'
+disp `"clear: `clear'"'
+disp `"povline: `povline'"'
+disp `"cache: `cache'"'
+
+exit 
+
+
 
 syntax [anything(name=subcommand)]  ///
 [,                             	   /// 
@@ -68,8 +82,6 @@ set checksum off
 //========================================================
 // housekeeping
 //========================================================
-
-pip_setup, `pause'
 
 if ("`subcommand'" == "") local subcommand "cl"  // country-level
 
