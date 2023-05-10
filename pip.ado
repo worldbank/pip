@@ -33,7 +33,6 @@ YEAR(string)                   ///
 POVLine(numlist)               /// 
 POPShare(numlist)	   		       /// 
 PPP_year(numlist)              ///
-AGGregate                      /// 
 CLEAR                          /// 
 INFOrmation                    /// 
 COVerage(string)               /// 
@@ -182,18 +181,10 @@ qui {
 	//========================================================
 	// Conditions (Defenses)
 	//========================================================
-	if ("`aggregate'" != "") {
-		noi disp in red "Option {it:aggregate} is disable for now."
-		exit
-	}
-	if ("`aggregate'" != "" & "`fillgaps'" != "") {
-		noi disp in red "options {it:aggregate} and {it:fillgaps} are mutually exclusive." _n /* 
-		*/ "Please select only one."
-		error
-	}
 	
-	if ("`popshare'" != "" &  (lower("`subcommand'") == "wb" | "`aggregate'" != "")) {
-		noi disp in red "option {it:popshare} can't be combined with option {it:aggregate} or with subcommand {it:wb}" _n
+	if ("`popshare'" != "" &  lower("`subcommand'") == "wb") {
+		noi disp in red "option {it:popshare()} can't be combined " /* 
+		  */ "with subcommand {it:wb}" _n
 		error
 	}
 	
@@ -289,20 +280,6 @@ qui {
 	}
 	
 	*---------- Modify country(all) with aggregate
-	if (lower("`country'") == "all" & "`aggregate'" != "") {
-		local country    ""
-		local aggregate  ""
-		local subcommand "wb"
-		local wb_change  1
-		noi disp as err "Warning: " as text " {cmd:pip, country(all) aggregate} " /* 
-		*/	"is equivalent to {cmd:pip wb}. " _n /* 
-		*/  " if you want to aggregate all countries by survey years, " /* 
-		*/  "you need to parse the list of countries in {it:country()} option. See " /*
-		*/  "{help pip##options:aggregate option description} for an example on how to do it"
-	}
-	else {
-		local wb_change 0
-	}
 	
 	if ("`year'" == "") local year "all"
 	
@@ -443,12 +420,6 @@ qui {
 		drop _all
 	}
 	
-	
-	if ("`aggregate'" != "") {
-		noi disp as res "Note: " as text "Aggregation is only possible over reference years."
-		local agg_display = "Aggregation in base year(s) `year'"
-	}
-	
 	/*==================================================
 	Execution 
 	==================================================*/
@@ -529,7 +500,6 @@ qui {
 		`information'                           ///
 		`iso'                                   ///
 		`fillgaps'                              ///
-		`aggregate'                             ///
 		`wb'                                    ///
 		`pause'                                 ///
 		`groupedby'                             //
@@ -565,7 +535,7 @@ qui {
 		global pip_query = "`query'&format=csv"
 		
 		*---------- Base + query
-		if ("`aggregate'" != "" | "`subcommand'" == "wb"){
+		if ("`subcommand'" == "wb"){
 			local queryfull "`base_grp'?`query'"
 		}
 		else{
@@ -620,7 +590,7 @@ qui {
 			
 			* global qr = `qr'
 			
-			if ("`aggregate'" == "" & "`wb'" == "") {
+			if ("`wb'" == "") {
 				local rtype 1
 			}
 			else {
@@ -743,18 +713,11 @@ qui {
 		}
 		
 	}
-	
 	else {
-		if ("`aggregate'" == "") {
-			sort country_code year
-			local varstodisp "country_code year poverty_line headcount mean median welfare_type"
-			local sepby "country_code"
-		}
-		else {
-			sort year
-			local varstodisp "year poverty_line headcount mean"
-			local sepby "poverty_line"
-		}
+	
+		sort country_code year
+		local varstodisp "country_code year poverty_line headcount mean median welfare_type"
+		local sepby "country_code"
 		
 		foreach v of local varstodisp {
 			cap confirm var `v', exact
@@ -781,19 +744,9 @@ qui {
 	
 	
 	if ("`wb'" == "")   {
-		if ("`aggregate'" == "" & "`fillgaps'" == "") {
-			local lvlabel "country level"
-		} 
-		else if ("`aggregate'" != "" & "`fillgaps'" == "") {
-			local lvlabel "aggregated level"
-		} 
-		else if ("`aggregate'" == "" & "`fillgaps'" != "") {
-			local lvlabel "Country level (lined up)"
-		} 
-		else {
-			local lvlabel ""
-		}
-	}   
+		if ("`fillgaps'" == "") local lvlabel "country level"	 
+		else local lvlabel "Country level (lined up)"
+	}
 	else {
 		local lvlabel "regional and global level"
 	}
