@@ -18,14 +18,8 @@ Output:
 program define pip_setup, rclass
 version 16
 
-syntax [anything(name=subcmd)]  ///
-[,                              ///
-pause                           /// 
-*                              ///
-] 
+syntax [anything(name=subcmd)]  [, * ] 
 
-if ("`pause'" == "pause") pause on
-else                      pause off
 pip_setup_dates
 
 //========================================================
