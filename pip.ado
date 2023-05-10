@@ -51,49 +51,49 @@ set checksum off
 // housekeeping
 //========================================================
 
-if ("`subcommand'" == "") local subcommand "cl"  // country-level
+if ("`subcmd'" == "") local subcmd "cl"  // country-level
 
-if ("`subcommand'" == "setup") {
+if ("`subcmd'" == "setup") {
 noi disp "{res:Setup done!}"
 exit
 }
 
 local curframe = c(frame)
 
-if regexm("`subcommand'", "^clean") {
+if regexm("`subcmd'", "^clean") {
 noi pip_cleanup
 exit
 }
 
 
-if regexm("`subcommand'", "^dropframe") {
+if regexm("`subcmd'", "^dropframe") {
 pip_drop frame, frame_prefix(`frame_prefix')
 exit
 }
 
-if regexm("`subcommand'", "^dropglobal") {
+if regexm("`subcmd'", "^dropglobal") {
 pip_drop global
 exit
 }
 
-if regexm("`subcommand'", "^install") {
-local sscmd: word 2 of `subcommand'
+if regexm("`subcmd'", "^install") {
+local sscmd: word 2 of `subcmd'
 noi pip_install `sscmd', path(`path') `pause'
 exit
 }
 
-if regexm("`subcommand'", "^uninstall") {
+if regexm("`subcmd'", "^uninstall") {
 pip_install uninstall, path(`path') `pause'
 exit
 }
 
-if regexm("`subcommand'", "^update") {
+if regexm("`subcmd'", "^update") {
 noi pip_update, path(`path') `pause'
 exit
 }
 
 // Cache
-if regexm("`subcommand'", "cache") {
+if regexm("`subcmd'", "cache") {
 if ("`cachedelete'" != "") {
 pip_cache delete, cachedir("`cachedir'")
 }
@@ -134,7 +134,7 @@ local server = "${pip_server}"
 //========================================================
 // Auxiliary tables
 //========================================================
-if regexm("`subcommand'", "^tab") {
+if regexm("`subcmd'", "^tab") {
 noi pip_tables `table', server(`server')        ///
 version(`version')                ///
 release(`release')                ///
@@ -162,7 +162,7 @@ local i = 1
 // Conditions (Defenses)
 //========================================================
 
-if ("`popshare'" != "" &  lower("`subcommand'") == "wb") {
+if ("`popshare'" != "" &  lower("`subcmd'") == "wb") {
 noi disp in red "option {it:popshare()} can't be combined " /* 
 */ "with subcommand {it:wb}" _n
 error
@@ -217,7 +217,7 @@ if ("`timer'" != "") timer on `i_on'
 // --- timer
 
 
-if regexm("`subcommand'", "^ver") {
+if regexm("`subcmd'", "^ver") {
 noi pip_versions, server(`server') availability
 return add
 exit
@@ -245,10 +245,10 @@ if ("`timer'" != "") timer off `i_off'
 // conditions
 //========================================================
 *---------- lower case subcommand
-local subcommand = lower("`subcommand'")
+local subcmd = lower("`subcmd'")
 
 *---------- Test
-if ("`subcommand'" == "test") {
+if ("`subcmd'" == "test") {
 if ("${pip_query}" == "") {
 noi di as err "global pip_query does not exist. You cannot test the query."
 error
@@ -315,9 +315,9 @@ local pcall = "popshare"
 }
 
 *---------- Info
-if regexm("`subcommand'", "^info")	{
+if regexm("`subcmd'", "^info")	{
 local information = "information"
-local subcommand  = "information"
+local subcmd  = "information"
 }
 
 //------------ Region
@@ -369,7 +369,7 @@ error
 
 *---------- WB aggregate
 
-if ("`subcommand'" == "wb") {
+if ("`subcmd'" == "wb") {
 if ("`country'" != "") {
 noi disp as err "option {it:country()} is not allowed with subcommand {it:wb}"
 noi disp as res "Note: " as txt "subcommand {it:wb} only accepts options {it:region()} and {it:year()}"
@@ -430,7 +430,7 @@ if ("`timer'" != "") timer off `i_off'
 // --- timer
 
 *---------- Regular query and Aggregate Query
-if ("`subcommand'" == "wb") {
+if ("`subcmd'" == "wb") {
 local wb "wb"
 }
 else local wb ""
@@ -515,7 +515,7 @@ return local query_`f' "`query'"
 global pip_query = "`query'&format=csv"
 
 *---------- Base + query
-if ("`subcommand'" == "wb"){
+if ("`subcmd'" == "wb"){
 local queryfull "`base_grp'?`query'"
 }
 else{
@@ -673,7 +673,7 @@ noi di as res _n "{ul: No observations available}"
 }	
 
 
-if ("`subcommand'" == "wb") {
+if ("`subcmd'" == "wb") {
 sort region_code year 
 
 tempname tolist
