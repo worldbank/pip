@@ -23,22 +23,28 @@ version 16
 1: parse subcommand
 ==================================================*/
 
-gettoken subcommand opts: 0, parse(",")
+gettoken subcmd opts: 0, parse(",")
 if (`"`opts'"' == `""') {
-	local subcommand ""
+	local subcmd ""
 	local opts: copy local 0
 } 
 
-else if ("`subcommand'" == ",") {
-	local subcommand ""
+else if ("`subcmd'" == ",") {
+	local subcmd ""
 }
 else gettoken comma opts: opts, parse(",")
-return local subcommand = "`subcommand'"
+
+if ("`subcmd'" != "") {
+	local optnames "subcmd"
+	return local subcmd = "`subcmd'"
+}
 
 
 /*==================================================
 Parse options
 ==================================================*/
+return local options = `"`opts'"'
+local optnames "`optnames' options"
 
 gettoken opt opts: opts, bind
 
