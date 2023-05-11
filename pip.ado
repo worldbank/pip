@@ -195,6 +195,7 @@ qui {
 	local server    = "`r(server)'"
 	local base      = "`r(base)'"
 	local base_grp  = "`r(base_grp)'"
+	local base_cp = regexr("`base'", "v1/pip", "v1/cp-download")	
 	
 	// --- timer
 	if ("`timer'" != "") timer off `i_off'
@@ -448,6 +449,23 @@ qui {
 		return add 
 		exit
 	}	
+
+	if ("`subcommand'" == "cp"){
+		noi pip_cp, country("`country'") ///
+		povline("`povline'") ///
+		ppp_year("`ppp_year'") ///
+		`clear' `pause' server(`server') version(`version')
+		
+		local query_cp = "`r(query_cp)'"
+		local query_cp "`base_cp'`query_cp'"
+		return local query = "`query_cp'"
+
+		*---------- download country profile data 
+		cap import delimited  "`query_cp'", `clear' varn(1) asdouble
+		
+		return add 
+		exit
+	}
 	
 	// --- timer
 	if ("`timer'" != "") timer off `i_off'
