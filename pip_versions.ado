@@ -73,10 +73,12 @@ qui {
 	//========================================================
 	
 	//------------ get server url
-	pip_set_server `server', `pause'
-	local url       = "`r(url)'"
-	local server    = "`r(server)'"
-	return add 
+	if ("${pip_host}" == "" | server != "") {
+		pip_set_server,  server(`server')
+		local url       = "`r(url)'"
+		local server    = "`r(server)'"
+		return add 
+	}
 	
 	
 	
@@ -85,7 +87,7 @@ qui {
 	
 	frame _pip_versions_`server' {
 
-		import delimited using "`url'/versions?format=csv", clear varn(1) asdouble
+		import delimited using "${pip_host}/versions?format=csv", clear varn(1) asdouble
 		keep version
 		
 		//------------* Split and rename 

@@ -16,13 +16,7 @@ Output:
 0: Program set up
 ==================================================*/
 program define pip_set_server, rclass
-syntax [anything(name=server)]  ///
-[,                             	/// 
-pause                           /// 
-] 
-
-if ("`pause'" == "pause") pause on
-else                      pause off
+syntax [, server(string) ] 
 
 version 16.0
 
@@ -76,11 +70,14 @@ if (!regexm(tpage, "API is running") | _rc) {
 //========================================================
 // Return values
 //========================================================
+global pip_host "`url'"
+global pip_server "`server'"
 
 return local server = "`server'"
 return local url    = "`url'"
 return local base   = "`url'/pip"
 return local base_grp  = "`url'/pip-grp"
+
 
 end
 exit

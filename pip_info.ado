@@ -27,10 +27,12 @@ qui {
 	//if ("`clear'" == "") preserve
 	
 	*---------- API defaults
-	pip_set_server  `server', `pause'
-	local server    = "`r(server)'"
-	local url       = "`r(url)'"
-	return add
+	if ("${pip_host}" == "" | server != "") {
+		pip_set_server,  server(`server')
+		local server    = "`r(server)'"
+		local url       = "`r(url)'"
+		return add		
+	}
 	
 	//------------ version
 	if ("`version'" != "") {
@@ -78,7 +80,7 @@ qui {
 		
 		// drop frame if error happened
 		if (`rc1' != 0) {
-			local csvfile0  = "`url'/aux?table=countries`version_qr'&format=csv"
+			local csvfile0  = "${pip_host}/aux?table=countries`version_qr'&format=csv"
 			
 			noi disp in red "There is a problem accessing country name data." 
 			noi disp in red "to check your connection, copy and paste in your browser the following address:" _n /* 
@@ -108,7 +110,7 @@ qui {
 		
 		// drop frame if error happened
 		if (`rc1' != 0) {
-			local csvfilergn  = "`url'/aux?table=regions`version_qr'&format=csv"
+			local csvfilergn  = "${pip_host}/aux?table=regions`version_qr'&format=csv"
 			noi disp in red "There is a problem accessing region name data." 
 			noi disp in red "to check your connection, copy and paste in your browser the following address:" _n /* 
 			*/	_col(4) in w `"`csvfilergn'"'
@@ -139,7 +141,7 @@ qui {
 		
 		// drop frame if error happened
 		if (`rc1' != 0) {
-			local csvfile2  = "`url'/aux?table=framework`version_qr'&format=csv"
+			local csvfile2  = "${pip_host}/aux?table=framework`version_qr'&format=csv"
 			
 			noi disp in red "There is a problem accessing framework name data." 
 			noi disp in red "to check your connection, copy and paste in your browser the following address:" _n /* 

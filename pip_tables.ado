@@ -16,7 +16,8 @@ Output:
 0: Program set up
 ==================================================*/
 program define pip_tables, rclass
-syntax [anything(name=table)], [ ///
+syntax , [ ///
+table(string)                    ///
 server(string)                   ///
 version(string)                  ///
 release(numlist)                 ///
@@ -51,7 +52,7 @@ qui {
 	==================================================*/
 	
 	if ("`table'" != "") {
-		local table_call = "`url'/aux?table=`table'&`version_qr'&format=csv"
+		local table_call = "${pip_host}/aux?table=`table'&`version_qr'&format=csv"
 		
 		// Caching 
 		
@@ -103,7 +104,7 @@ qui {
 	==================================================*/
 	if ("`table'" == "") {
 		preserve
-		local table_call = "`url'/aux?`version_qr'&format=csv"
+		local table_call = "${pip_host}/aux?`version_qr'&format=csv"
 		import delimit "`table_call'", varn(1) clear asdouble
 		return local table_call = "`table_call'"
 		

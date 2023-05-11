@@ -57,6 +57,15 @@ if ("`subcmd'" == "cachedir") {
 }
 
 
+// server
+if ("`subcmd'" == "server") {
+	pip_set_server, `options'
+	exit
+}
+
+
+
+
 qui {
 	/*==================================================
 	Run globals 
@@ -97,11 +106,18 @@ qui {
 	}
 	
 	//========================================================
-	// PIp cache directory
+	// PIP cache directory
 	//========================================================
 	
 	if ("${pip_cachedir}" == "") {
 		noi pip_setup_cachedir
+	}
+	
+	//========================================================
+	// Set global for server
+	//========================================================
+	if ("${pip_host}" == "") {
+		pip_set_server
 	}
 	
 }

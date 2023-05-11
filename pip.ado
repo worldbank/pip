@@ -28,9 +28,10 @@ pip_setup
 
 pip_parseopts `0'
 mata: pip_retlist2locals("`r(optnames)'")
-
+if ("`subcmd'" == "") local subcmd "cl"  // country-level       
 
 /* 
+ 
 disp `"country: `country'"'
 disp `"year: `year'"'
 disp `"clear: `clear'"'
@@ -47,62 +48,74 @@ if ("`pause'" == "pause") pause on
 else                      pause off
 set checksum off
 
+
 //========================================================
 // housekeeping
 //========================================================
 
-if ("`subcmd'" == "") local subcmd "cl"  // country-level
 
 if ("`subcmd'" == "setup") {
-noi disp "{res:Setup done!}"
-exit
+	noi disp "{res:Setup done!}"
+	exit
 }
 
 local curframe = c(frame)
 
 if regexm("`subcmd'", "^clean") {
-noi pip_cleanup
-exit
+	noi pip_cleanup
+	exit
 }
 
 
 if regexm("`subcmd'", "^dropframe") {
-pip_drop frame, frame_prefix(`frame_prefix')
-exit
+	pip_drop frame, frame_prefix(`frame_prefix')
+	exit
 }
 
 if regexm("`subcmd'", "^dropglobal") {
-pip_drop global
-exit
+	pip_drop global
+	exit
 }
 
 if regexm("`subcmd'", "^install") {
-local sscmd: word 2 of `subcmd'
-noi pip_install `sscmd', path(`path') `pause'
-exit
+	if ( wordcount("`subcmd'") != 2) {
+		noi disp "{err}subcommand {it:install} must be use with either {it:ssc} " /* 
+	 */	"or {it:gh}" _n "E.x., {cmd:pip install ssc} or {cmd:pip install gh}."
+	 error
+	}
+	local sscmd: word 2 of `subcmd'
+	noi pip_install `sscmd', `path' `pause'
+	exit
 }
 
 if regexm("`subcmd'", "^uninstall") {
-pip_install uninstall, path(`path') `pause'
-exit
+	pip_install uninstall, `path' `pause'
+	exit
 }
 
 if regexm("`subcmd'", "^update") {
-noi pip_update, path(`path') `pause'
-exit
+	noi pip_update, `path' `pause'
+	exit
 }
+
+if regexm("`subcmd'", "^ver") {	
+	noi pip_versions, `server' availability
+	return add
+	exit
+}
+
 
 // Cache
 if regexm("`subcmd'", "cache") {
-if ("`cachedelete'" != "") {
-pip_cache delete, cachedir("`cachedir'")
-}
-exit
+	if ("`delete'" != "") {
+		pip_cache `delete'
+	}
+	exit
 }
 
 if ("`cacheforce'" != "") 	{
-global pip_cacheforce `cacheforce'
-local replace replace
+	global pip_cacheforce `cacheforce'
+	local replace replace
 }
 else global pip_cacheforce `cacheforce'
 
@@ -113,731 +126,698 @@ else global pip_cacheforce `cacheforce'
 pip_new_session , `pause'
 
 qui {
-
-//========================================================
-// setup defaults
-//========================================================
-
-local server     = lower("`server'")
-local identity   = upper("`identity'")
-local country    = upper("`country'")
-local coverage   = lower("`coverage'")
-local table      = lower("`table'")
-
-* In case global server is specified
-if ("${pip_server}" != "" & "`server'" == "") {
-noi disp in red "warning:" in y "Global {it:pip_server} (${pip_server}) is in use"
-local server = "${pip_server}"
-}
-
-
-//========================================================
-// Auxiliary tables
-//========================================================
-if regexm("`subcmd'", "^tab") {
-noi pip_tables `table', server(`server')        ///
-version(`version')                ///
-release(`release')                ///
-ppp_year(`ppp_year')              ///
-identity(`identity')              ///
-`clear' 
-return add
-exit
-}
-
-
-//========================================================
-//  Timer
-//========================================================
-
-local i = 0
-local crlf "`=char(10)'`=char(13)'"
-scalar tt = ""
-
-if ("`timer'" != "") {
-timer clear
-local i = 1
-}
-//========================================================
-// Conditions (Defenses)
-//========================================================
-
-if ("`popshare'" != "" &  lower("`subcmd'") == "wb") {
-noi disp in red "option {it:popshare()} can't be combined " /* 
-*/ "with subcommand {it:wb}" _n
-error
-}
-
-if ("`frame_prefix'" == "") {
-local frame_prefix "pip_"
-}
-
-
-/*==================================================
-Defaults
-==================================================*/
-// --- timer
-if ("`timer'" != "") {
-local i_on = `i'
-scalar tt = tt + "`crlf' `i': Set server"
-local i_off = `i++'
-}	
-// --- timer
-
-// --- timer
-if ("`timer'" != "") timer on `i_on'
-// --- timer
-
-*---------- API defaults
-pip_set_server  `server', `pause'
-*return add
-local url       = "`r(url)'"
-local server    = "`r(server)'"
-local base      = "`r(base)'"
-local base_grp  = "`r(base_grp)'"
-
-// --- timer
-if ("`timer'" != "") timer off `i_off'
-// --- timer
-
-//========================================================
-// versions
-//========================================================
-
-// --- timer
-if ("`timer'" != "") {
-local i_on = `i'
-scalar tt = tt + "`crlf' `i': Get version"
-local i_off = `i++'
-}	
-// --- timer
-
-// --- timer
-if ("`timer'" != "") timer on `i_on'
-// --- timer
-
-
-if regexm("`subcmd'", "^ver") {
-noi pip_versions, server(`server') availability
-return add
-exit
-}
-noi pip_versions, server(`server') ///
-version(`version')                ///
-release(`release')               ///
-ppp_year(`ppp_year')             ///
-identity(`identity')    
-
-local version_qr = "`r(version_qr)'"
-local version    = "`r(version)'"
-local release    = "`r(release)'"
-local ppp_year   = "`r(ppp_year)'"
-local identity   = "`r(identity)'"
-
-return local pip_version = "`version'"
-
-// --- timer
-if ("`timer'" != "") timer off `i_off'
-// --- timer
-
-
-//========================================================
-// conditions
-//========================================================
-*---------- lower case subcommand
-local subcmd = lower("`subcmd'")
-
-*---------- Test
-if ("`subcmd'" == "test") {
-if ("${pip_query}" == "") {
-noi di as err "global pip_query does not exist. You cannot test the query."
-error
-}
-local fq = "`base'?${pip_query}"
-noi disp in y "querying" in w _n "`fq'"
-noi view browse "`fq'"
-exit
-}
-
-*---------- Modify country(all) with aggregate
-
-if ("`year'" == "") local year "all"
-
-if ("`year'" != "" & "`year'" != "all") {
-local yrtemp
-foreach yr of local year {
-local tt = substr("`yr'", 1, 4) 
-local yrtemp `yrtemp' `tt'
-}
-local year "`yrtemp'"
-} 
-* 
-
-*---------- Coverage
-if ("`coverage'" == "") local coverage = "all"
-local coverage = lower("`coverage'")
-
-foreach c of local coverage {	
-
-if !inlist(lower("`c'"), "national", "rural", "urban", "all") {
-noi disp in red `"option {it:coverage()} must be "national", "rural",  "urban" or "all" "'
-error
-}
-
-}
-
-*---------- Poverty line/population share
-
-// Blank popshare and blank povline = default povline 1.9
-if ("`popshare'" == "" & "`povline'" == "")  {
-
-if ("`ppp_year'" == "2005") local povline = 1.25
-if ("`ppp_year'" == "2011") local povline = 1.9
-if ("`ppp_year'" == "2017") local povline = 2.15
-
-local pcall = "povline"
-}
-
-// defined popshare and defined povline = error
-else if ("`popshare'" != "" & "`povline'" != "")  {
-noi disp as err "povline and popshare cannot be used at the same time"
-error
-}
-
-// blank popshare and defined povline
-else if ("`popshare'" == "" & "`povline'" != "")  {
-local pcall = "povline"
-}
-
-// defined popshare and blank povline
-else {
-local pcall = "popshare"
-}
-
-*---------- Info
-if regexm("`subcmd'", "^info")	{
-local information = "information"
-local subcmd  = "information"
-}
-
-//------------ Region
-
-if ("`region'" != "") {
-local region = upper("`region'")
-
-if ("`country'" != "") {
-noi disp in red "You must use either {it:country()} or {it:region()}."
-error
-}
-
-if (regexm("`region'", "SAR")) {
-noi disp in red "Note: " in y "The official code of South Asia is" ///
-"{it: SAS}, not {it:SAR}. We'll make the change for you"
-local region: subinstr local region "SAR" "SAS", word
-}
-
-tokenize "`version'", parse("_")
-local _version   = "_`1'_`3'_`9'"
-
-frame dir 
-local av_frames "`r(frames)'"
-local av_frames: subinstr local  av_frames " " "|", all
-local av_frames = "^(" + "`av_frames'" + ")"
-
-//------------ Regions frame
-local frpiprgn "_pip_regions`_version'"
-if (!regexm("`frpiprgn'", "`av_frames'")) {
-pip_info, clear justdata `pause' server(`server') version(`version')
-} 
-frame `frpiprgn' {
-levelsof region_code, local(av_regions)  clean
-}
-
-// Add all to have the same functionality as in country(all)
-local av_regions = "`av_regions'" + " ALL"
-
-local inregion: list region in av_regions
-if (`inregion' == 0) {
-
-noi disp in red "region `region' is not available." _n ///
-"Only the following are available:" _n "`av_regions'"
-
-error
-}
-
-}
-
-*---------- WB aggregate
-
-if ("`subcmd'" == "wb") {
-if ("`country'" != "") {
-noi disp as err "option {it:country()} is not allowed with subcommand {it:wb}"
-noi disp as res "Note: " as txt "subcommand {it:wb} only accepts options {it:region()} and {it:year()}"
-error
-}
-}
-
-
-*---------- Country
-if ("`country'" == "" & "`region'" == "") local country "ALL" // to modify
-if ("`country'" != "") {
-if (lower("`country'") != "all") local country = upper("`country'")
-else                             local country "ALL" // to modify
-}
-
-
-/*==================================================
-Main conditions
-==================================================*/
-
-if ("`information'" == "") {
-
-if (c(N) != 0 & "`clear'" == "" & "`information'" == "") {
-
-noi di as err "You must start with an empty dataset; or enable the option {it:clear}."
-error 4
-}	
-drop _all
-}
-
-/*==================================================
-Execution 
-==================================================*/
-pause pip - before execution
-
-*---------- Information
-// --- timer
-if ("`timer'" != "") {
-local i_on = `i'
-scalar tt = tt + "`crlf' `i': Get info"
-local i_off = `i++'
-}	
-// --- timer
-
-// --- timer
-if ("`timer'" != "") timer on `i_on'
-// --- timer
-
-
-if ("`information'" != ""){
-noi pip_info, `clear' `pause' server(`server') version(`version')
-return add 
-exit
-}	
-
-// --- timer
-if ("`timer'" != "") timer off `i_off'
-// --- timer
-
-*---------- Regular query and Aggregate Query
-if ("`subcmd'" == "wb") {
-local wb "wb"
-}
-else local wb ""
-
-
-tempfile povcalf
-save `povcalf', empty 
-
-local f = 0
-
-if ("`pcall'" == "povline") 	loc i_call "i_povline"
-else 							loc i_call "i_popshare"
-
-
-// --- timer
-if ("`timer'" != "") {
-local j = `i++'
-local k = `i++'
-local h = `i++'
-scalar tt = tt + "`crlf' `j': building query"
-scalar tt = tt + "`crlf' `k': downloading data"
-scalar tt = tt + "`crlf' `h': cleaning data"
-}	
-// --- timer		
-
-foreach `i_call' of local `pcall' {	
-
-// --- timer
-if ("`timer'" != "") timer on `j'
-// --- timer
-
-local ++f 
-
-/*==================================================
-Create Query
-==================================================*/
-pip_query,   country("`country'")       ///
-region("`region'")                      ///
-year("`year'")                          ///
-povline("`i_povline'")                  ///
-popshare("`i_popshare'")	   					  ///
-ppp("`ppp_year'")                            ///
-coverage(`coverage')                    ///
-server(`server')                        ///
-version(`version')                      ///
-`clear'                                 ///
-`information'                           ///
-`iso'                                   ///
-`fillgaps'                              ///
-`wb'                                    ///
-`pause'                                 ///
-`groupedby'                             //
-
-local query_ys = "`r(query_ys)'"
-local query_ct = "`r(query_ct)'"
-local query_pl = "`r(query_pl)'"
-local query_ds = "`r(query_ds)'"
-local query_pp = "`r(query_pp)'"
-local query_ps = "`r(query_ps)'"
-
-local query_cv = "`r(query_cv)'"
-
-return local query_ys_`f' = "`query_ys'"
-return local query_ct_`f' = "`query_ct'"
-return local query_pl_`f' = "`query_pl'"
-return local query_ds_`f' = "`query_ds'"
-return local query_pp_`f' = "`query_pp'"
-return local query_ps_`f' = "`query_ps'"
-
-return local query_cv_`f' = "`query_cv'"
-
-return local base      = "`base'"
-
-*---------- Query
-if ("`popshare'" == ""){
-local query = "`query_ys'&`query_ct'&`query_cv'&`query_pl'`query_pp'`query_ds'&`version_qr'"
-}
-else{
-local query = "`query_ys'&`query_ct'&`query_cv'&`query_ps'`query_pp'`query_ds'&`version_qr'"
-}
-return local query_`f' "`query'"
-global pip_query = "`query'&format=csv"
-
-*---------- Base + query
-if ("`subcmd'" == "wb"){
-local queryfull "`base_grp'?`query'"
-}
-else{
-local queryfull "`base'?`query'"
-}
-
-return local queryfull_`f' = "`queryfull'"
-
-// --- timer
-if ("`timer'" != "") timer off `j'
-// --- timer
-
-/*==================================================
-Download  and clean data
-==================================================*/
-
-
-// --- timer
-if ("`timer'" != "") timer on `k'
-// --- timer
-
-*---------- download data
-
-pip_cache load, query("`queryfull'") `cacheforce' `clear'
-local pc_exists = "`r(pc_exists)'"
-local piphash   = "`r(piphash)'"
-
-// if not cached because it war forced or because user does not want to
-if ("`pc_exists'" == "0" | "`${pip_cachedir}'" == "0") {
-
-cap import delimited  "`queryfull'&format=csv", `clear' varn(1) asdouble
-if (_rc) {
-noi dis ""
-noi dis in red "It was not possible to download data from the PIP API."
-noi dis ""
-noi dis in white `"(1) Please check your Internet connection by "' _c 
-noi dis in white  `"{browse "`url'/health-check" :clicking here}"'
-noi dis in white `"(2) Test that the data is retrievable. By"' _c
-noi dis in white  `"{stata pip test, server(`server'): clicking here }"' _c
-noi dis in white  "you should be able to download the data."
-noi dis in white `"(3) Please consider adjusting your Stata timeout parameters. For more details see {help netio}"'
-noi dis in white `"(4) Please send us an email to:"'
-noi dis in white _col(8) `"email: pip@worldbank.org"'
-noi dis in white _col(8) `"subject: pip query error on `c(current_date)' `c(current_time)'"'
-noi di ""
-error 673
-}
-
-// --- timer
-if ("`timer'" != "") timer off `k'
-// --- timer
-
-* global qr = `qr'
-
-if ("`wb'" == "") {
-local rtype 1
-}
-else {
-local rtype 2
-}
-
-pause after download
-
-// --- timer
-if ("`timer'" != "") timer on `h'
-// --- timer
-
-*---------- Clean data
-noi pip_clean `rtype', year("`year'") `iso' server(`server') /* 
-*/ region(`region') `pause' `fillgaps' version(`version')
-
-pause after cleaning
-// --- timer
-if ("`timer'" != "") timer off `h'
-// --- timer
-
-//========================================================
-// Caching
-//========================================================
-pip_cache save, piphash("`piphash'") `replace' ///
-query("`queryfull'") `cacheforce'
-}  // end of regular Download
-
-/*==================================================
-Display Query
-==================================================*/
-
-if ("`dispquery'" != "") {
-noi di as res _n "{ul: Query at \$`i_povline' poverty line}"
-noi di as res "{hline}"
-
-
-if ("`query_ys'" != "") {
-noi di as res "Year:" as txt "{p 4 6 2} `query_ys' {p_end}"
-}
-
-if ("`query_ct'" != "") {
-noi di as res "Country:" as txt "{p 4 6 2} `query_ct' {p_end}"
-}
-
-if ("`query_pl'" != "") {
-noi di as res "Poverty line:" as txt "{p 4 6 2} `query_pl' {p_end}"
-}
-
-if ("`query_ps'" != "") {
-noi di as res "Population share:" as txt "{p 4 6 2} `query_ps' {p_end}"
-}
-
-if ("`query_ds'" != "") {
-noi di as res "Aggregation:" as txt "{p 4 6 2} `query_ds' {p_end}"
-}
-
-if ("`query_pp'" != "") {
-noi di as res "PPP:" as txt "{p 4 6 2} `query_pp' {p_end}"
-}
-
-if ("`'&`version_qr''" != "") {
-noi di as res "Version:" as txt "{p 4 6 2} `version_qr' {p_end}"
-}
-
-noi di as res "full query:" as txt "{p 4 6 2} `queryfull' {p_end}" _n
-noi di as res "See in browser: "  `"{browse "`queryfull'":here}"'  _n 
-noi di as res "Download .csv: "  `"{browse "`queryfull'&format=csv":here}"' 
-
-noi di as res _dup(20) "-"
-noi di as res "No. Obs:"      as txt _col(20) c(N)
-noi di as res "{hline}"
-}
-
-/*==================================================
-Append data
-==================================================*/			
-append using `povcalf'
-save `povcalf', replace
-
-} // end of povline loop
-
-return local npl = `f'
-
-// ------------------------------
-//  display results 
-// ------------------------------
-
-if ("`n2disp'" == "") local n2disp 1
-local n2disp = min(`c(N)', `n2disp')
-
-if (`n2disp' > 1) {
-noi di as res _n "{ul: first `n2disp' observations}"
-} 
-else	if (`n2disp' == 1) {
-noi di as res _n "{ul: first observation}"
-}
-else {
-noi di as res _n "{ul: No observations available}"
-}	
-
-
-if ("`subcmd'" == "wb") {
-sort region_code year 
-
-tempname tolist
-frame copy `c(frame)' `tolist'
-frame `tolist' {
-gsort region_code -year 
-
-count if (region_code == "WLD")
-local cwld = r(N)
-if (`cwld' >= `n2disp') {
-keep if (region_code == "WLD")			
-}
-noi list region_code year poverty_line headcount mean ///
-in 1/`n2disp',  abbreviate(12) noobs
-}
-
-}
-else {
-
-sort country_code year
-local varstodisp "country_code year poverty_line headcount mean median welfare_type"
-local sepby "country_code"
-
-foreach v of local varstodisp {
-cap confirm var `v', exact
-if _rc continue 
-local v2d "`v2d' `v'"
-}
-
-noi list `v2d' in 1/`n2disp',  abbreviate(12)  sepby(`sepby') noobs
-
-}
-
-
-
-//========================================================
-//  Create notes
-//========================================================
-
-local pllabel ""
-foreach p of local povline {
-local pllabel "`pllabel' \$`p'"
-}
-local pllabel = trim("`pllabel'")
-local pllabel: subinstr local pllabel " " ", ", all
-
-
-if ("`wb'" == "")   {
-if ("`fillgaps'" == "") local lvlabel "country level"	 
-else local lvlabel "Country level (lined up)"
-}
-else {
-local lvlabel "regional and global level"
-}
-
-
-local datalabel "WB poverty at `lvlabel' using `pllabel'"
-local datalabel = substr("`datalabel'", 1, 80)
-
-label data "`datalabel' (`c(current_date)')"
-
-//========================================================
-// Final messages
-//========================================================
-
-* citations
-if ("${pip_cmds_ssc}" == "1") {
-local cnoi "noi"
-global pip_cmds_ssc = ${pip_cmds_ssc} + 1
-}
-else {
-local cnoi "qui"
-noi disp `"Click {stata "pip_cite, reg_cite":here} to display how to cite"'
-}
-`cnoi' pip_cite, reg_cite
-notes: `r(cite_data)'
-
-noi disp in y _n `"`cite'"'
-
-return local cite `"`cite'"'
-
-* Install alternative version
-if ("${pip_cmds_ssc}" == "") {
-noi pip_${pip_source} msg
-}
-
-
-
-//========================================================
-// Convert to povcalnet format
-//========================================================
-
-if ("`timer'" != "") {
-local i_on = `i'
-scalar tt = tt + "`crlf' `i': formating to povcalnet"
-local i_off = `i++'
-}	
-// --- timer
-
-// --- timer
-if ("`timer'" != "") timer on `i_on'
-// --- timer
-
-if ("`povcalnet_format'" != "") {
-pause before povcalnet format
-pip_povcalnet_format  `rtype', `pause'
-}
-
-// --- timer
-if ("`timer'" != "") timer off `i_off'
-// --- timer
-
-//========================================================
-//  Drop frames created in the middle of the process
-//========================================================
-
-if ("`timer'" != "") {
-local i_on = `i'
-scalar tt = tt + "`crlf' `i': remove frames"
-local i_off = `i++'
-}	
-// --- timer
-
-// --- timer
-if ("`timer'" != "") timer on `i_on'
-// --- timer
-
-frame dir
-local av_frames "`r(frames)'"
-
-* set trace on 
-foreach fr of local av_frames {
-
-if (regexm("`fr'", "(^_pip_)(.+)")) {
-
-// If users wants to keep frames
-if ("`keepframes'" != "") {
-local frname = "`frame_prefix'" + regexs(2)
-frame copy `fr' `frname', `replace'
-}
-// if user wants to drop them
-if ("`efficient'" == "noefficient") {
-frame drop `fr'
-}
-}
-
-} // condition to keep frames
-
-// --- timer
-if ("`timer'" != "") timer off `i_on'
-// --- timer
-
-
-* set trace off
-
-
-
-// --- timer
-if ("`timer'" != "") {
-noi disp tt
-noi timer list
-}
-// --- timer
-
+	
+	//========================================================
+	// setup defaults
+	//========================================================
+	
+	local server     = lower("`server'")
+	local identity   = upper("`identity'")
+	local country    = upper("`country'")
+	local coverage   = lower("`coverage'")
+	local table      = lower("`table'")
+	
+	* In case global server is specified
+	if ("${pip_server}" != "" & "`server'" == "") {
+		noi disp in red "warning:" in y "Global {it:pip_server} (${pip_server}) is in use"
+		local server = "${pip_server}"
+	}
+	
+	
+	//========================================================
+	// Auxiliary tables
+	//========================================================
+	if regexm("`subcmd'", "^tab") {
+		noi pip_tables, `options'
+		return add
+		exit
+	}
+	
+	
+	//========================================================
+	//  Timer
+	//========================================================
+	
+	local i = 0
+	local crlf "`=char(10)'`=char(13)'"
+	scalar tt = ""
+	
+	if ("`timer'" != "") {
+		timer clear
+		local i = 1
+	}
+	
+	//========================================================
+	//  Poverty estimates defaults
+	//========================================================
+	
+	if ("`year'" == "") local year "all"
+	
+	// Blank popshare and blank povline = default povline 1.9
+	if ("`popshare'" == "" & "`povline'" == "")  {
+		
+		if ("`ppp_year'" == "2005") local povline = 1.25
+		if ("`ppp_year'" == "2011") local povline = 1.9
+		if ("`ppp_year'" == "2017") local povline = 2.15
+		
+		local pcall = "povline"
+	}
+	
+	if ("`frame_prefix'" == "") {
+		local frame_prefix "pip_"
+	}
+	
+		
+	//========================================================
+	// Conditions (Defenses)
+	//========================================================
+	
+	pip_pov_check_args `subcmd', `options'
+	
+	//========================================================
+	// Country level estimates 
+	//========================================================
+	
+	if ("`subcmd'" == "cl") {
+		pip_cl, `options'
+	}
+	
+	// --- timer
+	if ("`timer'" != "") {
+		local i_on = `i'
+		scalar tt = tt + "`crlf' `i': Set server"
+		local i_off = `i++'
+	}	
+	// --- timer
+	
+	// --- timer
+	if ("`timer'" != "") timer on `i_on'
+	// --- timer
+	
+	*---------- API defaults
+	pip_set_server, `server'
+	*return add
+	local url       = "`r(url)'"
+	local server    = "`r(server)'"
+	local base      = "`r(base)'"
+	local base_grp  = "`r(base_grp)'"
+	
+	// --- timer
+	if ("`timer'" != "") timer off `i_off'
+	// --- timer
+	
+	//========================================================
+	// versions
+	//========================================================
+	
+	// --- timer
+	if ("`timer'" != "") {
+		local i_on = `i'
+		scalar tt = tt + "`crlf' `i': Get version"
+		local i_off = `i++'
+	}	
+	// --- timer
+	
+	// --- timer
+	if ("`timer'" != "") timer on `i_on'
+	// --- timer
+	
+	
+
+	noi pip_versions, server(`server') ///
+	version(`version')                ///
+	release(`release')               ///
+	ppp_year(`ppp_year')             ///
+	identity(`identity')    
+	
+	local version_qr = "`r(version_qr)'"
+	local version    = "`r(version)'"
+	local release    = "`r(release)'"
+	local ppp_year   = "`r(ppp_year)'"
+	local identity   = "`r(identity)'"
+	
+	return local pip_version = "`version'"
+	
+	// --- timer
+	if ("`timer'" != "") timer off `i_off'
+	// --- timer
+	
+	
+	//========================================================
+	// conditions
+	//========================================================
+	*---------- lower case subcommand
+	local subcmd = lower("`subcmd'")
+	
+	*---------- Test
+	if ("`subcmd'" == "test") {
+		if ("${pip_query}" == "") {
+			noi di as err "global pip_query does not exist. You cannot test the query."
+			error
+		}
+		local fq = "`base'?${pip_query}"
+		noi disp in y "querying" in w _n "`fq'"
+		noi view browse "`fq'"
+		exit
+	}
+	
+	
+	*---------- Poverty line/population share
+	
+	// blank popshare and defined povline
+	else if ("`popshare'" == "" & "`povline'" != "")  {
+		local pcall = "povline"
+	}
+	
+	// defined popshare and blank povline
+	else {
+		local pcall = "popshare"
+	}
+	
+	*---------- Info
+	if regexm("`subcmd'", "^info")	{
+		local information = "information"
+		local subcmd  = "information"
+	}
+	
+	//------------ Region
+	
+	if ("`region'" != "") {
+		local region = upper("`region'")
+		
+		if ("`country'" != "") {
+			noi disp in red "You must use either {it:country()} or {it:region()}."
+			error
+		}
+		
+		if (regexm("`region'", "SAR")) {
+			noi disp in red "Note: " in y "The official code of South Asia is" ///
+			"{it: SAS}, not {it:SAR}. We'll make the change for you"
+			local region: subinstr local region "SAR" "SAS", word
+		}
+		
+		tokenize "`version'", parse("_")
+		local _version   = "_`1'_`3'_`9'"
+		
+		frame dir 
+		local av_frames "`r(frames)'"
+		local av_frames: subinstr local  av_frames " " "|", all
+		local av_frames = "^(" + "`av_frames'" + ")"
+		
+		//------------ Regions frame
+		local frpiprgn "_pip_regions`_version'"
+		if (!regexm("`frpiprgn'", "`av_frames'")) {
+			pip_info, clear justdata `pause' server(`server') version(`version')
+		} 
+		frame `frpiprgn' {
+			levelsof region_code, local(av_regions)  clean
+		}
+		
+		// Add all to have the same functionality as in country(all)
+		local av_regions = "`av_regions'" + " ALL"
+		
+		local inregion: list region in av_regions
+		if (`inregion' == 0) {
+			
+			noi disp in red "region `region' is not available." _n ///
+			"Only the following are available:" _n "`av_regions'"
+			
+			error
+		}
+		
+	}
+	
+	*---------- WB aggregate
+	
+	if ("`subcmd'" == "wb") {
+		if ("`country'" != "") {
+			noi disp as err "option {it:country()} is not allowed with subcommand {it:wb}"
+			noi disp as res "Note: " as txt "subcommand {it:wb} only accepts options {it:region()} and {it:year()}"
+			error
+		}
+	}
+	
+	
+	*---------- Country
+	if ("`country'" == "" & "`region'" == "") local country "ALL" // to modify
+	if ("`country'" != "") {
+		if (lower("`country'") != "all") local country = upper("`country'")
+		else                             local country "ALL" // to modify
+	}
+	
+	
+	/*==================================================
+	Main conditions
+	==================================================*/
+	
+	if ("`information'" == "") {
+		
+		if (c(N) != 0 & "`clear'" == "" & "`information'" == "") {
+			
+			noi di as err "You must start with an empty dataset; or enable the option {it:clear}."
+			error 4
+		}	
+		drop _all
+	}
+	
+	/*==================================================
+	Execution 
+	==================================================*/
+	pause pip - before execution
+	
+	*---------- Information
+	// --- timer
+	if ("`timer'" != "") {
+		local i_on = `i'
+		scalar tt = tt + "`crlf' `i': Get info"
+		local i_off = `i++'
+	}	
+	// --- timer
+	
+	// --- timer
+	if ("`timer'" != "") timer on `i_on'
+	// --- timer
+	
+	
+	if ("`information'" != ""){
+		noi pip_info, `clear' `pause' server(`server') version(`version')
+		return add 
+		exit
+	}	
+	
+	// --- timer
+	if ("`timer'" != "") timer off `i_off'
+	// --- timer
+	
+	*---------- Regular query and Aggregate Query
+	if ("`subcmd'" == "wb") {
+		local wb "wb"
+	}
+	else local wb ""
+	
+	
+	tempfile povcalf
+	save `povcalf', empty 
+	
+	local f = 0
+	
+	if ("`pcall'" == "povline") 	loc i_call "i_povline"
+	else 							loc i_call "i_popshare"
+	
+	
+	// --- timer
+	if ("`timer'" != "") {
+		local j = `i++'
+		local k = `i++'
+		local h = `i++'
+		scalar tt = tt + "`crlf' `j': building query"
+		scalar tt = tt + "`crlf' `k': downloading data"
+		scalar tt = tt + "`crlf' `h': cleaning data"
+	}	
+	// --- timer		
+	
+	foreach `i_call' of local `pcall' {	
+		
+		// --- timer
+		if ("`timer'" != "") timer on `j'
+		// --- timer
+		
+		local ++f 
+		
+		/*==================================================
+		Create Query
+		==================================================*/
+		pip_query,   country("`country'")       ///
+		region("`region'")                      ///
+		year("`year'")                          ///
+		povline("`i_povline'")                  ///
+		popshare("`i_popshare'")	   					  ///
+		ppp("`ppp_year'")                            ///
+		coverage(`coverage')                    ///
+		server(`server')                        ///
+		version(`version')                      ///
+		`clear'                                 ///
+		`information'                           ///
+		`iso'                                   ///
+		`fillgaps'                              ///
+		`wb'                                    ///
+		`pause'                                 ///
+		`groupedby'                             //
+		
+		local query_ys = "`r(query_ys)'"
+		local query_ct = "`r(query_ct)'"
+		local query_pl = "`r(query_pl)'"
+		local query_ds = "`r(query_ds)'"
+		local query_pp = "`r(query_pp)'"
+		local query_ps = "`r(query_ps)'"
+		
+		local query_cv = "`r(query_cv)'"
+		
+		return local query_ys_`f' = "`query_ys'"
+		return local query_ct_`f' = "`query_ct'"
+		return local query_pl_`f' = "`query_pl'"
+		return local query_ds_`f' = "`query_ds'"
+		return local query_pp_`f' = "`query_pp'"
+		return local query_ps_`f' = "`query_ps'"
+		
+		return local query_cv_`f' = "`query_cv'"
+		
+		return local base      = "`base'"
+		
+		*---------- Query
+		if ("`popshare'" == ""){
+			local query = "`query_ys'&`query_ct'&`query_cv'&`query_pl'`query_pp'`query_ds'&`version_qr'"
+		}
+		else{
+			local query = "`query_ys'&`query_ct'&`query_cv'&`query_ps'`query_pp'`query_ds'&`version_qr'"
+		}
+		return local query_`f' "`query'"
+		global pip_query = "`query'&format=csv"
+		
+		*---------- Base + query
+		if ("`subcmd'" == "wb"){
+			local queryfull "`base_grp'?`query'"
+		}
+		else{
+			local queryfull "`base'?`query'"
+		}
+		
+		return local queryfull_`f' = "`queryfull'"
+		
+		// --- timer
+		if ("`timer'" != "") timer off `j'
+		// --- timer
+		
+		/*==================================================
+		Download  and clean data
+		==================================================*/
+		
+		
+		// --- timer
+		if ("`timer'" != "") timer on `k'
+		// --- timer
+		
+		*---------- download data
+		
+		pip_cache load, query("`queryfull'") `cacheforce' `clear'
+		local pc_exists = "`r(pc_exists)'"
+		local piphash   = "`r(piphash)'"
+		
+		// if not cached because it war forced or because user does not want to
+		if ("`pc_exists'" == "0" | "`${pip_cachedir}'" == "0") {
+			
+			cap import delimited  "`queryfull'&format=csv", `clear' varn(1) asdouble
+			if (_rc) {
+				noi dis ""
+				noi dis in red "It was not possible to download data from the PIP API."
+				noi dis ""
+				noi dis in white `"(1) Please check your Internet connection by "' _c 
+				noi dis in white  `"{browse "${pip_host}/health-check" :clicking here}"'
+				noi dis in white `"(2) Test that the data is retrievable. By"' _c
+				noi dis in white  `"{stata pip test, server(`server'): clicking here }"' _c
+				noi dis in white  "you should be able to download the data."
+				noi dis in white `"(3) Please consider adjusting your Stata timeout parameters. For more details see {help netio}"'
+				noi dis in white `"(4) Please send us an email to:"'
+				noi dis in white _col(8) `"email: pip@worldbank.org"'
+				noi dis in white _col(8) `"subject: pip query error on `c(current_date)' `c(current_time)'"'
+				noi di ""
+				error 673
+			}
+			
+			// --- timer
+			if ("`timer'" != "") timer off `k'
+			// --- timer
+			
+			* global qr = `qr'
+			
+			if ("`wb'" == "") {
+				local rtype 1
+			}
+			else {
+				local rtype 2
+			}
+			
+			pause after download
+			
+			// --- timer
+			if ("`timer'" != "") timer on `h'
+			// --- timer
+			
+			*---------- Clean data
+			noi pip_clean `rtype', year("`year'") `iso' server(`server') /* 
+			*/ region(`region') `pause' `fillgaps' version(`version')
+			
+			pause after cleaning
+			// --- timer
+			if ("`timer'" != "") timer off `h'
+			// --- timer
+			
+			//========================================================
+			// Caching
+			//========================================================
+			pip_cache save, piphash("`piphash'") `replace' ///
+			query("`queryfull'") `cacheforce'
+		}  // end of regular Download
+		
+		/*==================================================
+		Display Query
+		==================================================*/
+		
+		if ("`dispquery'" != "") {
+			noi di as res _n "{ul: Query at \$`i_povline' poverty line}"
+			noi di as res "{hline}"
+			
+			
+			if ("`query_ys'" != "") {
+				noi di as res "Year:" as txt "{p 4 6 2} `query_ys' {p_end}"
+			}
+			
+			if ("`query_ct'" != "") {
+				noi di as res "Country:" as txt "{p 4 6 2} `query_ct' {p_end}"
+			}
+			
+			if ("`query_pl'" != "") {
+				noi di as res "Poverty line:" as txt "{p 4 6 2} `query_pl' {p_end}"
+			}
+			
+			if ("`query_ps'" != "") {
+				noi di as res "Population share:" as txt "{p 4 6 2} `query_ps' {p_end}"
+			}
+			
+			if ("`query_ds'" != "") {
+				noi di as res "Aggregation:" as txt "{p 4 6 2} `query_ds' {p_end}"
+			}
+			
+			if ("`query_pp'" != "") {
+				noi di as res "PPP:" as txt "{p 4 6 2} `query_pp' {p_end}"
+			}
+			
+			if ("`'&`version_qr''" != "") {
+				noi di as res "Version:" as txt "{p 4 6 2} `version_qr' {p_end}"
+			}
+			
+			noi di as res "full query:" as txt "{p 4 6 2} `queryfull' {p_end}" _n
+			noi di as res "See in browser: "  `"{browse "`queryfull'":here}"'  _n 
+			noi di as res "Download .csv: "  `"{browse "`queryfull'&format=csv":here}"' 
+			
+			noi di as res _dup(20) "-"
+			noi di as res "No. Obs:"      as txt _col(20) c(N)
+			noi di as res "{hline}"
+		}
+		
+		/*==================================================
+		Append data
+		==================================================*/			
+		append using `povcalf'
+		save `povcalf', replace
+		
+	} // end of povline loop
+	
+	return local npl = `f'
+	
+	// ------------------------------
+	//  display results 
+	// ------------------------------
+	
+	if ("`n2disp'" == "") local n2disp 1
+	local n2disp = min(`c(N)', `n2disp')
+	
+	if (`n2disp' > 1) {
+		noi di as res _n "{ul: first `n2disp' observations}"
+	} 
+	else	if (`n2disp' == 1) {
+		noi di as res _n "{ul: first observation}"
+	}
+	else {
+		noi di as res _n "{ul: No observations available}"
+	}	
+	
+	
+	if ("`subcmd'" == "wb") {
+		sort region_code year 
+		
+		tempname tolist
+		frame copy `c(frame)' `tolist'
+		frame `tolist' {
+			gsort region_code -year 
+			
+			count if (region_code == "WLD")
+			local cwld = r(N)
+			if (`cwld' >= `n2disp') {
+				keep if (region_code == "WLD")			
+			}
+			noi list region_code year poverty_line headcount mean ///
+			in 1/`n2disp',  abbreviate(12) noobs
+		}
+		
+	}
+	else {
+		
+		sort country_code year
+		local varstodisp "country_code year poverty_line headcount mean median welfare_type"
+		local sepby "country_code"
+		
+		foreach v of local varstodisp {
+			cap confirm var `v', exact
+			if _rc continue 
+			local v2d "`v2d' `v'"
+		}
+		
+		noi list `v2d' in 1/`n2disp',  abbreviate(12)  sepby(`sepby') noobs
+		
+	}
+	
+	
+	
+	//========================================================
+	//  Create notes
+	//========================================================
+	
+	local pllabel ""
+	foreach p of local povline {
+		local pllabel "`pllabel' \$`p'"
+	}
+	local pllabel = trim("`pllabel'")
+	local pllabel: subinstr local pllabel " " ", ", all
+	
+	
+	if ("`wb'" == "")   {
+		if ("`fillgaps'" == "") local lvlabel "country level"	 
+		else local lvlabel "Country level (lined up)"
+	}
+	else {
+		local lvlabel "regional and global level"
+	}
+	
+	
+	local datalabel "WB poverty at `lvlabel' using `pllabel'"
+	local datalabel = substr("`datalabel'", 1, 80)
+	
+	label data "`datalabel' (`c(current_date)')"
+	
+	//========================================================
+	// Final messages
+	//========================================================
+	
+	* citations
+	if ("${pip_cmds_ssc}" == "1") {
+		local cnoi "noi"
+		global pip_cmds_ssc = ${pip_cmds_ssc} + 1
+	}
+	else {
+		local cnoi "qui"
+		noi disp `"Click {stata "pip_cite, reg_cite":here} to display how to cite"'
+	}
+	`cnoi' pip_cite, reg_cite
+	notes: `r(cite_data)'
+	
+	noi disp in y _n `"`cite'"'
+	
+	return local cite `"`cite'"'
+	
+	* Install alternative version
+	if ("${pip_cmds_ssc}" == "") {
+		noi pip_${pip_source} msg
+	}
+	
+	
+	
+	//========================================================
+	// Convert to povcalnet format
+	//========================================================
+	
+	if ("`timer'" != "") {
+		local i_on = `i'
+		scalar tt = tt + "`crlf' `i': formating to povcalnet"
+		local i_off = `i++'
+	}	
+	// --- timer
+	
+	// --- timer
+	if ("`timer'" != "") timer on `i_on'
+	// --- timer
+	
+	if ("`povcalnet_format'" != "") {
+		pause before povcalnet format
+		pip_povcalnet_format  `rtype', `pause'
+	}
+	
+	// --- timer
+	if ("`timer'" != "") timer off `i_off'
+	// --- timer
+	
+	//========================================================
+	//  Drop frames created in the middle of the process
+	//========================================================
+	
+	if ("`timer'" != "") {
+		local i_on = `i'
+		scalar tt = tt + "`crlf' `i': remove frames"
+		local i_off = `i++'
+	}	
+	// --- timer
+	
+	// --- timer
+	if ("`timer'" != "") timer on `i_on'
+	// --- timer
+	
+	frame dir
+	local av_frames "`r(frames)'"
+	
+	* set trace on 
+	foreach fr of local av_frames {
+		
+		if (regexm("`fr'", "(^_pip_)(.+)")) {
+			
+			// If users wants to keep frames
+			if ("`keepframes'" != "") {
+				local frname = "`frame_prefix'" + regexs(2)
+				frame copy `fr' `frname', `replace'
+			}
+			// if user wants to drop them
+			if ("`efficient'" == "noefficient") {
+				frame drop `fr'
+			}
+		}
+		
+	} // condition to keep frames
+	
+	// --- timer
+	if ("`timer'" != "") timer off `i_on'
+	// --- timer
+	
+	
+	* set trace off
+	
+	
+	
+	// --- timer
+	if ("`timer'" != "") {
+		noi disp tt
+		noi timer list
+	}
+	// --- timer
+	
 } // end of qui
 end
 
