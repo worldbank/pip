@@ -96,7 +96,7 @@ if ("`subcmd'" == "save") {
 //========================================================
 
 if ("`subcmd'" == "delete") {
-	local pc_files: dir "`cachedir'" files  "_pc*"
+	local pc_files: dir "${pip_cachedir}" files  "_pc*"
 	local nfiles: word count `pc_files'
 	
 	noi disp "{err:Warning:} you will delete `nfiles' cache files." _n ///
@@ -104,7 +104,7 @@ if ("`subcmd'" == "delete") {
 	
 	if (lower("`confirm'") == "y") {
 		foreach f of local pc_files {
-			erase "`cachedir'/`f'"
+			erase "${pip_cachedir}/`f'"
 		}
 	}
 	
