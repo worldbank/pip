@@ -73,7 +73,7 @@ qui {
 	//========================================================
 	
 	//------------ get server url
-	if ("${pip_host}" == "" | server != "") {
+	if ("${pip_host}" == "" | "`server'" != "") {
 		pip_set_server,  server(`server')
 		local url       = "`r(url)'"
 		local server    = "`r(server)'"

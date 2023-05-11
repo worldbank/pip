@@ -27,7 +27,7 @@ qui {
 	//if ("`clear'" == "") preserve
 	
 	*---------- API defaults
-	if ("${pip_host}" == "" | server != "") {
+	if ("${pip_host}" == "" | "`server'" != "") {
 		pip_set_server,  server(`server')
 		local server    = "`r(server)'"
 		local url       = "`r(url)'"
@@ -66,7 +66,7 @@ qui {
 		
 		frame `frpipcts' {
 			
-			cap pip_tables countries, server(`server') version(`version') clear
+			cap pip_tables , table(countries) server(`server') version(`version') clear
 			local rc1 = _rc
 			
 			if (`rc1' == 0) {
@@ -99,7 +99,7 @@ qui {
 		
 		frame `frpiprgn' {
 			
-			cap pip_tables regions, server(`server') version(`version') clear
+			cap pip_tables , table(regions) server(`server') version(`version') clear
 			local rc1 = _rc
 			
 			if (`rc1' == 0) {
@@ -129,7 +129,7 @@ qui {
 		
 		frame `frpipfw' {
 			
-			cap pip_tables framework, server(`server') version(`version') clear
+			cap pip_tables , table(framework) server(`server') version(`version') clear
 			
 			//------------format variables to make them link to data. 
 			rename welfare_type wt

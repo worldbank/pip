@@ -55,6 +55,30 @@ if ("`pause'" == "pause") pause on
 else                      pause off
 
 qui {
+	//========================================================
+	// setup
+	//========================================================
+	//------------ get server url
+	if ("${pip_host}" == "" | "`server'" != "") {
+		pip_set_server,  server(`server')
+	}
+	
+	//------------ Set versions
+	noi pip_versions, server(`server') ///
+	version(`version')                ///
+	release(`release')               ///
+	ppp_year(`ppp_year')             ///
+	identity(`identity')  
+	
+	local version_qr = "`r(version_qr)'"
+	local version    = "`r(version)'"
+	local release    = "`r(release)'"
+	local ppp_year   = "`r(ppp_year)'"
+	local identity   = "`r(identity)'"
+	
+	
+	//------------ Get auxiliary data
+	pip_info, clear justdata `pause' server(`server') version(`version')
 	
 }
 end

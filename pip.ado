@@ -187,12 +187,24 @@ qui {
 		local frame_prefix "pip_"
 	}
 	
+	*---------- Country
+	if ("`country'" == "" & "`region'" == "") local country "ALL" // to modify
+	if ("`country'" != "") {
+		if (lower("`country'") != "all") local country = upper("`country'")
+		else                             local country "ALL" // to modify
+	}
+	
 		
 	//========================================================
 	// Conditions (Defenses)
 	//========================================================
 	
 	pip_pov_check_args `subcmd', `options'
+	if ("`r(region)'" != "") local region = "`r(region)'" 
+	
+	/* noi disp `"`region'"'
+	exit  */
+	
 	
 	//========================================================
 	// Country level estimates 
@@ -300,85 +312,7 @@ qui {
 		local subcmd  = "information"
 	}
 	
-	//------------ Region
 	
-	if ("`region'" != "") {
-		local region = upper("`region'")
-		
-		if ("`country'" != "") {
-			noi disp in red "You must use either {it:country()} or {it:region()}."
-			error
-		}
-		
-		if (regexm("`region'", "SAR")) {
-			noi disp in red "Note: " in y "The official code of South Asia is" ///
-			"{it: SAS}, not {it:SAR}. We'll make the change for you"
-			local region: subinstr local region "SAR" "SAS", word
-		}
-		
-		tokenize "`version'", parse("_")
-		local _version   = "_`1'_`3'_`9'"
-		
-		frame dir 
-		local av_frames "`r(frames)'"
-		local av_frames: subinstr local  av_frames " " "|", all
-		local av_frames = "^(" + "`av_frames'" + ")"
-		
-		//------------ Regions frame
-		local frpiprgn "_pip_regions`_version'"
-		if (!regexm("`frpiprgn'", "`av_frames'")) {
-			pip_info, clear justdata `pause' server(`server') version(`version')
-		} 
-		frame `frpiprgn' {
-			levelsof region_code, local(av_regions)  clean
-		}
-		
-		// Add all to have the same functionality as in country(all)
-		local av_regions = "`av_regions'" + " ALL"
-		
-		local inregion: list region in av_regions
-		if (`inregion' == 0) {
-			
-			noi disp in red "region `region' is not available." _n ///
-			"Only the following are available:" _n "`av_regions'"
-			
-			error
-		}
-		
-	}
-	
-	*---------- WB aggregate
-	
-	if ("`subcmd'" == "wb") {
-		if ("`country'" != "") {
-			noi disp as err "option {it:country()} is not allowed with subcommand {it:wb}"
-			noi disp as res "Note: " as txt "subcommand {it:wb} only accepts options {it:region()} and {it:year()}"
-			error
-		}
-	}
-	
-	
-	*---------- Country
-	if ("`country'" == "" & "`region'" == "") local country "ALL" // to modify
-	if ("`country'" != "") {
-		if (lower("`country'") != "all") local country = upper("`country'")
-		else                             local country "ALL" // to modify
-	}
-	
-	
-	/*==================================================
-	Main conditions
-	==================================================*/
-	
-	if ("`information'" == "") {
-		
-		if (c(N) != 0 & "`clear'" == "" & "`information'" == "") {
-			
-			noi di as err "You must start with an empty dataset; or enable the option {it:clear}."
-			error 4
-		}	
-		drop _all
-	}
 	
 	/*==================================================
 	Execution 
