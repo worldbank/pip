@@ -39,8 +39,8 @@ if ("`subcmd'" != "") {
 Parse options
 ==================================================*/
 if (`"`opts'"' != "") {
-	return local options = `"`opts'"'
-	local optnames "`optnames' options"
+	return local pipoptions = `"`opts'"'
+	local optnames "`optnames' pipoptions"
 }
 
 gettoken opt opts: opts, bind

@@ -171,6 +171,19 @@ void pip_retlist2locals(string scalar optnames)
 }
 
 
+//========================================================
+//  create string of calling of locals
+//========================================================
+
+void pip_locals2call(string scalar optnames, string scalar newname)
+{
+	string rowvector V
+	
+	V = tokens(optnames)
+	V = "`" :+ V :+ "'"
+	st_local(newname, invtokens(V))
+}
+
 
 //========================================================
 // deprecated functions

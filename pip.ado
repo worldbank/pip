@@ -31,14 +31,14 @@ mata: pip_retlist2locals("`r(optnames)'")
 if ("`subcmd'" == "") local subcmd "cl"  // country-level       
 
 /* 
- 
+
 disp `"country: `country'"'
 disp `"year: `year'"'
 disp `"clear: `clear'"'
 disp `"povline: `povline'"'
 disp `"cache: `cache'"'
 disp `"subcmd: `subcmd'"'
-disp `"options: `options'"'
+disp `"pipoptions: `pipoptions'"'
 
 exit 
 */
@@ -80,8 +80,8 @@ if regexm("`subcmd'", "^dropglobal") {
 if regexm("`subcmd'", "^install") {
 	if ( wordcount("`subcmd'") != 2) {
 		noi disp "{err}subcommand {it:install} must be use with either {it:ssc} " /* 
-	 */	"or {it:gh}" _n "E.x., {cmd:pip install ssc} or {cmd:pip install gh}."
-	 error
+		*/	"or {it:gh}" _n "E.x., {cmd:pip install ssc} or {cmd:pip install gh}."
+		error
 	}
 	local sscmd: word 2 of `subcmd'
 	noi pip_install `sscmd', `path' `pause'
@@ -131,16 +131,10 @@ qui {
 	// setup defaults
 	//========================================================
 	
-	local server     = lower("`server'")
-	local identity   = upper("`identity'")
-	local country    = upper("`country'")
-	local coverage   = lower("`coverage'")
-	local table      = lower("`table'")
-	
 	* In case global server is specified
 	if ("${pip_server}" != "" & "`server'" == "") {
 		noi disp in red "warning:" in y "Global {it:pip_server} (${pip_server}) is in use"
-		local server = "${pip_server}"
+		local server = "server(${pip_server})"
 	}
 	
 	
@@ -148,7 +142,7 @@ qui {
 	// Auxiliary tables
 	//========================================================
 	if regexm("`subcmd'", "^tab") {
-		noi pip_tables, `options'
+		noi pip_tables, `pipoptions'
 		return add
 		exit
 	}
@@ -171,39 +165,32 @@ qui {
 	//  Poverty estimates defaults
 	//========================================================
 	
-	if ("`year'" == "") local year "all"
-	
-	// Blank popshare and blank povline = default povline 1.9
-	if ("`popshare'" == "" & "`povline'" == "")  {
-		
-		if ("`ppp_year'" == "2005") local povline = 1.25
-		if ("`ppp_year'" == "2011") local povline = 1.9
-		if ("`ppp_year'" == "2017") local povline = 2.15
-		
-		local pcall = "povline"
-	}
-	
 	if ("`frame_prefix'" == "") {
 		local frame_prefix "pip_"
 	}
-	
-	*---------- Country
-	if ("`country'" == "" & "`region'" == "") local country "ALL" // to modify
-	if ("`country'" != "") {
-		if (lower("`country'") != "all") local country = upper("`country'")
-		else                             local country "ALL" // to modify
-	}
-	
-		
 	//========================================================
 	// Conditions (Defenses)
 	//========================================================
 	
-	pip_pov_check_args `subcmd', `options'
-	if ("`r(region)'" != "") local region = "`r(region)'" 
+	pip_pov_check_args `subcmd', `country' `region' `year' ///
+	`povline' `popshare' `ppp_year' `clear' `coverage'  ///
+  `server' `version' `identity' `release'
+	local optnames "`r(optnames)'"
+	mata: pip_retlist2locals("`optnames'")
+	mata: pip_locals2call("`optnames'", "povoptions")
 	
-	/* noi disp `"`region'"'
-	exit  */
+	/*
+  noi {
+		disp `"country: `country'"'
+		disp `"year: `year'"'
+		disp `"clear: `clear'"'
+		disp `"povline: `povline'"'
+		disp `"popshare: `cache'"'
+		disp `"subcmd: `subcmd'"'
+		disp `"povoptions: `povoptions'"'	
+	}
+	exit  
+	*/
 	
 	
 	//========================================================
@@ -211,7 +198,8 @@ qui {
 	//========================================================
 	
 	if ("`subcmd'" == "cl") {
-		pip_cl, `options'
+		pip_cl, `povoptions' `clear'
+		exit
 	}
 	
 	// --- timer
@@ -255,7 +243,7 @@ qui {
 	// --- timer
 	
 	
-
+	
 	noi pip_versions, server(`server') ///
 	version(`version')                ///
 	release(`release')               ///

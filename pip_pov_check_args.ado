@@ -16,32 +16,13 @@ REGion(string)                  ///
 YEAR(string)                    /// 
 POVLine(numlist)                /// 
 POPShare(numlist)	   	          /// 
-PPP_year(numlist)               ///
+PPP_year(numlist)          /// to change with new round
 CLEAR                           /// 
-INFOrmation                     /// 
 COVerage(string)                /// 
-ISO                             /// 
 SERver(string)                  /// 
-pause                           /// 
-FILLgaps                        /// 
-N2disp(integer 1)               /// 
-DISPQuery                       ///
-querytimes(integer 5)           ///
-TIMEr                           ///
-POVCALNET_format                ///
-noEFFICIENT                     ///
-KEEPFrames                      ///
-frame_prefix(string)            ///
-replace                         ///
 VERsion(string)                 ///
 IDEntity(string)                ///
 RELease(numlist)                ///
-TABle(string)                   ///
-path(string)                    ///
-noCACHE                         ///
-cachedir(string)                ///
-cachedelete                     ///
-cacheforce                      ///
 ] 
 
 version 16
@@ -62,11 +43,12 @@ release(`release')               ///
 ppp_year(`ppp_year')             ///
 identity(`identity')  
 
-local version_qr = "`r(version_qr)'"
 local version    = "`r(version)'"
-local release    = "`r(release)'"
 local ppp_year   = "`r(ppp_year)'"
-local identity   = "`r(identity)'"
+
+return local version = "version(`version')"
+return local ppp_year = "ppp_year(`ppp_year')"
+local optnames "`optnames' version ppp_year"
 
 
 //------------ Get auxiliary data
@@ -76,6 +58,7 @@ pip_info, clear justdata `pause' server(`server') version(`version')
 // Checks
 //========================================================
 
+// poshare
 if ("`popshare'" != "" &  lower("`subcmd'") == "wb") {
 	noi disp in red "option {it:popshare()} can't be combined " /* 
 	*/ "with subcommand {it:wb}" _n
@@ -91,15 +74,28 @@ foreach c of local coverage {
 	if !inlist(lower("`c'"), "national", "rural", "urban", "all") {
 		noi disp in red `"option {it:coverage()} must be "national", "rural",  "urban" or "all" "'
 		error
-	}
-	
+	}	
 }
+return local coverage = "coverage(`coverage')"
+local optnames "`optnames' coverage"
+
 
 // defined popshare and defined povline = error
-else if ("`popshare'" != "" & "`povline'" != "")  {
+if ("`popshare'" != "" & "`povline'" != "")  {
 	noi disp as err "povline and popshare cannot be used at the same time"
 	error
 }
+// Blank popshare and blank povline = default povline 1.9
+else if ("`popshare'" == "" & "`povline'" == "")  {
+	
+	if ("`ppp_year'" == "2005") local povline = 1.25
+	if ("`ppp_year'" == "2011") local povline = 1.9
+	if ("`ppp_year'" == "2017") local povline = 2.15
+}
+return local povline  = "povline(`povline')"
+return local popshare = "popshare(`popshare')"
+local optnames "`optnames' povline popshare"
+
 
 //------------ Region
 if ("`region'" != "") {
@@ -113,8 +109,7 @@ if ("`region'" != "") {
 	if (regexm("`region'", "SAR")) {
 		noi disp in red "Note: " in y "The official code of South Asia is" ///
 		"{it: SAS}, not {it:SAR}. We'll make the change for you"
-		local region: subinstr local region "SAR" "SAS", word
-		return local region = "region(`region')" 
+		local region: subinstr local region "SAR" "SAS", word 
 	}
 	
 	tokenize "`version'", parse("_")
@@ -160,17 +155,37 @@ if ("`subcmd'" == "wb") {
 
 // empty data
 if !ustrregexm("`subcmd'", "^info") {
-	
-	if (c(N) != 0 & "`clear'" == "") {
-		
+	if (c(changed) != 0 & "`clear'" == "") {	
 		noi di as err "You must start with an empty dataset; or enable the option {it:clear}."
 		error 4
 	}	
 	drop _all
 }
 
+//------------ year
+if ("`year'" != "") {
+	numlist "`year'"
+	local year = r(numlist)
+}
+if ("`year'" == "") local year "all"
+return local year = "year(`year')"
+local optnames "`optnames' year"
+
+*---------- Country
+local country = stritrim(ustrtrim("`country' `region'"))
+if (lower("`country'") != "all") local country = upper("`country'")
+if ("`country'" == "") local country "all" // to modify
+return local country = "country(`country')"
+local optnames "`optnames' country"
 
 
+
+//========================================================
+// Return options names
+//========================================================
+
+
+return local optnames "`optnames'"
 
 end
 exit

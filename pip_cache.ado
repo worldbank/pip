@@ -22,7 +22,6 @@ PREfix(string)              ///
 cachedir(string)            ///
 piphash(string)             ///
 clear                       ///
-replace                     ///
 cacheforce                  ///
 ]
 
@@ -86,7 +85,7 @@ if ("`subcmd'" == "save") {
 	if (_rc == 0 | "`cacheforce'" != "") {
 		char _dta[piphash] `piphash'
 		char _dta[pipquery] `query'
-		save "`pc_file'", `replace'
+		qui save "`pc_file'", replace
 	}
 	exit
 }

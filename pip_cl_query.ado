@@ -35,7 +35,7 @@ VERsion(string)                 ///
 //========================================================
 
 // country
-local country = stritrim(ustrtrim("`country' `region'"))
+local country = stritrim(ustrtrim("`country'"))
 local country : subinstr local country " " ",", all
 if ("`country'" == "") local country = "all"
 // year

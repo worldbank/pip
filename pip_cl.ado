@@ -22,30 +22,17 @@ YEAR(string)                    ///
 POVLine(numlist)                /// 
 POPShare(numlist)	   	          /// 
 PPP_year(numlist)               ///
-CLEAR                           /// 
-INFOrmation                     /// 
+FILLgaps                        /// 
 COVerage(string)                /// 
+CLEAR                           /// 
 ISO                             /// 
 SERver(string)                  /// 
 pause                           /// 
-FILLgaps                        /// 
-N2disp(integer 1)               /// 
-DISPQuery                       ///
-querytimes(integer 5)           ///
-TIMEr                           ///
 POVCALNET_format                ///
-noEFFICIENT                     ///
-KEEPFrames                      ///
-frame_prefix(string)            ///
 replace                         ///
 VERsion(string)                 ///
 IDEntity(string)                ///
 RELease(numlist)                ///
-TABle(string)                   ///
-path(string)                    ///
-noCACHE                         ///
-cachedir(string)                ///
-cachedelete                     ///
 cacheforce                      ///
 ] 
 
@@ -64,13 +51,14 @@ qui {
 	}
 	
 	//------------ Set versions
-	noi pip_versions, server(`server') ///
-	version(`version')                ///
-	release(`release')               ///
-	ppp_year(`ppp_year')             ///
-	identity(`identity')  
-	local version    = "`r(version)'"
-	
+	if ("`version'" == "") {  // this should never be true
+		noi pip_versions, server(`server') ///
+		version(`version')                ///
+		release(`release')               ///
+		ppp_year(`ppp_year')             ///
+		identity(`identity')  
+		local version    = "`r(version)'"		
+	}
 	//------------ Get auxiliary data
 	pip_info, clear justdata `pause' server(`server') version(`version')
 	
