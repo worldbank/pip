@@ -69,16 +69,25 @@ qui {
 	release(`release')               ///
 	ppp_year(`ppp_year')             ///
 	identity(`identity')  
-	
-	local version_qr = "`r(version_qr)'"
 	local version    = "`r(version)'"
-	local release    = "`r(release)'"
-	local ppp_year   = "`r(ppp_year)'"
-	local identity   = "`r(identity)'"
-	
 	
 	//------------ Get auxiliary data
 	pip_info, clear justdata `pause' server(`server') version(`version')
+	
+	//========================================================
+	// Build query (queries returned in ${pip_last_queries}) 
+	//========================================================
+	pip_cl_query, country(`country') region(`region') year(`year') ///
+	              povline(`povline') popshare(`popshare')  `fillgaps' ///
+								ppp(`ppp_year') coverage(`coverage') ///
+								version(`version')
+								
+	
+	
+	//========================================================
+	// download data
+	//========================================================
+	pip_get, `clear' `cacheforce'
 	
 }
 end
