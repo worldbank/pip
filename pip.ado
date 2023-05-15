@@ -168,6 +168,13 @@ qui {
 	if ("`frame_prefix'" == "") {
 		local frame_prefix "pip_"
 	}
+	
+		
+	if ("`subcmd'" == "cp") {
+		pip_cp, `povoptions' `clear'
+		exit
+	}
+	
 	//========================================================
 	// Conditions (Defenses)
 	//========================================================
@@ -196,9 +203,15 @@ qui {
 	//========================================================
 	// Country level estimates 
 	//========================================================
+
 	
 	if ("`subcmd'" == "cl") {
 		pip_cl, `povoptions' `clear'
+		exit
+	}
+	
+	if ("`subcmd'" == "wb") {
+		pip_wb, `povoptions' `clear'
 		exit
 	}
 	
@@ -446,7 +459,7 @@ qui {
 		local piphash   = "`r(piphash)'"
 		
 		// if not cached because it war forced or because user does not want to
-		if ("`pc_exists'" == "0" | "`${pip_cachedir}'" == "0") {
+		if ("`pc_exists'" == "0" | "${pip_cachedir}" == "0") {
 			
 			cap import delimited  "`queryfull'&format=csv", `clear' varn(1) asdouble
 			if (_rc) {

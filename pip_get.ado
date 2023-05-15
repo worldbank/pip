@@ -26,7 +26,7 @@ frame `tempframe' {
 		local pc_exists = "`r(pc_exists)'"
 		local piphash   = "`r(piphash)'"
 		
-		if ("`pc_exists'" == "0" | "`${pip_cachedir}'" == "0") {	
+		if ("`pc_exists'" == "0" | "${pip_cachedir}" == "0") {	
 			cap import delimited  "`queryfull'", `clear' varn(1) asdouble
 			if  (_rc) pip_download_err_msg
 			pip_cache save, piphash("`piphash'") query("`queryfull'") /* 

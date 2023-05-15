@@ -61,7 +61,7 @@ qui {
 		local piphash   = "`r(piphash)'"
 		
 		// if not cached because it war forced or because user does not want to
-		if ("`pc_exists'" == "0" | "`${pip_cachedir}'" == "0") {
+		if ("`pc_exists'" == "0" | "${pip_cachedir}" == "0") {
 			
 			import delimit "`table_call'", varn(1) `clear' asdouble
 			return local table_call = "`table_call'"

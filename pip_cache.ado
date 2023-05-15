@@ -32,7 +32,7 @@ SET UP
 ++++++++++++++++++++++++++++++++++++++++++++++++++*/
 
 
-if ("`${pip_cachedir}'" == "0") {
+if ("${pip_cachedir}" == "0") {
 	return local piphash = "0"
 	return local pc_exists = 0 
 	exit
