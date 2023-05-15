@@ -23,6 +23,7 @@ SERver(string)                  ///
 VERsion(string)                 ///
 IDEntity(string)                ///
 RELease(numlist)                ///
+fillgaps                        ///
 ] 
 
 version 16
@@ -151,7 +152,19 @@ if ("`subcmd'" == "wb") {
 		noi disp as res "Note: " as txt "subcommand {it:wb} only accepts options {it:region()} and {it:year()}"
 		error
 	}
+	
+	if ("`fillgaps'" != "") {
+		noi disp "{res}Note:{txt} option {it:fillgaps} not allowed with " /* 
+		 */  "subcommand {cmd:wb}."
+		 local fillgaps ""
+	}
 }
+
+//------------ fillgaps
+
+return local fillgaps = "`fillgaps'"
+local optnames "`optnames' fillgaps"
+
 
 // empty data
 if !ustrregexm("`subcmd'", "^info") {

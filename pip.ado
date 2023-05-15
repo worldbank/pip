@@ -169,11 +169,6 @@ qui {
 		local frame_prefix "pip_"
 	}
 	
-		
-	if ("`subcmd'" == "cp") {
-		pip_cp, `povoptions' `clear'
-		exit
-	}
 	
 	//========================================================
 	// Conditions (Defenses)
@@ -181,7 +176,7 @@ qui {
 	
 	pip_pov_check_args `subcmd', `country' `region' `year' ///
 	`povline' `popshare' `ppp_year' `clear' `coverage'  ///
-  `server' `version' `identity' `release'
+  `server' `version' `identity' `release' `fillgaps'
 	local optnames "`r(optnames)'"
 	mata: pip_retlist2locals("`optnames'")
 	mata: pip_locals2call("`optnames'", "povoptions")
