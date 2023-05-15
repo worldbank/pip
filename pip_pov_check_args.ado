@@ -163,11 +163,22 @@ if !ustrregexm("`subcmd'", "^info") {
 }
 
 //------------ year
-if ("`year'" != "") {
+
+*##s
+if ("`year'" == "") local year "all"
+else if (lower("`year'") == "last") local year "last"
+else if (ustrregexm("`year'"), "[a-zA-Z]+") {
+	noi disp "{err} `year' is not a valid {it:year} value" _n /* 
+	 */  "only numeric values are accepted{txt}" _n
+	error
+}
+else {
 	numlist "`year'"
 	local year = r(numlist)
 }
-if ("`year'" == "") local year "all"
+
+*##e
+
 return local year = "year(`year')"
 local optnames "`optnames' year"
 
