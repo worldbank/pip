@@ -30,6 +30,9 @@ pip_parseopts `0'
 mata: pip_retlist2locals("`r(optnames)'")
 if ("`subcmd'" == "") local subcmd "cl"  // country-level       
 
+pip_timer
+pip_timer pip, on
+
 /* 
 
 disp `"country: `country'"'
@@ -56,6 +59,7 @@ set checksum off
 
 if ("`subcmd'" == "setup") {
 	noi disp "{res:Setup done!}"
+	pip_timer pip, off
 	exit
 }
 
@@ -202,6 +206,7 @@ qui {
 	
 	if ("`subcmd'" == "cl") {
 		pip_cl, `povoptions' `clear'
+		noi pip_timer pip, off `printtimer'
 		exit
 	}
 	

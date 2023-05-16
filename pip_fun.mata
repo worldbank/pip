@@ -186,6 +186,106 @@ void pip_locals2call(string scalar optnames, string scalar newname)
 
 
 //========================================================
+// PIP TIMER
+//========================================================
+struct pip_time_info
+{
+	
+	//------------ input
+	string scalar label // label of timer
+	
+	//------------ output
+	real   scalar counter  // timer counter
+	real   matrix time_i   // index of timers
+	string colvector time_l   // labels of timers
+	
+}
+
+struct pip_time_info scalar pip_timeset( )
+{
+	struct pip_time_info scalar r
+	r.label =  r.time_l = J(0,1,"")
+	r.counter  = r.time_i = .m
+	return(r)
+}
+
+// counter
+real scalar pip_time_count(struct pip_time_info scalar r)
+{
+	if (r.counter == .m) {
+		r.counter = 1
+	}
+	else {
+		r.counter = r.counter + 1
+	}
+	return(r.counter)
+}
+
+
+// get all the info of the time
+struct pip_time_info scalar pip_timer_on(string scalar label,  /* 
+*/                                    struct pip_time_info scalar r)
+{
+	
+	//------------ setup
+	string scalar pattern
+	
+	//------------create timer
+	if (r.time_l == J(0,1,"")) {
+		timer_clear()
+		r.time_l = label
+		r.time_i = pip_time_count(r)
+	}
+	else {
+		pattern = "^"+label+"$"
+		if (anyof(ustrregexm(r.time_l, pattern), 1)) {
+			errprintf("%s is already in used\n", label)
+			exit(498)
+		}
+		
+		r.time_l = r.time_l \ label
+		r.time_i = r.time_i \ pip_time_count(r)
+	}
+	// start timer
+	timer_on(r.counter)
+	return(r)
+}
+
+void pip_timer_off(string scalar label,  /* 
+*/                 struct pip_time_info scalar r)
+{
+	//------------ setup
+	string scalar pattern
+	real colvector w  // check whether label is in r.time_l
+	
+	//------------stop timer
+	pattern = "^"+label+"$"
+	w       = selectindex(ustrregexm(r.time_l, pattern))
+	if (rows(w) > 0) {
+		timer_off(w)
+	}
+	else {
+		errprintf("%s is not a timer\ntimers available are\n", label)
+		r.time_l
+		exit(498)
+	}
+}
+void pip_time_print_info(struct pip_time_info scalar r)
+{
+	real scalar i 
+	printf("{res}PIP timer report {hline 40}\n")
+	for (i = 1; i <= rows(r.time_l); i++) {
+		printf("{txt}{col 2}%g.{col 6}%s: {res}{col 40}%5.0g{txt} secs\n", /* 
+	 */	     i, r.time_l[i], timer_value(i)[1])
+	}
+	printf("{res}{hline 57}")
+	
+}
+
+
+
+
+//========================================================
 // deprecated functions
 //========================================================
 
@@ -276,4 +376,13 @@ Notes:
 
 Version Control:
 
+*##s
+cap mata: mata drop pip_time*()
+* cap mata: mata drop pip_time_info()
 
+mata
+
+
+end
+
+*##e

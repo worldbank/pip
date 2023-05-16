@@ -38,6 +38,8 @@ cacheforce                      ///
 
 version 16.0
 
+pip_timer pip_cl, on
+
 if ("`pause'" == "pause") pause on
 else                      pause off
 
@@ -70,9 +72,6 @@ qui {
 								ppp(`ppp_year') coverage(`coverage') ///
 								version(`version')
 								
-	
-	
-	
 	//========================================================
 	// Getting data
 	//========================================================
@@ -85,6 +84,7 @@ qui {
 	
 	
 }
+pip_timer pip_cl, off
 end
 exit
 /* End of do-file */
