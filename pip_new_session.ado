@@ -29,15 +29,19 @@ else                      pause off
 
 *##s
 * ---- Initial time parameters
-global pip_cmds_ssc 1
+
+if ("${pip_old_session}" != "") exit
+
 if ("${pip_lastupdate}" != "") {
 	local day_diff = date("${pip_date_file}","YMD") - ///
 	                 date("${pip_lastupdate}","YMD")
 	if (`day_diff' <= 31) {
 		noi disp "Check for updates will be done in `=31-`day_diff'' days"
+		global pip_old_session "1"
 		exit
 	}
 }
+
 
 *##e
 
@@ -54,7 +58,7 @@ local bye        = "`r(bye)'"
 ==================================================*/
 
 *---------- check SSC commands
-
+/* 
 local ssc_cmds missings 
 
 noi disp in y "Note: " in w "{cmd:pip} requires the packages " ///
@@ -70,7 +74,7 @@ foreach cmd of local ssc_cmds {
 
 adoupdate `ssc_cmds', ssconly
 if ("`r(pkglist)'" != "") adoupdate `r(pkglist)', update ssconly
-
+ */
 
 * ----- Globals
 
@@ -80,9 +84,6 @@ pip_setup replace, pattern("pip_lastupdate") /*
 pip_setup replace, pattern("pip_source") new(`"`tgl'"')
 
 pip_setup run 
-
-
-* global pip_cmds_ssc = 1  // make sure it does not execute again per session
 
 `bye'
 

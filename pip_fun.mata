@@ -275,10 +275,11 @@ void pip_time_print_info(struct pip_time_info scalar r)
 	real scalar i 
 	printf("{res}PIP timer report {hline 40}\n")
 	for (i = 1; i <= rows(r.time_l); i++) {
-		printf("{txt}{col 2}%g.{col 6}%s: {res}{col 40}%5.0g{txt} secs\n", /* 
+		timer_off(i)  // just in case
+		printf("{txt}{col 2}%g.{col 6}%s: {res}{col 40}%3.2f{txt} secs\n", /* 
 	 */	     i, r.time_l[i], timer_value(i)[1])
 	}
-	printf("{res}{hline 57}")
+	printf("{res}{hline 57}\n")
 	
 }
 

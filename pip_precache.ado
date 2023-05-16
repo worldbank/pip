@@ -30,7 +30,7 @@ version 16
 qui {
 	
 	*----------1.1:
-	global pip_cmds_ssc = 1  // make sure it does not execute again per session
+	global pip_old_session = "1"  // make sure it does not execute again per session
 	local pp = round(runiform()*100, .01)  // random poverty line
 	local stime 100
 	

@@ -24,27 +24,29 @@ else                      pause off
 
 qui {
 	
-	//if ("`clear'" == "") preserve
-	
-	*---------- API defaults
+	//========================================================
+	// setup
+	//========================================================
+	//------------ get server url
 	if ("${pip_host}" == "" | "`server'" != "") {
 		pip_set_server,  server(`server')
-		local server    = "`r(server)'"
-		local url       = "`r(url)'"
-		return add		
+	}
+	
+	//------------ Set versions
+	if ("`version'" == "") {  // this should never be true
+		noi pip_versions, server(`server')       /*
+		*/                version(`version')     /*
+		*/                release(`release')     /*
+		*/                ppp_year(`ppp_year')   /*
+		*/                identity(`identity')  
+		local version    = "`r(version)'"		
 	}
 	
 	//------------ version
-	if ("`version'" != "") {
-		local version_qr = "&version=`version'"
-		tokenize "`version'", parse("_")
-		local _version   = "_`1'_`3'_`9'"
-	}
-	else {
-		local version_qr = ""
-		local _version   = ""
-	}
 	
+	local version_qr = "&version=`version'"
+	tokenize "`version'", parse("_")
+	local _version   = "_`1'_`3'_`9'"
 	
 	***************************************************
 	* 0. Info frame 

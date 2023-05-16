@@ -15,7 +15,7 @@ Output:
 /*==================================================
 0: Program set up
 ==================================================*/
-program define pip_timer, rclass
+program define pip_timer
 syntax [anything(name=label)], [on off PRINTtimer]
 version 16
 

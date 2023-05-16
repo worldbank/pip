@@ -336,7 +336,7 @@ qui {
 	local varlist `r(varlist)'
 	foreach v of local varlist { 
 		count if missing(`v') 
-		if r(N) == `N' { 
+		if r(N) == c(N) { 
 			local droplist `droplist' `v' 
 		} 
 	}
