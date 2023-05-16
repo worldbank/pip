@@ -81,7 +81,7 @@ if ("`subcmd'" == "load") {
 
 if ("`subcmd'" == "save") {
 	mata: st_local("pc_file", pathjoin("${pip_cachedir}", "`piphash'.dta"))
-	cap confirm file "`pc_file'"
+	cap confirm new file "`pc_file'"
 	if (_rc == 0 | "`cacheforce'" != "") {
 		char _dta[piphash] `piphash'
 		char _dta[pipquery] `query'
@@ -110,6 +110,13 @@ if ("`subcmd'" == "delete") {
 }
 
 
+if (ustrregexm("`subcmd'","^iscache")) {
+	noi pip_cache_iscache
+	return add
+	exit
+}
+
+
 end
 
 
@@ -121,15 +128,31 @@ PREfix(string)              ///
 
 version 16.0
 
+qui {
+	if ("`prefix'" == "") local prefix = "pip"
+	tempname spiphash
+	
+	mata:  st_numscalar("`spiphash'", hash1(`"`prefix'`query'"', ., 2)) 
+	local piphash = "_pip" + strofreal(`spiphash', "%12.0g")
+	return local piphash = "`piphash'"
+}
 
-if ("`prefix'" == "") local prefix = "pip"
+end
 
-tempname spiphash
 
-mata:  st_numscalar("`spiphash'", hash1(`"`prefix'`query'"', ., 2)) 
-local piphash = "_pip" + strofreal(`spiphash', "%12.0g")
-return local piphash = "`piphash'"
+program define pip_cache_iscache, rclass
 
+local iscache: char _dta[piphash]
+if ("`iscache'" != "") {
+	disp "{res}Yes! {txt}this is cached data :)"
+	local query: char _dta[pipquery]
+	return local query = "`query'"	
+}
+else {
+	disp "{err}No. {txt} this is not cached data :("
+}
+
+return local hash = "`iscache'"
 end
 
 
