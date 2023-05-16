@@ -108,9 +108,9 @@ qui {
 	//========================================================
 	// PIP cache directory
 	//========================================================
-	
-	if ("${pip_cachedir}" == "") {
-		noi pip_setup_cachedir
+	mata: st_local("ex_cachedir", direxists("${pip_cachedir}"))
+	if ("${pip_cachedir}" == "" | `ex_cachedir' == 0) {
+		noi pip_setup_cachedir, cachedir("${pip_cachedir}") 
 	}
 	
 	//========================================================
