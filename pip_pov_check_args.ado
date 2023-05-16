@@ -56,15 +56,26 @@ local optnames "`optnames' version ppp_year"
 pip_info, clear justdata `pause' server(`server') version(`version')
 
 //========================================================
-// Checks
+// General checks
 //========================================================
 
-// poshare
-if ("`popshare'" != "" &  lower("`subcmd'") == "wb") {
-	noi disp in red "option {it:popshare()} can't be combined " /* 
-	*/ "with subcommand {it:wb}" _n
+
+//------------ year
+if ("`year'" == "") local year "all"
+else if (lower("`year'") == "last") local year "last"
+else if (ustrregexm("`year'"), "[a-zA-Z]+") {
+	noi disp "{err} `year' is not a valid {it:year} value" _n /* 
+	*/  "only numeric values are accepted{txt}" _n
 	error
 }
+else {
+	numlist "`year'"
+	local year = r(numlist)
+}
+
+return local year = "year(`year')"
+local optnames "`optnames' year"
+
 
 *---------- Coverage
 if ("`coverage'" == "") local coverage = "all"
@@ -81,31 +92,9 @@ return local coverage = "coverage(`coverage')"
 local optnames "`optnames' coverage"
 
 
-// defined popshare and defined povline = error
-if ("`popshare'" != "" & "`povline'" != "")  {
-	noi disp as err "povline and popshare cannot be used at the same time"
-	error
-}
-// Blank popshare and blank povline = default povline 1.9
-else if ("`popshare'" == "" & "`povline'" == "")  {
-	
-	if ("`ppp_year'" == "2005") local povline = 1.25
-	if ("`ppp_year'" == "2011") local povline = 1.9
-	if ("`ppp_year'" == "2017") local povline = 2.15
-}
-return local povline  = "povline(`povline')"
-return local popshare = "popshare(`popshare')"
-local optnames "`optnames' povline popshare"
-
-
 //------------ Region
 if ("`region'" != "") {
 	local region = upper("`region'")
-	
-	if ("`country'" != "") {
-		noi disp in red "You must use either {it:country()} or {it:region()}."
-		error
-	}
 	
 	if (regexm("`region'", "SAR")) {
 		noi disp in red "Note: " in y "The official code of South Asia is" ///
@@ -143,8 +132,57 @@ if ("`region'" != "") {
 	}
 }
 
+//------------empty data
+if !ustrregexm("`subcmd'", "^info") {
+	if (c(changed) != 0 & "`clear'" == "") {	
+		noi di as err "You must start with an empty dataset; or enable the option {it:clear}."
+		error 4
+	}	
+	drop _all
+}
 
-*---------- WB aggregate
+//========================================================
+//  Country Level (cl)
+//========================================================
+
+if ("`subcmd'" == "cl") {
+	//------------ Poverty line 
+	// defined popshare and defined povline = error
+	if ("`popshare'" != "" & "`povline'" != "")  {
+		noi disp as err "povline and popshare cannot be used at the same time"
+		error
+	}
+	// Blank popshare and blank povline = default povline 1.9
+	else if ("`popshare'" == "" & "`povline'" == "")  {
+		
+		if ("`ppp_year'" == "2005") local povline = 1.25
+		if ("`ppp_year'" == "2011") local povline = 1.9
+		if ("`ppp_year'" == "2017") local povline = 2.15
+	}
+	return local povline  = "povline(`povline')"
+	return local popshare = "popshare(`popshare')"
+	local optnames "`optnames' povline popshare"
+	
+	//------------ fillgaps
+	
+	return local fillgaps = "`fillgaps'"
+	local optnames "`optnames' fillgaps"
+	
+	
+	*---------- Country
+	local country = stritrim(ustrtrim("`country' `region'"))
+	if (lower("`country'") != "all") local country = upper("`country'")
+	if ("`country'" == "") local country "all" // to modify
+	return local country = "country(`country')"
+	local optnames "`optnames' country"
+	
+}
+
+
+//========================================================
+// Aggregate level (wb)
+//========================================================
+
 
 if ("`subcmd'" == "wb") {
 	if ("`country'" != "") {
@@ -155,54 +193,38 @@ if ("`subcmd'" == "wb") {
 	
 	if ("`fillgaps'" != "") {
 		noi disp "{res}Note:{txt} option {it:fillgaps} not allowed with " /* 
-		 */  "subcommand {cmd:wb}."
-		 local fillgaps ""
+		*/  "subcommand {cmd:wb}."
+		error
 	}
+	
+	// poshare
+	if ("`popshare'" != "") {
+		noi disp in red "option {it:popshare()} can't be combined " /* 
+		*/ "with subcommand {it:wb}" _n
+		error
+	}
+	
+	if ("`region'" != "") {
+		return local region = "region(`region')"
+		local optnames "`optnames' region"
+	}
+	
+	// poverty line 
+	
+	if ("`povline'" == "")  {
+		
+		if ("`ppp_year'" == "2005") local povline = 1.25
+		if ("`ppp_year'" == "2011") local povline = 1.9
+		if ("`ppp_year'" == "2017") local povline = 2.15
+	}
+	return local povline  = "povline(`povline')"
+	local optnames "`optnames' povline"
+	
 }
 
-//------------ fillgaps
-
-return local fillgaps = "`fillgaps'"
-local optnames "`optnames' fillgaps"
-
-
-// empty data
-if !ustrregexm("`subcmd'", "^info") {
-	if (c(changed) != 0 & "`clear'" == "") {	
-		noi di as err "You must start with an empty dataset; or enable the option {it:clear}."
-		error 4
-	}	
-	drop _all
-}
-
-//------------ year
-
-*##s
-if ("`year'" == "") local year "all"
-else if (lower("`year'") == "last") local year "last"
-else if (ustrregexm("`year'"), "[a-zA-Z]+") {
-	noi disp "{err} `year' is not a valid {it:year} value" _n /* 
-	 */  "only numeric values are accepted{txt}" _n
-	error
-}
-else {
-	numlist "`year'"
-	local year = r(numlist)
-}
-
-*##e
-
-return local year = "year(`year')"
-local optnames "`optnames' year"
-
-*---------- Country
-local country = stritrim(ustrtrim("`country' `region'"))
-if (lower("`country'") != "all") local country = upper("`country'")
-if ("`country'" == "") local country "all" // to modify
-return local country = "country(`country')"
-local optnames "`optnames' country"
-
-
+//========================================================
+//  Country profiles (cp)
+//========================================================
 
 //========================================================
 // Return options names

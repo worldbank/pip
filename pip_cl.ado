@@ -25,7 +25,6 @@ PPP_year(numlist)               ///
 FILLgaps                        /// 
 COVerage(string)                /// 
 CLEAR                           /// 
-ISO                             /// 
 SERver(string)                  /// 
 pause                           /// 
 POVCALNET_format                ///
@@ -155,8 +154,9 @@ qui {
 	
 	local optname = cond("`povline'" != "", "povline", "popshare")
 	
+	local endpoint "pip"
 	if ("``optname''" == "") {
-		global pip_last_queries "pip?`query'&format=csv"
+		global pip_last_queries "`endpoint'?`query'&format=csv"
 		exit
 	}
 	
@@ -165,7 +165,7 @@ qui {
 	local i = 1
 	foreach v of local `optname' {
 		// each povline or popshare + format
-		local queryp = "pip?`query'&`optname'=`v'&format=csv" 
+		local queryp = "`endpoint'?`query'&`optname'=`v'&format=csv" 
 		if (`i' == 1) mata: `M' = "`queryp'"
 		else            mata: `M' = `M' , "`queryp'"
 		local ++i
@@ -332,18 +332,7 @@ qui {
 	//missings dropvars, force
 	// drop var where all obs are missing
 	
-	ds
-	local varlist `r(varlist)'
-	foreach v of local varlist { 
-		count if missing(`v') 
-		if r(N) == c(N) { 
-			local droplist `droplist' `v' 
-		} 
-	}
-	if "`droplist'" != "" { 
-		drop `droplist' 
-		di "{p}note: `droplist' dropped{p_end}" // from missings.ado
-	}
+	pip_utils dropvars
 	
 }
 

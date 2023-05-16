@@ -46,10 +46,18 @@ disp `"pipoptions: `pipoptions'"'
 exit 
 */
 
-
 if ("`pause'" == "pause") pause on
 else                      pause off
 set checksum off
+
+
+// ------------------------------------------------------------------------
+// New session procedure
+// ------------------------------------------------------------------------
+
+pip_timer pip.pip_new_session, on
+pip_new_session , `pause'
+pip_timer pip.pip_new_session, off
 
 
 //========================================================
@@ -133,14 +141,6 @@ if regexm("`subcmd'", "cache") {
 	exit
 }
 
-// ------------------------------------------------------------------------
-// New session procedure
-// ------------------------------------------------------------------------
-
-pip_timer pip.pip_new_session, on
-pip_new_session , `pause'
-pip_timer pip.pip_new_session, off
-
 //------------Info
 if regexm("`subcmd'", "^info") {
 	noi pip_info, `clear' `pause' `server' `version'
@@ -179,14 +179,6 @@ qui {
 	//  Poverty estimates defaults
 	//========================================================
 	
-	if ("`frame_prefix'" == "") {
-		local frame_prefix "pip_"
-	}
-	
-	
-	//========================================================
-	// Conditions (Defenses)
-	//========================================================
 	
 	pip_timer pip.pip_pov_check_args, on
 	pip_pov_check_args `subcmd', `country' `region' `year'         /*
@@ -224,6 +216,13 @@ qui {
 	
 	if ("`subcmd'" == "wb") {
 		pip_wb, `povoptions' `clear'
+		noi pip_timer pip, off `printtimer'
+		exit
+	}
+	
+	// Country Profile
+	if ("`subcmd'" == "cp") {
+		pip_cp, `povoptions' `clear'
 		noi pip_timer pip, off `printtimer'
 		exit
 	}
@@ -340,41 +339,21 @@ qui {
 	//========================================================
 	// Convert to povcalnet format
 	//========================================================
-	
-	if ("`timer'" != "") {
-		local i_on = `i'
-		scalar tt = tt + "`crlf' `i': formating to povcalnet"
-		local i_off = `i++'
-	}	
-	// --- timer
-	
-	// --- timer
-	if ("`timer'" != "") timer on `i_on'
-	// --- timer
-	
+
 	if ("`povcalnet_format'" != "") {
 		pause before povcalnet format
 		pip_povcalnet_format  `rtype', `pause'
 	}
 	
-	// --- timer
-	if ("`timer'" != "") timer off `i_off'
-	// --- timer
-	
+
 	//========================================================
 	//  Drop frames created in the middle of the process
 	//========================================================
 	
-	if ("`timer'" != "") {
-		local i_on = `i'
-		scalar tt = tt + "`crlf' `i': remove frames"
-		local i_off = `i++'
-	}	
-	// --- timer
 	
-	// --- timer
-	if ("`timer'" != "") timer on `i_on'
-	// --- timer
+	if ("`frame_prefix'" == "") {
+		local frame_prefix "pip_"
+	}
 	
 	frame dir
 	local av_frames "`r(frames)'"
