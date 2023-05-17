@@ -48,7 +48,7 @@ quietly {
 	***************************************************
 	* 1. Will load guidance database
 	***************************************************
-	pip_info, clear justdata `pause' server(`server') version(`version')
+	pip_info, clear justdata `pause' server(${pip_server}) version(`version')
 	
 		//------------ version
 		if ("`version'" != "") {

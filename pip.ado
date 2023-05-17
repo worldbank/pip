@@ -18,20 +18,29 @@ Output:
 =======================================================*/
 
 
-/*==================================================
-0: Program set up
-==================================================*/
 
 program define pip, rclass
 	version 16.0
+	/*==================================================
+	Program set up
+	==================================================*/
 	pip_setup
 	
+	//------------ Parsing args
 	pip_parseopts `0'
 	mata: pip_retlist2locals("`r(optnames)'")
 	if ("`subcmd'" == "") local subcmd "cl"  // country-level       
 	
+	//------------ Start timer
 	pip_timer
 	pip_timer pip, on
+	
+	//------------ set server
+	* In case global server is specified
+	if (`"`server'"' != `""') {
+		pip_set_server, `server'
+	}
+	
 	
 	/* 
 	
@@ -97,8 +106,9 @@ program define pip, rclass
 	//------------Install and Uninstall
 	if regexm("`subcmd'", "^install") {
 		if ( wordcount("`subcmd'") != 2) {
-			noi disp "{err}subcommand {it:install} must be use with either {it:ssc} " /* 
-			*/	"or {it:gh}" _n "E.x., {cmd:pip install ssc} or {cmd:pip install gh}."
+			noi disp "{err}subcommand {it:install} must be use "  /* 
+			*/	 "with either {it:ssc} or {it:gh}" _n               /* 
+			*/  "E.x., {cmd:pip install ssc} or {cmd:pip install gh}."
 			error
 		}
 		local sscmd: word 2 of `subcmd'
@@ -122,7 +132,7 @@ program define pip, rclass
 	//------------Versions
 	if regexm("`subcmd'", "^ver") {
 		pip_timer pip.pip_versions, on
-		noi pip_versions, `server' availability
+		noi pip_versions, availability
 		pip_timer pip.pip_versions, off
 		return add
 		exit
@@ -143,25 +153,19 @@ program define pip, rclass
 	
 	//------------Info
 	if regexm("`subcmd'", "^info") {
-		noi pip_info, `clear' `pause' `server' `version'
+		noi pip_info, `clear' `pause' `version'
 		return add 
 		exit
 	}	
 	
-	
-	
 	qui {
 		
 		//========================================================
-		// setup defaults
+		// Set up version
 		//========================================================
-		
-		* In case global server is specified
-		if ("${pip_server}" != "" & "`server'" == "") {
-			* noi disp in red "warning:" in y "Global {it:pip_server} (${pip_server}) is in use"
-			local server = "server(${pip_server})"
-		}
-		
+		pip_timer pip.pip_versions, on
+		pip_versions, `release' `ppp_year' `identity' `version'	
+		pip_timer pip.pip_versions, off
 		
 		//========================================================
 		// Auxiliary tables
@@ -183,7 +187,7 @@ program define pip, rclass
 		pip_timer pip.pip_pov_check_args, on
 		pip_pov_check_args `subcmd', `country' `region' `year'         /*
 		*/         `povline' `popshare' `ppp_year' `clear' `coverage'  /*
-		*/          `server' `version' `identity' `release' `fillgaps'
+		*/          `version' `identity' `release' `fillgaps'
 		local optnames "`r(optnames)'"
 		mata: pip_retlist2locals("`optnames'")
 		mata: pip_locals2call("`optnames'", "povoptions")
@@ -215,7 +219,7 @@ program define pip, rclass
 		}
 		
 		if ("`subcmd'" == "wb") {
-			pip_wb, `povoptions' `clear' `n2disp'
+			noi pip_wb, `povoptions' `clear' `n2disp'
 			noi pip_timer pip, off `printtimer'
 			exit
 		}
@@ -226,62 +230,6 @@ program define pip, rclass
 			noi pip_timer pip, off `printtimer'
 			exit
 		}
-		
-		
-		
-		// ------------------------------
-		//  display results 
-		// ------------------------------
-		
-		if ("`n2disp'" == "") local n2disp 1
-		local n2disp = min(`c(N)', `n2disp')
-		
-		if (`n2disp' > 1) {
-			noi di as res _n "{ul: first `n2disp' observations}"
-		} 
-		else	if (`n2disp' == 1) {
-			noi di as res _n "{ul: first observation}"
-		}
-		else {
-			noi di as res _n "{ul: No observations available}"
-		}	
-		
-		
-		if ("`subcmd'" == "wb") {
-			sort region_code year 
-			
-			tempname tolist
-			frame copy `c(frame)' `tolist'
-			frame `tolist' {
-				gsort region_code -year 
-				
-				count if (region_code == "WLD")
-				local cwld = r(N)
-				if (`cwld' >= `n2disp') {
-					keep if (region_code == "WLD")			
-				}
-				noi list region_code year poverty_line headcount mean ///
-				in 1/`n2disp',  abbreviate(12) noobs
-			}
-			
-		}
-		else {
-			
-			sort country_code year
-			local varstodisp "country_code year poverty_line headcount mean median welfare_type"
-			local sepby "country_code"
-			
-			foreach v of local varstodisp {
-				cap confirm var `v', exact
-				if _rc continue 
-				local v2d "`v2d' `v'"
-			}
-			
-			noi list `v2d' in 1/`n2disp',  abbreviate(12)  sepby(`sepby') noobs
-			
-		}
-		
-		
 		
 		//========================================================
 		//  Create notes

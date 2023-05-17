@@ -48,13 +48,13 @@ program define pip_cl, rclass
 		// setup
 		//========================================================
 		//------------ get server url
-		if ("${pip_host}" == "" | "`server'" != "") {
-			pip_set_server,  server(`server')
+		if ("${pip_host}" == "") {
+			pip_set_server,  server(${pip_server})
 		}
 		
 		//------------ Set versions
 		if ("`version'" == "") {  // this should never be true
-			noi pip_versions, server(`server')       /*
+			noi pip_versions, server(${pip_server})       /*
 			*/                version(`version')     /*
 			*/                release(`release')     /*
 			*/                ppp_year(`ppp_year')   /*
@@ -62,7 +62,7 @@ program define pip_cl, rclass
 			local version    = "`r(version)'"		
 		}
 		//------------ Get auxiliary data
-		pip_info, clear justdata `pause' server(`server') version(`version')
+		pip_info, clear justdata `pause' server(${pip_server}) version(`version')
 		
 		//========================================================
 		// Build query (queries returned in ${pip_last_queries}) 
@@ -113,7 +113,6 @@ program define pip_cl_query, rclass
 	PPP(numlist)                    /// 
 	COVerage(string)                /// 
 	FILLgaps                        /// 
-	VERsion(string)                 ///
 	] 
 	
 	//========================================================
@@ -135,6 +134,8 @@ program define pip_cl_query, rclass
 		// reporting level
 		if ("`coverage'" == "") local reporting_level = "all"
 		else                    local reporting_level = "`coverage'"
+		// version
+		local version "${pip_version}"
 		
 		//========================================================
 		// build query... THE ORDER IS VERY IMPORTANT

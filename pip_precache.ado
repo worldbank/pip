@@ -41,8 +41,8 @@ qui {
 	if (inlist("`subcmd'"), "all", "global") {
 		timer clear 1
 		timer on 1
-		pip, povline(`pp') clear server(`server')
-		pip wb, povline(`pp') clear  server(`server')
+		pip, povline(`pp') clear server(${pip_server})
+		pip wb, povline(`pp') clear  server(${pip_server})
 		timer off 1
 		timer list 1
 		
@@ -85,9 +85,9 @@ qui {
 			local ++i
 			
 			cap {
-				pip wb,  povline(`pv') clear  server(`server')
+				pip wb,  povline(`pv') clear  server(${pip_server})
 				sleep `stime'
-				pip,  povline(`pv') clear  server(`server')
+				pip,  povline(`pv') clear  server(${pip_server})
 				sleep `stime'
 			}
 			if (_rc) {
@@ -109,9 +109,9 @@ qui {
 		foreach pv of local pvdollar {
 			local ++i
 			cap {
-				pip wb,  povline(`pv') clear  server(`server')
+				pip wb,  povline(`pv') clear  server(${pip_server})
 				sleep `stime'
-				pip,  povline(`pv') clear  server(`server')
+				pip,  povline(`pv') clear  server(${pip_server})
 				sleep `stime'
 			}
 			if (_rc) {
@@ -136,9 +136,9 @@ qui {
 		
 		timer clear 3
 		timer on 3
-		pip, countr(COL) povline(`pp') clear         server(`server') // to initiate 
-		pip, countr(COL) povline(`=`pp'+.01') clear  server(`server') // to initiate 
-		pip, countr(COL) povline(`=`pp'+.01') clear  server(`server') // to initiate 
+		pip, countr(COL) povline(`pp') clear         server(${pip_server}) // to initiate 
+		pip, countr(COL) povline(`=`pp'+.01') clear  server(${pip_server}) // to initiate 
+		pip, countr(COL) povline(`=`pp'+.01') clear  server(${pip_server}) // to initiate 
 		timer off 3
 		timer list 3
 		
@@ -177,11 +177,11 @@ qui {
 			local ++i
 			
 			cap {
-				pip, countr(`country') clear  server(`server')
+				pip, countr(`country') clear  server(${pip_server})
 				sleep `stime'
-				pip, countr(`country') povline(3.2)  clear  server(`server')
+				pip, countr(`country') povline(3.2)  clear  server(${pip_server})
 				sleep `stime'
-				pip, countr(`country') povline(5.5)  clear  server(`server')
+				pip, countr(`country') povline(5.5)  clear  server(${pip_server})
 				sleep `stime'
 			}
 			if (_rc) {

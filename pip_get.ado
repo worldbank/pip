@@ -56,7 +56,7 @@ noi {
 	dis in white `"(1) Please check your Internet connection by "' _c 
 	dis in white  `"{browse "${pip_host}/health-check" :clicking here}"'
 	dis in white `"(2) Test that the data is retrievable. By"' _c
-	dis in white  `"{stata pip test, server(`server'): clicking here }"' _c
+	dis in white  `"{stata pip test, server(${pip_server}): clicking here }"' _c
 	dis in white  "you should be able to download the data."
 	dis in white `"(3) Please consider adjusting your Stata timeout parameters. For more details see {help netio}"'
 	dis in white `"(4) Please send us an email to:"'

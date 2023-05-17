@@ -42,6 +42,11 @@ if ("`subcmd'" == "dispquery") {
 }
 
 
+if ustrregexm("`subcmd'", "frame") {
+	pip_utils_frameexists, `frame'
+	return add
+}
+
 end
 
 //========================================================
@@ -99,6 +104,14 @@ if "`droplist'" != "" {
 }
 
 end
+
+
+program define pip_utils_frameexists,rclass
+	syntax, frame(string)
+	
+	mata: st_local("fexists", strofreal(st_frameexists("`frame'")))
+	return local fexists = `fexists'
+end 
 
 
 exit

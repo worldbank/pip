@@ -36,7 +36,7 @@ qui {
 	
 	*---------- API defaults
 	qui pip_versions,      ///
-	server(`server')       ///
+	server(${pip_server})       ///
 	version(`version')     ///
 	release(`release')     ///
 	ppp_year(`ppp_year')   ///
@@ -115,7 +115,7 @@ qui {
 			else                     local j = "`i'"
 			
 			local table = tables[`i']
-			local pip_code "pip tables, table(`table') server(`server') version(`version') clear"
+			local pip_code "pip tables, table(`table') server(${pip_server}) version(`version') clear"
 			
 			noi disp _col(6) `"`j' {c |} {stata `pip_code':`table'}"'
 		}
