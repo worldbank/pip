@@ -33,11 +33,14 @@ version 16
 // setup
 //========================================================
 //------------ get server url
+pip_timer pov_check_args.server, on
 if ("${pip_host}" == "" | "`server'" != "") {
 	pip_set_server,  server(`server')
 }
+pip_timer pov_check_args.server, off
 
 //------------ Set versions
+pip_timer pov_check_args.versions, on
 noi pip_versions, server(`server') ///
 version(`version')                ///
 release(`release')               ///
@@ -50,10 +53,12 @@ local ppp_year   = "`r(ppp_year)'"
 return local version = "version(`version')"
 return local ppp_year = "ppp_year(`ppp_year')"
 local optnames "`optnames' version ppp_year"
-
+pip_timer pov_check_args.versions, off
 
 //------------ Get auxiliary data
+pip_timer pov_check_args.info, on
 pip_info, clear justdata `pause' server(`server') version(`version')
+pip_timer pov_check_args.info, off
 
 //========================================================
 // General checks
