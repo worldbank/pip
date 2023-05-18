@@ -10,12 +10,8 @@ program define pip_info, rclass
 	syntax    [,       ///
 	COUntry(string)    ///
 	REGion             ///
-	AGGregate          ///
-	clear              ///
-	justdata           /// programmers option
 	pause              /// debugging
-	POVCALNET_format   ///
-	version(string)     ///
+	clear              ///
 	] 
 	
 	if ("`pause'" == "pause") pause on
@@ -26,178 +22,16 @@ program define pip_info, rclass
 		//========================================================
 		// setup
 		//========================================================
-		//------------ get server url
-		if ("${pip_host}" == "") {
-			pip_set_server,  server(${pip_server})
-		}
-		
-		//------------ Set versions
-		if ("${pip_version}" == "") {  // this should never be true
-			noi pip_versions, server(${pip_server})       /*
-			*/                version(`version')     /*
-			*/                release(`release')     /*
-			*/                ppp_year(`ppp_year')   /*
-			*/                identity(`identity')  
-			local version    = "`r(version)'"		
-		}
-		
+			local curframe = c(frame)
 		//------------ version
 		
 		local version_qr = "&version=${pip_version}"
-		tokenize "`version'", parse("_")
+		tokenize "${pip_version}", parse("_")
 		local _version   = "_`1'_`3'_`9'"
-		
-		***************************************************
-		* 0. Info frame 
-		***************************************************	
-		
-		local curframe = c(frame)
-		
-		//------------ Find available frames
-		frame dir 
-		local av_frames "`r(frames)'"
-		local av_frames: subinstr local  av_frames " " "|", all
-		local av_frames = "^(" + "`av_frames'" + ")"
-		
-		//------------ countries frame
-		local frpipcts "_pip_cts`_version'"
-		if (!regexm("`frpipcts'", "`av_frames'")) {
 			
-			frame create `frpipcts'
-			
-			frame `frpipcts' {
-				
-				cap pip_tables , table(countries) server(${pip_server}) version(`version') clear
-				local rc1 = _rc
-				
-				if (`rc1' == 0) {
-					cap confirm new var iso2_code
-					if (_rc) {
-						drop iso2_code
-					}
-					sort country_code
-				}
-			}
-			
-			// drop frame if error happened
-			if (`rc1' != 0) {
-				local csvfile0  = "${pip_host}/aux?table=countries`version_qr'&format=csv"
-				
-				noi disp in red "There is a problem accessing country name data." 
-				noi disp in red "to check your connection, copy and paste in your browser the following address:" _n /* 
-				*/	_col(4) in w `"`csvfile0'"'
-				frame drop `frpipcts'
-				error 
-			} 
-			
-		}
-		
-		//------------ regions frame
-		local frpiprgn "_pip_regions`_version'"
-		if (!regexm("`frpiprgn'", "`av_frames'")) {
-			
-			frame create `frpiprgn'
-			
-			frame `frpiprgn' {
-				
-				cap pip_tables , table(regions) server(${pip_server}) version(`version') clear
-				local rc1 = _rc
-				
-				if (`rc1' == 0) {
-					drop grouping_type
-					sort region_code
-				}
-			}
-			
-			// drop frame if error happened
-			if (`rc1' != 0) {
-				local csvfilergn  = "${pip_host}/aux?table=regions`version_qr'&format=csv"
-				noi disp in red "There is a problem accessing region name data." 
-				noi disp in red "to check your connection, copy and paste in your browser the following address:" _n /* 
-				*/	_col(4) in w `"`csvfilergn'"'
-				frame drop `frpiprgn'
-				error 
-			} 
-			
-		}	
-		
-		
-		
-		//------------ regions price framework
-		local frpipfw "_pip_fw`_version'"
-		if (!regexm("`frpipfw'", "`av_frames'")) {
-			frame create `frpipfw'
-			
-			frame `frpipfw' {
-				
-				cap pip_tables , table(framework) server(${pip_server}) version(`version') clear
-				
-				//------------format variables to make them link to data. 
-				rename welfare_type wt
-				label define welfare_type 1 "consumption" 2 "income"
-				encode wt, gen(welfare_type)
-				
-				local rc1 = _rc
-			}
-			
-			// drop frame if error happened
-			if (`rc1' != 0) {
-				local csvfile2  = "${pip_host}/aux?table=framework`version_qr'&format=csv"
-				
-				noi disp in red "There is a problem accessing framework name data." 
-				noi disp in red "to check your connection, copy and paste in your browser the following address:" _n /* 
-				*/	_col(4) in w `"`csvfile2'"'
-				frame drop `frpipfw'
-				error 
-			} 
-			
-		}
-		
-		*if ("`justdata'" != "") exit
-		
-		//========================================================
-		//  generating a lookup data
-		//========================================================
-		
-		local frlkupb "_pip_lkupb`_version'"
-		if (!regexm("`frlkupb'", "`av_frames'")) {
-			
-			frame copy `frpipfw' `frlkupb'
-			
-			
-			frame `frlkupb' {
-				
-				keep country_code country_name wb_region_code pcn_region_code survey_coverage surveyid_year
-				
-				local orgvar survey_coverage surveyid_year
-				local newvar coverage_level reporting_year 
-				
-				local i = 0
-				foreach var of local orgvar {
-					local ++i
-					rename `var' `: word `i' of `newvar''
-				}	
-				
-				tostring reporting_year, replace
-				gen year = reporting_year
-				duplicates drop
-				
-				reshape wide year, i( wb_region_code pcn_region_code country_code coverage_level country_name) j(reporting_year) string
-				
-				egen year    = concat(year*), p(" ")
-				replace year = stritrim(year)
-				replace year = subinstr(year," ", ",",.)
-				
-				keep country_code country_name wb_region_code pcn_region_code coverage_level year
-				order country_code country_name wb_region_code pcn_region_code coverage_level year
-				
-			}
-		}
-		
-		
 		local frlkupwr "_pip_lkup_wrk"
+		local frlkupb  "_pip_fw`_version'"
 		frame copy `frlkupb' `frlkupwr', replace
-		if ("`justdata'" != "") exit
 		
 		***************************************************
 		* 2. Inital listing with countries and regions
@@ -214,7 +48,7 @@ program define pip_info, rclass
 				local current_line = 0
 				foreach cccc of local countries{
 					local current_line = `current_line' + 1 
-					local display_this = "{stata pip_info, country(`cccc') clear server(${pip_server}) version(`version'): `cccc'} "
+					local display_this = "{stata pip_info, country(`cccc') clear server(${pip_server}) version(${pip_version}): `cccc'} "
 					if (`current_line' < 8) noi display in y `"`display_this'"' _continue 
 					else{
 						noi display in y `"`display_this'"' 
