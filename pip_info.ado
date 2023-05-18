@@ -28,9 +28,14 @@ program define pip_info, rclass
 		local version_qr = "&version=${pip_version}"
 		tokenize "${pip_version}", parse("_")
 		local _version   = "_`1'_`3'_`9'"
+		
+		//------------ Get auxiliary data
+		pip_auxframes
+		
+			
 			
 		local frlkupwr "_pip_lkup_wrk"
-		local frlkupb  "_pip_fw`_version'"
+		local frlkupb  "_pip_lkupb`_version'"
 		frame copy `frlkupb' `frlkupwr', replace
 		
 		***************************************************
@@ -48,7 +53,7 @@ program define pip_info, rclass
 				local current_line = 0
 				foreach cccc of local countries{
 					local current_line = `current_line' + 1 
-					local display_this = "{stata pip_info, country(`cccc') clear server(${pip_server}) version(${pip_version}): `cccc'} "
+					local display_this = "{stata pip_info, country(`cccc') clear: `cccc'} "
 					if (`current_line' < 8) noi display in y `"`display_this'"' _continue 
 					else{
 						noi display in y `"`display_this'"' 
@@ -104,8 +109,9 @@ program define pip_info, rclass
 					foreach ind_y of local years_current {
 						local current_line = `current_line' + 1 
 						local ind_y_c=substr("`ind_y'",1,4)
-						local display_this = "{stata  pip, country(`country') year(`ind_y') server(${pip_server}) coverage(`coverage')   clear: `ind_y_c'}"		
-						if (`current_line' < 10) noi display in y `"`display_this'"' _continue 
+						local stcall "pip, country(`country') year(`ind_y') server(${pip_server}) coverage(`coverage') version(${pip_version}) clear"
+						local display_this = `"{stata  `stcall': `ind_y_c' }"'
+						if (`current_line' < 7) noi display in y `"`display_this'"' _continue 
 						
 						else {
 							noi display in y `"`display_this'"' 
@@ -144,14 +150,14 @@ program define pip_info, rclass
 					local years_current = "$refyears"
 					foreach ind_y of local years_current {
 						local current_line = `current_line' + 1 
-						local display_this = "{stata  pip, region(`i_reg') year(`ind_y') aggregate clear: `ind_y'}"		
-						if (`current_line' < 10) noi display in y `"`display_this'"' _continue 
+						local display_this = "{stata  pip, region(`i_reg') year(`ind_y') clear: `ind_y'}"		
+						if (`current_line' < 7) noi display in y `"`display_this'"' _continue 
 						else{
 							noi display in y `"`display_this'"' 
 							local current_line = 0		
 						}
 					}
-					noi display in y "{stata  pip, region(`i_reg') year(all) aggregate clear: All}"
+					noi display in y "{stata  pip, region(`i_reg') year(all)  clear: All}"
 				} // end of loop 
 				
 			} // end of frame

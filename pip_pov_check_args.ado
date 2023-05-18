@@ -16,13 +16,8 @@ program define pip_pov_check_args, rclass
 	YEAR(string)                    /// 
 	POVLine(numlist)                /// 
 	POPShare(numlist)	   	          /// 
-	PPP_year(numlist)              /// 
 	CLEAR                           /// 
 	COVerage(string)                /// 
-	VERsion(string)                 ///
-	IDEntity(string)                ///
-	RELease(numlist)                ///
-	fillgaps                        ///
 	] 
 	
 	version 16
@@ -42,7 +37,7 @@ program define pip_pov_check_args, rclass
 	
 	//------------ Get auxiliary data
 	pip_timer pov_check_args.info, on
-	pip_info, clear justdata `pause' version(`version')
+	pip_auxframes
 	pip_timer pov_check_args.info, off
 	
 	//========================================================
@@ -52,6 +47,7 @@ program define pip_pov_check_args, rclass
 	
 	//------------ year
 	if ("`year'" == "") local year "all"
+	else if (lower("`year'") == "all") local year "all"
 	else if (lower("`year'") == "last") local year "last"
 	else if (ustrregexm("`year'"), "[a-zA-Z]+") {
 		noi disp "{err} `year' is not a valid {it:year} value" _n /* 
@@ -101,10 +97,8 @@ program define pip_pov_check_args, rclass
 		local av_frames = "^(" + "`av_frames'" + ")"
 		
 		//------------ Regions frame
-		local frpiprgn "_pip_regions`_version'"
-		if (!regexm("`frpiprgn'", "`av_frames'")) {
-			pip_info, clear justdata `pause' server(${pip_server}) version(`version')
-		} 
+		pip_auxframes
+		local frpiprgn "_pip_regions`_version'" 
 		frame `frpiprgn' {
 			levelsof region_code, local(av_regions)  clean
 		}

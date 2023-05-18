@@ -65,7 +65,7 @@ qui if ("`type'" == "1") {
 	***************************************************
 	// check if country data frame is available
 	
-	pip_info, clear justdata `pause' server(${pip_server}) version(`version')
+	pip_auxframes
 	
 	local orgvar  reporting_pop reporting_pce 
 	local newvar  population reporting_hfce

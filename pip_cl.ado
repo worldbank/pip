@@ -21,17 +21,14 @@ program define pip_cl, rclass
 	YEAR(string)                    /// 
 	POVLine(numlist)                /// 
 	POPShare(numlist)	   	          /// 
-	PPP_year(numlist)               ///
 	FILLgaps                        /// 
+	PPP_year(numlist)               ///
 	COVerage(string)                /// 
 	CLEAR                           /// 
 	SERver(string)                  /// 
 	pause                           /// 
 	POVCALNET_format                ///
 	replace                         ///
-	VERsion(string)                 ///
-	IDEntity(string)                ///
-	RELease(numlist)                ///
 	cacheforce                      ///
 	n2disp(passthru)                ///
 	] 
@@ -47,30 +44,22 @@ program define pip_cl, rclass
 		//========================================================
 		// setup
 		//========================================================
-		//------------ get server url
-		if ("${pip_host}" == "") {
-			pip_set_server,  server(${pip_server})
+		//------------ setup 
+		if ("${pip_version}" == "") {
+			noi disp "{err}No version selected."
+			error
 		}
-		
-		//------------ Set versions
-		if ("`version'" == "") {  // this should never be true
-			noi pip_versions, server(${pip_server})       /*
-			*/                version(`version')     /*
-			*/                release(`release')     /*
-			*/                ppp_year(`ppp_year')   /*
-			*/                identity(`identity')  
-			local version    = "`r(version)'"		
-		}
+		tokenize "${pip_version}", parse("_")
+		local ppp_year  `3'
 		//------------ Get auxiliary data
-		pip_info, clear justdata `pause' server(${pip_server}) version(`version')
+		pip_auxframes
 		
 		//========================================================
 		// Build query (queries returned in ${pip_last_queries}) 
 		//========================================================
 		pip_cl_query, country(`country') region(`region') year(`year') ///
 		povline(`povline') popshare(`popshare')  `fillgaps' ///
-		ppp(`ppp_year') coverage(`coverage') ///
-		version(`version')
+		ppp(`ppp_year') coverage(`coverage') 
 		
 		//========================================================
 		// Getting data
@@ -83,7 +72,7 @@ program define pip_cl, rclass
 		
 		//------------ clean
 		pip_timer pip_cl_clean, on
-		pip_cl_clean, version(`version')
+		pip_cl_clean
 		pip_timer pip_cl_clean, off
 		
 		//------------ display results
@@ -186,13 +175,17 @@ end
 //------------Clean Cl data
 
 program define pip_cl_clean, rclass
-	syntax, version(string)
 	
 	version 16
 	
 	//========================================================
 	//  setup
 	//========================================================
+	if ("${pip_version}" == "") {
+		noi disp "{err}No version selected."
+		error
+	}
+	local version = "${pip_version}"
 	tokenize "`version'", parse("_")
 	local _version   = "_`1'_`3'_`9'"
 	local ppp_version = `3'

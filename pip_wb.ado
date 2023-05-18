@@ -24,8 +24,6 @@ program define pip_wb, rclass
 	pause                           /// 
 	POVCALNET_format                ///
 	replace                         ///
-	IDEntity(string)                ///
-	RELease(numlist)                ///
 	cacheforce                      ///
 	n2disp(passthru)                ///
 	] 
@@ -43,13 +41,13 @@ program define pip_wb, rclass
 		//========================================================
 
 		//------------ Get auxiliary data
-		pip_info, clear justdata `pause'
+		pip_auxframes
 		
 		//========================================================
 		// Build query (queries returned in ${pip_last_queries}) 
 		//========================================================
 		pip_wb_query, region(`region') year(`year') povline(`povline')   /*
-		*/            ppp(`ppp_year') coverage(`coverage')  version(`version')
+		*/            ppp(`ppp_year') coverage(`coverage') 
 		
 		//========================================================
 		// Getting data
@@ -62,14 +60,11 @@ program define pip_wb, rclass
 		
 		//------------ clean
 		pip_timer pip_wb_clean, on
-		pip_wb_clean, version(`version')
+		pip_wb_clean
 		pip_timer pip_wb_clean, off
 		
 		//------------ Display results
-		pip_wb_display_results, `n2disp'
-		
-		
-		
+		noi pip_wb_display_results, `n2disp'
 		
 	}
 	pip_timer pip_wb, off
@@ -156,9 +151,15 @@ end
 
 //------------Clean Cl data
 program define pip_wb_clean, rclass
-	syntax, version(string)
-	
 	version 16
+	if ("${pip_version}" == "") {
+		noi disp "{err}No version selected."
+		error
+	}
+	local version = "${pip_version}"
+	tokenize "`version'", parse("_")
+	local _version   = "_`1'_`3'_`9'"
+	local ppp_version = `3'
 	
 	
 	qui {
@@ -226,7 +227,7 @@ program define pip_wb_display_results
 	
 	tempname tolist
 	frame copy `c(frame)' `tolist'
-	frame `tolist' {
+	qui frame `tolist' {
 		gsort region_code -year 
 		
 		count if (region_code == "WLD")
