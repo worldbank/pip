@@ -240,11 +240,12 @@ struct pip_time_info scalar pip_timer_on(string scalar label,  /*
 		pattern = "^"+label+"$"
 		if (anyof(ustrregexm(r.time_l, pattern), 1)) {
 			errprintf("%s is already in used\n", label)
-			exit(498)
+			timer_off(r.counter)			
 		}
-		
-		r.time_l = r.time_l \ label
-		r.time_i = r.time_i \ pip_time_count(r)
+		else {
+			r.time_l = r.time_l \ label
+			r.time_i = r.time_i \ pip_time_count(r)
+		}
 	}
 	// start timer
 	timer_on(r.counter)
@@ -272,14 +273,19 @@ void pip_timer_off(string scalar label,  /*
 }
 void pip_time_print_info(struct pip_time_info scalar r)
 {
-	real scalar i 
-	printf("{res}PIP timer report {hline 40}\n")
+	real scalar i, ti, nt, av
+	printf("{res}{hline 20} PIP timer report {hline 40}\n")
+	printf("{res}{col 6}function{col 45}elapsed{col 70}avg.\n\n")
 	for (i = 1; i <= rows(r.time_l); i++) {
 		timer_off(i)  // just in case
-		printf("{txt}{col 2}%g.{col 6}%s: {res}{col 40}%3.2f{txt} secs\n", /* 
-	 */	     i, r.time_l[i], timer_value(i)[1])
+		ti = timer_value(i)[1]  // time in i
+		nt = timer_value(i)[2]  // number of times
+		av = ti/nt              // avg.
+		
+		printf("{txt}{col 2}%g.{col 6}%s: {res}{col 45}%3.2f{txt} secs{col 55}/%2.0f = {col 70}%3.2f\n", /* 
+		*/	     i, r.time_l[i], ti, nt, av)
 	}
-	printf("{res}{hline 57}\n")
+	printf("{res}{hline 77}\n")
 	
 }
 
