@@ -49,20 +49,6 @@ program define pip, rclass
 		pip_set_server, `server'
 	}
 	
-	
-	/* 
-	
-	disp `"country: `country'"'
-	disp `"year: `year'"'
-	disp `"clear: `clear'"'
-	disp `"povline: `povline'"'
-	disp `"cache: `cache'"'
-	disp `"subcmd: `subcmd'"'
-	disp `"pipoptions: `pipoptions'"'
-	
-	exit 
-	*/
-	
 	if ("`pause'" == "pause") pause on
 	else                      pause off
 	set checksum off
@@ -199,19 +185,6 @@ program define pip, rclass
 		mata: pip_retlist2locals("`optnames'")
 		mata: pip_locals2call("`optnames'", "povoptions")
 		pip_timer pip.pip_pov_check_args, off
-		
-		/*
-		noi {
-		disp `"country: `country'"'
-		disp `"year: `year'"'
-		disp `"clear: `clear'"'
-		disp `"povline: `povline'"'
-		disp `"popshare: `cache'"'
-		disp `"subcmd: `subcmd'"'
-		disp `"povoptions: `povoptions'"'	
-		}
-		exit  
-		*/
 		
 		
 		//========================================================
