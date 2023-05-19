@@ -133,8 +133,6 @@ For a detailed description of the {cmd:server()} and {cmd:identity()} options se
 {synoptset 27 tabbed}{...}
 {synopthdr:tables}
 {synoptline}
-{synopt :{opt querytimes(integer)}}Number of times the API is hit before defaulting to failure. 
-Default is 5. {it:Advanced option. Use only if internet connection is poor}.{p_end}
 {synopt :{opt table(string)}}Loads one auxiliary table, this option is used along with the {cmd:tables} subcommand.{p_end}
 
 {synoptset 27 tabbed}{...}

@@ -232,6 +232,18 @@ Notes:
 
 Version Control:
 
+*! version 0.10.0           <2023May19>
+*! -- Complete refactoring of pip. many breaking changes
+*! -- All callings of data are done with pip_get
+*! -- local Caching is enabled for all calls
+*! -- new timer functionality
+*! -- new modular structure for future additions
+*! -- efficient execution of code
+*! -- add MATA functionality 
+*! -- add setup of variables for many future uses
+*! -- dismiss dependency of {missings} command
+*! -- BREAK CHANGE: options names MUST be parsed completely. Partial naming breaks
+*! -- Remove old code.
 *! version 0.9.7            <2023May09>
 *! -- several improvements to caching and setup.do 
 *! version 0.9.6            <2023May05>
