@@ -19,7 +19,7 @@
 {hline}
 help for {cmd:pip}{right:R.Andrés Castañeda}
 {hline}
-{title:Title}
+{title:Stata client for PIP}
 
 {p2colset 9 24 22 2}{...}
 {p2col :{hi:pip} {hline 2}}Access poverty and inequality data from the 
@@ -32,67 +32,47 @@ between the indicators in the pip and povcalnet commands. {p_end}
 {p2colreset}{...}
 {title:Syntax}
 
-{p 6 16 2}
+{pstd}
+{it:General}
+
+{p 8 16 2}
 {cmd:pip} [{it:{help pip##subcommands:subcommand}}]{cmd:,} 
-[{it:{help pip##param:Parameters}} {it:{help pip##options:Options}}]
+[{it:{help pip##param:Parameters}} {it:{help pip##options:General options}}]
+
+{p 8 16 2}
+where {it:subcommand} could be {it:cl}, {it:wb}, {it:tables}, {it:info}, 
+{it:setup}, {it:clean}, {it:install}, {it:uninstall}, {it:update}, {it:version},
+{it:cache}, {it:dropframe}, or {it:dropglobal}
 
 {pstd}
-Description of parameters and options
+{it:cl}: Country level
 
-{synoptset 27 tabbed}{...}
-{synopthdr:Parameters}
-{synoptline}
-{synopt :{opt coun:try:}(3-letter code)}List of {it:{help pip_countries##countries:country code}} (accepts multiples) or {it:all}. Default "{it:all}".
-Cannot be used with option {it:region()}{p_end}
-{synopt :{opt reg:ion}(WB code)}List of {it:{help pip_countries##regions:region code}} (accepts multiple) or {it:all}. Default "{it:all}".
-Cannot be used with option {it:country()}{p_end}
-{synopt :{opt coverage(string)}}Coverage level ("national", "urban", "rural", "all"). Default "all".{p_end}
-{synopt :{opt year:}(numlist|string)}List of years (accepts up to 10),  or {it:all}, or {it:last}. Default "all".{p_end}
-{synopt :{opt pov:line:}(#)}List of poverty lines (in PPP specified, see option {cmd:ppp_year(#)}) to calculate 
- poverty measures (accepts up to 5). Default is 2.15 and 2017 PPPs.{p_end}
-{synopt :{opt pops:hare:}(#)}List of quantiles. No default. Cannot be used with option {opt pov:line:}{p_end}
-{synopt :{opt fill:gaps}}Loads country-level estimates (including extrapolations and interpolations) used to create regional and global aggregates.{p_end}
+{p 8 16 2}
+{cmd:pip} [cl], [country(string) year(numlist) povline(numlist) popshare(numlist)
+ppp_year(numlist) coverage(string) fillgaps  clear n2disp(numlist) region(string)]
 
-{synoptset 27 tabbed}{...}
-{synopthdr:Options}
-{synoptline}
-{synopt :{opt version(string)}}Combination of numbers in the format %Y%m%d_YYYY_RV_AV_SSS 
-(click {bf:{help pip_note:here}} for explanation of each component). This {it:version()} option supersedes 
-the next 3 options {it:ppp_year()}, {it:release()} & {it:identity()}, as the combination of these parameters uniquely identifies a dataset.{p_end}
-{synopt :{opt ppp:_year:}(#)}PPP round (2011 or 2017). {p_end}
-{synopt :{opt release(numlist)}}8 digit number with the PIP release date in the format {it:YYYYMMDD}.{p_end}
-{synopt :{opt identity(string)}{err:*}}Version of data to run the query on (e.g., prod, int, test). See description of each identity {bf:{help pip_note:here}}.{p_end}
-{synopt :{opt server(string)}{err:*}}Name of server to query (e.g, prod, dev, qa). See description of each server {bf:{help pip_note:here}}.{p_end}
 
 {pstd}
-{err:*Note}: The {cmd:server()} and {cmd:identity()} options are available internally only for Bank staff.
-For a detailed description of the {cmd:server()} and {cmd:identity()} options see {bf:{help pip_note:here}}.
+{it:wb}: World Bank global and regional aggregates
 
-{synoptset 27 tabbed}{...}
-{synopthdr:Operational}
-{synoptline}
-{synopt :{opt clear}}Replaces data in memory.{p_end}
-{synopt :{opt querytimes(integer)}}Number of times the API is hit before defaulting to failure. 
-Default is 5. {it:Advanced option. Use only if internet connection is poor}.{p_end}
-{synopt :{opt table(string)}}Loads one auxiliary table, this option is used along with the {cmd:tables} subcommand.{p_end}
+{p 8 16 2}
+{cmd:pip} wb, [region(string) year(numlist) povline(numlist) 
+ppp_year(numlist) coverage(string)  clear n2disp(numlist)]
 
-{synoptset 27 tabbed}{...}
-{synopthdr:Subcommands}
-{synoptline}
-{synopt :{opt info:rmation}}Presents a clickable version of the available surveys, 
-countries and regions.{p_end}
-{synopt :{opt wb}}Downloads World Bank's regional and global aggregation.{p_end}
-{synopt :{opt tab:les}}Provides clickable list of auxiliary tables for download.{p_end}
-{synopt :{opt clean:up}}Deletes all pip data from current stata memory.{p_end}
-{synopt :{opt dropframe}}({it:Programmer's option}) Deletes auxiliary PIP frames in memory.{p_end}
-{synopt :{opt dropglobal}}({it:Programmer's option}) Deletes auxiliary PIP global macros in memory.{p_end}
-{synopt :{opt ver:sions}}Display available versions of PIP data.{p_end}
-{synopt :{opt test}}Open in browser last pip call. Type {cmd:disp "${pip_query}"} to see the parameters of the API query.{p_end}
-{synopt :{opt install}}Installs the stable version of pip from SSC 
-({cmd:pip install ssc}) or the development version from GitHub ({cmd:pip install gh}){p_end}
 
 {pstd}
-{bf:Note}: {cmd:pip} requires an internet connection.
+{it:tables}: Display or access auxiliary tables
+
+{p 8 16 2}
+{cmd:pip} tables, [table({it:aux table name})]
+
+
+{pstd}
+{it:info}: Display data availability
+
+{p 8 16 2}
+{cmd:pip} info
+
 
 {marker sections}{...}
 {title:Sections}
@@ -116,6 +96,65 @@ Sections are presented under the following headings:
 		{it:{help pip##contact:Contact}}
 		{it:{help pip##howtocite:How to cite}}
 		{it:{help pip_countries:Region and country codes}}
+
+
+{title:Options description}
+
+{synoptset 27 tabbed}{...}
+{synopthdr:cl and wb}
+{synoptline}
+{synopt :{opt coun:try:}(3-letter code)}List of {it:{help pip_countries##countries:country code}} (accepts multiples) or {it:all}. Default "{it:all}".
+Cannot be used with option {it:region()}{p_end}
+{synopt :{opt reg:ion}(WB code)}List of {it:{help pip_countries##regions:region code}} (accepts multiple) or {it:all}. Default "{it:all}".
+Cannot be used with option {it:country()}{p_end}
+{synopt :{opt coverage(string)}}Coverage level ("national", "urban", "rural", "all"). Default "all".{p_end}
+{synopt :{opt year:}(numlist|string)}List of years (accepts up to 10),  or {it:all}, or {it:last}. Default "all".{p_end}
+{synopt :{opt pov:line:}(#)}List of poverty lines (in PPP specified, see option {cmd:ppp_year(#)}) to calculate 
+ poverty measures (accepts up to 5). Default is 2.15 and 2017 PPPs.{p_end}
+{synopt :{opt pops:hare:}(#)}List of quantiles. No default. Cannot be used with option {opt pov:line:}{p_end}
+{synopt :{opt fill:gaps}}Loads country-level estimates (including extrapolations and interpolations) used to create regional and global aggregates.{p_end}
+
+{synoptset 27 tabbed}{...}
+{synopthdr:General Options}
+{synoptline}
+{synopt :{opt version(string)}}Combination of numbers in the format %Y%m%d_YYYY_RV_AV_SSS 
+(click {bf:{help pip_note:here}} for explanation of each component). This {it:version()} option supersedes 
+the next 3 options {it:ppp_year()}, {it:release()} & {it:identity()}, as the combination of these parameters uniquely identifies a dataset.{p_end}
+{synopt :{opt ppp:_year:}(#)}PPP round (2011 or 2017). {p_end}
+{synopt :{opt release(numlist)}}8 digit number with the PIP release date in the format {it:YYYYMMDD}.{p_end}
+{synopt :{opt identity(string)}{err:*}}Version of data to run the query on (e.g., prod, int, test). See description of each identity {bf:{help pip_note:here}}.{p_end}
+{synopt :{opt server(string)}{err:*}}Name of server to query (e.g, prod, dev, qa). See description of each server {bf:{help pip_note:here}}.{p_end}
+{synopt :{opt clear}}Replaces data in memory.{p_end}
+
+{pstd}
+{err:*Note}: The {cmd:server()} and {cmd:identity()} options are available internally only for Bank staff.
+For a detailed description of the {cmd:server()} and {cmd:identity()} options see {bf:{help pip_note:here}}.
+
+{synoptset 27 tabbed}{...}
+{synopthdr:tables}
+{synoptline}
+{synopt :{opt querytimes(integer)}}Number of times the API is hit before defaulting to failure. 
+Default is 5. {it:Advanced option. Use only if internet connection is poor}.{p_end}
+{synopt :{opt table(string)}}Loads one auxiliary table, this option is used along with the {cmd:tables} subcommand.{p_end}
+
+{synoptset 27 tabbed}{...}
+{synopthdr:Subcommands}
+{synoptline}
+{synopt :{opt info:rmation}}Presents a clickable version of the available surveys, 
+countries and regions.{p_end}
+{synopt :{opt wb}}Downloads World Bank's regional and global aggregation.{p_end}
+{synopt :{opt tab:les}}Provides clickable list of auxiliary tables for download.{p_end}
+{synopt :{opt clean:up}}Deletes all pip data from current stata memory.{p_end}
+{synopt :{opt dropframe}}({it:Programmer's option}) Deletes auxiliary PIP frames in memory.{p_end}
+{synopt :{opt dropglobal}}({it:Programmer's option}) Deletes auxiliary PIP global macros in memory.{p_end}
+{synopt :{opt ver:sions}}Display available versions of PIP data.{p_end}
+{synopt :{opt test}}Open in browser last pip call. Type {cmd:disp "${pip_query}"} to see the parameters of the API query.{p_end}
+{synopt :{opt install}}Installs the stable version of pip from SSC 
+({cmd:pip install ssc}) or the development version from GitHub ({cmd:pip install gh}){p_end}
+
+{pstd}
+{bf:Note}: {cmd:pip} requires an internet connection.
+
 
 {marker desc}{...}
 {p 40 20 2}(Go up to {it:{help pip##sections:Sections Menu}}){p_end}

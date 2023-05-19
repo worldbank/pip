@@ -85,7 +85,7 @@ program define pip, rclass
 	
 	//------------Drops
 	if regexm("`subcmd'", "^dropframe") {
-		pip_drop frame, frame_prefix(`frame_prefix')
+		pip_drop frame, `frame_prefix'
 		exit
 	}
 	
