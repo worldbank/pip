@@ -42,10 +42,23 @@ program define pip_utils, rclass
 	}
 	
 	
-	if ustrregexm("`subcmd'", "frame") {
+	if ustrregexm("`subcmd'", "^frame") {
 		pip_utils_frameexists, `frame'
 		return add
 	}
+	
+	if ("`subcmd'" == "finalmsg") {
+		noi pip_utils_final_msg
+		return add
+	}
+	
+	if ("`subcmd'" == "keepframes") {
+		pip_utils_keep_frame, `frame_prefix' `keepframes' `efficient'
+	}
+	
+	
+	
+	
 	
 end
 
@@ -106,7 +119,7 @@ program define pip_utils_dropvars
 end
 
 
-program define pip_utils_frameexists,rclass
+program define pip_utils_frameexists, rclass
 	syntax, frame(string)
 	
 	mata: st_local("fexists", strofreal(st_frameexists("`frame'")))
@@ -114,6 +127,54 @@ program define pip_utils_frameexists,rclass
 end 
 
 
+program define pip_utils_final_msg, rclass
+	* citations
+	if ("${pip_old_session}" == "1") {
+		local cnoi "noi"
+		global pip_old_session = ${pip_old_session} + 1
+	}
+	else {
+		local cnoi "qui"
+		noi disp `"Click {stata "pip_cite, reg_cite":here} to display how to cite"'
+	}
+	`cnoi' pip_cite, reg_cite
+	notes: `r(cite_data)'
+	return add
+	
+	* Install alternative version
+	if ("${pip_old_session}" == "") {
+		noi pip_${pip_source} msg
+	}
+end
+
+//------------ Keep or drop frames
+program define pip_utils_keep_frame
+	syntax , [ frame_prefix(string) keepframes noEFFICIENT]
+	if ("`frame_prefix'" == "") {
+		local frame_prefix "pip_"
+	}
+	
+	frame dir
+	local av_frames "`r(frames)'"
+	
+	* set trace on 
+	foreach fr of local av_frames {
+		
+		if (regexm("`fr'", "(^_pip_)(.+)")) {
+			
+			// If users wants to keep frames
+			if ("`keepframes'" != "") {
+				local frname = "`frame_prefix'" + regexs(2)
+				frame copy `fr' `frname', `replace'
+			}
+			// if user wants to drop them
+			if ("`efficient'" == "noefficient") {
+				frame drop `fr'
+			}
+		}
+		
+	} // condition to keep frames
+end
 exit
 /* End of do-file */
 

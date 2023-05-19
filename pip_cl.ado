@@ -75,8 +75,27 @@ program define pip_cl, rclass
 		pip_cl_clean
 		pip_timer pip_cl_clean, off
 		
+		//------------ Add data notes
+		if ("`fillgaps'" == "") local lvlabel "country level"	 
+		else local lvlabel "Country level (lined up)"
+		
+		local datalabel "WB poverty at `lvlabel'"
+		local datalabel = substr("`datalabel'", 1, 80)
+		
+		label data "`datalabel' (`c(current_date)')"
+		
 		//------------ display results
 		noi pip_cl_display_results, `n2disp'
+		
+		//------------ Povcalnet format
+		
+		if ("`povcalnet_format'" != "") {
+			noi disp "{p 2 4 2 70}{err}Warning: {res}option {it:povcalnet_format}" /* 
+		 */	" is meant for replicability purposes only or to be used in Stata code " /* 
+		 */ "that still executes the deprecated {cmd:povcalnet} command.{p_end}"
+			
+			pip_cl_povcalnet
+		}
 		
 		
 	}
@@ -369,6 +388,59 @@ program define pip_cl_display_results
 	
 end
 
+
+program define pip_cl_povcalnet
+	ren year       requestyear
+	ren population reqyearpopulation
+	
+	
+	local vars1 country_code region_code reporting_level welfare_time /*
+	*/ welfare_type is_interpolated distribution_type poverty_line poverty_gap /*
+	*/ poverty_severity country_name 
+	
+	local vars2 countrycode regioncode coveragetype datayear datatype isinterpolated usemicrodata /*
+	*/povertyline povgap povgapsqr countryname
+	
+	local i = 0
+	foreach var of local vars1 {
+		local ++i
+		cap confirm var `var', exact
+		if _rc continue
+		rename `var' `: word `i' of `vars2''
+	}	
+	
+	local keepvars  countrycode countryname regioncode coveragetype requestyear /* 
+	*/ datayear datatype isinterpolated usemicrodata /*
+	*/ ppp povertyline mean headcount povgap povgapsqr watts gini /* 
+	*/ median mld polarization reqyearpopulation decile? decile10
+	
+	foreach v of local keepvars {
+		cap confirm var `v', exact
+		if _rc continue
+		local tokeep "`tokeep' `v'"
+	}
+	keep  `tokeep'
+	order `tokeep'
+	
+	
+	* Standardize names with R package	
+	local Snames requestyear reqyearpopulation 
+	
+	local Rnames year population 
+	
+	local i = 0
+	foreach var of local Snames {
+		local ++i
+		rename `var' `: word `i' of `Rnames''
+	}
+	
+	sort countrycode year coveragetype
+	
+	//------------ Convert to monthly values
+	replace mean = mean * (360/12)
+	replace median = median * (360/12)
+	
+end 
 
 exit
 /* End of do-file */

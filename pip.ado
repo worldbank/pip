@@ -86,7 +86,7 @@ program define pip, rclass
 	//------------ setup 
 	if ("`subcmd'" == "setup") {
 		noi disp "{res:Setup done!}"
-		pip_timer pip, off `printtimer'
+		pip_timer pip, off 
 		exit
 	}
 	
@@ -171,7 +171,8 @@ program define pip, rclass
 		// Set up version
 		//========================================================
 		pip_timer pip.pip_versions, on
-		pip_versions, `release' `ppp_year' `identity' `version'	
+		pip_versions, `release' `ppp_year' `identity' `version'
+		return add
 		pip_timer pip.pip_versions, off
 		
 		//========================================================
@@ -187,7 +188,7 @@ program define pip, rclass
 		}
 		
 		//========================================================
-		//  Poverty estimates defaults
+		//  Check of arguments
 		//========================================================
 		
 		
@@ -214,122 +215,35 @@ program define pip, rclass
 		
 		
 		//========================================================
-		// Country level estimates 
+		// retrieve and format estimates
 		//========================================================
 		
-		
+		//------------ Coutry lavel
 		if ("`subcmd'" == "cl") {
-			noi pip_cl, `povoptions' `clear' `n2disp'
+			noi pip_cl, `povoptions' `clear' `n2disp' `povcalnet_format'
 			noi pip_timer pip, off `printtimer' 
-			exit
 		}
-		
-		if ("`subcmd'" == "wb") {
-			noi pip_wb, `povoptions' `clear' `n2disp'
+		//------------ World Bank Aggregate
+		else if ("`subcmd'" == "wb") {
+			noi pip_wb, `povoptions' `clear' `n2disp' `povcalnet_format'
 			noi pip_timer pip, off `printtimer'
-			exit
 		}
-		
-		// Country Profile
-		if ("`subcmd'" == "cp") {
+		//------------ Country Profile
+		else if ("`subcmd'" == "cp") {
 			pip_cp, `povoptions' `clear' `n2disp'
 			noi pip_timer pip, off `printtimer'
-			exit
 		}
 		
 		//========================================================
-		//  Create notes
+		// closing actions
 		//========================================================
 		
-		local pllabel ""
-		foreach p of local povline {
-			local pllabel "`pllabel' \$`p'"
-		}
-		local pllabel = trim("`pllabel'")
-		local pllabel: subinstr local pllabel " " ", ", all
+		//------------Final messages
+		noi pip_utils finalmsg
+		return add
 		
-		
-		if ("`wb'" == "")   {
-			if ("`fillgaps'" == "") local lvlabel "country level"	 
-			else local lvlabel "Country level (lined up)"
-		}
-		else {
-			local lvlabel "regional and global level"
-		}
-		
-		
-		local datalabel "WB poverty at `lvlabel' using `pllabel'"
-		local datalabel = substr("`datalabel'", 1, 80)
-		
-		label data "`datalabel' (`c(current_date)')"
-		
-		//========================================================
-		// Final messages
-		//========================================================
-		
-		* citations
-		if ("${pip_old_session}" == "1") {
-			local cnoi "noi"
-			global pip_old_session = ${pip_old_session} + 1
-		}
-		else {
-			local cnoi "qui"
-			noi disp `"Click {stata "pip_cite, reg_cite":here} to display how to cite"'
-		}
-		`cnoi' pip_cite, reg_cite
-		notes: `r(cite_data)'
-		
-		noi disp in y _n `"`cite'"'
-		
-		return local cite `"`cite'"'
-		
-		* Install alternative version
-		if ("${pip_old_session}" == "") {
-			noi pip_${pip_source} msg
-		}
-		
-		
-		
-		//========================================================
-		// Convert to povcalnet format
-		//========================================================
-		
-		if ("`povcalnet_format'" != "") {
-			pause before povcalnet format
-			pip_povcalnet_format  `rtype', `pause'
-		}
-		
-		
-		//========================================================
-		//  Drop frames created in the middle of the process
-		//========================================================
-		
-		
-		if ("`frame_prefix'" == "") {
-			local frame_prefix "pip_"
-		}
-		
-		frame dir
-		local av_frames "`r(frames)'"
-		
-		* set trace on 
-		foreach fr of local av_frames {
-			
-			if (regexm("`fr'", "(^_pip_)(.+)")) {
-				
-				// If users wants to keep frames
-				if ("`keepframes'" != "") {
-					local frname = "`frame_prefix'" + regexs(2)
-					frame copy `fr' `frname', `replace'
-				}
-				// if user wants to drop them
-				if ("`efficient'" == "noefficient") {
-					frame drop `fr'
-				}
-			}
-			
-		} // condition to keep frames
-		
+		//----------Drop frames created in the middle of the process
+		pip_utils keepframes, `frame_prefix' `keepframes' `efficient'
 		
 	} // end of qui
 end  // end of pip

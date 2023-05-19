@@ -39,7 +39,7 @@ program define pip_wb, rclass
 		//========================================================
 		// setup
 		//========================================================
-
+		
 		//------------ Get auxiliary data
 		pip_auxframes
 		
@@ -63,8 +63,25 @@ program define pip_wb, rclass
 		pip_wb_clean
 		pip_timer pip_wb_clean, off
 		
+		//------------ Add data notes
+		local datalabel "WB poverty at regional and global level"
+		local datalabel = substr("`datalabel'", 1, 80)
+		
+		label data "`datalabel' (`c(current_date)')"
+		
 		//------------ Display results
 		noi pip_wb_display_results, `n2disp'
+		
+		//------------ Povcalnet format
+		
+		if ("`povcalnet_format'" != "") {
+			noi disp "{p 2 4 2 70}{err}Warning: {res}option {it:povcalnet_format}" /* 
+			*/	" is meant for replicability purposes only or to be used in Stata code " /* 
+			*/ "that still executes the deprecated {cmd:povcalnet} command.{p_end}" _n
+			
+			pip_wb_povcalnet
+		}
+		
 		
 	}
 	pip_timer pip_wb, off
@@ -239,6 +256,37 @@ program define pip_wb_display_results
 		in 1/`n2disp',  abbreviate(12) noobs
 	}
 	
+end
+
+
+program define pip_wb_povcalnet
+	ren year        requestyear
+	ren population  reqyearpopulation
+	
+	//------------ Renaming and labeling
+	
+	rename region_code      regioncode
+	rename poverty_line     povertyline
+	rename poverty_gap      povgap
+	rename poverty_severity povgapsqr
+	
+	keep requestyear regioncode povertyline mean headcount povgap ///
+	povgapsqr reqyearpopulation
+	order requestyear regioncode povertyline mean headcount povgap ///
+	povgapsqr reqyearpopulation
+	
+	local Snames requestyear reqyearpopulation 
+	
+	local Rnames year population 
+	
+	local i = 0
+	foreach var of local Snames {
+		local ++i
+		rename `var' `: word `i' of `Rnames''
+	}
+	
+	//------------ Convert to monthly values
+	replace mean = mean * (360/12)
 end
 
 exit
