@@ -91,7 +91,7 @@ program define pip_auxframes_create, rclass
 		}
 		return local fexisted = 0
 	}
-	return local fexisted = 1
+	else return local fexisted = 1
 	
 end
 

@@ -36,9 +36,9 @@ program define pip_pov_check_args, rclass
 	local optnames "`optnames' ppp_year"
 	
 	//------------ Get auxiliary data
-	pip_timer pov_check_args.info, on
+	pip_timer pov_check_args.auxframes, on
 	pip_auxframes
-	pip_timer pov_check_args.info, off
+	pip_timer pov_check_args.auxframes, off
 	
 	//========================================================
 	// General checks

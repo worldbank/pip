@@ -7,11 +7,15 @@ program define pip_info, rclass
 	
 	version 16.0
 	
-	syntax    [,       ///
-	COUntry(string)    ///
-	REGion             ///
-	pause              /// debugging
-	clear              ///
+	syntax    [,          ///
+	COUntry(string)       ///
+	REGion                ///
+	pause                 /// debugging
+	clear                 ///
+	release(passthru)     ///
+	ppp_year(passthru)    ///
+	identity(passthru)    ///
+	version(passthru)     ///
 	] 
 	
 	if ("`pause'" == "pause") pause on
@@ -22,8 +26,14 @@ program define pip_info, rclass
 		//========================================================
 		// setup
 		//========================================================
-			local curframe = c(frame)
+		local curframe = c(frame)
 		//------------ version
+		if ("${pip_version}" == "") {
+			pip_timer pip_info.pip_versions, on
+			pip_versions, `release' `ppp_year' `identity' `version'	
+			pip_timer pip_info.pip_versions, off
+		}
+		
 		
 		local version_qr = "&version=${pip_version}"
 		tokenize "${pip_version}", parse("_")
@@ -32,8 +42,8 @@ program define pip_info, rclass
 		//------------ Get auxiliary data
 		pip_auxframes
 		
-			
-			
+		
+		
 		local frlkupwr "_pip_lkup_wrk"
 		local frlkupb  "_pip_lkupb`_version'"
 		frame copy `frlkupb' `frlkupwr', replace

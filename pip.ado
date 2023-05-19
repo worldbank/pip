@@ -31,6 +31,14 @@ program define pip, rclass
 	mata: pip_retlist2locals("`r(optnames)'")
 	if ("`subcmd'" == "") local subcmd "cl"  // country-level       
 	
+	//------------ Print timer`
+	if ("`subcmd'" == "print") {
+		if ("`timer'" != "") {
+			pip_timer, printtimer
+			exit
+		}
+	}
+	
 	//------------ Start timer
 	pip_timer
 	pip_timer pip, on
@@ -68,6 +76,7 @@ program define pip, rclass
 	pip_new_session , `pause'
 	pip_timer pip.pip_new_session, off
 	
+	local curframe = c(frame)
 	
 	//========================================================
 	// Early returns
@@ -80,9 +89,6 @@ program define pip, rclass
 		pip_timer pip, off `printtimer'
 		exit
 	}
-	
-	local curframe = c(frame)
-	
 	
 	//------------Cleaup
 	if regexm("`subcmd'", "^clean") {
@@ -153,7 +159,8 @@ program define pip, rclass
 	
 	//------------Info
 	if regexm("`subcmd'", "^info") {
-		noi pip_info, `clear' `pause' `version'
+		noi pip_info, `clear' `pause' `release' `ppp_year' /* 
+		 */ `identity' `version'	
 		return add 
 		exit
 	}	
