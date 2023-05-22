@@ -309,6 +309,7 @@ void pip_reverse_macro(string scalar name, | /*
 	string colvector M
 	real   colvector o
 	pointer(real scalar function) scalar fn
+	real scalar rv
 	
 	if (args() == 1) islocal = 1
 	else {
