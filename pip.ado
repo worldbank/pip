@@ -232,6 +232,8 @@ Notes:
 
 Version Control:
 
+*! version 0.10.0.9000       <2023May22>
+*! -- Fix circularity when building MATA library.
 *! version 0.10.0           <2023May19>
 *! -- Complete refactoring of pip. many breaking changes
 *! -- All callings of data are done with pip_get

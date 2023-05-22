@@ -42,7 +42,7 @@ disp "`toins'"
 
 
 make pip, replace toc pkg                         ///  readme
-		version(0.10.0)                          ///
+		version(0.10.0.9000)                          ///
     license("MIT")                                                          ///
     author("R.Andres Castaneda")                                            ///
     affiliation("The World Bank")                                           ///
