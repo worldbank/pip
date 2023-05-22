@@ -289,6 +289,45 @@ void pip_time_print_info(struct pip_time_info scalar r)
 	
 }
 
+//========================================================
+// Reverse macro order
+//========================================================
+//------------CReate own functions for built-in 
+function pip_local(x, | y)  {
+	if (args() == 1) return(st_local(x))
+	else             return(st_local(x,y))
+} 
+function pip_global(x, | y)  {
+	if (args() == 1) return(st_global(x))
+	else             return(st_global(x,y))
+}
+
+//------------actual reverse
+void pip_reverse_macro(string scalar name, | /* 
+*/                     real scalar islocal)
+{
+	string colvector M
+	real   colvector o
+	pointer(real scalar function) scalar fn
+	
+	if (args() == 1) islocal = 1
+	else {
+		rv = anyof((0\1), islocal) // right values
+		if (rv == 0) {
+			_error("islocal must be either 0 or 1")
+		}
+	}
+	if (islocal == 1) fn = &pip_local()
+	else              fn = &pip_global()
+	
+	
+	M = tokens((*fn)(name))'
+	o = range(rows(M), 1, 1)
+	M = M[o]
+	
+	(*fn)(name, invtokens(M'))	
+}
+
 
 
 
@@ -384,12 +423,13 @@ Notes:
 Version Control:
 
 *##s
-cap mata: mata drop pip_time*()
+cap mata: mata drop pip_*()
 * cap mata: mata drop pip_time_info()
 
-mata
+mata:
 
 
 end
+
 
 *##e
