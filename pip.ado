@@ -232,6 +232,8 @@ Notes:
 
 Version Control:
 
+*! version 0.10.0.9003       <2023May22>
+*! -- Add dialog box for cache directory
 *! version 0.10.0.9001       <2023May22>
 *! -- Fix issue with pip_find_src
 *! version 0.10.0.9000       <2023May22>

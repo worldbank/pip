@@ -33,7 +33,7 @@ getfiles "*.mata"
 local ms = "`r(files)'"
 
 
-getfiles "pip*.do"
+getfiles "*.dlg"
 local ds = "`r(files)'"
 
 
@@ -42,7 +42,7 @@ disp "`toins'"
 
 
 make pip, replace toc pkg                         ///  readme
-		version(0.10.0.9001)                          ///
+		version(0.10.0.9003)                          ///
     license("MIT")                                                          ///
     author("R.Andres Castaneda")                                            ///
     affiliation("The World Bank")                                           ///
