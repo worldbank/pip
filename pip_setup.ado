@@ -54,7 +54,7 @@ program define pip_setup, rclass
 	
 	// cche dir
 	if ("`subcmd'" == "cachedir") {
-		pip_setup_cachedir, `options'
+		noi pip_setup_cachedir, `options'
 		exit
 	}
 	
@@ -223,7 +223,8 @@ program define pip_setup_cachedir, rclass
 					
 					if (_rc) {
 						db pip_setup_cachedir
-						exit
+						noi disp "{err}NOTE: {res}Abort operation untilcCache directory is either set up or disabled"
+						error
 					}
 					
 					continue, break // exit while
@@ -242,6 +243,7 @@ program define pip_setup_cachedir, rclass
 				local newline `"global pip_cachedir = "`cachedir'""'
 				pip_setup replace, pattern(`"`pattern'"') new(`"`newline'"')
 				pip_setup run
+				noi disp "{res}Cache directory has been set up. If you want to change it, type {cmd:pip_setup cachedir}"
 			}
 		}
 		
