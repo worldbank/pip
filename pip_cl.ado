@@ -138,9 +138,9 @@ program define pip_cl_query, rclass
 		
 		// fill gaps
 		if ("`fillgaps'" != "") local fill_gaps = "true"
-		else                    local fill_gaps = "false"
+		else                    local fill_gaps = ""
 		// reporting level
-		if ("`coverage'" == "") local reporting_level = "all"
+		if ("`coverage'" == "") local reporting_level = ""
 		else                    local reporting_level = "`coverage'"
 		// version
 		local version "${pip_version}"

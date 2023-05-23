@@ -232,6 +232,8 @@ Notes:
 
 Version Control:
 
+*! version 0.10.2       <2023May23>
+*! -- Hot fix on query
 *! version 0.10.1       <2023May22>
 *1 -- Fix bug
 *! -- Add dialog box for cache directory
@@ -279,18 +281,9 @@ Version Control:
 *! -- change all labels to lower cases
 *! -- BREAKING Change: remove distribution estimates from line up estimates. 
 *! version 0.3.8             <2022Oct06>
-*! -- Testing version change
-*! -- Fix bugs
 *! version 0.3.7        <2022Oct06>
-*! -- Add new routines to install and update pip
-*! -- Fix bug in `pip wb, region(WLD)`, which used to return all regions, rather than just WLD.
-*! -- Labels for variables `icp` and `ppp` now depend on the PPP year of the data.
 *! version 0.3.6        <2022Sep08>
-*! -- make it work with new API specifications
-*! -- Fix problem with variable name version
-*! -- Fix problem with variable name version
 *! version 0.3.5        <2022Jul06>
-*! -- Add `asdouble` in all calls of `import delimited`
 *! version 0.3.4        <2022Jun10>
 *! version 0.3.3        <2022may25>
 *! version 0.3.2        <2022apr26>
