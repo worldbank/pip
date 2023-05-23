@@ -99,7 +99,7 @@ program define pip_cache, rclass
 		local nfiles: word count `pc_files'
 		
 		noi disp "{err:Warning:} you will delete `nfiles' cache files." _n ///
-		"Do you want to continue? (Y/n)", _request(_confirm)
+		"Do you want to continue? (Y/n)", _n(2)  _request(_confirm)
 		
 		if (lower("`confirm'") == "y") {
 			foreach f of local pc_files {
