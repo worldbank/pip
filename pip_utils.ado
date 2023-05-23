@@ -202,8 +202,6 @@ program define pip_utils_clicktable
 		}
 	}
 	
-	noi display _n
-	
 end
 
 

@@ -232,8 +232,8 @@ program define pip_cache_info, rclass
 		}
 	}  // end of frame
 	
-	noi disp "{title:Cache data available}"
-	noi disp "{res}Filter your data per parameter"
+	noi disp "{break}{title:Cache data available}"
+	noi disp "{res}Filter your data by parameter"
 	qui frame `hnd' {
 		local novars "hash query"
 		qui ds
@@ -246,7 +246,7 @@ program define pip_cache_info, rclass
 			// 36 is a nice display length ()
 			local l = floor(36/(`vtype'+2))
 			
-			noi pip_utils click, variable(`v') title("{title:`v'} {col 10}{hline 20}") /* 
+			noi pip_utils click, variable(`v') title("{title:`v'}") /* 
 			 */ statacode("pip_cache_info, `v'(obsi) frame(`hnd')") length(`l')
 		}
 	}
