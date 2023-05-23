@@ -55,8 +55,9 @@ program define pip_utils, rclass
 	if ("`subcmd'" == "keepframes") {
 		pip_utils_keep_frame, `frame_prefix' `keepframes' `efficient'
 	}
-	
-	
+	if ustrregexm("`subcmd'", "^click"){
+		pip_utils_clicktable , `variable' `title' `statacode' `length'
+	}
 	
 	
 	
@@ -175,6 +176,37 @@ program define pip_utils_keep_frame
 		
 	} // condition to keep frames
 end
+
+program define pip_utils_clicktable
+	
+	syntax , VARiable(varname) ///
+	[                     ///
+	title(string)         ///
+	STATAcode(string)     ///
+	length(integer 8)     ///
+	]
+	
+	noi disp in y  _n `"`title'"'
+	
+	local statacode: subinstr local statacode "obsi" "`=uchar(96)'obsi`=uchar(39)'", all
+	
+	quietly levelsof `variable' , local(tmp) 
+	local current_line = 0
+	foreach obsi of local tmp {
+		local current_line = `current_line' + 1 
+		local display_this = `"{stata `statacode': `obsi'}"'
+		if (`current_line' < `length') noi display in y `"`display_this'"' _continue 
+		else{
+			noi display in y `"`display_this'"' 
+			local current_line = 0
+		}
+	}
+	
+	noi display _n
+	
+end
+
+
 exit
 /* End of do-file */
 
