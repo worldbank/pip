@@ -232,11 +232,10 @@ Notes:
 
 Version Control:
 
-*! version 0.10.0.9003       <2023May22>
+*! version 0.10.0.9004       <2023May22>
+*1 -- Fix bug
 *! -- Add dialog box for cache directory
-*! version 0.10.0.9001       <2023May22>
 *! -- Fix issue with pip_find_src
-*! version 0.10.0.9000       <2023May22>
 *! -- Fix circularity when building MATA library.
 *! version 0.10.0           <2023May19>
 *! -- Complete refactoring of pip. many breaking changes
