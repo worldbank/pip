@@ -14,183 +14,434 @@ Output:             dta
 0: Program set up
 ==================================================*/
 program define pip_cl, rclass
-syntax ,   server(string)        ///
-handle(string)        ///
-[                       ///
-country(string)       ///
-year(string)          ///
-povline(numlist)      ///
-ppp_year(numlist)          ///
-coverage(string)      /// 
-clear                 ///
-pause                 /// 
-iso                   /// 
-noDIPSQuery           /// 
-version(string)       ///
-]
-
-version 16.0
-
-if ("`pause'" == "pause") pause on
-else                      pause off
-
-qui {
-	/*==================================================
-	conditions and setup 
-	==================================================*/
+	syntax ///
+	[ ,                             /// 
+	COUntry(string)                 /// 
+	REGion(string)                  /// 
+	YEAR(string)                    /// 
+	POVLine(numlist)                /// 
+	POPShare(numlist)	   	          /// 
+	FILLgaps                        /// 
+	PPP_year(numlist)               ///
+	COVerage(string)                /// 
+	CLEAR                           /// 
+	SERver(string)                  /// 
+	pause                           /// 
+	POVCALNET_format                ///
+	replace                         ///
+	cacheforce                      ///
+	n2disp(passthru)                ///
+	] 
 	
+	version 16.0
 	
-	local base = "`server'/`handle'/pip"
+	pip_timer pip_cl, on
 	
+	if ("`pause'" == "pause") pause on
+	else                      pause off
 	
-	if ("`povline'" == "")  local povline  1.9
-	if ("`ppp_year'" == "")      local ppp_year      -1
-	if ("`coverage'" == "") local coverage -1
-	
-	*---------- download guidance data
-	pip_info, clear justdata `pause' 
-	
-	tempname pip_lkup
-	frame copy _pip_lkupb `pip_lkup', replace
-	
-	frame `pip_lkup' {
-		
-		
-		
-		
-		levelsof country_code, local(countries) clean
-		if (lower("`country'") != "all") {
-			
-			local uniq_country : list uniq country
-			
-			local ncountries: list uniq_country  - countries
-			local avai_country: list uniq_country  & countries
-			
-			local countries:  list country | avai_country
-			
-		}
-		
-		if ("`ncountries'" != "") {
-			if wordcount("`ncountries'") == 1 local be "is"
-			if wordcount("`ncountries'") > 1 local be "are"
-			
-			noi disp as err "Warning: " _c
-			noi disp as input `"`ncountries' `be' not part of the country list"' /* 
-			*/ _n "available in PIP. See {stata povcalnet info}"
-			
-		}	
-		
-		if ("`countries'" == "") {
-			noi disp in red "None of the countries provided in {it:country()} is available in PIP"
+	qui {
+		//========================================================
+		// setup
+		//========================================================
+		//------------ setup 
+		if ("${pip_version}" == "") {
+			noi disp "{err}No version selected."
 			error
 		}
+		tokenize "${pip_version}", parse("_")
+		local ppp_year  `3'
+		//------------ Get auxiliary data
+		pip_auxframes
 		
-		*---------- alternative macros
-		local ct = "`countries'" 
-		local pl = "`povline'" 
-		local pp = "`ppp'"     
-		local yr = "`year'"    
-		local cv = "`coverage'"
+		//========================================================
+		// Build query (queries returned in ${pip_last_queries}) 
+		//========================================================
+		pip_cl_query, country(`country') region(`region') year(`year') ///
+		povline(`povline') popshare(`popshare')  `fillgaps' ///
+		ppp(`ppp_year') coverage(`coverage') 
 		
-		/*==================================================
-		1: Evaluate parameters
-		==================================================*/
+		//========================================================
+		// Getting data
+		//========================================================
 		
-		*----------1.1: counting words
+		//------------ download
+		pip_timer pip_cl.pip_get, on
+		pip_get, `clear' `cacheforce'
+		pip_timer pip_cl.pip_get, off
 		
-		local nct = wordcount("`ct'")  // number of countries
-		local npl = wordcount("`pl'")  // number of poverty lines
-		local npp = wordcount("`pp'")  // number of PPP values
-		local nyr = wordcount("`yr'")  // number of years
-		local ncv = wordcount("`cv'")  // number of coverage
+		//------------ clean
+		pip_timer pip_cl_clean, on
+		pip_cl_clean
+		pip_timer pip_cl_clean, off
 		
-		matrix A = `nct' \ `npl' \ `npp' \ `nyr' \ `ncv'
-		mata:  A = st_matrix("A"); /* 
-		*/    B = ((A :== A[1]) + (A :== 1) :>= 1); /* 
-		*/    st_local("m", strofreal(mean(B)))
+		//------------ Add data notes
+		if ("`fillgaps'" == "") local lvlabel "country level"	 
+		else local lvlabel "Country level (lined up)"
 		
-		if (`m' != 1) {
-			noi disp in r "number of elements in options {it:povline(), ppp(), year()} and " _n /* 
-			*/ "{it:coverage()} must be equal to 1 or to the number of countries in option {it:country()}"
-			error 197
+		local datalabel "WB poverty at `lvlabel'"
+		local datalabel = substr("`datalabel'", 1, 80)
+		
+		label data "`datalabel' (`c(current_date)')"
+		
+		//------------ display results
+		noi pip_cl_display_results, `n2disp'
+		
+		//------------ Povcalnet format
+		
+		if ("`povcalnet_format'" != "") {
+			noi disp "{p 2 4 2 70}{err}Warning: {res}option {it:povcalnet_format}" /* 
+		 */	" is meant for replicability purposes only or to be used in Stata code " /* 
+		 */ "that still executes the deprecated {cmd:povcalnet} command.{p_end}"
+			
+			pip_cl_povcalnet
 		}
 		
-		*----------1.2: Expand macros of size one
-		local n = _n
-		foreach o in pl pp yr cv {
-			if (`n`o'' == 1) {
-				local `o': disp _dup(`nct') " ``o'' "
-			}
+		
+	}
+	pip_timer pip_cl, off
+end 
+
+
+//========================================================
+// Sub programs
+//========================================================
+
+//------------ Build CL query
+
+program define pip_cl_query, rclass
+	version 16
+	syntax ///
+	[ ,                             /// 
+	COUntry(string)                 /// 
+	REGion(string)                  /// 
+	YEAR(string)                    /// 
+	POVLine(numlist)                /// 
+	POPShare(numlist)	   	          /// 
+	PPP(numlist)                    /// 
+	COVerage(string)                /// 
+	FILLgaps                        /// 
+	] 
+	
+	//========================================================
+	// conditions and set up
+	//========================================================
+	qui {
+		
+		// country
+		local country = stritrim(ustrtrim("`country'"))
+		local country : subinstr local country " " ",", all
+		if ("`country'" == "") local country = "all"
+		// year
+		local year: subinstr local year " " ",", all
+		if ("`year'" == "") local year = "all"
+		
+		// fill gaps
+		if ("`fillgaps'" != "") local fill_gaps = "true"
+		else                    local fill_gaps = "false"
+		// reporting level
+		if ("`coverage'" == "") local reporting_level = "all"
+		else                    local reporting_level = "`coverage'"
+		// version
+		local version "${pip_version}"
+		
+		//========================================================
+		// build query... THE ORDER IS VERY IMPORTANT
+		//========================================================
+		
+		local params = "country year ppp fill_gaps " + ///
+		"reporting_level version welfare_type" 
+		
+		
+		foreach p of local params {
+			if (`"``p''"' == `""') continue
+			local query "`query'`p'=``p'' "
+		}
+		local query = ustrtrim("`query'")
+		local query : subinstr local query " " "&", all
+		
+		
+		//========================================================
+		//  Povline and Popshare are different
+		//========================================================
+		
+		
+		local optname = cond("`povline'" != "", "povline", "popshare")
+		
+		local endpoint "pip"
+		if ("``optname''" == "") {
+			global pip_last_queries "`endpoint'?`query'&format=csv"
+			exit
 		}
 		
-		/*==================================================
-		2:  Download data
-		==================================================*/
 		
-		*----------2.1: download data
-		tempfile clfile
-		local queryfull "`base'?format=csv"
-		return local queryfull = "`queryfull'"
+		tempname M
+		local i = 1
+		foreach v of local `optname' {
+			// each povline or popshare + format
+			local queryp = "`endpoint'?`query'&`optname'=`v'&format=csv" 
+			if (`i' == 1) mata: `M' = "`queryp'"
+			else            mata: `M' = `M' , "`queryp'"
+			local ++i
+		}
 		
-	} // end of temp frame
-	
-	
-	cap import delimited  "`queryfull'", `clear' asdouble
-	if (_rc) {
-		noi dis ""
-		noi dis in red "It was not possible to download data from the PIP API."
-		noi dis ""
-		noi dis in white `"(1) Please check your Internet connection by "' _c 
-		noi dis in white  `"{browse "`server'/`handle'/health-check" :clicking here}"'
-		noi dis in white `"(2) Test that the data is retrievable. By"' _c
-		noi dis in white  `"{stata pip test: clicking here }"' _c
-		noi dis in white  "you should be able to download the data."
-		noi dis in white `"(3) Please consider adjusting your Stata timeout parameters. For more details see {help netio}"'
-		noi dis in white `"(4) Please send us an email to:"'
-		noi dis in white _col(8) `"email: data@worldbank.org"'
-		noi dis in white _col(8) `"subject: pip query error on `c(current_date)' `c(current_time)'"'
-		noi di ""
-		error 673
+		mata: st_global("pip_last_queries", invtokens(`M'))
 	}
 	
-	*---------- 2.2 create filter conditions in loop
-	local j = 0
-	local n = 1
-	local kquery = ""   // whole filter condition to extract data
-	foreach ict of local countries {
-		
-		* corresponding element to each country
-		foreach o in pl yr pp cv {
-			local i`o': word `n' of ``o''
-		}
-		
-		*---------- coverage
-		if inlist("`icv'", "-1", "all") & ("`ipp'" == "-1") {
-			local kquery "`kquery' | (country_code == "`ict'" & reporting_year == `iyr')"
-			return local kquery_`j' = "`kquery_`j''"
-		} 
-		else if inlist("`icv'", "-1", "all") & ("`ipp'" != "-1") {
-			local kquery "`kquery' | (country_code == "`ict'"  & reporting_year == `iyr'  & ppp ==  "`ipp'")"
-			return local kquery_`j' = "`kquery_`j''"
-		}
-		else if !inlist("`icv'", "-1", "all") & ("`ipp'" == "-1") {
-			local kquery "`kquery' | (country_code == "`ict'"  & reporting_year == `iyr'  & survey_coverage == "`icv'")"
-			return local kquery_`j' = "`kquery_`j''"
-		} 
-		else {
-			local kquery "`kquery' | (country_code == "`ict'"  & reporting_year == `iyr'  & ppp ==  "`ipp'"  & survey_coverage == "`icv'")"
-			return local kquery_`j' = "`kquery_`j''"
-		}
-		
-		local ++j
-		local ++n
-	} 
-	
-	local kquery : subinstr  local kquery  "|" " "
-	keep if `kquery'
-	
-}
 end
+
+
+//------------Clean Cl data
+
+program define pip_cl_clean, rclass
+	
+	version 16
+	
+	//========================================================
+	//  setup
+	//========================================================
+	if ("${pip_version}" == "") {
+		noi disp "{err}No version selected."
+		error
+	}
+	local version = "${pip_version}"
+	tokenize "`version'", parse("_")
+	local _version   = "_`1'_`3'_`9'"
+	local ppp_version = `3'
+	
+	//========================================================
+	//  Dealing with invalid values
+	//========================================================
+	*rename  prmld  mld
+	qui {
+		
+		foreach v of varlist polarization median gini mld decile? decile10 {
+			cap replace `v'=. if `v'==-1 | `v' == 0
+		}
+		
+		cap drop if ppp==""
+		cap drop  svyinfoid
+		
+		
+		//========================================================
+		// labels
+		//========================================================
+		
+		//------------ Survey coverage
+		tostring survey_coverage, replace
+		replace survey_coverage = "1" if survey_coverage == "rural"
+		replace survey_coverage = "2" if survey_coverage == "urban"
+		replace survey_coverage = "3" if survey_coverage == "national"
+		
+		destring survey_coverage, force replace
+		label define survey_coverage 1 "rural"     /* 
+		*/                       2 "urban"     /* 
+		*/                       3 "national", modify
+		
+		label values survey_coverage survey_coverage
+		
+		//------------Welfare type
+		replace welfare_type = "1" if welfare_type == "consumption"
+		replace welfare_type = "2" if welfare_type == "income"
+		destring welfare_type, force replace
+		label define welfare_type 1 "consumption" 2 "income", modify
+		label values welfare_type welfare_type
+		
+		//------------ All variables
+		label var country_code		  "country/economy code"
+		label var country_name 		  "country/economy name"
+		label var region_code 		  "region code"
+		label var region_name 		  "region name"
+		label var survey_coverage   "survey coverage"
+		label var reporting_year	  "year"
+		label var survey_year 		  "survey year"
+		label var welfare_type 		  "welfare measured by income or consumption"
+		label var is_interpolated 	"data is interpolated"
+		label var distribution_type "data comes from grouped or microdata"
+		label var ppp 				      "`ppp_version' purchasing power parity"
+		label var poverty_line 		  "poverty line in `ppp_version' PPP US\$ (per capita per day)"
+		label var mean				      "average daily per capita income/consumption `ppp_version' PPP US\$"
+		label var headcount 		    "poverty headcount"
+		label var poverty_gap 		  "poverty gap"
+		label var poverty_severity 	"squared poverty gap"
+		label var watts 			      "watts index"
+		label var gini 				      "gini index"
+		label var median 			      "median daily per capita income/consumption in `ppp_version' PPP US\$"
+		label var mld 				      "mean log deviation"
+		label var reporting_pop 	  "polarization"
+		label var reporting_pop     "population in year"
+		
+		ds decile*
+		local vardec = "`r(varlist)'"
+		foreach var of local vardec {
+			if regexm("`var'", "([0-9]+)") local q = regexs(1)
+			label var `var' "decile `q' welfare share"
+		}
+		
+		label var reporting_level 	   "reporting data level"
+		label var survey_acronym 	     "survey acronym"     
+		label var survey_comparability "survey comparability"
+		label var comparable_spell 	   "comparability over time at country level"   
+		label var cpi 				         "consumer price index (CPI) in `ppp_version' base"
+		label var reporting_gdp 	     "GDP per capita in constant 2015 US\$, annual calendar year"
+		label var reporting_pce 	     "HFCE per capita in constant 2015 US\$, annual calendar year"
+		
+		//========================================================
+		//  Sorting and Formatting
+		//========================================================
+		
+		//------------Sorting
+		sort country_code reporting_year survey_coverage 
+		
+		//------------ Formatting
+		format headcount poverty_gap poverty_severity watts  gini mld ///
+		decile*  mean polarization  /* survey_mean_ppp */  cpi %8.4f
+		
+		* format ppp survey_mean_lcu  %10.2fc
+		format reporting_gdp  reporting_pce %15.2fc
+		
+		format reporting_pop %15.0fc
+		
+		format poverty_line %6.2f
+		
+		//------------ renaming variables
+		local old survey_year reporting_year reporting_gdp reporting_pce /* 
+		*/	        reporting_pop
+		local new welfare_time year gdp hfce population
+		rename (`old') (`new')
+		
+		
+		//------------survey_time
+		
+		local frpipfw "_pip_fw`_version'"
+		
+		tempname frfw
+		frame copy `frpipfw' `frfw'
+		frame `frfw' {  
+			drop year
+			rename reporting_year year
+		}
+		
+		frlink m:1 country_code year welfare_type, frame(`frfw') 
+		frget survey_time, from(`frfw')
+		
+		//------------ Ordering vars
+		order country_code country_name region_code                /*
+		*/    region_name reporting_level year welfare_time        /*
+		*/    welfare_type poverty_line mean headcount             /*
+		*/    poverty_gap  poverty_severity watts gini             /*
+		*/    median mld polarization population decile? decile10  /*
+		*/    cpi ppp gdp hfce survey_comparability                /*
+		*/    survey_acronym  survey_time  is_interpolated         /*
+		*/    distribution_type survey_coverage
+		
+		
+		//------------remaining labels
+		label var welfare_time "time income or consumption refers to"
+		label var survey_time  "time of survey in the field"
+		
+		//------------drop unnecesary variables
+		cap drop estimation_type
+		
+		if ("`fillgaps'" != "") {
+			drop ppp survey_time distribution_type gini mld polarization decile* median
+		}
+		
+		//missings dropvars, force
+		// drop var where all obs are missing
+		
+		pip_utils dropvars
+		
+	}			
+end
+
+//------------ display results
+program define pip_cl_display_results
+	
+	syntax , [n2disp(numlist)]
+	
+	if ("`n2disp'" == "") local n2disp 1
+	local n2disp = min(`c(N)', `n2disp')
+	
+	if (`n2disp' > 1) {
+		noi di as res _n "{ul: first `n2disp' observations}"
+	} 
+	else	if (`n2disp' == 1) {
+		noi di as res _n "{ul: first observation}"
+	}
+	else {
+		noi di as res _n "{ul: No observations available}"
+	}	
+	
+	sort country_code year
+	local varstodisp "country_code year poverty_line headcount mean median welfare_type"
+	local sepby "country_code"
+	
+	foreach v of local varstodisp {
+		cap confirm var `v', exact
+		if _rc continue 
+		local v2d "`v2d' `v'"
+	}
+	
+	noi list `v2d' in 1/`n2disp',  abbreviate(12)  sepby(`sepby') noobs
+	
+	
+end
+
+
+program define pip_cl_povcalnet
+	ren year       requestyear
+	ren population reqyearpopulation
+	
+	
+	local vars1 country_code region_code reporting_level welfare_time /*
+	*/ welfare_type is_interpolated distribution_type poverty_line poverty_gap /*
+	*/ poverty_severity country_name 
+	
+	local vars2 countrycode regioncode coveragetype datayear datatype isinterpolated usemicrodata /*
+	*/povertyline povgap povgapsqr countryname
+	
+	local i = 0
+	foreach var of local vars1 {
+		local ++i
+		cap confirm var `var', exact
+		if _rc continue
+		rename `var' `: word `i' of `vars2''
+	}	
+	
+	local keepvars  countrycode countryname regioncode coveragetype requestyear /* 
+	*/ datayear datatype isinterpolated usemicrodata /*
+	*/ ppp povertyline mean headcount povgap povgapsqr watts gini /* 
+	*/ median mld polarization reqyearpopulation decile? decile10
+	
+	foreach v of local keepvars {
+		cap confirm var `v', exact
+		if _rc continue
+		local tokeep "`tokeep' `v'"
+	}
+	keep  `tokeep'
+	order `tokeep'
+	
+	
+	* Standardize names with R package	
+	local Snames requestyear reqyearpopulation 
+	
+	local Rnames year population 
+	
+	local i = 0
+	foreach var of local Snames {
+		local ++i
+		rename `var' `: word `i' of `Rnames''
+	}
+	
+	sort countrycode year coveragetype
+	
+	//------------ Convert to monthly values
+	replace mean = mean * (360/12)
+	replace median = median * (360/12)
+	
+end 
+
 exit
 /* End of do-file */
 

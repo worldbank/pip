@@ -52,7 +52,7 @@ if ("`subcommand'" == "update") {
 		github install `username'/`cmd', replace
 		cap window stopbox note "pip command has been reinstalled to " ///
 		"keep record of new updates. Please type {stata discard} and retry."
-		global pip_cmds_ssc = ""
+		global pip_old_session = ""
 		exit 
 	}
 	local ghfile "`r(fn)'"
@@ -68,7 +68,7 @@ if ("`subcommand'" == "update") {
 			github install `username'/`cmd', replace
 			cap window stopbox note "pip command has been reinstalled to " ///
 			"keep record of new updates. Please type discard and retry."
-			global pip_cmds_ssc = ""
+			global pip_old_session = ""
 			exit 
 		}
 		if _N > 1 {
@@ -115,7 +115,7 @@ if ("`subcommand'" == "update") {
 		github install `username'/`cmd', replace version(`latestversion')
 		cap window stopbox note "pip command has been reinstalled to " ///
 		"keep record of new updates. Please type discard and retry."
-		global pip_cmds_ssc = ""
+		global pip_old_session = ""
 		exit 
 	}
 	
