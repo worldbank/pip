@@ -223,7 +223,7 @@ program define pip_setup_cachedir, rclass
 					
 					if (_rc) {
 						db pip_setup_cachedir
-						noi disp "{err}NOTE: {res}Abort operation untilcCache directory is either set up or disabled"
+						noi disp "{err}NOTE: {res}Abort operation until cache directory is either set up or disabled"
 						error
 					}
 					
