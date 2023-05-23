@@ -47,7 +47,8 @@ BEGIN
  			 put " cachedir(no)"
  			}
  			else {
- 				optionarg d.cachedir
+				 put " cachedir(" d.cachedir
+				 put ")"
  			}
   
 //	put "local "

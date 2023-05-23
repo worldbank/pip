@@ -206,12 +206,12 @@ program define pip_setup_cachedir, rclass
 	
 	qui {
 		
+		tempname direxist
 		if ("`cachedir'" == "") {
 			// find folder to store setup.do
 			local pdirs `" "`c(sysdir_personal)'" "`c(sysdir_plus)'" "`c(pwd)'" "`c(sysdir_site)'" "'
 			
 			tokenize `"`pdirs'"'
-			tempname direxist
 			scalar `direxist' = 0
 			while ("`1'" != "") {
 				mata: st_local("cachedir", pathjoin("`1'", "pip_cache"))
@@ -234,7 +234,7 @@ program define pip_setup_cachedir, rclass
 		} // if cache dir is empty
 		
 		
-		if (!inlist("`cachedir'", "")) {
+		if ("`cachedir'" != "") {
 			if (lower("`cachedir'") == "no") local cachedir = 0
 			mata: st_numscalar("`direxist'", pip_check_folder("`cachedir'"))
 			if (`direxist' == 1 )  {
