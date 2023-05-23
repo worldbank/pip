@@ -223,6 +223,7 @@ program define pip_setup_cachedir, rclass
 					
 					if (_rc) {
 						db pip_setup_cachedir
+						exit
 					}
 					
 					continue, break // exit while

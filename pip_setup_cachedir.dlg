@@ -41,7 +41,7 @@ BEGIN
 	
 	
 	
- put "pip_setup_cachedir"
+ put "pip_setup cachedir"
  put ", "
       if (d.cachedir.iseq("")) {
  			 put " cachedir(no)"
