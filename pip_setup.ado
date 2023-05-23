@@ -217,15 +217,12 @@ program define pip_setup_cachedir, rclass
 				mata: st_local("cachedir", pathjoin("`1'", "pip_cache"))
 				mata: st_numscalar("`direxist'", pip_check_folder("`cachedir'"))
 				if (`direxist' == 1 )  {
-					capture window stopbox rusure ///
+					cap window stopbox rusure ///
 					`"Do you want to use directory "`cachedir'" to store PIP cache data?"' ///
-					`"If not, click "No" and provide an alternative directory path in the console."' ///
-					`"If yo don't want to store any PIP cache, click "No" and type "NO" in the console"'
+					`"If you don't, click "No" and provide an alternative directory path in the console."'
 					
 					if (_rc) {
-						noi disp "{res} provide an alternative directory path to store PIP cache data." _n ///
-						`" {res} If you don't want to store any PIP cache, type {txt}NO"', /// 
-						_request(_cachedir)
+						db pip_setup_cachedir
 					}
 					
 					continue, break // exit while

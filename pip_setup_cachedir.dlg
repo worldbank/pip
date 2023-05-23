@@ -1,0 +1,64 @@
+* developed by R.Andres Castaneda based on E. F. Haghish - 2018
+
+VERSION 16
+POSITION . . 410 120
+
+DIALOG d, label("PIP-Setup Cache Directory") 
+BEGIN				 
+	
+	//---------------------
+	// File content
+	//---------------------
+	
+	// select installable files
+	TEXT tx_doinfo  10  20  . ., label("Provide an alternative directory path to store PIP cache data.")
+	
+	TEXT tx_doinfo2  10  +20  . ., label("If you don't want to store any PIP cache, leave blank")
+	
+	
+	// Path
+	TEXT tx_dir  10   +30  . 290, label("Directory path")
+	FILE cachedir    100    @  200  .  , label("Browse ...")        ///
+        directory option(path)
+		
+	
+END
+
+OK ok1,      label("OK")
+CANCEL can1, label("Cancel")
+SUBMIT sub1, label("Submit")
+HELP hlp1,   view("help usersite")
+RESET res1
+COPY copy1
+
+
+// ---------------------------------------------------------
+// MAKE COMMAND
+// =========================================================
+PROGRAM command
+BEGIN
+	
+	
+	
+	
+// put "pip_setup_cachedir"
+// put ", "
+//      if (d.cachedir.iseq("")) {
+// 			 put " cachedir(no)"
+// 			}
+// 			else {
+// 				optionarg d.cachedir
+// 			}
+  
+	put "local "
+				if (d.cachedir.iseq("")) {
+				 put " cachedir  no"
+				}
+				else {
+					put " cachedir " d.cachedir
+				}
+  
+
+
+END
+
