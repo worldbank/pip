@@ -232,7 +232,7 @@ Notes:
 
 Version Control:
 
-*! version 0.10.0.9006       <2023May22>
+*! version 0.10.1       <2023May22>
 *1 -- Fix bug
 *! -- Add dialog box for cache directory
 *! -- Fix issue with pip_find_src
