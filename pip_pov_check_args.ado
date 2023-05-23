@@ -64,12 +64,12 @@ program define pip_pov_check_args, rclass
 	
 	
 	*---------- Coverage
-	if ("`coverage'" == "") local coverage = "all"
+	if ("`coverage'" == "") local coverage = ""
 	local coverage = lower("`coverage'")
 	
 	foreach c of local coverage {	
 		
-		if !inlist(lower("`c'"), "national", "rural", "urban", "all") {
+		if !inlist(lower("`c'"), "national", "rural", "urban", "") {
 			noi disp in red `"option {it:coverage()} must be "national", "rural",  "urban" or "all" "'
 			error
 		}	
