@@ -76,7 +76,7 @@ program define pip_cache, rclass
 	}
 	
 	/*==================================================
-	3: saves
+	3: save
 	==================================================*/
 	
 	if ("`subcmd'" == "save") {
@@ -95,7 +95,7 @@ program define pip_cache, rclass
 	//========================================================
 	
 	if ("`subcmd'" == "delete") {
-		local pc_files: dir "${pip_cachedir}" files  "_pc*"
+		local pc_files: dir "${pip_cachedir}" files  "_pip*"
 		local nfiles: word count `pc_files'
 		
 		noi disp "{err:Warning:} you will delete `nfiles' cache files." _n ///
