@@ -96,8 +96,9 @@ program define pip_cache, rclass
 			
 			//------------ write cache infor file
 			
+			mata: st_local("fuse", pathjoin("${pip_cachedir}", "pip_cache_info.txt"))
 			tempname hd
-			file open `hd' using "${pip_cachedir}/pip_cache_info.txt", write append
+			file open `hd' using "`fuse'", write append
 			file write `hd' "`piphash' , `query'" _n
 			file close `hd'
 			
@@ -320,6 +321,7 @@ program define pip_cache_info, rclass
 				*/ statacode(`"pip_cache info, `condition' frame(`frame2')"') /* 
 				*/ length(`l')
 			} // end for parameters loop
+			disp _n
 			
 		} // end if more than one data available
 		else {
@@ -359,7 +361,9 @@ program define pip_cache_info, rclass
 			noi disp "{p2line}" 
 			
 			//------------ Build  Stata calls
-			local duse    `"use "${pip_cachedir}/`hash'.dta", clear "'
+			mata: st_local("fuse", pathjoin("${pip_cachedir}", "`hash'.dta"))
+			* local duse    `"use "${pip_cachedir}/`hash'.dta", clear "'
+			local duse    `"use "`fuse'", clear "'
 			local ddelete `"pip_cache delete,  piphash(`hash')"'
 			
 			noi disp "{break}{pstd}{ul:{res:ACTION}}{p_end}" _n /* 
