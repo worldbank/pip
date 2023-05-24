@@ -139,6 +139,10 @@ program define pip, rclass
 			pip_cache `iscache'
 			return add
 		}
+		if ("`info'" != "") {
+			pip_cache info
+			return add
+		}
 		
 		exit
 	}

@@ -35,6 +35,7 @@ program define pip_cache, rclass
 	
 	if ("`subcmd'" == "info") {
 		noi pip_cache_info, `options'
+		return add
 		exit
 	}
 	
@@ -362,7 +363,6 @@ program define pip_cache_info, rclass
 			
 			//------------ Build  Stata calls
 			mata: st_local("fuse", pathjoin("${pip_cachedir}", "`hash'.dta"))
-			* local duse    `"use "${pip_cachedir}/`hash'.dta", clear "'
 			local duse    `"use "`fuse'", clear "'
 			local ddelete `"pip_cache delete,  piphash(`hash')"'
 			
@@ -374,7 +374,14 @@ program define pip_cache_info, rclass
 			
 			*##e
 		} // end of else 
-	} // end of frame2 
+	} // end of frame2
+	
+	return local cache_file = "`fuse'"
+	return local piphash    = "`hash'"
+	return local f_json     = "`injson'"
+	return local f_csv      = "`incsv'"
+	return local host       = "`host'"
+	return local endpoint   = "`endpoint'"
 	
 end
 
