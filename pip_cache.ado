@@ -109,7 +109,7 @@ program define pip_cache, rclass
 	//========================================================
 	
 	if ("`subcmd'" == "delete") {
-		pip_cache_delete, piphash(`piphash')
+		noi pip_cache_delete, piphash(`piphash')
 		
 	}
 	
@@ -195,6 +195,8 @@ program define pip_cache_delete, rclass
 		local cfile "${pip_cachedir}/pip_cache_info.txt"
 		mata: pip_replace_in_pattern("`cfile'", `"`piphash'"', `""')
 		copy `tempf' "`origf'" , replace 
+		
+		noi disp "cache {res:`piphash'} deleted"
 		
 	}
 	
