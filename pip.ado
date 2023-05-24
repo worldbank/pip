@@ -105,7 +105,7 @@ program define pip, rclass
 		}
 		local sscmd: word 2 of `subcmd'
 		pip_timer pip.pip_install, on
-		noi pip_install `sscmd', `path' `pause'
+		noi pip_install `sscmd', `path' `pause' `version'
 		pip_timer pip.pip_install, off
 		exit
 	}
