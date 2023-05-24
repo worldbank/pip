@@ -186,11 +186,11 @@ program define pip_utils_clicktable
 	length(integer 8)     ///
 	]
 	
+	quietly levelsof `variable' , local(tmp)
+	if (`"`tmp'"' == `""') exit
 	noi disp in y  _n `"`title'"'
-	
 	local statacode: subinstr local statacode "obsi" "`=uchar(96)'obsi`=uchar(39)'", all
 	
-	quietly levelsof `variable' , local(tmp) 
 	local current_line = 0
 	foreach obsi of local tmp {
 		local current_line = `current_line' + 1 

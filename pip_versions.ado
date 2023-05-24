@@ -90,9 +90,15 @@ program define pip_versions, rclass
 			frame create `fversions'
 			
 			frame `fversions' {
-				import delimited using "${pip_host}/versions?format=csv", clear varn(1) asdouble
-				keep version
+				pip_timer pip_version.pip_get, on
 				
+				global pip_tmp_query = "versions?format=csv"
+				pip_get , clear gname(pip_tmp_query)
+				global pip_tmp_query ""
+				
+				pip_timer pip_version.pip_get, off
+				
+				keep version
 				//------------* Split and rename 
 				split version, parse("_") generate(sp)
 				local sp_names "release ppp_year ppp_rv ppp_av identity"

@@ -9,9 +9,11 @@ Creation Date:    12 May 2023 - 11:32:30
 0: Program set up
 ==================================================*/
 program define pip_get, rclass
-	syntax , [ clear cacheforce]
+	syntax , [ clear cacheforce gname(string)]
 	
 	if (c(changed) != 1 & "`clear'" == "") error 4
+	
+	if ("`gname'" == "") local gname pip_last_queries
 	
 	tempname tempframe
 	frame create `tempframe'
@@ -19,7 +21,7 @@ program define pip_get, rclass
 		tempfile fpip_get
 		save `fpip_get', empty
 		
-		foreach query of global pip_last_queries {
+		foreach query of global `gname' {
 			local queryfull "${pip_host}/`query'"
 			
 			pip_cache load, query("`queryfull'") `cacheforce' `clear'

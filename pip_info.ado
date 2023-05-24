@@ -42,8 +42,6 @@ program define pip_info, rclass
 		//------------ Get auxiliary data
 		pip_auxframes
 		
-		
-		
 		local frlkupwr "_pip_lkup_wrk"
 		local frlkupb  "_pip_lkupb`_version'"
 		frame copy `frlkupb' `frlkupwr', replace
