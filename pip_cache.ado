@@ -369,7 +369,7 @@ program define pip_cache_info, rclass
 			noi disp "{break}{pstd}{ul:{res:ACTION}}{p_end}" _n /* 
 			*/ `"{pmore}{stata `"`duse'"':use}{p_end}"' _n /* 
 			*/ `"{pmore}{browse "`injson'":see in browser}{p_end}"' _n /* 
-			*/ `"{pmore}{browse "`incsv'":download csv}{p_end}"' _n /* 
+			*/ `"{pmore}{browse "`incsv'":download .csv}{p_end}"' _n /* 
 			*/ `"{pmore}{stata `"`ddelete'"':delete}{err: {it: (use with caution)}}{p_end}"' 
 			
 			*##e
