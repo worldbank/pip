@@ -172,8 +172,11 @@ The following only work with subcommand {cmd:cl}
 {synoptset 27 tabbed}{...}
 {synopthdr:cache}
 {synoptline}
-{synopt :{opt info}}Displays interactive information of cache data in local memory.{p_end}
-{synopt :{opt delete}}Deletes {p_end}
+{synopt :{opt info}}Displays interactive information of cache local memory.{p_end}
+{synopt :{opt delete}}Deletes cache local memory{p_end}
+{synopt :{opt cachedir(path}}displays or deletes cache in that particular 
+directory. Seldom used. {p_end}
+{synopt :{opt iscache}}Checks whether or not the data loaded has been cached{p_end}
 {synoptline}
 
 
