@@ -21,7 +21,7 @@ help for {cmd:pip}{right:R.Andrés Castañeda}
 {hline}
 {title:Stata client for PIP}
 
-{p2colset 9 24 22 2}{...}
+{p2colset 9 22 22 2}{...}
 {p2col :{hi:pip} {hline 2}}Access poverty and inequality data from the 
 World Bank's {browse "https://pip.worldbank.org/":Poverty and Inequality Platform (PIP)}. 
 The {cmd:pip} command allows Stata users to access the poverty and inequality indicators 
@@ -40,38 +40,56 @@ between the indicators in the pip and povcalnet commands. {p_end}
 [{it:{help pip##param:Parameters}} {it:{help pip##options:General options}}]
 
 {p 8 16 2}
-where {it:subcommand} could be {it:cl}, {it:wb}, {it:tables}, {it:info}, 
-{it:setup}, {it:clean}, {it:install}, {it:uninstall}, {it:update}, {it:version},
-{it:cache}, {it:dropframe}, or {it:dropglobal}
+where {it:subcommand} could be {cmd:{it:cl}}, {cmd:{it:wb}}, {cmd:{it:tables}}, {cmd:{it:info}}, 
+{cmd:{it:setup}}, {cmd:{it:clean}}, {cmd:{it:install}}, {cmd:{it:uninstall}}, {cmd:{it:update}}, {cmd:{it:version}},
+{cmd:{it:cache}}, {cmd:{it:dropframe}}, or {cmd:{it:dropglobal}}
+
 
 {pstd}
-{it:cl}: Country level
+{cmd:{it:cl}}: Country level
 
 {p 8 16 2}
-{cmd:pip} [cl], [country(string) year(numlist) povline(numlist) popshare(numlist)
-ppp_year(numlist) coverage(string) fillgaps  clear n2disp(numlist) region(string)]
+{cmd:pip} [cl], [{cmd:,} {it:{help pip##cl_wb_options:cl options}}]
 
 
 {pstd}
-{it:wb}: World Bank global and regional aggregates
+{cmd:{it:wb}}: World Bank global and regional aggregates
 
 {p 8 16 2}
-{cmd:pip} wb, [region(string) year(numlist) povline(numlist) 
-ppp_year(numlist) coverage(string)  clear n2disp(numlist)]
+{cmd:pip wb}, [{cmd:,} {it:{help pip##cl_wb_options:wb options}}]
 
 
 {pstd}
-{it:tables}: Display or access auxiliary tables
+{cmd:{it:tables}}: Display or access auxiliary tables
 
 {p 8 16 2}
-{cmd:pip} tables, [table({it:aux table name})]
+{cmd:pip tables} [, {cmd:table({it:aux table name)}}]
 
 
 {pstd}
-{it:info}: Display data availability
+{cmd:{it:cache}}: Manage local cache
+
+{p 8 16 2}
+{cmd:pip cache}[{cmd:,} {it:{help pip##cache_options:cache options}}]
+
+
+{pstd}
+{cmd:{it:info}}: Display data availability
 
 {p 8 16 2}
 {cmd:pip} info
+
+
+{pstd}
+{cmd:{it:print}}: Print useful information
+
+{p 8 16 2}
+{cmd:pip print}[{cmd:,} {it:{help pip##print_options:print options}}]
+
+
+
+{pstd}
+{bf:Note}: {cmd:pip} requires an internet connection.
 
 
 {marker sections}{...}
@@ -80,40 +98,77 @@ ppp_year(numlist) coverage(string)  clear n2disp(numlist)]
 {pstd}
 Sections are presented under the following headings:
 
-		{it:{help pip##desc:Command description}}
-		{it:{help pip##memory:Memory use and frames}}
-		{it:{help pip##param:Parameters description}}
-		{it:{help pip##options:Options description}}
-		{it:{help pip##operational:Operational description}}
-		{it:{help pip##subcommands:Subcommands description}}
-		{it:{help pip##list:List of pip and povcalnet variables}}
-		{it:{help pip##return:Stored results}}
+		{it:{help pip##basic_info:Basic Information}}
+			{it:{help pip##opts_desc:Options description}}
+				{it:{help pip##cl_wb_options:cl and wb options}}
+				{it:{help pip##tables_options:tables options}}
+				{it:{help pip##cache_options:cache options}}
+				{it:{help pip##print_options:print options}}
+				{it:{help pip##install_options:install/update options}}
+				{it:{help pip##general_options:general options}}
+			{it:{help pip##desc:Command description}}
+			{it:{help pip##subcmd_desc:Subcommands description}}
+			
+		{it:{help pip##subcmd_detail:Subcommands details}}
+			{it:{help pip##cl_wb_detail:cl and wb details}}
+			{it:{help pip##options:Options description}}
+			{it:{help pip##operational:Operational description}}
+		
 		{it:{help pip##Examples:Examples}}
-		{it:{help pip##disclaimer:Disclaimer}}
-		{it:{help pip##references:References}}
-		{it:{help pip##acknowled:Acknowledgments}}
-		{it:{help pip##authors:Authors}}
-		{it:{help pip##contact:Contact}}
-		{it:{help pip##howtocite:How to cite}}
-		{it:{help pip_countries:Region and country codes}}
+		
+		{it:{help pip##misc:Miscellaneous}}
+			{it:{help pip##memory:Memory use and frames}}
+			{it:{help pip##list:List of pip and povcalnet variables}}
+			{it:{help pip##return:Stored results}}
+			{it:{help pip##disclaimer:Disclaimer}}
+			{it:{help pip##references:References}}
+			{it:{help pip##acknowled:Acknowledgments}}
+			{it:{help pip##authors:Authors}}
+			{it:{help pip##contact:Contact}}
+			{it:{help pip##howtocite:How to cite}}
+			{it:{help pip_countries:Region and country codes}}
 
 
+{marker basic_info}{...}
+{center:{bf:Basic information}}
+{hline}
+
+{marker opts_desc}{...}
 {title:Options description}
 
-{synoptset 27 tabbed}{...}
-{synopthdr:cl and wb}
-{synoptline}
-{synopt :{opt coun:try:}(3-letter code)}List of {it:{help pip_countries##countries:country code}} (accepts multiples) or {it:all}. Default "{it:all}".
-Cannot be used with option {it:region()}{p_end}
-{synopt :{opt reg:ion}(WB code)}List of {it:{help pip_countries##regions:region code}} (accepts multiple) or {it:all}. Default "{it:all}".
-Cannot be used with option {it:country()}{p_end}
-{synopt :{opt coverage(string)}}Coverage level ("national", "urban", "rural", "all"). Default "all".{p_end}
-{synopt :{opt year:}(numlist|string)}List of years (accepts up to 10),  or {it:all}, or {it:last}. Default "all".{p_end}
-{synopt :{opt pov:line:}(#)}List of poverty lines (in PPP specified, see option {cmd:ppp_year(#)}) to calculate 
- poverty measures (accepts up to 5). Default is 2.15 and 2017 PPPs.{p_end}
-{synopt :{opt pops:hare:}(#)}List of quantiles. No default. Cannot be used with option {opt pov:line:}{p_end}
-{synopt :{opt fill:gaps}}Loads country-level estimates (including extrapolations and interpolations) used to create regional and global aggregates.{p_end}
+{pstd}
+{err:Note}: Options abbreviation is not allowed in {cmd:pip} 
 
+
+{marker cl_wb_options}{...}
+{synoptset 27 tabbed}{...}
+{synopthdr:cl and wb options}
+{synoptline}
+{synopt :{opt country:}(3-letter code)}List of {it:{help pip_countries##countries:country code}} or {it:all}. Default is "{it:all}".
+Does not work with subcommand {cmd:wb}.{p_end}
+{synopt :{opt region}(3-letter WB code)}List of {it:{help pip_countries##regions:region code}} or {it:all}. Default is "{it:all}".{p_end}
+{synopt :{opt coverage(string)}}Coverage level ("national", "urban", "rural", "all"). Default "all".{p_end}
+{synopt :{opt year:}(numlist|string)}{it:{help numlist}} of years  or {it:all}, or {it:last}. Default is "all".{p_end}
+{synopt :{opt povline:}(#)}list of poverty lines (in PPP specified, see option {cmd:ppp_year(#)}) to calculate 
+ poverty measures (accepts up to 5). Default is 2.15 at 2017 PPPs.{p_end}
+ {pstd}
+The following only work with subcommand {cmd:cl}
+
+{synopt :{opt popshare:}(#)}List of quantiles. No default. Cannot be used with option {opt povline:(#)}{p_end}
+{synopt :{opt fillgaps}}Loads country-level estimates (including extrapolations and interpolations) used to create regional and global aggregates.{p_end}
+{synoptline}
+
+
+{marker tables_options}{...}
+{synoptset 27 tabbed}{...}
+{synopthdr:tables}
+{synoptline}
+{synopt :{opt table(string)}}Loads one auxiliary table, this option is used along with the {cmd:tables} subcommand.{p_end}
+{synoptline}
+
+
+
+{marker general_options}{...}
 {synoptset 27 tabbed}{...}
 {synopthdr:General Options}
 {synoptline}
@@ -128,35 +183,14 @@ the next 3 options {it:ppp_year()}, {it:release()} & {it:identity()}, as the com
 
 {pstd}
 {err:*Note}: The {cmd:server()} and {cmd:identity()} options are available internally only for Bank staff.
-For a detailed description of the {cmd:server()} and {cmd:identity()} options see {bf:{help pip_note:here}}.
-
-{synoptset 27 tabbed}{...}
-{synopthdr:tables}
+For a detailed description of the {cmd:server()} and {cmd:identity()} options see {bf:{help pip_note:here}}.{p_end}
 {synoptline}
-{synopt :{opt table(string)}}Loads one auxiliary table, this option is used along with the {cmd:tables} subcommand.{p_end}
 
-{synoptset 27 tabbed}{...}
-{synopthdr:Subcommands}
-{synoptline}
-{synopt :{opt info:rmation}}Presents a clickable version of the available surveys, 
-countries and regions.{p_end}
-{synopt :{opt wb}}Downloads World Bank's regional and global aggregation.{p_end}
-{synopt :{opt tab:les}}Provides clickable list of auxiliary tables for download.{p_end}
-{synopt :{opt clean:up}}Deletes all pip data from current stata memory.{p_end}
-{synopt :{opt dropframe}}({it:Programmer's option}) Deletes auxiliary PIP frames in memory.{p_end}
-{synopt :{opt dropglobal}}({it:Programmer's option}) Deletes auxiliary PIP global macros in memory.{p_end}
-{synopt :{opt ver:sions}}Display available versions of PIP data.{p_end}
-{synopt :{opt test}}Open in browser last pip call. Type {cmd:disp "${pip_query}"} to see the parameters of the API query.{p_end}
-{synopt :{opt install}}Installs the stable version of pip from SSC 
-({cmd:pip install ssc}) or the development version from GitHub ({cmd:pip install gh}){p_end}
-
-{pstd}
-{bf:Note}: {cmd:pip} requires an internet connection.
 
 
 {marker desc}{...}
 {p 40 20 2}(Go up to {it:{help pip##sections:Sections Menu}}){p_end}
-{title:Description}
+{title:Command Description}
 
 {pstd}
 The {cmd:pip} command has the same functionality as the {browse "https://pip.worldbank.org/":PIP website}. 
@@ -176,18 +210,44 @@ The underlying welfare aggregate is the per capita household income or consumpti
 PIP is the result of a close collaboration between World Bank staff across the Development Data Group, the Development Research Group, and the Poverty and Inequality Global Practice. 
 
 
-{marker memory}{...}
-{title:Memory use and frames}:
+{marker subcmd_desc}{...}
+{title:Subcommands description}
 
 {pstd}
-{cmd:pip} makes use of the `frames` feature--available since Stata 16--to store a lot of information in memory. This is partly the reason why the first call of pip in a new Stata session is slower compared to subsequent calls. When closing Stata, you may see a pop-up 
-message reading {bf:"Frames in memory have changed"}. That is perfectly normal and should not cause any concern. 
-However, make sure you save the frames that you created and wish to keep. You can do that by typing {stata frames dir}. 
-Frames created by {cmd:pip} are prefixed by {it:_pip} and are marked by an {it:*}, meaning they have not been saved. If you do not wish to save any frames in use, just click "Exit without saving." You can also delete all PIP data in memory using the command {stata pip cleanup}.
+The main functionality of {cmd:pip} if to provide the user with the poverty and
+inequality estimates at the country level and the poverty aggregates at the regional
+and global levels. This can be achieved by using the subcommands {cmd:cl} 
+(the default) and {cmd:wb}, respectively. However, {cmd:pip} also provides a set 
+of tools and auxiliary data that you may find useful in your projects. 
+
+{pstd}
+Below you will find a short description of each subcommand and then a longer 
+explnation of each.
+
+{synoptset 27 tabbed}{...}
+{synopthdr:Subcommand}
+{synoptline}
+{synopt :{opt info:rmation}}Presents a clickable version of the available surveys, 
+countries and regions.{p_end}
+{synopt :{opt wb}}Downloads World Bank's regional and global aggregation.{p_end}
+{synopt :{opt tab:les}}Provides clickable list of auxiliary tables for download.{p_end}
+{synopt :{opt clean:up}}Deletes all pip data from current stata memory.{p_end}
+{synopt :{opt dropframe}}({it:Programmer's option}) Deletes auxiliary PIP frames in memory.{p_end}
+{synopt :{opt dropglobal}}({it:Programmer's option}) Deletes auxiliary PIP global macros in memory.{p_end}
+{synopt :{opt ver:sions}}Display available versions of PIP data.{p_end}
+{synopt :{opt test}}Open in browser last pip call. Type {cmd:disp "${pip_query}"} to see the parameters of the API query.{p_end}
+{synopt :{opt install}}Installs the stable version of pip from SSC 
+({cmd:pip install ssc}) or the development version from GitHub ({cmd:pip install gh}){p_end}
 
 
-{marker typesc}{...}
-{title:Type of calculations}:
+
+
+{marker subcmd_detail}{...}
+{center:{bf:Subcommands details}}
+{hline}
+
+{marker cl_wb_detail}{...}
+{title:cl and wb}:
 
 {pstd}
 The pip API reports two types of results:
@@ -383,6 +443,16 @@ session but want to update the version of {cmd:pip}, use {cmd:pip update}.
 {it:Note}: this subcommand was intended for the members of the core PIP team,
 who constantly need to update their version of {cmd:pip}{p_end}
 {p 8 8 2}5. If {cmd:pip} fails, start this process over.{p_end}
+
+
+{marker memory}{...}
+{title:Memory use and frames}:
+
+{pstd}
+{cmd:pip} makes use of the `frames` feature--available since Stata 16--to store a lot of information in memory. This is partly the reason why the first call of pip in a new Stata session is slower compared to subsequent calls. When closing Stata, you may see a pop-up 
+message reading {bf:"Frames in memory have changed"}. That is perfectly normal and should not cause any concern. 
+However, make sure you save the frames that you created and wish to keep. You can do that by typing {stata frames dir}. 
+Frames created by {cmd:pip} are prefixed by {it:_pip} and are marked by an {it:*}, meaning they have not been saved. If you do not wish to save any frames in use, just click "Exit without saving." You can also delete all PIP data in memory using the command {stata pip cleanup}.
 
 
 {marker return}{...}
