@@ -29,7 +29,7 @@ program define pip_tables, rclass
 	==================================================*/
 	
 	*---------- API defaults
-	local version_qr = "&version=${pip_version}"
+	local version_qr = "version=${pip_version}"
 	tokenize "${pip_version}", parse("_")
 	local _version   = "_`1'_`3'_`9'"
 	

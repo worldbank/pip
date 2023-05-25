@@ -329,7 +329,27 @@ void pip_reverse_macro(string scalar name, | /*
 	(*fn)(name, invtokens(M'))	
 }
 
+//========================================================
+//  Utilities
+//========================================================
 
+void pip_drop_cache_info_frames() {
+	
+	//------------define
+	string colvector SF
+	real colvector  o
+	real scalar i, u
+	
+	//------------ find frames
+	SF = st_framedir()
+	o = ustrregexm(SF, "cache_info_[0-9]{5}")
+	SF = select(SF, o)
+	
+	//------------remove frames
+	for (i = 1; i <= rows(SF); i++) {
+		 u = _st_framedrop(SF[i], 1)
+	}
+}
 
 
 //========================================================
