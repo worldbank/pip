@@ -109,7 +109,7 @@ program define pip_cache, rclass
 	//========================================================
 	
 	if ("`subcmd'" == "delete") {
-		noi pip_cache_delete, piphash(`piphash')
+		noi pip_cache_delete, piphash(`piphash') cachedir(`cachedir')
 		
 	}
 	
@@ -164,10 +164,11 @@ end
 //------------ Delete
 
 program define pip_cache_delete, rclass
-	syntax [, piphash(string)]
-	
+	syntax [, piphash(string) cachedir(string)]
+		
+	if ("`cachedir'" == "") local cachedir "${pip_cachedir}"
 	if ("`piphash'" == "") {
-		local pc_files: dir "${pip_cachedir}" files  "_pip*"
+		local pc_files: dir "`cachedir'" files  "_pip*"
 		local nfiles: word count `pc_files'
 		
 		noi disp "{err:Warning:} you will delete `nfiles' cache files." _n ///
@@ -175,14 +176,14 @@ program define pip_cache_delete, rclass
 		
 		if (lower("`confirm'") == "y") {
 			foreach f of local pc_files {
-				erase "${pip_cachedir}/`f'"
+				erase "`cachedir'/`f'"
 				}
-			erase "${pip_cachedir}/pip_cache_info.txt"
+			erase "`cachedir'/pip_cache_info.txt"
 		}
 	}
 	else {
 		local piphash = ustrtrim("`piphash'")
-		local f2delete "${pip_cachedir}/`piphash'.dta"
+		local f2delete "`cachedir'/`piphash'.dta"
 		
 		cap confirm file "`f2delete'"
 		if (_rc) {
@@ -192,7 +193,7 @@ program define pip_cache_delete, rclass
 			erase "`f2delete'"
 		}
 		// locals tempf and origf are created in MATA routine
-		local cfile "${pip_cachedir}/pip_cache_info.txt"
+		local cfile "`cachedir'/pip_cache_info.txt"
 		mata: pip_replace_in_pattern("`cfile'", `"`piphash'"', `""')
 		copy `tempf' "`origf'" , replace 
 		

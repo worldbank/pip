@@ -168,6 +168,16 @@ The following only work with subcommand {cmd:cl}
 
 
 
+{marker cache_options}{...}
+{synoptset 27 tabbed}{...}
+{synopthdr:cache}
+{synoptline}
+{synopt :{opt info}}Displays interactive information of cache data in local memory.{p_end}
+{synopt :{opt delete}}Deletes {p_end}
+{synoptline}
+
+
+
 {marker general_options}{...}
 {synoptset 27 tabbed}{...}
 {synopthdr:General Options}

@@ -130,7 +130,7 @@ program define pip, rclass
 	//------------Cache
 	if regexm("`subcmd'", "cache") {
 		if ("`delete'" != "") {
-			pip_cache `delete'
+			pip_cache `delete', `cachedir'
 		}
 		if ("`iscache'" != "") {
 			pip_cache `iscache'
