@@ -78,7 +78,7 @@ program define pip_tables, rclass
 		
 		* to lower cases
 		local tolvars "welfare_type"
-		foreach t of local tolvars {
+		qui foreach t of local tolvars {
 			cap confirm new var `t', exact
 			if (_rc) replace `t' = lower(`t')		
 		}

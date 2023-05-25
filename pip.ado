@@ -76,6 +76,7 @@ program define pip, rclass
 	//------------Cleaup
 	if regexm("`subcmd'", "^clean") {
 		noi pip_cleanup
+		pip_timer pip, off
 		exit
 	}
 	
@@ -83,11 +84,13 @@ program define pip, rclass
 	//------------Drops
 	if regexm("`subcmd'", "^dropframe") {
 		pip_drop frame, `frame_prefix'
+		noi pip_timer pip, off
 		exit
 	}
 	
 	if regexm("`subcmd'", "^dropglobal") {
 		pip_drop global
+		pip_timer pip, off
 		exit
 	}
 	
@@ -95,7 +98,7 @@ program define pip, rclass
 	//------------Install and Uninstall
 	if regexm("`subcmd'", "^install") {
 		if ( ("`gh'" == "" & "`ssc'" == "") | /* 
-		 */  ("`gh'" != "" & "`ssc'" != "") ) {
+		*/  ("`gh'" != "" & "`ssc'" != "") ) {
 			noi disp "{err}subcommand {it:install} must be use "  /* 
 			*/	 "with either {it:ssc} or {it:gh}" _n               /* 
 			*/  "E.x., {cmd:pip install, ssc} or {cmd:pip install, gh}."
@@ -105,29 +108,68 @@ program define pip, rclass
 		pip_timer pip.pip_install, on
 		noi pip_install `gh'`ssc', `path' `pause' `version'
 		pip_timer pip.pip_install, off
+		pip_timer pip, off
 		exit
 	}
 	
 	if regexm("`subcmd'", "^uninstall") {
 		pip_install uninstall, `path' `pause'
+		noi pip_timer pip, off
 		exit
 	}
 	
 	if regexm("`subcmd'", "^update") {
 		noi pip_update, `path' `pause'
+		pip_timer pip, off
 		exit
 	}
 	
-	
-	//------------Print info
+	//========================================================
+	//  Print information
+	//========================================================
 	if ("`subcmd'" == "print") {
+		//------------Versions
 		if ("`versions'" != "") {
 			pip_timer pip.pip_versions, on
 			noi pip_versions, availability
 			pip_timer pip.pip_versions, off
+			pip_timer pip, off
 			return add
 			exit
 		}
+		//------------Tables
+		if ("`tables'" != "") {
+			
+			pip_timer pip.pip_versions, on
+			pip_versions, `release' `ppp_year' `identity' `version'
+			pip_timer pip.pip_versions, off
+			
+			pip_timer pip.pip_tables, on
+			noi pip_tables
+			return add
+			pip_timer pip.pip_tables, off
+			pip_timer pip, off `printtimer'
+			exit
+		}
+		//------------ info or availability
+		if ("`info'" != "" | "`available'" != ""| "`availability'" != "") {
+			noi pip_info, `clear' `pause' `release' `ppp_year' /* 
+			*/ `identity' `version'	
+			return add 
+			pip_timer pip, off 
+			exit
+		}	
+		if ("`cache'" != "") {
+			//------------ Cache info
+			pip_cache info
+			return add
+			pip_timer pip, off 
+			exit
+		}
+		
+		noi disp "{err}Options not supported by subcommand {it:print}." _n /* 
+		 */ "see {it:{help pip##print_options:print options}}"
+		 error
 	}
 	
 	//------------Cache
@@ -144,13 +186,14 @@ program define pip, rclass
 			return add
 		}
 		
+		pip_timer pip, off
 		exit
 	}
 	
 	//------------Info
 	if regexm("`subcmd'", "^info") {
 		noi pip_info, `clear' `pause' `release' `ppp_year' /* 
-		 */ `identity' `version'	
+		*/ `identity' `version'	
 		return add 
 		exit
 	}	
