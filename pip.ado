@@ -94,15 +94,16 @@ program define pip, rclass
 	
 	//------------Install and Uninstall
 	if regexm("`subcmd'", "^install") {
-		if ( wordcount("`subcmd'") != 2) {
+		if ( ("`gh'" == "" & "`ssc'" == "") | /* 
+		 */  ("`gh'" != "" & "`ssc'" != "") ) {
 			noi disp "{err}subcommand {it:install} must be use "  /* 
 			*/	 "with either {it:ssc} or {it:gh}" _n               /* 
-			*/  "E.x., {cmd:pip install ssc} or {cmd:pip install gh}."
+			*/  "E.x., {cmd:pip install, ssc} or {cmd:pip install, gh}."
 			error
 		}
-		local sscmd: word 2 of `subcmd'
+		
 		pip_timer pip.pip_install, on
-		noi pip_install `sscmd', `path' `pause' `version'
+		noi pip_install `gh'`ssc', `path' `pause' `version'
 		pip_timer pip.pip_install, off
 		exit
 	}
@@ -118,13 +119,15 @@ program define pip, rclass
 	}
 	
 	
-	//------------Versions
-	if regexm("`subcmd'", "^ver") {
-		pip_timer pip.pip_versions, on
-		noi pip_versions, availability
-		pip_timer pip.pip_versions, off
-		return add
-		exit
+	//------------Print info
+	if ("`subcmd'" == "print") {
+		if ("`versions'" != "") {
+			pip_timer pip.pip_versions, on
+			noi pip_versions, availability
+			pip_timer pip.pip_versions, off
+			return add
+			exit
+		}
 	}
 	
 	//------------Cache
