@@ -10,13 +10,10 @@ tdegefu@worldbank.org
 
 World Bank Group	
 
-project:	  Adaptation Stata package (from povcalnet) to easily query the [PIP API]
 Dependencies: The World Bank - DECIS
 -----------------------------------------------------------------------
-References:          
-Output: 
+References: https://pip.worldbank.org/home  https://pip.worldbank.org/api
 =======================================================*/
-
 
 
 program define pip, rclass
