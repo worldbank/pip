@@ -189,7 +189,7 @@ program define pip_setup_replace, rclass
 		findfile "pip_setup.do"
 		local setup_file = "`r(fn)'"
 		mata: pip_replace_in_pattern("`setup_file'", `"`pattern'"', `"`newline'"')
-		copy `tempf' "`origf'" , replace
+		copy `tempf' "`origf'" , replace // locals tempf and origf are created in MATA routine
 		
 		return local fn = "`setup_file'"
 	}

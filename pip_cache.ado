@@ -236,6 +236,7 @@ program define pip_cache_info, rclass
 			* pause on 
 			* pause cache_txt
 			split query, gen(ep) parse(?)
+			gen endpoint = ustrregexs(2) if ustrregexm(ep1, "(.*)/([^/]+)$")
 			split ep2, gen(par) parse(&)
 			qui ds par*
 			local level1 = "`r(varlist)'"
@@ -277,7 +278,7 @@ program define pip_cache_info, rclass
 				* replace query = _frval(`cache_txt', query, `i') in `i'
 			}
 			
-			frget hash query, from(`cache_txt')
+			frget hash query endpoint, from(`cache_txt')
 		}  // end of frame
 		
 	}  // end of condition == ""
@@ -289,7 +290,7 @@ program define pip_cache_info, rclass
 	local frame2 "cache_info_`rname'"
 	if ("`frame'" != "`frame2'") frame copy `frame' `frame2'
 	
-	if ("`condition'" != "") {
+	if (`"`condition'"' != `""') {
 		qui frame `frame2': keep if `condition'
 	}
 	
@@ -312,12 +313,22 @@ program define pip_cache_info, rclass
 			local vars: list vars - novars
 			
 			foreach v of local vars {
+				//------------ get length of string for formatting
 				local vtype: type `v'
 				local vtype: subinstr local vtype "str" ""
 				// 36 is a nice display length ()
 				local l = floor(36/(`vtype'+2))
+				
+				//------------ Unique values
+				tempvar uniq
+				qui bysort `v': gen byte `uniq' = (_n==_N) if `v' != ""
+				qui summ `uniq', meanonly
+				if (r(sum) > 1) local filterable = "{txt:{it:(filterable)}}"
+				else            local filterable = ""
+				
+				//------------ build call of pip_utils click
 				local condition = `"condition(`"`v' == "obsi""')"'
-				noi pip_utils click, variable(`v') title("{title:`v'}") /* 
+				noi pip_utils click, variable(`v') title("{title:`v'} `filterable'") /* 
 				*/ statacode(`"pip_cache info, `condition' frame(`frame2')"') /* 
 				*/ length(`l')
 			} // end for parameters loop
@@ -365,10 +376,10 @@ program define pip_cache_info, rclass
 			local duse    `"use "`fuse'", clear "'
 			local ddelete `"pip_cache delete,  piphash(`hash')"'
 			
-			noi disp "{break}{pstd}{ul:{res:ACTION}}{p_end}" _n /* 
-			*/ `"{pmore}{stata `"`duse'"':use}{p_end}"' _n /* 
+			noi disp "{break}{pstd}{ul:{res:ACTION}}{p_end}"        _n /* 
+			*/ `"{pmore}{stata `"`duse'"':use}{p_end}"'             _n /* 
 			*/ `"{pmore}{browse "`injson'":see in browser}{p_end}"' _n /* 
-			*/ `"{pmore}{browse "`incsv'":download .csv}{p_end}"' _n /* 
+			*/ `"{pmore}{browse "`incsv'":download .csv}{p_end}"'   _n /* 
 			*/ `"{pmore}{stata `"`ddelete'"':delete}{err: {it: (use with caution)}}{p_end}"' 
 			
 			*##e
