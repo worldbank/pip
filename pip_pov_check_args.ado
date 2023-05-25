@@ -64,7 +64,7 @@ program define pip_pov_check_args, rclass
 	
 	
 	*---------- Coverage
-	if ("`coverage'" == "") local coverage = ""
+	if (lower("`coverage'") == "all") local coverage = ""
 	local coverage = lower("`coverage'")
 	
 	foreach c of local coverage {	
