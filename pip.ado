@@ -236,6 +236,12 @@ Notes:
 
 Version Control:
 
+*! version 0.10.3       <2023May24>
+*! -- Add interactive management of cache info
+*! -- add pip_get to pip_versions
+*! -- Fix bug in pip_table query
+*! -- Create clickable table program
+*! -- add version() option to install from GitHub
 *! version 0.10.2       <2023May23>
 *! -- Hot fix on query
 *! version 0.10.1       <2023May22>
@@ -267,24 +273,8 @@ Version Control:
 *! -- Add general troubleshooting to documentation.
 *! -- Change some variable labels for clarity
 *! -- Update help file with installation instructions.
-*! version 0.9.5                 <2023Feb14>
-*! -- fix writing error in pip.pkg file that did not allow the installation of pip_update
-*! version 0.9.2                 <2023Feb14>
-*! -- improve installation and update features
-*! version 0.9.0                  <2023Feb09>
-*! -- Update help file
-*! version 0.3.9                  <2022Dec16>
-*! -- BREAKING Change: Fix formating of aux tables. Rename some variables to make it consistent with other PIP outputs
-*! -- Drop obs with missing values in poverty line or headcount 
-*! -- Fix display of citations
-*! -- Improve Help file
-*! -- fix bug with PPP_year  and ppp parameters
-*! -- Display only one observation
-*! -- Fix big with options ppp and ppp_year. Only ppp_year remained.
-*! -- Change order of returning variables. 
-*! -- change all labels to lower cases
-*! -- BREAKING Change: remove distribution estimates from line up estimates. 
-*! version 0.3.8             <2022Oct06>
+*! version 0.9.5        <2023Feb14>
+*! version 0.3.8        <2022Oct06>
 *! version 0.3.7        <2022Oct06>
 *! version 0.3.6        <2022Sep08>
 *! version 0.3.5        <2022Jul06>
@@ -293,18 +283,8 @@ Version Control:
 *! version 0.3.2        <2022apr26>
 *! version 0.3.1        <2022apr08>
 *! version 0.3.0        <2022apr07>
-*! version 0.2.2        <2022apr06>
-*! version 0.2.1        <2022apr04>
 *! version 0.2.0        <2022apr01>
-*! version 0.1.7        <2022mar30>
-*! version 0.1.6        <2022mar28>
-*! version 0.1.5        <2022mar25>
-*! version 0.1.4        <2022mar18>
-*! version 0.1.3        <2022mar18>
-*! version 0.1.2        <2022feb07>
-*! version 0.1.1        <2022feb01>
 *! version 0.1.0        <2022feb01>
-*! version 0.0.2        <2022jan12>
 *! version 0.0.1        <2021dec01>
 
 
