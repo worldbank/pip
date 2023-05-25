@@ -104,7 +104,7 @@ Sections are presented under the following headings:
 				{it:{help pip##tables_options:tables options}}
 				{it:{help pip##cache_options:cache options}}
 				{it:{help pip##print_options:print options}}
-				{it:{help pip##install_options:install/update options}}
+				{it:{help pip##install_options:Un/install & update options}}
 				{it:{help pip##general_options:general options}}
 			{it:{help pip##desc:Command description}}
 			{it:{help pip##subcmd_desc:Subcommands description}}
@@ -161,24 +161,54 @@ The following only work with subcommand {cmd:cl}
 
 {marker tables_options}{...}
 {synoptset 27 tabbed}{...}
-{synopthdr:tables}
+{synopthdr:tables options}
 {synoptline}
 {synopt :{opt table(string)}}Loads one auxiliary table, this option is used along with the {cmd:tables} subcommand.{p_end}
 {synoptline}
 
 
-
 {marker cache_options}{...}
 {synoptset 27 tabbed}{...}
-{synopthdr:cache}
+{synopthdr:cache options}
 {synoptline}
 {synopt :{opt info}}Displays interactive information of cache local memory.{p_end}
 {synopt :{opt delete}}Deletes cache local memory{p_end}
-{synopt :{opt cachedir(path}}displays or deletes cache in that particular 
+{synopt :{opt cachedir(path)}}displays or deletes cache in that particular 
 directory. Seldom used. {p_end}
 {synopt :{opt iscache}}Checks whether or not the data loaded has been cached{p_end}
 {synoptline}
 
+
+{marker print_options}{...}
+{synoptset 27 tabbed}{...}
+{synopthdr:print options}
+{synoptline}
+{synopt :{opt timer}}displays timer report of last execution of {cmd:pip}{p_end}
+{synopt :{opt versions}}displays versions of data available{p_end}
+{synopt :{opt tables}}Equivalent to {cmd:pip tables}. Displays auxiliary tables
+available.{p_end}
+{synopt :{opt available}}Equivalent to {cmd:pip info}. Display data availability. 
+You can also use {cmd:pip print, {it:info}} or 
+{cmd:pip print, {it:availability}}{p_end}
+{synopt :{opt cache}}Equivalent to {cmd:pip cache, info}. 
+Displays interactive information of cache local memory.{p_end}
+{synoptline}
+
+
+
+{marker install_options}{...}
+{synoptset 27 tabbed}{...}
+{synopthdr:Un/Install & update opts}
+{synoptline}
+{synopt :{opt gh}}Install {cmd:pip} from 
+{browse "https://github.com/worldbank/pip":GitHub}{p_end}
+{synopt :{opt ssc}}Install {cmd:pip} from 
+{browse "https://ideas.repec.org/c/boc/bocode/s459179.html": SSC}{p_end}
+{synopt :{opt version(#)}}version to install. Only works with option {it:gh} 
+option{p_end}
+{synopt :{opt path(path)}}{it:(Programmer option)} Un/Installs {cmd:pip} 
+in that directory. Default is PLUS, as you regularly install commands from SSC.{p_end}
+{synoptline}
 
 
 {marker general_options}{...}
@@ -186,8 +216,10 @@ directory. Seldom used. {p_end}
 {synopthdr:General Options}
 {synoptline}
 {synopt :{opt version(string)}}Combination of numbers in the format %Y%m%d_YYYY_RV_AV_SSS 
-(click {bf:{help pip_note:here}} for explanation of each component). This {it:version()} option supersedes 
-the next 3 options {it:ppp_year()}, {it:release()} & {it:identity()}, as the combination of these parameters uniquely identifies a dataset.{p_end}
+(click {bf:{help pip_note:here}} for explanation of each component). 
+Option {it:version()} takes prevalence over the next 3 options 
+{it:ppp_year()}, {it:release()} & {it:identity()}, as the combination of 
+these three parameters uniquely identifies a dataset.{p_end}
 {synopt :{opt ppp:_year:}(#)}PPP round (2011 or 2017). {p_end}
 {synopt :{opt release(numlist)}}8 digit number with the PIP release date in the format {it:YYYYMMDD}.{p_end}
 {synopt :{opt identity(string)}{err:*}}Version of data to run the query on (e.g., prod, int, test). See description of each identity {bf:{help pip_note:here}}.{p_end}
@@ -195,7 +227,8 @@ the next 3 options {it:ppp_year()}, {it:release()} & {it:identity()}, as the com
 {synopt :{opt clear}}Replaces data in memory.{p_end}
 
 {pstd}
-{err:*Note}: The {cmd:server()} and {cmd:identity()} options are available internally only for Bank staff.
+{err:*Note}: The {cmd:server()} and {cmd:identity()} options are available internally only for World Bank staff upon request to the  
+{browse "pip@worldbank.org":  PIP technical team}.
 For a detailed description of the {cmd:server()} and {cmd:identity()} options see {bf:{help pip_note:here}}.{p_end}
 {synoptline}
 
