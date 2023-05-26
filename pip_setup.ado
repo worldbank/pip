@@ -209,7 +209,10 @@ program define pip_setup_cachedir, rclass
 		tempname direxist
 		if ("`cachedir'" == "") {
 			// find folder to store setup.do
-			local pdirs `" "`c(sysdir_personal)'" "`c(sysdir_plus)'" "`c(pwd)'" "`c(sysdir_site)'" "'
+			if !inlist("${pip_cachedir}", "no", "") local oldcachedir "${pip_cachedir}"
+			else                                    local oldcachedir ""
+			
+			local pdirs `" "`oldcachedir'" "`c(sysdir_personal)'" "`c(sysdir_plus)'" "`c(pwd)'" "`c(sysdir_site)'" "'
 			
 			tokenize `"`pdirs'"'
 			scalar `direxist' = 0
@@ -236,14 +239,23 @@ program define pip_setup_cachedir, rclass
 		
 		
 		if ("`cachedir'" != "") {
-			if (lower("`cachedir'") == "no") local cachedir = 0
-			mata: st_numscalar("`direxist'", pip_check_folder("`cachedir'"))
+			if inlist(lower("`cachedir'"), "0", "no") {
+				local cachedir    = 0
+				scalar `direxist' = 1 // bypass condition
+			}
+			else mata: st_numscalar("`direxist'", pip_check_folder("`cachedir'"))
+			
 			if (`direxist' == 1 )  {
 				local pattern "pip_cachedir"
 				local newline `"global pip_cachedir = "`cachedir'""'
 				pip_setup replace, pattern(`"`pattern'"') new(`"`newline'"')
 				pip_setup run
-				noi disp "{res}Cache directory has been set up. If you want to change it, type {cmd:pip_setup cachedir}"
+				if ("`cachedir'" != "0") {
+					noi disp "{res}Cache directory has been set up. If you want to change it, type {cmd:pip_setup cachedir}"
+				}
+				else {
+					noi disp "{res}Cache has been {err}disabled{res}. If you want to change it, type {cmd:pip_setup cachedir}"
+				}
 			}
 		}
 		
@@ -256,34 +268,34 @@ end
 
 //========================================================
 //  Program to create dates that will be used across PIP
-//========================================================
-
-program define pip_setup_dates
-	
-	version 16
-	
-	
-	local date        = date("`c(current_date)'", "DMY")  // %tdDDmonCCYY
-	local time        = clock("`c(current_time)'", "hms") // %tcHH:MM:SS
-	local date_time   = `date'*24*60*60*1000 + `time'  // %tcDDmonCCYY_HH:MM:SS
-	local datetimeHRF:  disp %tcDDmonCCYY_HH:MM:SS `date_time'
-	local datetimeHRF = trim("`datetimeHRF'")
-	local dateHRF:      disp %tdDDmonCCYY `date'
-	local dateHRF     = trim("`dateHRF'")
-	
-	local date_file:   disp %tdCCYYNNDD `date'
-	local date_file   = trim("`date_file'")
-	
-	
-	global pip_date_file = "`date_file'"
-	global pip_date_file_format = "%tdDDmonCCYY"
-	
-	global pip_dateHRF = "`dateHRF'"
-	global pip_date_format = "%tdDDmonCCYY"
-	
-	global pip_datetimeHRF = "`datetimeHRF'"
-	global pip_datetime_format = "%tcDDmonCCYY_HH:MM:SS"
-	
+			//========================================================
+			
+			program define pip_setup_dates
+			
+			version 16
+			
+			
+			local date        = date("`c(current_date)'", "DMY")  // %tdDDmonCCYY
+			local time        = clock("`c(current_time)'", "hms") // %tcHH:MM:SS
+			local date_time   = `date'*24*60*60*1000 + `time'  // %tcDDmonCCYY_HH:MM:SS
+			local datetimeHRF:  disp %tcDDmonCCYY_HH:MM:SS `date_time'
+			local datetimeHRF = trim("`datetimeHRF'")
+			local dateHRF:      disp %tdDDmonCCYY `date'
+			local dateHRF     = trim("`dateHRF'")
+			
+			local date_file:   disp %tdCCYYNNDD `date'
+			local date_file   = trim("`date_file'")
+			
+			
+			global pip_date_file = "`date_file'"
+			global pip_date_file_format = "%tdDDmonCCYY"
+			
+			global pip_dateHRF = "`dateHRF'"
+			global pip_date_format = "%tdDDmonCCYY"
+			
+			global pip_datetimeHRF = "`datetimeHRF'"
+			global pip_datetime_format = "%tcDDmonCCYY_HH:MM:SS"
+			
 end
 
 
