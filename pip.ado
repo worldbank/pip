@@ -295,7 +295,13 @@ Notes:
 
 Version Control:
 
-*! version 0.10.3       <2023May24>
+*! version 0.10.3.dev     <2023May26>
+*! -- Start reorganization of helpfile
+*! -- Improve cache manipulation, specially with cachedir() option
+*! -- Add more print options
+*! -- BREAKING CHANGE: `pip versions` is now `pip print, version`
+*! -- Fix coverage issue
+*! version 0.10.3         <2023May24>
 *! -- Add interactive management of cache info
 *! -- add pip_get to pip_versions
 *! -- Fix bug in pip_table query
@@ -320,9 +326,7 @@ Version Control:
 *! -- dismiss dependency of {missings} command
 *! -- BREAK CHANGE: options names MUST be parsed completely. Partial naming breaks
 *! -- Remove old code.
-*! version 0.9.7            <2023May09>
 *! -- several improvements to caching and setup.do 
-*! version 0.9.6            <2023May05>
 *! -- add caching to aux tables
 *! -- add pip_setup.do file... this should be created internally
 *! -- add mata functions to edit pip_setup.do
@@ -332,7 +336,8 @@ Version Control:
 *! -- Add general troubleshooting to documentation.
 *! -- Change some variable labels for clarity
 *! -- Update help file with installation instructions.
-*! version 0.9.5        <2023Feb14>
+*! ---------- DEPRECATED DEVELOPMENT
+*! version 0.9.5        <2023Feb14> (Stable version)
 *! version 0.3.8        <2022Oct06>
 *! version 0.3.7        <2022Oct06>
 *! version 0.3.6        <2022Sep08>
