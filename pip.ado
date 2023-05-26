@@ -68,6 +68,9 @@ program define pip, rclass
 	
 	//------------ setup 
 	if ("`subcmd'" == "setup") {
+		if ("`cachedir'" != "") {
+			pip_setup cachedir, `cachedir'
+		}
 		noi disp "{res:Setup done!}"
 		pip_timer pip, off 
 		exit
@@ -172,18 +175,31 @@ program define pip, rclass
 		 error
 	}
 	
-	//------------Cache
-	if regexm("`subcmd'", "cache") {
+	//========================================================
+	// Cache 
+	//========================================================
+	if ("`subcmd'" == "cache") {
 		if ("`delete'" != "") {
 			pip_cache `delete', `cachedir'
+			pip_timer pip, off 
+			exit
 		}
 		if ("`iscache'" != "") {
 			pip_cache `iscache'
 			return add
+			pip_timer pip, off 
+			exit
 		}
 		if ("`info'" != "") {
 			pip_cache info
 			return add
+			pip_timer pip, off 
+			exit
+		}
+		if ("`cachedir'" != "" & "`setup'" != "") {
+			pip_setup cachedir, `cachedir'
+			pip_timer pip, off 
+			exit
 		}
 		
 		pip_timer pip, off
