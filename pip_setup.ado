@@ -209,10 +209,10 @@ program define pip_setup_cachedir, rclass
 		tempname direxist
 		if ("`cachedir'" == "") {
 			// find folder to store setup.do
-			if !inlist("${pip_cachedir}", "no", "") local oldcachedir "${pip_cachedir}"
+			if !inlist("${pip_cachedir}", "no", "") local oldcachedir `""${pip_cachedir}""'
 			else                                    local oldcachedir ""
 			
-			local pdirs `" "`oldcachedir'" "`c(sysdir_personal)'" "`c(sysdir_plus)'" "`c(pwd)'" "`c(sysdir_site)'" "'
+			local pdirs `" `oldcachedir' "`c(sysdir_personal)'" "`c(sysdir_plus)'" "`c(pwd)'" "`c(sysdir_site)'" "'
 			
 			tokenize `"`pdirs'"'
 			scalar `direxist' = 0
