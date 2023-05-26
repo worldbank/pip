@@ -305,7 +305,7 @@ countries and regions.{p_end}
 {hline}
 
 {marker cl_wb_detail}{...}
-{title:cl and wb}:
+{title:cl and wb subcommand}:
 
 {pstd}
 the {cmd:cl} (the default) and {cmd:wb} subcommands are the main modules of {cmd:pip}.
@@ -425,38 +425,42 @@ Therefore, changes at the country-level from one reference year to the next need
 to be interpreted carefully and may not be the result of a new household survey.{p_end}
 
 
-{marker options}{...}
+{marker cache_detail}{...}
 {p 40 20 2}(Go up to {it:{help pip##sections:Sections Menu}}){p_end}
-{title:Options description}
+{title:cache subcommand}
 
-{phang}
-{opt version} A detailed description of the {bf:version} option is available {bf:{help pip_note:here}}.
+{pstd}
+Caching is the process of storing data so that future requests for the same data
+can be served faster. Even though the PIP API is cached at different levels, it is 
+possible that either re-deployment/maintenance of the data in API o Internet
+connectivity issues may affect the speed at which PIP data is served. This is why, 
+{cmd:pip} provides you with the ability cache PIP data and with a set of tools to 
+manage it. 
 
-{phang}
-{opt ppp_year} Allows to specify PPP round (version) that will be used to calculate estimates. Default PPP round year is 2017. The other option are the 2011 PPPs.
+{pstd}
+By default, {cmd:pip} provides the option to store cache data in your local machine
+or in any drive Stata has access to. The first time you execute {cmd:pip}, you are
+required to either confirm the default cache directory, provide your own directory
+path, or opt out. Just follow the instructions of the pop-up messages. 
 
-{phang}
-{opt release} Allows to specify the PIP release date in the format YYYYMMDD.
+{pstd}
+{cmd:pip} makes specific requests to the 
+{browse "https://pip.worldbank.org/api": PIP API} in the for of URLs. 
+This URL is hashed and used as the ID of cache. Since 
+{cmd:pip} makes sure that the version of the data is part of the URL request,
+the hash of the query is unique you only have to request the data once. The only 
+case in which you have to hit the API again for the same request is when the API 
+parameters for a specific endpoint have changed. Since this happens rarely, your 
+cache data is useful for long time. 
 
-{phang}
-{opt identity} A detailed description of the {bf:identity} option is available {bf:{help pip_note:here}}.
+{pstd}
+In software development, caching is usually a {it:temporary} storing data practice 
+because the speed you gain comes to the expense storage memory. You can either 
+opt out altogether the caching mechanism of {cmd:pip} or you can manage your cache, 
+making use of the tools provided by {cmd:pip}.
 
-{phang}
-{opt server} A detailed description of the {bf:server} option is available {bf:{help pip_note:here}}.  
 
-{marker operational}{...}
-{p 40 20 2}(Go up to {it:{help pip##sections:Sections Menu}}){p_end}
-{title:Operational description}
 
-{marker optinfo}{...}
-{phang}
-{opt clear} replaces data in memory.
-
-{phang}
-{opt querytimes} Number of times the API is hit before defaulting to failure. Default is 5. Advanced option. Use only if internet connection is poor.
-
-{phang}
-{opt table} Allows to load one auxiliary table, this option is used along with {cmd:tables} subcommand.
 
 
 {marker subcommands}{...}
