@@ -86,6 +86,8 @@ where {it:subcommand} could be {cmd:{it:cl}}, {cmd:{it:wb}}, {cmd:{it:tables}}, 
 {p 8 16 2}
 {cmd:pip print}[{cmd:,} {it:{help pip##print_options:print options}}]
 
+{err:TO BE COMPLETED}
+
 
 
 {pstd}
@@ -94,6 +96,7 @@ where {it:subcommand} could be {cmd:{it:cl}}, {cmd:{it:wb}}, {cmd:{it:tables}}, 
 
 {marker sections}{...}
 {title:Sections}
+{err:CHANGE FORMAT AND FIX ORDER}
 
 {pstd}
 Sections are presented under the following headings:
@@ -130,6 +133,7 @@ Sections are presented under the following headings:
 
 
 {marker basic_info}{...}
+{hline}
 {center:{bf:Basic information}}
 {hline}
 
@@ -270,6 +274,7 @@ PIP is the result of a close collaboration between World Bank staff across the D
 
 {marker subcmd_desc}{...}
 {title:Subcommands description}
+{err: TO BE COMPLETED AND FIXED}
 
 {pstd}
 The main functionality of {cmd:pip} if to provide the user with the poverty and
@@ -301,6 +306,7 @@ countries and regions.{p_end}
 
 
 {marker subcmd_detail}{...}
+{hline}
 {center:{bf:Subcommands details}}
 {hline}
 
@@ -459,15 +465,39 @@ because the speed you gain comes to the expense storage memory. You can either
 opt out altogether the caching mechanism of {cmd:pip} or you can manage your cache, 
 making use of the tools provided by {cmd:pip}.
 
+{err:TO BE COMPLETED}
 
 
 
-
-{marker subcommands}{...}
+{marker print_detail}{...}
 {p 40 20 2}(Go up to {it:{help pip##sections:Sections Menu}}){p_end}
-{title:Subcommands}
+{title:print subcommand}
+{err:TO BE ADDED}
 
-{dlgtab: MISC}
+
+{marker tables_detail}{...}
+{p 40 20 2}(Go up to {it:{help pip##sections:Sections Menu}}){p_end}
+{title:tables subcommand}
+{err:TO BE ADDED}
+
+{phang}
+{opt tables} Provides access to the auxiliary tables. 
+Default command {stata pip tables} a list of auxiliary tables using the 2017 PPPs.
+Users can also specify PPP year as {stata  pip tables, ppp_year(2017)}.
+
+
+
+{marker setup_detail}{...}
+{p 40 20 2}(Go up to {it:{help pip##sections:Sections Menu}}){p_end}
+{title:setup subcommand}
+{err:TO BE ADDED}
+
+
+{marker noopt_detail}{...}
+{p 40 20 2}(Go up to {it:{help pip##sections:Sections Menu}}){p_end}
+{title:No-options subcommands}
+{err:TO BE COMPLETED}
+
 
 {phang}
 {opt information} Presents a clickable version of the available surveys, countries 
@@ -480,15 +510,6 @@ with a pip guidance database. If option {it:clear} is {ul:not} included,
 availability in the results window.{p_end} 
 
 {phang}
-{opt wb} Download the World Bank's regional and global aggregates. It can be
-combined with {it:year()} to filter the aggregated data.
-
-{phang}
-{opt tables} Provides access to the auxiliary tables. 
-Default command {stata pip tables} a list of auxiliary tables using the 2017 PPPs.
-Users can also specify PPP year as {stata  pip tables, ppp_year(2017)}.
-
-{phang}
 {opt cleanup} Deletes all PIP data from Stata's memory. 
 
 {phang}
@@ -496,9 +517,21 @@ Users can also specify PPP year as {stata  pip tables, ppp_year(2017)}.
 "${pip_query}" to query your browser directly and test whether the data is
 downloadable. 
 
-{dlgtab: Installation}
 
-{p 4 8 2}
+
+{marker install_detail}{...}
+{p 40 20 2}(Go up to {it:{help pip##sections:Sections Menu}}){p_end}
+{title:Un/install and update subcommands}
+{err:TO BE COMPLETED}
+
+{pstd}
+{err: add INTRODUCTION} 
+
+{phang}
+{res:{ul:Description:} }{cmd:pip} provides three different tools to manage 
+it own installation:
+
+{pmore}
 {opt install} Installs the stable version of {cmd:pip} from SSC ({cmd:pip install ssc}) or
 the development version from GitHub ({cmd:pip install gh}). the {it:install} subcommand 
 prevents issues from duplicate, and potentially conflicting, installations 
@@ -508,7 +541,27 @@ the command will request a deinstallation or a different installation path.
 Further details are provided in the examples section 
 {it:{help pip##installation_ex:below}}. {p_end}
 
-{p 4 8 2}
+{marker installation_process}{...}
+{pmore}
+{ul:Installation process}
+
+{pmore}
+In case of conflicting installation issues, this is the recommended process to install {cmd:pip} properly{p_end}
+{p 10 14 6}1. Uninstall {cmd:pip} by typing {cmd:pip uninstall}{p_end}
+{p 10 14 6}2. Install the stable version of {cmd:pip} from SSS 
+({cmd:ssc install pip}) or the development version from GitHub 
+({cmd:github install worldbank/pip}){p_end}
+{p 10 14 6}3. from now on, {res:always} install pip using the {cmd:install}
+subcommand: {cmd:pip install ssc} for SSC or {cmd:pip install gh} for 
+GitHub{p_end}
+{p 10 14 6}4. In rare occasions, when you don't want to restart your Stata 
+session but want to update the version of {cmd:pip}, use {cmd:pip update}.
+{it:Note}: this subcommand was intended for the members of the core PIP team,
+who constantly need to update their version of {cmd:pip}{p_end}
+{p 10 14 6}5. If {cmd:pip} fails, start this process over.{p_end}
+
+
+{pmore}
 {opt uninstall} Uninstalls any version of pip in the installation path.
 This is useful before a new installation from either SSC of GitHub. 
 Once you have executed {cmd:pip uninstall}, you cannot use {cmd:pip install}
@@ -517,7 +570,8 @@ You will need to install {cmd:pip} directly from either SSC
 ({cmd:ssc install pip}) or from GitHub ({cmd:github install worldbank/pip})
 {p_end}
 
-{p 4 8 2}
+
+{pmore}
 {opt update} This subcommand makes sure the {cmd:pip} version is up-to-date. By
 default, the first time that {cmd:pip} is used in a session, it will search for 
 any new versions available from either SSC or GitHub, depending on where it 
@@ -526,113 +580,75 @@ used in a session takes longer than subsequently). If you want to get the
 latest version without leaving your Stata session, type {cmd:pip update}.
 {p_end}
 
-{marker installation_process}{...}
-{p 4 6 2}{ul:Installation process}{p_end}
+{marker install_options_detail}{...}
+{phang}
+{res:{ul:Un/install & update options detail}}
 
-{p 4 4 2}
-In case of conflicting installation issues, this is the recommended process to install {cmd:pip} properly{p_end}
-{p 8 8 2}1. Uninstall {cmd:pip} by typing {cmd:pip uninstall}{p_end}
-{p 8 8 2}2. Install the stable version of {cmd:pip} from SSS 
-({cmd:ssc install pip}) or the development version from GitHub 
-({cmd:github install worldbank/pip}){p_end}
-{p 8 8 2}3. from now on, {res:always} install pip using the {cmd:install}
-subcommand: {cmd:pip install ssc} for SSC or {cmd:pip install gh} for 
-GitHub{p_end}
-{p 8 8 2}4. In rare occasions, when you don't want to restart your Stata 
-session but want to update the version of {cmd:pip}, use {cmd:pip update}.
-{it:Note}: this subcommand was intended for the members of the core PIP team,
-who constantly need to update their version of {cmd:pip}{p_end}
-{p 8 8 2}5. If {cmd:pip} fails, start this process over.{p_end}
+{err:TO BE ADDED}
 
 
-{marker memory}{...}
-{title:Memory use and frames}:
+{marker install_troubleshoot}{...}
+{phang}
+{res:{ul:Installation troubleshooting}}
 
-{pstd}
-{cmd:pip} makes use of the `frames` feature--available since Stata 16--to store a lot of information in memory. This is partly the reason why the first call of pip in a new Stata session is slower compared to subsequent calls. When closing Stata, you may see a pop-up 
-message reading {bf:"Frames in memory have changed"}. That is perfectly normal and should not cause any concern. 
-However, make sure you save the frames that you created and wish to keep. You can do that by typing {stata frames dir}. 
-Frames created by {cmd:pip} are prefixed by {it:_pip} and are marked by an {it:*}, meaning they have not been saved. If you do not wish to save any frames in use, just click "Exit without saving." You can also delete all PIP data in memory using the command {stata pip cleanup}.
+{p 8 8 2}
+Installing the same Stata command from two different sources may result in 
+conflicting issues in your {help sysdir:search path} if the installation is 
+not {it:{help net:done properly}}. 
+The subcommand {cmd:install} is helpful to keep your 
+{help sysdir:search path} clean. Say, for example, that you install the 
+dev version from GitHub in the regular way and then 
+you install the stable version from SSC. By doing that, you are creating 
+two entries in the {it:stata.trk} file, making Stata believe that you 
+have installed {cmd:pip} twice, but in reality you don't because you used 
+the same location to install both packages. You can confirm this 
+by typing the following, {p_end}
+{cmd}
+	github install worldbank/pip  {text:// development}
+	ssc install pip, replace      {text:// stable}
+	
+	* {text:You can't uninstall pip directly}
+	ado uninstall pip
+	{err:criterion matches more than one package}
+	
+	* {text:This is because you have two versions of {cmd:pip} installed}
+	ado dir pip
+{result}
+	[318] package pip from https://raw.githubusercontent.com/worldbank/pip/master
+	'PIP': Poverty and Inequality Platform Stata wrapper
+
+	[319] package pip from http://fmwww.bc.edu/repec/bocode/p
+	'PIP': module to access poverty and inequality data from the World Bank's Poverty and 
+	Inequality Platform (PIP)
+{text}
+{p 8 8 2}
+By using the {it:install} subcommand, {cmd:pip} makes sure all the conflicting installations
+are solved. You can install {cmd:pip} from SSC and from GitHub, one after the other, and you 
+won't have conflicting installations. 
+Be aware that if you have more than one version installed in your {help sysdir:search path}, 
+{cmd:pip} is going to request you to confirm that you want to uninstall both versions by type 
+{it:yes} in the conosole and hitting enter.
+{p_end}
+
+	{cmd:pip install ssc}
+{err}
+	There is more than one version of PIP installed in the same search path, PLUS.
+	You need to uninstall pip in PLUS or change installation path with option path()
+	Type yes in the console and hit enter to confirm you agree to uninstall pip. 
+{text}
+{p 8 8 2}To troubleshoot, follow the installation process 
+{it:{help pip##installation_process:above}}.{p_end}
 
 
-{marker return}{...}
-{title:Stored results}{p 50 20 2}{p_end}
-
-{pstd}
-{cmd:pip} stores the following in {cmd:r()}. Suffix _{it:#} is a count of the
-poverty line included in {it:povlines()}:
-
-{p2col 5 20 24 2: queries}{p_end}
-{synopt:{cmd:r(query_ys_{it:#})}}Years{p_end}
-{synopt:{cmd:r(query_pl_{it:#})}}Poverty lines{p_end}
-{synopt:{cmd:r(query_ct_{it:#})}}Countries{p_end}
-{synopt:{cmd:r(query_cv_{it:#})}}Coverages{p_end}
-{synopt:{cmd:r(query_ds_{it:#})}}Whether aggregation was used{p_end}
-{synopt:{cmd:r(query_{it:#})}}Concatenation of the queries above{p_end}
-
-{p2col 5 20 24 2: API parts}{p_end}
-{synopt:{cmd:r(server)}}Protocol (http://) and server name{p_end}
-{synopt:{cmd:r(site_name)}}Site names{p_end}
-{synopt:{cmd:r(handler)}}Action handler{p_end}
-{synopt:{cmd:r(base)}}Concatenation of server, site_name, and handler{p_end}
-
-{p2col 5 20 24 2: additional info}{p_end}
-{synopt:{cmd:r(queryfull_{it:#})}}Complete query{p_end}
-{synopt:{cmd:r(npl)}}Total number of poverty lines{p_end}
-{synopt:{cmd:pip_query}}Global macro with query information in case {cmd:pip} fails. 
-"${pip_query}" to display {p_end}
-
-{marker list}{...}
-{p 40 20 2}(Go up to {it:{help pip##sections:Sections Menu}}){p_end}
-{title:List of pip and povcalnet variables}{p 50 20 2}{p_end}
-
-{pstd}
-The following list compares the variables names available in {cmd:pip} with its predecessor command {cmd:povcalnet}.
-Only the variables available in povcalnet are listed.
-
-		{hline 43}
-		pip variable    {col 40}povcalnet variable
-		{hline 20}{col 40}{hline 20}
-		country_code     {col 40}countrycode
-		country_name     {col 40}countryname
-		region_code      {col 40}regioncode
-		year             {col 40}year
-		welfare_time     {col 40}datayear
-		welfare_type     {col 40}datatype
-		poverty_line     {col 40}povertyline
-		mean             {col 40}mean
-		headcount        {col 40}headcount
-		poverty_gap      {col 40}povgap
-		poverty_severity {col 40}povgapsqr
-		watts            {col 40}watts 
-		gini             {col 40}gini
-		median           {col 40}median
-		mld              {col 40}mld
-		polarization     {col 40}polarization
-		population       {col 40}population
-		decile1          {col 40}decile1
-		decile2          {col 40}decile2
-		decile3          {col 40}decile3
-		decile4          {col 40}decile4
-		decile5          {col 40}decile5
-		decile6          {col 40}decile6
-		decile7          {col 40}decile7
-		decile8          {col 40}decile8
-		decile9          {col 40}decile9
-		decile10         {col 40}decile10		
-		ppp              {col 40}ppp
-		is_interpolated  {col 40}isinterpolated
-		distribution_type {col 40}usemicrodata
-		survey_coverage  {col 40}coveragetype
-		{hline 43}
-
+{p 60 20 2}(Go up to {it:{help pip##sections:Sections Menu}}){p_end}
 
 
 {marker Examples}{...}
-{title:Examples}{p 50 20 2}{p_end}
-{p 40 20 2}(Go up to {it:{help pip##sections:Sections Menu}}){p_end}
+{hline}
+{center:{bf:Examples}}
+{hline}
 
-{dlgtab: 1. Basic examples}
+{title:1. Basic examples}
 
 {phang}
 1.1. Load latest available survey-year estimates for Colombia and Argentina
@@ -653,7 +669,7 @@ Only the variables available in povcalnet are listed.
 {stata pip, country(all) coverage("urban") clear}
 
 
-{dlgtab: 2. Illustration of differences between queries }
+{title:2. Differences between queries }
 
 {phang}
 2.1. Country estimation at $2.15 in 2015. Since there are no surveys in ARG in 
@@ -680,7 +696,7 @@ from 2015-2016 to 2015. Only works for reference years.
 {stata pip wb, clear}       // all regions and reference years{p_end}
 
 
-{dlgtab: 3. Samples uniquely identified by country/year}
+{title:3. Samples uniquely identified by country/year}
 
 {phang2}
 {ul:3.1} Longest possible time series for each country, {it:even if} welfare type or survey coverage
@@ -790,7 +806,7 @@ Not necessarily the latest
 
 {txt}      ({stata "pip_examples pip_example10":click to run})
 
-{dlgtab: 4. Analytical examples}
+{title:4. Analytical examples}
 
 {phang2}
 {ul:4.1} Graph of trend in poverty headcount ratio and number of poor for the world
@@ -887,65 +903,105 @@ Not necessarily the latest
 {txt}      ({stata "pip_examples pip_example03":click to run})
 
 
-
-{marker troubleshooting}{...}
-{title:Troubleshooting}{p 50 20 2}{p_end}
 {p 40 20 2}(Go up to {it:{help pip##sections:Sections Menu}}){p_end}
 
-{marker installation_ex}{...}
-{dlgtab: 1. Installation issues}
 
-{p 8 8 2}
-Installing the same Stata command from two different sources may result in 
-conflicting issues in your {help sysdir:search path} if the installation is 
-not {it:{help net:done properly}}. 
-The subcommand {cmd:install} is helpful to keep your 
-{help sysdir:search path} clean. Say, for example, that you install the 
-dev version from GitHub in the regular way and then 
-you install the stable version from SSC. By doing that, you are creating 
-two entries in the {it:stata.trk} file, making Stata believe that you 
-have installed {cmd:pip} twice, but in reality you don't because you used 
-the same location to install both packages. You can confirm this 
-by typing the following, {p_end}
-{cmd}
-	github install worldbank/pip  {text:// development}
-	ssc install pip, replace      {text:// stable}
-	
-	* {text:You can't uninstall pip directly}
-	ado uninstall pip
-	{err:criterion matches more than one package}
-	
-	* {text:This is because you have two versions of {cmd:pip} installed}
-	ado dir pip
-{result}
-	[318] package pip from https://raw.githubusercontent.com/worldbank/pip/master
-	'PIP': Poverty and Inequality Platform Stata wrapper
 
-	[319] package pip from http://fmwww.bc.edu/repec/bocode/p
-	'PIP': module to access poverty and inequality data from the World Bank's Poverty and 
-	Inequality Platform (PIP)
-{text}
-{p 8 8 2}
-By using the {it:install} subcommand, {cmd:pip} makes sure all the conflicting installations
-are solved. You can install {cmd:pip} from SSC and from GitHub, one after the other, and you 
-won't have conflicting installations. 
-Be aware that if you have more than one version installed in your {help sysdir:search path}, 
-{cmd:pip} is going to request you to confirm that you want to uninstall both versions by type 
-{it:yes} in the conosole and hitting enter.
-{p_end}
+{marker misc_detail}{...}
+{hline}
+{center:{bf:Miscellaneous information}}
+{hline}
 
-	{cmd:pip install ssc}
-{err}
-	There is more than one version of PIP installed in the same search path, PLUS.
-	You need to uninstall pip in PLUS or change installation path with option path()
-	Type yes in the console and hit enter to confirm you agree to uninstall pip. 
-{text}
-{p 8 8 2}To troubleshoot, follow the installation process 
-{it:{help pip##installation_process:above}}.{p_end}
+{marker general_options_detail}{...}
+{title:General options}
+{err:TO BE ADDED}
+
+
+{marker memory}{...}
+{title:Memory use and frames}:
+
+{pstd}
+{cmd:pip} makes use of the `frames` feature--available since Stata 16--to store a lot of information in memory. This is partly the reason why the first call of pip in a new Stata session is slower compared to subsequent calls. When closing Stata, you may see a pop-up 
+message reading {bf:"Frames in memory have changed"}. That is perfectly normal and should not cause any concern. 
+However, make sure you save the frames that you created and wish to keep. You can do that by typing {stata frames dir}. 
+Frames created by {cmd:pip} are prefixed by {it:_pip} and are marked by an {it:*}, meaning they have not been saved. If you do not wish to save any frames in use, just click "Exit without saving." You can also delete all PIP data in memory using the command {stata pip cleanup}. {err:TO BE completed}
+
+
+{marker return}{...}
+{title:Stored results}{p 50 20 2}{p_end}
+
+{pstd}
+{cmd:pip} stores the following in {cmd:r()}. Suffix _{it:#} is a count of the
+poverty line included in {it:povlines()}:
+
+{p2col 5 20 24 2: queries}{p_end}
+{synopt:{cmd:r(query_ys_{it:#})}}Years{p_end}
+{synopt:{cmd:r(query_pl_{it:#})}}Poverty lines{p_end}
+{synopt:{cmd:r(query_ct_{it:#})}}Countries{p_end}
+{synopt:{cmd:r(query_cv_{it:#})}}Coverages{p_end}
+{synopt:{cmd:r(query_ds_{it:#})}}Whether aggregation was used{p_end}
+{synopt:{cmd:r(query_{it:#})}}Concatenation of the queries above{p_end}
+
+{p2col 5 20 24 2: API parts}{p_end}
+{synopt:{cmd:r(server)}}Protocol (http://) and server name{p_end}
+{synopt:{cmd:r(site_name)}}Site names{p_end}
+{synopt:{cmd:r(handler)}}Action handler{p_end}
+{synopt:{cmd:r(base)}}Concatenation of server, site_name, and handler{p_end}
+
+{p2col 5 20 24 2: additional info}{p_end}
+{synopt:{cmd:r(queryfull_{it:#})}}Complete query{p_end}
+{synopt:{cmd:r(npl)}}Total number of poverty lines{p_end}
+{synopt:{cmd:pip_query}}Global macro with query information in case {cmd:pip} fails. 
+"${pip_query}" to display {p_end}
+
+{marker list}{...}
+{p 40 20 2}(Go up to {it:{help pip##sections:Sections Menu}}){p_end}
+{title:List of pip and povcalnet variables}{p 50 20 2}{p_end}
+
+{pstd}
+The following list compares the variables names available in {cmd:pip} with its predecessor command {cmd:povcalnet}.
+Only the variables available in povcalnet are listed.
+
+		{hline 43}
+		pip variable    {col 40}povcalnet variable
+		{hline 20}{col 40}{hline 20}
+		country_code     {col 40}countrycode
+		country_name     {col 40}countryname
+		region_code      {col 40}regioncode
+		year             {col 40}year
+		welfare_time     {col 40}datayear
+		welfare_type     {col 40}datatype
+		poverty_line     {col 40}povertyline
+		mean             {col 40}mean
+		headcount        {col 40}headcount
+		poverty_gap      {col 40}povgap
+		poverty_severity {col 40}povgapsqr
+		watts            {col 40}watts 
+		gini             {col 40}gini
+		median           {col 40}median
+		mld              {col 40}mld
+		polarization     {col 40}polarization
+		population       {col 40}population
+		decile1          {col 40}decile1
+		decile2          {col 40}decile2
+		decile3          {col 40}decile3
+		decile4          {col 40}decile4
+		decile5          {col 40}decile5
+		decile6          {col 40}decile6
+		decile7          {col 40}decile7
+		decile8          {col 40}decile8
+		decile9          {col 40}decile9
+		decile10         {col 40}decile10		
+		ppp              {col 40}ppp
+		is_interpolated  {col 40}isinterpolated
+		distribution_type {col 40}usemicrodata
+		survey_coverage  {col 40}coveragetype
+		{hline 43}
+
 
 
 {marker general_troubleshooting}{...}
-{dlgtab: 2. General troubleshooting}
+{title: General Troubleshooting}
 
 {p 4 4 2} 
 In case {cmd:pip} is not working correctly, try the following steps in order
