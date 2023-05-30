@@ -169,6 +169,12 @@ program define pip, rclass
 			pip_timer pip, off 
 			exit
 		}
+		if ("`setup'" != "") {
+			//------------ Cache info
+			pip_setup display
+			pip_timer pip, off 
+			exit
+		}
 		
 		noi disp "{err}Options not supported by subcommand {it:print}." _n /* 
 		 */ "see {it:{help pip##print_options:print options}}"

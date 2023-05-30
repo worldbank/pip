@@ -50,6 +50,14 @@ program define pip_setup, rclass
 		run  "`r(fn)'"
 		exit
 	}
+	// run pip_setup.do
+	if ("`subcmd'" == "display") {
+		cap findfile "pip_setup.do"
+		if (_rc)  pip_setup_create // if setup.do is not found
+		
+		type "`r(fn)'"
+		exit
+	}
 	
 	
 	// cche dir
