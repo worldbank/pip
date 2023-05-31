@@ -35,7 +35,14 @@ Update {cmd:pip}
 {synoptset 27 tabbed}{...}
 {synopthdr:tables options}
 {synoptline}
-{synopt :{opt tops}}Desc.{p_end}
+{synopt :{opt gh}}Install {cmd:pip} from 
+{browse "https://github.com/worldbank/pip":GitHub}{p_end}
+{synopt :{opt ssc}}Install {cmd:pip} from 
+{browse "https://ideas.repec.org/c/boc/bocode/s459179.html": SSC}{p_end}
+{synopt :{opt version(#)}}version to install. Only works with option {it:gh} 
+option{p_end}
+{synopt :{opt path(path)}}{it:(Programmer option)} Un/Installs {cmd:pip} 
+in that directory. Default is PLUS, as you regularly install commands from SSC.{p_end}
 {synoptline}
 
 

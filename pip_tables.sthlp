@@ -7,23 +7,16 @@
 
 {title:Syntax}
 
-
+{phang}
+{cmd:pip }
 
 {marker opts_desc}{...}
 {title:Options}
 
 {synoptset 27 tabbed}{...}
-{synopthdr:print options}
+{synopthdr:tables options}
 {synoptline}
-{synopt :{opt timer}}displays timer report of last execution of {cmd:pip}{p_end}
-{synopt :{opt versions}}displays versions of data available{p_end}
-{synopt :{opt tables}}Equivalent to {cmd:pip tables}. Displays auxiliary tables
-available.{p_end}
-{synopt :{opt available}}Equivalent to {cmd:pip info}. Display data availability. 
-You can also use {cmd:pip print, {it:info}} or 
-{cmd:pip print, {it:availability}}{p_end}
-{synopt :{opt cache}}Equivalent to {cmd:pip cache, info}. 
-Displays interactive information of cache local memory.{p_end}
+{synopt :{opt table(string)}}Loads one auxiliary table, this option is used along with the {cmd:tables} subcommand.{p_end}
 {synoptline}
 
 
