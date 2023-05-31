@@ -114,7 +114,8 @@ For a detailed description of the {cmd:server()} and {cmd:identity()} options se
 {title:Examples}
 
 {pstd}
-The examples below do not comprehend all {cmd:pip}'s features.
+The examples below do not comprehend all {cmd:pip}'s features. Please refer 
+to the {it:examples} section of the help file of {help pip##sbc_table:each subcommad}.
 
 {ul:Basic examples}
 
@@ -173,11 +174,21 @@ message reading {bf:"Frames in memory have changed"}. That is perfectly normal a
 However, make sure you save the frames that you created and wish to keep. You can do that by typing {stata frames dir}. 
 Frames created by {cmd:pip} are prefixed by {it:_pip} and are marked by an {it:*}, meaning they have not been saved. If you do not wish to save any frames in use, just click "Exit without saving." You can also delete all PIP data in memory using the command {stata pip cleanup}.
 
+{err: add usage of memory by cache}
+
+{err: add info about globals}
+
+{err: add info about pip_setup.do and Mata libraries}
+
+
 {marker return}{...}
 {title:Stored results}{p 50 20 2}{p_end}
 
 {pstd}
-{cmd:pip} is an {helpb return:rclass} command, which means that stores the results in {cmd:r()}. 
+{cmd:pip} is an {helpb return:rclass} command, which means that it stores the
+results in {cmd:r()}. Each subcommand has its own set of returned results, 
+and you can display them by typing {cmd:{ul:ret}urn list} after the execution
+of {cmd:pip}.
 
 
 {marker povcal}{...}
