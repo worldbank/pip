@@ -2,13 +2,13 @@
 {* *! version 1.0.0 dec 2022}{...}
 {vieweralsosee "" "--"}{...}
 {cmd:help pip tables}{right:{browse "https://pip.worldbank.org/":Poverty and Inequality Platform (PIP)}}
-{right:{browse "https://worldbank.github.io/pip/"}}
+{help pip:return to pip} {right:{browse "https://worldbank.github.io/pip/"}}
 {hline}
 
 {title:Syntax}
 
 {phang}
-{cmd:pip }
+{cmd:pip tables} [{it:tables(string)}]
 
 {marker opts_desc}{...}
 {title:Options}

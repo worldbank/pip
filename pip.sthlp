@@ -24,7 +24,7 @@
 {title:Syntax}
 
 {p 8 16 2}
-{cmd:pip} [{it:{help pip##subcommands:subcommand}}]{cmd:,} 
+{cmd:pip} [{it:{help pip##sbc_table:subcommand}}]{cmd:,} 
 [{it:subcommand options}]
 
 
@@ -42,10 +42,10 @@
 ({cmd:pip install ssc}) or the development version from GitHub ({cmd:pip install gh}){p_end}
 
 {p 4 4 2}Auxiliary subcommands{p_end}
-{synopt :{helpb info}}Display countries and regions availability{p_end}
-{synopt :{helpb cleanup}}Deletes all pip data from current stata memory.{p_end}
-{synopt :{helpb drop}}({it:Programmer's option}) Deletes objects from memory.{p_end}
-{synopt :{helpb test}}Open in browser last pip call. Type {cmd:disp "${pip_query}"} to see the parameters of the API query.{p_end}
+{synopt :{helpb pip_misc:info}}Display countries and regions availability{p_end}
+{synopt :{helpb pip_misc:cleanup}}Deletes all pip data from current stata memory.{p_end}
+{synopt :{helpb pip_misc:drop}}({it:Programmer's option}) Deletes objects from memory.{p_end}
+{synopt :{helpb pip_misc:test}}Open in browser last pip call. Type {cmd:disp "${pip_query}"} to see the parameters of the API query.{p_end}
 {synoptline}
 {pstd}
 {bf:Note}: {cmd:pip} requires an internet connection.

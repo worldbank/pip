@@ -1,24 +1,30 @@
 {smcl}
 {* *! version 1.0.0 dec 2022}{...}
 {vieweralsosee "" "--"}{...}
-{cmd:help pip tables}{right:{browse "https://pip.worldbank.org/":Poverty and Inequality Platform (PIP)}}
+{cmd:help pip misc}{right:{browse "https://pip.worldbank.org/":Poverty and Inequality Platform (PIP)}}
 {help pip:return to pip} {right:{browse "https://worldbank.github.io/pip/"}}
 {hline}
+
+{res:Miscellaneous subcommands}
 
 {title:Syntax}
 
 {phang}
-{cmd:pip }
+{cmd:pip info}
 
-{marker opts_desc}{...}
-{title:Options}
 
-{synoptset 27 tabbed}{...}
-{synopthdr:tables options}
-{synoptline}
-{synopt :{opt tops}}Desc.{p_end}
-{synoptline}
+{phang}
+{cmd:pip drop,} [options]
 
+
+{phang}
+{cmd:pip test}
+
+
+{phang}
+{cmd:pip cleanup}
+
+{err: add others}
 
 {marker description}{...}
 {title:Description}

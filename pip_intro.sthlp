@@ -16,15 +16,15 @@ of each subcommand, please visit the {help pip##sbc_table:subcommand directory}
 {pstd}
 This introduction is presented under the following headings
 
-	{help pip_intro#desc:Description}
-	{help pip_intro#basic:Basic Use}
-		{help pip_intro#cl:Country-level}
-		{help pip_intro#wb:Regional/global-level}
-		{help pip_intro#pl:Poverty Lines}
-		{help pip_intro#da:Data Availability}
-		{help pip_intro#ps:Towards distributional analysis}
-		{help pip_intro#ad:Auxiliary Data}
-	{help pip_intro#example:Examples}
+{col 8}{help pip_intro##desc:Description}
+{col 8}{help pip_intro##basic:Basic Use}
+{col 12}{help pip_intro##cl:Country-level}
+{col 12}{help pip_intro##wb:Regional/global-level}
+{col 12}{help pip_intro##pl:Poverty Lines}
+{col 12}{help pip_intro##da:Data Availability}
+{col 12}{help pip_intro##ps:Towards distributional analysis}
+{col 12}{help pip_intro##ad:Auxiliary Data}
+{col 8}{help pip_intro##example:Examples}
 
 
 {marker desc}{...}
@@ -38,7 +38,7 @@ The {browse "https://pip.worldbank.org/":Poverty and Inequality Platform}
 cross-country, as well as global and regional poverty analyses. 
 Users are able to estimate rates  over time and at any poverty line specified.
 {cmd:pip} reports a  wide range of measures for poverty (at any chosen poverty
-line) and inequality. See {help pip##povcal:full list of indicators} 
+line) and inequality. See {help pip####povcal:full list of indicators} 
 available in {cmd:pip} .
 
 {pstd}

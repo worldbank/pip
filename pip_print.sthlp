@@ -8,6 +8,9 @@
 {title:Syntax}
 
 
+{phang}
+{cmd:pip print, } [{it:{help pip_print##opts_desc:options}}]
+
 
 {marker opts_desc}{...}
 {title:Options}
