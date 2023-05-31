@@ -301,8 +301,8 @@ Notes:
 
 Version Control:
 
-*! version 0.10.3.dev     <2023May26>
-*! -- Start reorganization of helpfile
+*! version 0.10.4    <2023May31>
+*! -- Modular Helpfile (Incomplete)
 *! -- Improve cache manipulation, specially with cachedir() option
 *! -- Add more print options
 *! -- BREAKING CHANGE: `pip versions` is now `pip print, version`
