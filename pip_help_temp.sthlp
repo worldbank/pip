@@ -7,7 +7,8 @@
 
 {title:Syntax}
 
-
+{phang}
+{cmd:pip }
 
 {marker opts_desc}{...}
 {title:Options}
