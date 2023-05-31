@@ -177,28 +177,8 @@ Frames created by {cmd:pip} are prefixed by {it:_pip} and are marked by an {it:*
 {title:Stored results}{p 50 20 2}{p_end}
 
 {pstd}
-{cmd:pip} stores the following in {cmd:r()}. Suffix _{it:#} is a count of the
-poverty line included in {it:povlines()}:
+{cmd:pip} is an {helpb return:rclass} command, which means that stores the results in {cmd:r()}. 
 
-{p2col 5 20 24 2: queries}{p_end}
-{synopt:{cmd:r(query_ys_{it:#})}}Years{p_end}
-{synopt:{cmd:r(query_pl_{it:#})}}Poverty lines{p_end}
-{synopt:{cmd:r(query_ct_{it:#})}}Countries{p_end}
-{synopt:{cmd:r(query_cv_{it:#})}}Coverages{p_end}
-{synopt:{cmd:r(query_ds_{it:#})}}Whether aggregation was used{p_end}
-{synopt:{cmd:r(query_{it:#})}}Concatenation of the queries above{p_end}
-
-{p2col 5 20 24 2: API parts}{p_end}
-{synopt:{cmd:r(server)}}Protocol (http://) and server name{p_end}
-{synopt:{cmd:r(site_name)}}Site names{p_end}
-{synopt:{cmd:r(handler)}}Action handler{p_end}
-{synopt:{cmd:r(base)}}Concatenation of server, site_name, and handler{p_end}
-
-{p2col 5 20 24 2: additional info}{p_end}
-{synopt:{cmd:r(queryfull_{it:#})}}Complete query{p_end}
-{synopt:{cmd:r(npl)}}Total number of poverty lines{p_end}
-{synopt:{cmd:pip_query}}Global macro with query information in case {cmd:pip} fails. 
-"${pip_query}" to display {p_end}
 
 {marker povcal}{...}
 {p 40 20 2}(Go up to {it:{help pip##sections:Sections Menu}}){p_end}
