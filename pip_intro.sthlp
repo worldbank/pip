@@ -2,29 +2,52 @@
 {* *! version 1.0.0 dec 2022}{...}
 {vieweralsosee "" "--"}{...}
 {cmd:help pip intro}{right:{browse "https://pip.worldbank.org/":Poverty and Inequality Platform (PIP)}}
-{right:{browse "https://worldbank.github.io/pip/"}}
+{help pip:return to pip} {right:{browse "https://worldbank.github.io/pip/"}}
 {hline}
+
+{pstd}
+{res}This entry aims to equip new  users with basic knowledge of the most
+useful features of the {cmd:pip} command. For a more detailed explanation 
+of each subcommand, please visit the {help pip##sbc_table:subcommand directory}
+{txt}
+
+{title:Remarks}
+
+{pstd}
+This introduction is presented under the following headings
+
+	{help pip_intro#desc:Description}
+	{help pip_intro#basic:Basic Use}
+		{help pip_intro#cl:Country-level}
+		{help pip_intro#wb:Regional/global-level}
+		{help pip_intro#pl:Poverty Lines}
+		{help pip_intro#da:Data Availability}
+		{help pip_intro#ps:Towards distributional analysis}
+		{help pip_intro#ad:Auxiliary Data}
+	{help pip_intro#example:Examples}
 
 
 {marker desc}{...}
 {title:Description}
 
 {pstd}
-The {cmd:pip} command has the same functionality as the {browse "https://pip.worldbank.org/":PIP website}. 
-It allows Stata users to compute poverty and inequality indicators for over 160 countries 
-in the World Bank's database of household surveys. PIP is a computational tool that allows 
-users to conduct country-specific, cross-country, as well as global and regional poverty analyses. 
-Users are able estimate rates  over time and at any poverty line specified. {cmd:pip} reports a 
-wide range of measures for poverty (at any chosen poverty line) and inequality. See full list of indicators 
-available in {cmd:pip} {help pip##list:below}.
+The {cmd:pip} command allows Stata users to compute poverty and inequality
+indicators for over 160 countries in the World Bank's database of household surveys. 
+The {browse "https://pip.worldbank.org/":Poverty and Inequality Platform}
+(PIP) is a computational tool that allows users to conduct country-specific,
+cross-country, as well as global and regional poverty analyses. 
+Users are able to estimate rates  over time and at any poverty line specified.
+{cmd:pip} reports a  wide range of measures for poverty (at any chosen poverty
+line) and inequality. See {help pip##povcal:full list of indicators} 
+available in {cmd:pip} .
 
 {pstd}
 {it:{ul:modular structure:}} The {cmd:pip} command works in a modular 
 (subcommand, hereafter) fashion. There is no instruction to {cmd:pip} that is 
-executed outside a particular subcommand. When no subcommand is invoked, as in 
-{cmd:pip, clear}, the subcommand {cmd:cl} (coutry-level estimates) is in use. 
-Thus, understanding {cmd:pip} fully is equivalent to understand each subcommand 
-and its options fully. 
+executed outside a particular subcommand. When no subcommand is invoked--as 
+in {cmd:pip, clear}--the subcommand {cmd:cl} (country-level estimates) 
+is in use. Thus, understanding {cmd:pip} fully is equivalent to understand each subcommand and its options fully. For a list of all subcommands and 
+their corresponding help entries, visit the {help pip##sbc_table:subcommand directory}
 
 {pstd}
 {it:{ul:welfare aggregate:}} To make estimates 
@@ -36,10 +59,129 @@ aggregate conversion can be found in the
 {browse "https://datanalytics.worldbank.org/PIP-Methodology/convert.html": Poverty and Inequality Platform Methodology Handbook}.
  
 {pstd}
-PIP is the result of a close collaboration between World Bank staff across the Development Data Group, the Development Research Group, and the Poverty and Inequality Global Practice. 
+{it:{ul:Collaboration:}} PIP is the result of a close collaboration between World Bank staff across the Development Data Group, the Development Research Group, and the Poverty and Inequality Global Practice. 
 
 
+{marker basic}{...}
+{title:Basic use}
 
+{pstd}
+The main functionality of {cmd:pip} is to compute poverty and inequality
+indicators for over 160 countries in the World Bank's database of household
+surveys. Poverty measures are estimated at two  levels of aggregation:
+country-level and regional/global-level, which you can access using the
+subcommands {cmd:cl} (the default) and {cmd:wb}, respectively. For a detailed
+explanation of {cmd:cl} and {cmd:wb} go {help pip_cl:here}.
+
+{marker cl}{...}
+{ul:country-level}
+
+{pstd}
+For instance, you can query poverty at $2.15-a-day poverty line for 
+all countries in all survey years
+
+{p 8 16 2}
+{cmd:. pip cl,  clear} 
+
+{pstd}
+Yet, you can filter your query by country and survey year. For examples, for Morocco in 2013. Visit the {help pip_countries:list of countries and regions}.
+
+{p 8 16 2}
+{cmd:. pip, country(mar) year(2013) clear} // the default subcommand is {cmd:cl}
+
+{pstd}
+For extrapolated and interpolated data that underpin the global and regional
+poverty numbers, use {cmd:fillgaps} option. There is no survey in Morocco in
+2019, but you can estimate it
+
+{p 8 16 2}
+{cmd:. pip, country(mar) year(2019) fillgaps clear} {p_end}
+
+{phang2}
+{err:Note:} Extrapolated and interpolated values are made available for transparency
+purposes only and are {bf:NOT} intended to be use four country-level analysis, as
+they are originally calculated to estimated global poverty. 
+
+{marker wb}{...}
+{ul:regional/global-level}
+
+{pstd}
+To get poverty estimates at the regional/global-level, just switch the
+{cmd:cl} subcommand for {cmd:wb}
+
+{p 8 16 2}
+{cmd:. pip wb, clear} 
+
+{pstd}
+Query a particular region using {cmd:region()} options. Visit the {help pip_countries:list of countries and regions}.
+
+{p 8 16 2}
+{cmd:. pip wb, clear region(LAC)} 
+
+{marker pl}{...}
+{ul:Poverty lines}
+
+{pstd}
+By default, {cmd:pip} estimate poverty measures at the international poverty
+line of the current {browse "https://www.worldbank.org/en/programs/icp":ICP}
+round. For the 2017 round, the value is  $2.15-a-day.
+However, you can poverty at different thresholds. 
+
+{p 8 16 2}
+{cmd:. pip, country(mar) year(2019) fillgaps povline(6.85)} 
+
+{pstd}
+You can query multiple poverty lines. 
+
+{p 8 16 2}
+{cmd:. pip, country(mar) year(2019) fillgaps povline(2.15 3.65 6.85 10)} 
+
+{marker da}{...}
+{ul:Data availability}
+
+{pstd}
+Display data availability by country and region
+
+{p 8 16 2}
+{cmd:. pip info} 
+
+{pstd}
+If data is not available for a particular survey year, {cmd:pip} will return
+and error but will provide you with a clickable hyperlink to find out the 
+survey availability for the country of interest.
+
+{p 8 16 2}
+{cmd:. pip, country(mar) year(2019) clear}{p_end}
+{err: Add error message}
+
+{marker ps}{...}
+{ul:Towards distributional analysis}
+
+{pstd}
+The default use of pip is to get the poverty headcount. However, the inverse operation is also available in {cmd:pip}. You can provide the share of the population using {cmd:popshare()} and get in return the monetary value of the welfare distribution. For example, you can estimate the median like this
+
+{p 8 16 2}
+{cmd:.pip, country(mar) year(2013) clear popshare(0.5)}{p_end}
+
+{marker ad}{...}
+{ul:Auxiliary data}
+
+{pstd}
+Though the main underlying data of PIP are the household surveys, it makes
+use of many other sources such as GDP, CPI, population, among many others. 
+You can get the list of all auxiliary tables, and click in the one you want. 
+
+{p 8 16 2}
+{cmd:.pip tables, clear}{p_end}
+
+{pstd}
+Or, you can provide the name of the table of interest directly,
+
+{p 8 16 2}
+{cmd:.pip tables, table(cpi) clear}{p_end}
+
+
+{marker examples}{...}
 {title:Examples}
 
 {pstd}

@@ -2,7 +2,7 @@
 {* *! version 1.0.0 dec 2022}{...}
 {vieweralsosee "" "--"}{...}
 {cmd:help pip tables}{right:{browse "https://pip.worldbank.org/":Poverty and Inequality Platform (PIP)}}
-{right:{browse "https://worldbank.github.io/pip/"}}
+{help pip:return to pip} {right:{browse "https://worldbank.github.io/pip/"}}
 {hline}
 
 {title:Syntax}
@@ -176,11 +176,7 @@ Be aware that if you have more than one version installed in your {help sysdir:s
 	You need to uninstall pip in PLUS or change installation path with option path()
 	Type yes in the console and hit enter to confirm you agree to uninstall pip. 
 {text}
-{p 8 8 2}To troubleshoot, follow the installation process 
-{it:{help pip##installation_process:above}}.{p_end}
+{p 8 8 2}To troubleshoot, follow the 
+{it:{help pip##installation_process:installation process}}.{p_end}
 
-
-
-
-
-
+{right:{help pip:return to pip}}

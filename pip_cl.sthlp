@@ -2,7 +2,7 @@
 {* *! version 1.0.0 dec 2022}{...}
 {vieweralsosee "" "--"}{...}
 {cmd:help pip cl} and {cmd:help pip wb}{right:{browse "https://pip.worldbank.org/":Poverty and Inequality Platform (PIP)}}
-{right:{browse "https://worldbank.github.io/pip/"}}
+{help pip:return to pip} {right:{browse "https://worldbank.github.io/pip/"}}
 {hline}
 
 {title:syntax}
