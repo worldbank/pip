@@ -1,8 +1,6 @@
 {smcl}
 {* *! version 1.0.0 dec 2022}{...}
 {vieweralsosee "" "--"}{...}
-{vieweralsosee "Install wbopendata" "ssc install wbopendata"}{...}
-{vieweralsosee "Help wbopendata (if installed)" "help wbopendata"}{...}
 {viewerjumpto "Command description"   "pip##desc"}{...}
 {viewerjumpto "Parameters description"   "pip##param"}{...}
 {viewerjumpto "Options description"   "pip##options"}{...}
@@ -16,82 +14,60 @@
 {viewerjumpto "Authors"   "pip##authors"}{...}
 {viewerjumpto "Regions" "pip_countries##regions"}{...}
 {viewerjumpto "Countries" "pip_countries##countries"}{...}
+{cmd:help pip}{right:{browse "https://pip.worldbank.org/":Poverty and Inequality Platform (PIP)}}
+{right:{browse "https://worldbank.github.io/pip/"}}
 {hline}
-help for {cmd:pip}{right:R.Andrés Castañeda}
-{hline}
-{title:Stata client for PIP}
 
-{p2colset 9 22 22 2}{...}
-{p2col :{hi:pip} {hline 2}}Access poverty and inequality data from the 
-World Bank's {browse "https://pip.worldbank.org/":Poverty and Inequality Platform (PIP)}. 
-The {cmd:pip} command allows Stata users to access the poverty and inequality indicators 
-available in the PIP platform and estimate poverty at any line. PIP contains more 
-indicators than its predecessor(povcalnet). See {help pip##list:below} for a comparison
-between the indicators in the pip and povcalnet commands. {p_end}
-{p2col :{hi:Website: }}{browse "https://worldbank.github.io/pip/"}{p_end}
-{p2colreset}{...}
+{phang}
+{res:If you're new to {cmd:pip}, please start by reading {help pip_intro:pip intro}}
+
 {title:Syntax}
-
-{pstd}
-{it:General}
 
 {p 8 16 2}
 {cmd:pip} [{it:{help pip##subcommands:subcommand}}]{cmd:,} 
-[{it:{help pip##param:Parameters}} {it:{help pip##options:General options}}]
-
-{p 8 16 2}
-where {it:subcommand} could be {cmd:{it:cl}}, {cmd:{it:wb}}, {cmd:{it:tables}}, {cmd:{it:info}}, 
-{cmd:{it:setup}}, {cmd:{it:clean}}, {cmd:{it:install}}, {cmd:{it:uninstall}}, {cmd:{it:update}}, {cmd:{it:version}},
-{cmd:{it:cache}}, {cmd:{it:dropframe}}, or {cmd:{it:dropglobal}}
+[{it:subcommand options}]
 
 
-{pstd}
-{cmd:{it:cl}}: Country level
+{marker sbc_table}{...}
+{synoptset 27 tabbed}{...}
+{synopthdr:Subcommand}
+{synoptline}
+{p 4 4 2}Main subcommands{p_end}
+{synopt :{helpb pip_cl:cl}}Country-level poverty and inequality estimates. {help pip_cl##options:options}{p_end}
+{synopt :{helpb pip_cl:wb}}World Bank's regional and global aggregation. {help pip_cl##options:options}{p_end}
+{synopt :{helpb pip_tables:tables}}Clickable list of auxiliary tables. {help pip_tables##options:options}{p_end}
+{synopt :{helpb pip_cache:cache}}Manage local cache. {help pip_cache##options:options}{p_end}
+{synopt :{helpb pip_print:print}}Print useful information. {help pip_print##options:options}{p_end}
+{synopt :{helpb pip_install:[un]install}}Installs the stable version of pip from SSC 
+({cmd:pip install ssc}) or the development version from GitHub ({cmd:pip install gh}){p_end}
 
-{p 8 16 2}
-{cmd:pip} [cl], [{cmd:,} {it:{help pip##cl_wb_options:cl options}}]
-
-
-{pstd}
-{cmd:{it:wb}}: World Bank global and regional aggregates
-
-{p 8 16 2}
-{cmd:pip wb}, [{cmd:,} {it:{help pip##cl_wb_options:wb options}}]
-
-
-{pstd}
-{cmd:{it:tables}}: Display or access auxiliary tables
-
-{p 8 16 2}
-{cmd:pip tables} [, {cmd:table({it:aux table name)}}]
-
-
-{pstd}
-{cmd:{it:cache}}: Manage local cache
-
-{p 8 16 2}
-{cmd:pip cache}[{cmd:,} {it:{help pip##cache_options:cache options}}]
-
-
-{pstd}
-{cmd:{it:info}}: Display data availability
-
-{p 8 16 2}
-{cmd:pip} info
-
-
-{pstd}
-{cmd:{it:print}}: Print useful information
-
-{p 8 16 2}
-{cmd:pip print}[{cmd:,} {it:{help pip##print_options:print options}}]
-
-{err:TO BE COMPLETED}
-
-
-
+{p 4 4 2}Auxiliary subcommands{p_end}
+{synopt :{helpb info}}Display countries and regions availability{p_end}
+{synopt :{helpb cleanup}}Deletes all pip data from current stata memory.{p_end}
+{synopt :{helpb drop}}({it:Programmer's option}) Deletes objects from memory.{p_end}
+{synopt :{helpb test}}Open in browser last pip call. Type {cmd:disp "${pip_query}"} to see the parameters of the API query.{p_end}
+{synoptline}
 {pstd}
 {bf:Note}: {cmd:pip} requires an internet connection.
+
+
+
+{marker desc}{...}
+{title:Description}
+
+{pstd}
+The {cmd:pip} command has the same functionality as the {browse "https://pip.worldbank.org/":PIP website}. 
+It allows Stata users to compute poverty and inequality indicators for over 160 countries 
+in the World Bank's database of household surveys. PIP is a computational tool that allows 
+users to conduct country-specific, cross-country, as well as global and regional poverty analyses.
+
+{pstd}
+{res:If you're new to {cmd:pip}, please start by reading {help pip_intro:pip intro}}. 
+If you want to understand the details and functionalities of each subcommand, please click on the corresponding subcommand of the table {help pip##sbc_table:above}.
+The rest of this document contains general information regarding PIP and the {cmd:pip}
+Stata command.
+
+
 
 
 {marker sections}{...}
@@ -131,6 +107,17 @@ Sections are presented under the following headings:
 			{it:{help pip##howtocite:How to cite}}
 			{it:{help pip_countries:Region and country codes}}
 
+{p2colset 9 22 22 2}{...}
+{p2col :{hi:pip} {hline 2}}Access poverty and inequality data from the 
+World Bank's {browse "https://pip.worldbank.org/":Poverty and Inequality Platform (PIP)}. 
+The {cmd:pip} command allows Stata users to access the poverty and inequality indicators 
+available in the PIP platform and estimate poverty at any line. PIP contains more 
+indicators than its predecessor(povcalnet). See {help pip##list:below} for a comparison
+between the indicators in the pip and povcalnet commands. {p_end}
+{p2col :{hi:Website: }}{browse "https://worldbank.github.io/pip/"}{p_end}
+{p2colreset}{...}
+
+
 
 {marker basic_info}{...}
 {hline}
@@ -143,24 +130,10 @@ Sections are presented under the following headings:
 {pstd}
 {err:Note}: Options abbreviation is not allowed in {cmd:pip} 
 
+.
+.
+.
 
-{marker cl_wb_options}{...}
-{synoptset 27 tabbed}{...}
-{synopthdr:cl and wb options}
-{synoptline}
-{synopt :{opt country:}(3-letter code)}List of {it:{help pip_countries##countries:country code}} or {it:all}. Default is "{it:all}".
-Does not work with subcommand {cmd:wb}.{p_end}
-{synopt :{opt region}(3-letter WB code)}List of {it:{help pip_countries##regions:region code}} or {it:all}. Default is "{it:all}".{p_end}
-{synopt :{opt coverage(string)}}Coverage level ("national", "urban", "rural", "all"). Default "all".{p_end}
-{synopt :{opt year:}(numlist|string)}{it:{help numlist}} of years  or {it:all}, or {it:last}. Default is "all".{p_end}
-{synopt :{opt povline:}(#)}list of poverty lines (in PPP specified, see option {cmd:ppp_year(#)}) to calculate 
- poverty measures (accepts up to 5). Default is 2.15 at 2017 PPPs.{p_end}
- {pstd}
-The following only work with subcommand {cmd:cl}
-
-{synopt :{opt popshare:}(#)}List of quantiles. No default. Cannot be used with option {opt povline:(#)}{p_end}
-{synopt :{opt fillgaps}}Loads country-level estimates (including extrapolations and interpolations) used to create regional and global aggregates.{p_end}
-{synoptline}
 
 
 {marker tables_options}{...}
@@ -238,39 +211,6 @@ For a detailed description of the {cmd:server()} and {cmd:identity()} options se
 
 
 
-{marker desc}{...}
-{p 40 20 2}(Go up to {it:{help pip##sections:Sections Menu}}){p_end}
-{title:Command Description}
-
-{pstd}
-The {cmd:pip} command has the same functionality as the {browse "https://pip.worldbank.org/":PIP website}. 
-It allows Stata users to compute poverty and inequality indicators for over 160 countries 
-in the World Bank's database of household surveys. PIP is a computational tool that allows 
-users to conduct country-specific, cross-country, as well as global and regional poverty analyses. 
-Users are able estimate rates  over time and at any poverty line specified. {cmd:pip} reports a 
-wide range of measures for poverty (at any chosen poverty line) and inequality. See full list of indicators 
-available in {cmd:pip} {help pip##list:below}.
-
-{pstd}
-{it:{ul:modular structure:}} The {cmd:pip} command works in a modular 
-(subcommand, hereafter) fashion. There is no instruction to {cmd:pip} that is 
-executed outside a particular subcommand. When no subcommand is invoked, as in 
-{cmd:pip, clear}, the subcommand {cmd:cl} (coutry-level estimates) is in use. 
-Thus, understanding {cmd:pip} fully is equivalent to understand each subcommand 
-and its options fully. 
-
-{pstd}
-{it:{ul:welfare aggregate:}} To make estimates 
-comparable across countries, the welfare aggregate is expressed in PPP values
-of the most recent {browse "https://www.worldbank.org/en/programs/icp":ICP } 
-round that has been approved for global poverty estimates
-by the directives of the World Bank.  The detailed methodology of the welfare
-aggregate conversion can be found in the 
-{browse "https://datanalytics.worldbank.org/PIP-Methodology/convert.html": Poverty and Inequality Platform Methodology Handbook}.
- 
-{pstd}
-PIP is the result of a close collaboration between World Bank staff across the Development Data Group, the Development Research Group, and the Poverty and Inequality Global Practice. 
-
 
 {marker subcmd_desc}{...}
 {title:Subcommands description}
@@ -287,148 +227,16 @@ of tools and auxiliary data that you may find useful in your projects.
 Below you will find a short description of each subcommand and then a longer 
 explnation of each.
 
-{synoptset 27 tabbed}{...}
-{synopthdr:Subcommand}
-{synoptline}
-{synopt :{opt info:rmation}}Presents a clickable version of the available surveys, 
-countries and regions.{p_end}
-{synopt :{opt wb}}Downloads World Bank's regional and global aggregation.{p_end}
-{synopt :{opt tab:les}}Provides clickable list of auxiliary tables for download.{p_end}
-{synopt :{opt clean:up}}Deletes all pip data from current stata memory.{p_end}
-{synopt :{opt dropframe}}({it:Programmer's option}) Deletes auxiliary PIP frames in memory.{p_end}
-{synopt :{opt dropglobal}}({it:Programmer's option}) Deletes auxiliary PIP global macros in memory.{p_end}
-{synopt :{opt ver:sions}}Display available versions of PIP data.{p_end}
-{synopt :{opt test}}Open in browser last pip call. Type {cmd:disp "${pip_query}"} to see the parameters of the API query.{p_end}
-{synopt :{opt install}}Installs the stable version of pip from SSC 
-({cmd:pip install ssc}) or the development version from GitHub ({cmd:pip install gh}){p_end}
-
-
-
 
 {marker subcmd_detail}{...}
 {hline}
 {center:{bf:Subcommands details}}
 {hline}
 
-{marker cl_wb_detail}{...}
-{title:cl and wb subcommand}:
-
-{pstd}
-the {cmd:cl} (the default) and {cmd:wb} subcommands are the main modules of {cmd:pip}.
-{cmd:cl} provides the country-level poverty and inequality estimates, whereas 
-{cmd:wb} provides regional and global level poverty estimates. As of now, the
-underlying welfare aggregate is the per capita household income or consumption
-expressed in 2017 PPP USD (with option {cmd:ppp_year(2011)} you can select
-estimates in 2011 PPPs values). Poverty lines, means, and medians are expressed in
-daily amounts. 
-
-{phang}
-{res:{ul:Country-level estimates:} }The PIP API reports two types of results:
-
-{pmore}
-{opt 1.Survey-year}: Refers to poverty and inequality estimates for the year 
-in which the survey was conducted (i.e., survey period). This is the default 
-behavior of {cmd:pip cl}. Details of the poverty and inequality estimates 
-methodology can be found 
-{browse "https://datanalytics.worldbank.org/PIP-Methodology/surveyestimates.html": here}.
-
-{pmore}
-{opt 2.Lineup-year}: In order to estimate regional and global poverty measures, 
-it is necessary to have country-level poverty measures in a reference year that 
-is common across countries. Since there is no single year in which all countries in
-the world have conducted a household survey suitable for national poverty estimates,
-it is necessary to {it: fill the gaps} by interpolating or extrapolating 
-poverty measures for those countries with no survey in the reference year. 
-This process of {it:filling the gaps} is known as {it:lining up} the welfare
-aggregate, and hence {it:lineup years} estimates. You can get the lineup estimates
-by using the option {it:fillgaps}, as in {cmd:pip cl, fillgaps}. Methodological 
-details of the lineup can be found
-{browse "https://datanalytics.worldbank.org/PIP-Methodology/lineupestimates.html": here}.
-
-{pin}
-{res:Note 1}: The option {it:fillgaps} reports the underlying country estimates for a lineup-year.
-These may coincide with the survey-year estimates if the country has a survey in the
-lineup year. In other cases,  these would be extrapolated from the nearest survey or
-interpolated between two surveys. 
-
-{pin}
-{res:Note 2}: Poverty measures that are calculated for both survey-years and
-lineup-years  include the headcount ratio, poverty gap, and squared poverty gap.
-Inequality measures, including the Gini index, the mean log deviation and decile
-shares, are calculated only in survey-years and are not reported for lineup-years.
-
-{phang}
-{res:{ul:Regional/Global-level estimates:} }Regional and global aggregates are 
-available with subcommand {it:wb} and in {cmd: pip wb} and they calculated only 
-for lineup-years. The extrapolated or interpolated survey-year estimates require two
-assumptions:
-
-{phang2}
-1. Growth in household income or consumption can be approximated by growth in national accounts{p_end}
-{phang2}
-2. All parts of the distribution grow at the same rate.{...}
-
-
-
-{marker cl_wb_options_det}{...}
-{p 40 20 2}(Go up to {it:{help pip##sections:Sections Menu}}){p_end}
-
-{phang}
-{res:{ul:cl and wb options details}}
-
-{phang}
-{opt country(string)} {help pip_countries##countries:Countries and Economies Abbreviations}. 
-If specified with {opt year(#)}, this option will return all the countries for which there is
-actual survey data in the year specified.  When selecting multiple countries, use the corresponding
-three-letter codes separated by spaces. The option {it:all} is a shorthand for calling all countries.
-
-{phang}
-{opt region(string)} {help pip_countries##regions:Regions Abbreviations}  If 
-specified with {opt year(#)}, this option will return all the countries in the specified region(s)
-that have a survey in that year. For example, {opt region(LAC)} will return all countries in Latin
-America and the Caribbean that have a survey in the specific year. When selecting multiple regions,
-use the corresponding three-letter codes separated by spaces. The  option {it:all} is a shorthand
-for calling all regions, which is equivalent to  calling all countries.
-
-{phang}
-{opt coverage(string)} Selects the geographic coverage of the estimates. By default, all coverage
-levels are loaded, but the user may select "national", "urban", or "rural".
-Only one level of coverage can be selected per query.
-
-{phang}
-{opt year(#)} Four digit years are accepted. When selecting multiple years, use
-spaces to separate them. The option {it:all} is a shorthand for calling all
-years, while the {it:last} option will download the latest available year
-for each country.
-
-{phang}
-{opt povline(#)} The poverty lines for which the poverty measures will be calculated.
-When selecting multiple poverty lines, use less than 4 decimals and separate
-each value with spaces. If left empty, the default poverty line of $2.15 is used.
-By default, poverty lines are expressed in 2017 PPP USD per capita per day.
-If option {opt ppp_ppp(2011)} is specified, the poverty lines are expressed in 2011 PPPs.
-
-{phang}
-{ul:{it:The following options only apply to cl}}
-
-{phang}
-{opt popshare(#)} The desired quantile. For example, specifying popshare(0.1) returns the first
-decile as the value of the poverty line. In other words, the estimated poverty line will be the
-nearest income or consumption level such that the incomes of 10% of the population fall below it.
-This has no default, and cannot be combined with {opt povline}. The quantile (recorded in the variable
-poverty_line) is expressed in 2017 PPP USD per capita per day (unless option {opt ppp_year(2011)} is specified,
-in which case it is reported in 2011 PPPs).
-
-{phang}
-{opt fillgaps} Loads all country-level estimates that are used to create the  
-global and regional aggregates in the reference years.
-
-{p 8 8 2}{err:Note}: Countries without a survey in the reference-year have been 
-extrapolated or interpolated using national accounts growth rates and assuming
-distribution-neutrality (see Chapter 6
-{browse "https://openknowledge.worldbank.org/bitstream/handle/10986/20384/9781464803611.pdf":here}).
-Therefore, changes at the country-level from one reference year to the next need 
-to be interpreted carefully and may not be the result of a new household survey.{p_end}
+.
+.
+.
+.
 
 
 {marker cache_detail}{...}
