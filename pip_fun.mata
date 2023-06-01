@@ -239,7 +239,7 @@ struct pip_time_info scalar pip_timer_on(string scalar label,  /*
 	else {
 		pattern = "^"+label+"$"
 		if (anyof(ustrregexm(r.time_l, pattern), 1)) {
-			errprintf("%s is already in used\n", label)
+			// errprintf("timer %s is already in used\n", label)
 			timer_off(r.counter)			
 		}
 		else {
