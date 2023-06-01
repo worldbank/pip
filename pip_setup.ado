@@ -86,7 +86,13 @@ program define pip_setup, rclass
 		
 		pip_cache gethash, query(`"`: disp `spipmata''"')
 		local pipmata_hash = "`r(piphash)'"
-		disp "`pipmata_hash'"
+		
+		// To avoid MATA library to be  built each time. 
+		if ("${pip_pipmata_hash}" == "") {
+			cap findfile "pip_setup.do"
+			if (_rc) global pip_pipmata_hash "000" // if setup.do is not found
+			else      run  "`r(fn)'"
+		}
 		
 		// If mata functions have changed, saved them again. 
 		if ("${pip_pipmata_hash}" != "`pipmata_hash'") {
