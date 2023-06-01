@@ -31,6 +31,7 @@ program define pip_auxframes, rclass
 	gettoken frame frames: frames 
 	
 	while ("`table'" != "") {
+		pip_timer aux_frames.`table', on
 		local pframe "_pip_`frame'`_version'"
 		pip_auxframes_create, table(`table') frame(`pframe')
 		
@@ -58,6 +59,7 @@ program define pip_auxframes, rclass
 			}
 		} // end of previous existence condition
 		
+		pip_timer aux_frames.`table', off
 		//------------ go to next iteration
 		gettoken table tables: tables 
 		gettoken frame frames: frames 

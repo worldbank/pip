@@ -91,11 +91,6 @@ program define pip_pov_check_args, rclass
 		tokenize "`version'", parse("_")
 		local _version   = "_`1'_`3'_`9'"
 		
-		frame dir 
-		local av_frames "`r(frames)'"
-		local av_frames: subinstr local  av_frames " " "|", all
-		local av_frames = "^(" + "`av_frames'" + ")"
-		
 		//------------ Regions frame
 		pip_auxframes
 		local frpiprgn "_pip_regions`_version'" 

@@ -9,6 +9,7 @@ Creation Date:    12 May 2023 - 11:32:30
 0: Program set up
 ==================================================*/
 program define pip_get, rclass
+	version 16
 	syntax , [ clear cacheforce gname(string)]
 	
 	if (c(changed) != 1 & "`clear'" == "") error 4
