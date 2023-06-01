@@ -34,7 +34,7 @@ program define pip_pov_check_args, rclass
 	
 	return local ppp_year = "ppp_year(`ppp_year')"
 	local optnames "`optnames' ppp_year"
-	
+
 	//------------ Get auxiliary data
 	pip_timer pov_check_args.auxframes, on
 	pip_auxframes
@@ -58,13 +58,9 @@ program define pip_pov_check_args, rclass
 		numlist "`year'"
 		local year = r(numlist)
 	}
-	
-	return local year = "year(`year')"
-	local optnames "`optnames' year"
-	
-	
+
 	*---------- Coverage
-	if (lower("`coverage'") == "all") local coverage = ""
+	if ("`coverage'" == "") local coverage = ""
 	local coverage = lower("`coverage'")
 	
 	foreach c of local coverage {	
@@ -209,7 +205,34 @@ program define pip_pov_check_args, rclass
 	//========================================================
 	//  Country profiles (cp)
 	//========================================================
-	
+
+	if ("`subcmd'" == "cp") {
+		
+		return local coverage = ""
+		return local year     = ""
+		
+		*---------- Country
+		local country = stritrim(ustrtrim("`country' `region'"))
+		if (lower("`country'") != "all") local country = upper("`country'")
+		if ("`country'" == "") local country "all" // to modify
+		return local country = "country(`country')"
+		local optnames "`optnames' country"
+		
+		
+
+		// poverty line 
+		if ("`povline'" == "")  {
+			
+			if ("`ppp_year'" == "2005") local povline = 1.25
+			if ("`ppp_year'" == "2011") local povline = 1.9
+			if ("`ppp_year'" == "2017") local povline = 2.15
+		}
+		return local povline  = "povline(`povline')"
+		local optnames "`optnames' povline"
+		
+		
+	}	
+
 	//========================================================
 	// Return options names
 	//========================================================
