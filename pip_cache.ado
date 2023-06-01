@@ -305,7 +305,7 @@ program define pip_cache_info, rclass
 		if (`nobs' > 1) {
 			
 			noi disp "{break}{title:{res:Cache data available}} " /* 
-			*/ "{txt:{it:(Filter your data by parameter)}}"
+			*/ "{txt:{it:(Filter your data by parameter)}}" _n
 			
 			
 			local novars "hash query n"
@@ -313,13 +313,7 @@ program define pip_cache_info, rclass
 			local vars = "`r(varlist)'"
 			local vars: list vars - novars
 			
-			foreach v of local vars {
-				//------------ get length of string for formatting
-				local vtype: type `v'
-				local vtype: subinstr local vtype "str" ""
-				// 36 is a nice display length ()
-				local l = floor(36/(`vtype'+2))
-				
+			foreach v of local vars {				
 				//------------ Unique values
 				tempvar uniq
 				qui bysort `v': gen byte `uniq' = (_n==_N) if `v' != ""
@@ -330,8 +324,8 @@ program define pip_cache_info, rclass
 				//------------ build call of pip_utils click
 				local condition = `"condition(`"`v' == "obsi""')"'
 				noi pip_utils click, variable(`v') title("{title:`v'} `filterable'") /* 
-				*/ statacode(`"pip_cache info, `condition' frame(`frame2')"') /* 
-				*/ length(`l')
+				*/ statacode(`"pip_cache info, `condition' frame(`frame2')"')
+				
 			} // end for parameters loop
 			disp _n
 			
