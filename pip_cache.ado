@@ -56,6 +56,12 @@ program define pip_cache, rclass
 		exit
 	}
 	
+	if (ustrregexm("`subcmd'","^iscache")) {
+		noi pip_cache_iscache
+		return add
+		exit
+	}
+	
 	/*==================================================
 	1:load
 	==================================================*/
@@ -80,6 +86,8 @@ program define pip_cache, rclass
 		else {
 			return local pc_exists = 1
 			use "`pc_file'", `clear'
+			char _dta[piphash] `piphash'
+			char _dta[pipquery] `query'
 			exit
 		}
 	}
@@ -92,8 +100,6 @@ program define pip_cache, rclass
 		mata: st_local("pc_file", pathjoin("${pip_cachedir}", "`piphash'.dta"))
 		cap confirm new file "`pc_file'"
 		if (_rc == 0 | "`cacheforce'" != "") {
-			char _dta[piphash] `piphash'
-			char _dta[pipquery] `query'
 			qui save "`pc_file'", replace
 			
 			//------------ write cache infor file
@@ -116,15 +122,6 @@ program define pip_cache, rclass
 		noi pip_cache_delete, piphash(`piphash') cachedir(`cachedir')
 		
 	}
-	
-	
-	if (ustrregexm("`subcmd'","^iscache")) {
-		noi pip_cache_iscache
-		return add
-		exit
-	}
-	
-	
 end
 
 
