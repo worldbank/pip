@@ -16,7 +16,7 @@ program define pip_wb, rclass
 	syntax ///
 	[ ,                             /// 
 	REGion(string)                  /// 
-	YEAR(string)                    /// 
+	Year(string)                    /// 
 	POVLine(numlist)                /// 
 	PPP_year(numlist)               ///
 	COVerage(string)                /// 

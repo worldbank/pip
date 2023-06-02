@@ -72,7 +72,7 @@ If you want to understand the details and functionalities of each subcommand, pl
 {pstd}
 The rest of this document contains general information about PIP and the {cmd:pip} Stata command. Sections are presented under the following headings:
 
-		{it:{help pip##basic_info:General Options}}
+		{it:{help pip##general_options:General Options}}
 		{it:{help pip##examples:Examples}}
 		{it:{help pip##memory:Memory use and Stata frames}}
 		{it:{help pip##return:Stored Results}}
@@ -91,17 +91,17 @@ The options below work for any subcommad that returns vintaged data
 {synoptset 27 tabbed}{...}
 {synopthdr:General Options}
 {synoptline}
-{synopt :{opt version(string)}}Combination of numbers in the format %Y%m%d_YYYY_RV_AV_SSS 
+{synopt :{opt ver:sion(string)}}Combination of numbers in the format %Y%m%d_YYYY_RV_AV_SSS
 (click {bf:{help pip_note:here}} for explanation of each component). 
 Option {it:version()} takes prevalence over the next 3 options 
 {it:ppp_year()}, {it:release()} & {it:identity()}, as the combination of 
 these three parameters uniquely identifies a dataset.{p_end}
 {synopt :{opt ppp:_year:}(#)}PPP round (2011 or 2017). {p_end}
-{synopt :{opt release(numlist)}}8 digit number with the PIP release date in the format {it:YYYYMMDD}.{p_end}
-{synopt :{opt identity(string)}{err:*}}Version of data to run the query on (e.g., prod, int, test). See description of each identity {bf:{help pip_note:here}}.{p_end}
-{synopt :{opt server(string)}{err:*}}Name of server to query (e.g, prod, dev, qa). See description of each server {bf:{help pip_note:here}}.{p_end}
+{synopt :{opt rel:ease(numlist)}}8 digit number with the PIP release date in the format {it:YYYYMMDD}.{p_end}
+{synopt :{opt ide:ntity(string)}{err:*}}Version of data to run the query on (e.g., prod, int, test). See description of each identity {bf:{help pip_note:here}}.{p_end}
+{synopt :{opt ser:ver(string)}{err:*}}Name of server to query (e.g, prod, dev, qa). See description of each server {bf:{help pip_note:here}}.{p_end}
 {synopt :{opt clear}}Replaces data in memory.{p_end}
-{synopt :{opt n2disp}}Number of rows to display. (default 1).{p_end}
+{synopt :{opt n2d:isp}}Number of rows to display. (default 1).{p_end}
 
 {pstd}
 {err:*Note}: The {cmd:server()} and {cmd:identity()} options are available internally only for World Bank staff upon request to the  

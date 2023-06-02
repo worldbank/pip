@@ -18,7 +18,7 @@ program define pip_cl, rclass
 	[ ,                             /// 
 	COUntry(string)                 /// 
 	REGion(string)                  /// 
-	YEAR(string)                    /// 
+	Year(string)                    /// 
 	POVLine(numlist)                /// 
 	POPShare(numlist)	   	          /// 
 	FILLgaps                        /// 

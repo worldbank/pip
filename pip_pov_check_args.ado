@@ -13,7 +13,7 @@ program define pip_pov_check_args, rclass
 	[ ,                             /// 
 	COUntry(string)                 /// 
 	REGion(string)                  /// 
-	YEAR(string)                    /// 
+	Year(string)                    /// 
 	POVLine(numlist)                /// 
 	POPShare(numlist)	   	          /// 
 	CLEAR                           /// 
