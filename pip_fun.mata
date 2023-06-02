@@ -15,7 +15,9 @@ mata set matadebug off // (on when debugging; off in production)
 mata set matalnum  off // (on when debugging; off in production)
 
 
-
+//========================================================
+// read text files
+//========================================================
 // Read and return the line in a file from a specific position
 // of the file
 string scalar pip_read_pos_file(string scalar filetoread, real scalar pos)
@@ -151,8 +153,12 @@ real scalar pip_mkdir_recursive(string scalar path, | real scalar pub)
 
 
 //========================================================
-//  Create locals using the macros in retlist
+// Utilities
 //========================================================
+
+
+//--------  Create locals using the macros in retlist
+
 
 void pip_retlist2locals(string scalar optnames) 
 {
@@ -170,10 +176,7 @@ void pip_retlist2locals(string scalar optnames)
 	}
 }
 
-
-//========================================================
-//  create string of calling of locals
-//========================================================
+//------ create string of calling of locals
 
 void pip_locals2call(string scalar optnames, string scalar newname)
 {
@@ -183,6 +186,47 @@ void pip_locals2call(string scalar optnames, string scalar newname)
 	V = "`" :+ V :+ "'"
 	st_local(newname, invtokens(V))
 }
+
+
+//------- crate local for matching abbreviation
+
+void pip_abb_regex(string rowvector v, | /* 
+					 */      real scalar x,     /* 
+					 */      string scalar name) {
+	
+	// define objects
+	real   scalar y, i, j, a
+	string scalar V
+	string rowvector H
+	
+	// setup
+	if (args() < 3 | name == "") {
+		name = "abb_reg"
+	}
+	if (args() < 2 | x == .) {
+		x = 3
+	}
+	x = x - 1 // to account for character x as defined 
+	y = x + 1
+	
+	
+	// process
+	for (j = 1; j <= cols(v); j++) {
+		
+		V = substr(v[j], 1, x) + "("
+		a = ustrlen(v[j]) - x
+		for (i = 1; i <= a; i++) {
+				if (i < a) V = V + substr(v[j], y, i) + "|" 
+				else       V = V + substr(v[j], y, i) + ")" 
+		}
+		
+		if (j == 1) H = V
+		else        H = H, V	
+	}
+	
+	st_local(name, invtokens(H))
+}
+
 
 
 //========================================================
@@ -449,8 +493,51 @@ cap mata: mata drop pip_*()
 
 mata:
 
+void pip_abb_regex(string rowvector v, | /* 
+					 */      real scalar x,     /* 
+					 */      string scalar name) {
+	
+	// define objects
+	real   scalar y, i, j, a
+	string scalar V
+	string rowvector H
+	
+	// setup
+	if (args() < 3 | name == "") {
+		name = "abb_reg"
+	}
+	if (args() < 2 | x == .) {
+		x = 3
+	}
+	x = x - 1 // to account for character x as defined 
+	y = x + 1
+	
+	
+	// process
+	for (j = 1; j <= cols(v); j++) {
+		
+		V = substr(v[j], 1, x) + "("
+		a = ustrlen(v[j]) - x
+		for (i = 1; i <= a; i++) {
+				if (i < a) V = V + substr(v[j], y, i) + "|" 
+				else       V = V + substr(v[j], y, i) + ")" 
+		}
+		
+		if (j == 1) H = V
+		else        H = H, V	
+	}
+	
+	st_local(name, invtokens(H))
+}
+
 
 end
+
+local nname = "abbs"
+mata: pip_abb_regex(tokens("version ppp_year release identity server n2disp"), 3, "`nname'")
+disp "`abb_reg'"
+disp "`nname': ``nname''"
+
 
 
 *##e
