@@ -101,6 +101,7 @@ these three parameters uniquely identifies a dataset.{p_end}
 {synopt :{opt identity(string)}{err:*}}Version of data to run the query on (e.g., prod, int, test). See description of each identity {bf:{help pip_note:here}}.{p_end}
 {synopt :{opt server(string)}{err:*}}Name of server to query (e.g, prod, dev, qa). See description of each server {bf:{help pip_note:here}}.{p_end}
 {synopt :{opt clear}}Replaces data in memory.{p_end}
+{synopt :{opt n2disp}}Number of rows to display. (default 1).{p_end}
 
 {pstd}
 {err:*Note}: The {cmd:server()} and {cmd:identity()} options are available internally only for World Bank staff upon request to the  

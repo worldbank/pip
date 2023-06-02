@@ -54,7 +54,7 @@ program define pip_info, rclass
 
 			frame `frlkupwr' {
 				noi pip_utils click, variable(country_code)       /* 
-				*/ title("{title:Countries}{txt} (Click to display survey availability)") /* 
+				*/ title("{res}{title:Countries}{txt} (Click to display survey availability)") /* 
 				*/ statacode(`"pip_info, country(obsi) clear"') /* 
 				*/ width(50)
 				
@@ -89,7 +89,7 @@ program define pip_info, rclass
 				local country = upper("`country'")
 				keep if country_code == "`country'"
 				local country_name = country_name[1] 
-				noi disp _n "{title:Available Surveys for `country_name' (`country')}" _n
+				noi disp _n "{res}{title:Available Surveys for `country_name' (`country')}{txt}" _n
 				
 				qui levelsof survey_coverage, local(levels)
 				
