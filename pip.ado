@@ -338,6 +338,20 @@ Notes:
 
 Version Control:
 
+*! version 0.10.4.dev    <2023Jun02>
+*! -- update to version 16.1
+*! -- update abbreviation of general and pip_cl help files
+*! -- replacre optnames for returnnames and add optnames only for options
+*! -- add abbreviation program`
+*! -- fix formatting
+*! -- add fillgaps to check in pov_check_args
+*! -- provide table of countries when wrong country is selected
+*! -- delete lukup auxiliary frame. We don't need it anymore
+*! -- refactor pip_info to pip_utils click
+*! -- get length of string for formatting in pip_utils_cliackable
+*! -- comment message of repeated timer
+*! -- fix issue of building the mata lib all the time
+*! -- delete pip_clean as we don't need it anymore
 *! version 0.10.4    <2023May31>
 *! -- Modular Helpfile (Incomplete)
 *! -- Improve cache manipulation, specially with cachedir() option
