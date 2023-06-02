@@ -22,10 +22,8 @@ program define pip_cl, rclass
 	POVLine(numlist)                /// 
 	POPShare(numlist)	   	          /// 
 	FILLgaps                        /// 
-	PPP_year(numlist)               ///
 	COVerage(string)                /// 
 	CLEAR                           /// 
-	SERver(string)                  /// 
 	pause                           /// 
 	POVCALNET_format                ///
 	replace                         ///

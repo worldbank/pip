@@ -24,43 +24,18 @@ program define pip, rclass
 	pip_setup
 	
 	//------------ Parsing args
-	pip_parseopts `0'
-	noi ret list
-	local returnnames "`r(returnnames)'"
-	local optnames    "`r(optnames)'"
-	mata: pip_retlist2locals("`returnnames'")
-	if ("`subcmd'" == "") local subcmd "cl"  // country-level  
+	pip_parseopts `0'   // parse whatever the user gives
+	local returnnames "`r(returnnames)'" // name of all return object
+	local optnames    "`r(optnames)'"    // names of options (after the comma)
+	mata: pip_retlist2locals("`returnnames'") // convert return to locals
 	
+	if ("`subcmd'" == "") local subcmd "cl"  // default country-level 
 	
-	disp `"subcmd: `subcmd'"'
-	disp `"returnnames: `returnnames'"'
-	disp `"pipoptions: `pipoptions'"'
+	pip_split_options `optnames'  // get general options and estimation opts
 	
-	local gen_opts "version ppp_year release identity server n2disp"
-	mata: pip_abb_regex(tokens("`gen_opts'"), 3, "patterns")
-	
-	foreach o of local optnames {
-		local bsgo 0 // belogs to selected general options
-		foreach p of local patterns {
-			if regexm("`o'", "^`p'") {
-				local sgo `"`sgo' `o'"' // selected general options
-				local bsgo 1
-				continue, break
-			}
-		}
-		if (`bsgo' == 0) local oo `"`oo' `o'"' // other options
-	}
-	
-	disp "`sgo'"
-	disp `"`oo'"'
-	mata: pip_locals2call("`sgo'", "general_opts")
-	mata: pip_locals2call("`oo'", "est_opts")
-	
-	disp "{res:general_opts:} {txt}`general_opts'"
-	disp "{res:est_opts:} {txt} `est_opts'"
-	
-	exit
-	
+	mata: pip_locals2call("`r(gen_opts)'", "gen_opts")
+	mata: pip_locals2call("`r(est_opts)'", "est_opts")
+
 	//------------ Print timer`
 	if ("`subcmd'" == "print") {
 		if ("`timer'" != "") {
@@ -89,7 +64,7 @@ program define pip, rclass
 	// ------------------------------------------------------------------------
 	
 	pip_timer pip.pip_new_session, on
-	pip_new_session , `pause'
+	pip_new_session , `pause' `path'
 	pip_timer pip.pip_new_session, off
 	
 	local curframe = c(frame)
@@ -142,7 +117,7 @@ program define pip, rclass
 		}
 		
 		pip_timer pip.pip_install, on
-		noi pip_install `gh'`ssc', `path' `pause' `version'
+		noi pip_install `gh'`ssc', `path' `pause' `version' `username' `replace'
 		pip_timer pip.pip_install, off
 		pip_timer pip, off
 		exit
@@ -175,7 +150,6 @@ program define pip, rclass
 		}
 		//------------Tables
 		if ("`tables'" != "") {
-			
 			pip_timer pip.pip_versions, on
 			pip_versions, `release' `ppp_year' `identity' `version'
 			pip_timer pip.pip_versions, off
@@ -259,7 +233,7 @@ program define pip, rclass
 		// Set up version
 		//========================================================
 		pip_timer pip.pip_versions, on
-		pip_versions, `release' `ppp_year' `identity' `version'
+		noi pip_versions, `release' `ppp_year' `identity' `version'
 		return add
 		pip_timer pip.pip_versions, off
 		
@@ -281,11 +255,10 @@ program define pip, rclass
 		
 		
 		pip_timer pip.pip_pov_check_args, on
-		noi pip_pov_check_args `subcmd', `country' `region' `year'         /*
-		*/         `povline' `popshare' `clear' `coverage' `fillgaps'
-		local returnnames "`r(returnnames)'"
-		mata: pip_retlist2locals("`returnnames'")
-		mata: pip_locals2call("`returnnames'", "povoptions")
+		noi pip_pov_check_args `subcmd', `est_opts'
+		local optnames "`r(optnames)'" 
+		mata: pip_retlist2locals("`optnames'")
+		mata: pip_locals2call("`optnames'", "est_opts")
 		pip_timer pip.pip_pov_check_args, off
 		
 		
@@ -295,17 +268,17 @@ program define pip, rclass
 		
 		//------------ Coutry lavel
 		if ("`subcmd'" == "cl") {
-			noi pip_cl, `povoptions' `clear' `n2disp' `povcalnet_format'
+			noi pip_cl, `est_opts' `clear' `n2disp' `povcalnet_format'
 			noi pip_timer pip, off `printtimer' 
 		}
 		//------------ World Bank Aggregate
 		else if ("`subcmd'" == "wb") {
-			noi pip_wb, `povoptions' `clear' `n2disp' `povcalnet_format'
+			noi pip_wb, `est_opts' `clear' `n2disp' `povcalnet_format'
 			noi pip_timer pip, off `printtimer'
 		}
 		//------------ Country Profile
 		else if ("`subcmd'" == "cp") {
-			pip_cp, `povoptions' `clear' `n2disp'
+			pip_cp, `est_opts' `clear' `n2disp'
 			noi pip_timer pip, off `printtimer'
 		}
 		
@@ -323,6 +296,37 @@ program define pip, rclass
 	} // end of qui
 end  // end of pip
 
+
+//========================================================
+//  aux programs
+//========================================================
+
+program define pip_split_options, rclass
+	syntax anything(name=optnames), [abblength(integer 3)]
+	
+	// current General options (Hard coded)
+	local gen_opts "version ppp_year release identity server n2disp"
+	
+	// get abbreviation regex
+	mata: pip_abb_regex(tokens("`gen_opts'"), `abblength', "patterns")
+	
+	// loop each options over each abbreviation
+	foreach o of local optnames {  // options by the user
+		local bsgo 0 // belogs to selected general options
+		foreach p of local patterns {  // patterns for general opt abbreviations
+			if regexm("`o'", "^`p'") {
+				local sgo `"`sgo' `o'"' // selected general options
+				local bsgo 1
+				continue, break
+			}
+		}
+		if (`bsgo' == 0) local oo `"`oo' `o'"' // estimation options
+	}
+	
+	return local gen_opts = "`sgo'"
+	return local est_opts     = "`oo'"
+	
+end 
 
 
 exit

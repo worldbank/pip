@@ -18,7 +18,7 @@ program define pip_pov_check_args, rclass
 	POPShare(numlist)	   	          /// 
 	CLEAR                           /// 
 	COVerage(string)                ///
-	fillgaps                        ///
+	FILLgaps                        ///
 	] 
 	
 	version 16
@@ -33,9 +33,6 @@ program define pip_pov_check_args, rclass
 	tokenize "`version'", parse("_")
 	local _version   = "_`1'_`3'_`9'"	
 	local ppp_year = `3'
-	
-	return local ppp_year = "ppp_year(`ppp_year')"
-	local optnames "`optnames' ppp_year"
 	
 	//------------ Get auxiliary data
 	pip_timer pov_check_args.auxframes, on
