@@ -50,7 +50,11 @@ program define pip_cache, rclass
 		exit
 	}
 	
-	
+	if ("`subcmd'" == "inventory") {
+		pip_cache_inventory
+		noi disp "{res:Cache inventory has been loaded}"
+		exit
+	}
 	
 	/*==================================================
 	1:load
@@ -165,7 +169,7 @@ end
 
 program define pip_cache_delete, rclass
 	syntax [, piphash(string) cachedir(string)]
-		
+	
 	if ("`cachedir'" == "") local cachedir "${pip_cachedir}"
 	if ("`piphash'" == "") {
 		local pc_files: dir "`cachedir'" files  "_pip*"
@@ -177,7 +181,7 @@ program define pip_cache_delete, rclass
 		if (lower("`confirm'") == "y") {
 			foreach f of local pc_files {
 				erase "`cachedir'/`f'"
-				}
+			}
 			erase "`cachedir'/pip_cache_info.txt"
 		}
 	}
@@ -216,71 +220,15 @@ program define pip_cache_info, rclass
 	if ("`frame'" != "") {
 		if ustrregexm("`frame'", "(.*)([0-9]{5}$)") local fname = ustrregexs(2)
 		while ("`rname'" == "`fname'") {
-	local rname = floor(runiform(1e4, 99999))
-	}
+			local rname = floor(runiform(1e4, 99999))
+		}
 	}
 	
 	if (`"`condition'"' == `""') {
 		mata: pip_drop_cache_info_frames()
-		
-		tempname cache_txt 
 		local frame "cache_info_`rname'"
 		frame create `frame'	
-		frame create `cache_txt'
-		
-		//========================================================
-		//  Call original Date
-		//========================================================
-		qui frame `cache_txt' {
-			import delimited hash query using "${pip_cachedir}/pip_cache_info.txt", /* 
-			*/ clear delimiters(",")
-			* pause on 
-			* pause cache_txt
-			split query, gen(ep) parse(?)
-			gen endpoint = ustrregexs(2) if ustrregexm(ep1, "(.*)/([^/]+)$")
-			split ep2, gen(par) parse(&)
-			qui ds par*
-			local level1 = "`r(varlist)'"
-			qui foreach v of local level1 {
-				split `v', gen(`v'_) parse(=)
-			}
-			
-			//------------Key for linking frames
-			gen n = _n
-			local cN = _N
-		}
-		
-		//========================================================
-		// Organize data into  readable format
-		//========================================================
-		
-		// Create a frame whose vars are each available parameter
-		// associated with a particular hash. 
-		
-		qui frame `frame' {
-			set obs `cN'
-			gen n = _n
-			frlink 1:1 n, frame(`cache_txt')
-			
-			forvalues i = 1/`cN' {  // for each observation
-				
-				foreach v of loca level1 {  // forech parameter
-					local vname  = _frval(`cache_txt', `v'_1, `i')
-					local vvalue = _frval(`cache_txt', `v'_2, `i')
-					
-					// if par does not exists of is format
-					if inlist("`vname'", "", "format") continue 
-					cap confirm var `vname'
-					if (_rc) gen     `vname' = "`vvalue'" in `i'
-					else     replace `vname' = "`vvalue'" in `i'
-				}
-				
-				* replace hash  = _frval(`cache_txt', hash, `i') in `i'
-				* replace query = _frval(`cache_txt', query, `i') in `i'
-			}
-			
-			frget hash query endpoint, from(`cache_txt')
-		}  // end of frame
+		qui frame `frame': pip_cache_inventory
 		
 	}  // end of condition == ""
 	
@@ -390,6 +338,67 @@ program define pip_cache_info, rclass
 	
 end
 
+program define pip_cache_inventory, rclass
+	
+	tempname cache_txt 
+	frame create `cache_txt'
+	
+	//========================================================
+	//  Call original Date
+	//========================================================
+	qui frame `cache_txt' {
+		import delimited hash query using "${pip_cachedir}/pip_cache_info.txt", /* 
+		*/ clear delimiters(",")
+		* pause on 
+		* pause cache_txt
+		split query, gen(ep) parse(?)
+		gen endpoint = ustrregexs(2) if ustrregexm(ep1, "(.*)/([^/]+)$")
+		split ep2, gen(par) parse(&)
+		qui ds par*
+		local level1 = "`r(varlist)'"
+		qui foreach v of local level1 {
+			split `v', gen(`v'_) parse(=)
+		}
+		
+		//------------Key for linking frames
+		gen n = _n
+		local cN = _N
+	}
+	
+	//========================================================
+	// Organize data into  readable format
+	//========================================================
+	
+	// Create a frame whose vars are each available parameter
+	// associated with a particular hash. 
+	
+	qui  {
+		drop _all
+		set obs `cN'
+		gen n = _n
+		frlink 1:1 n, frame(`cache_txt')
+		
+		forvalues i = 1/`cN' {  // for each observation
+			
+			foreach v of loca level1 {  // forech parameter
+				local vname  = _frval(`cache_txt', `v'_1, `i')
+				local vvalue = _frval(`cache_txt', `v'_2, `i')
+				
+				// if par does not exists of is format
+				if inlist("`vname'", "", "format") continue 
+				cap confirm var `vname'
+				if (_rc) gen     `vname' = "`vvalue'" in `i'
+				else     replace `vname' = "`vvalue'" in `i'
+			}
+			
+			* replace hash  = _frval(`cache_txt', hash, `i') in `i'
+			* replace query = _frval(`cache_txt', query, `i') in `i'
+		}
+		
+		frget hash query endpoint, from(`cache_txt')
+	}  // end of qui
+	
+end
 
 exit
 /* End of do-file */

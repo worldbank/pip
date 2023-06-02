@@ -209,6 +209,11 @@ program define pip, rclass
 			pip_timer pip, off 
 			exit
 		}
+		if ("`inventory'" != "") {
+			pip_cache inventory
+			pip_timer pip, off 
+			exit
+		}
 		if ("`cachedir'" != "" & "`setup'" != "") {
 			pip_setup cachedir, `cachedir'
 			pip_timer pip, off 
