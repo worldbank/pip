@@ -24,7 +24,7 @@ program define pip_cache, rclass
 	*                               ///
 	]
 	
-	version 16.0
+	version 16.1
 	
 	/*++++++++++++++++++++++++++++++++++++++++++++++++++
 	SET UP
@@ -131,7 +131,7 @@ program define pip_cache_gethash, rclass
 	PREfix(string)              ///
 	]
 	
-	version 16.0
+	version 16.1
 	
 	qui {
 		if ("`prefix'" == "") local prefix = "pip"

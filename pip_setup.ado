@@ -16,7 +16,7 @@ Output:
 0: Program set up
 ==================================================*/
 program define pip_setup, rclass
-	version 16
+	version 16.1
 	
 	syntax [anything(name=subcmd)]  [, * ] 
 	
@@ -191,7 +191,7 @@ end
 //========================================================
 
 program define pip_setup_replace, rclass
-	version 16
+	version 16.1
 	
 	syntax [anything(name=subcmd)],  [ ///
 	pattern(string)                    ///
@@ -212,7 +212,7 @@ end
 
 
 program define pip_setup_cachedir, rclass
-	version 16
+	version 16.1
 	
 	syntax [anything(name=subcmd)] , [ ///
 	cachedir(string)                   ///  
@@ -286,7 +286,7 @@ end
 			
 			program define pip_setup_dates
 			
-			version 16
+			version 16.1
 			
 			
 			local date        = date("`c(current_date)'", "DMY")  // %tdDDmonCCYY

@@ -16,7 +16,7 @@ Output:
               0: Program set up
 ==================================================*/
 program define pip_ssc, rclass
-version 16.0
+version 16.1
 
 syntax [anything(name=subcommand)]  ///
 [,                             	    ///

@@ -5,7 +5,7 @@
 
 program define pip_info, rclass
 	
-	version 16.0
+	version 16.1
 	
 	syntax    [,          ///
 	COUntry(string)       ///

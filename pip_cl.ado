@@ -31,7 +31,7 @@ program define pip_cl, rclass
 	n2disp(passthru)                ///
 	] 
 	
-	version 16.0
+	version 16.1
 	
 	pip_timer pip_cl, on
 	
@@ -108,7 +108,7 @@ end
 //------------ Build CL query
 
 program define pip_cl_query, rclass
-	version 16
+	version 16.1
 	syntax ///
 	[ ,                             /// 
 	COUntry(string)                 /// 
@@ -193,7 +193,7 @@ end
 
 program define pip_cl_clean, rclass
 	
-	version 16
+	version 16.1
 	
 	//========================================================
 	//  setup

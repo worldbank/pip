@@ -30,16 +30,16 @@
 {synoptset 27 tabbed}{...}
 {synopthdr:cl and wb options}
 {synoptline}
-{synopt :{opt cou:ntry:}(3-letter code)}List of {it:{help pip_countries##countries:country code}} or {it:all}. Default is "{it:all}".
-Does not work with subcommand {cmd:wb}.{p_end}
 {synopt :{opt reg:ion}(3-letter WB code)}List of {it:{help pip_countries##regions:region code}} or {it:all}. Default is "{it:all}".{p_end}
 {synopt :{opt cov:erage(string)}}Coverage level ("national", "urban", "rural", "all"). Default "all".{p_end}
 {synopt :{opt y:ear}(numlist|string)}{it:{help numlist}} of years  or {it:all}, or {it:last}. Default is "all".{p_end}
 {synopt :{opt povl:ine:}(#)}list of poverty lines (in PPP specified, see option {cmd:ppp_year(#)}) to calculate 
  poverty measures (accepts up to 5). Default is 2.15 at 2017 PPPs.{p_end}
  {pstd}
+ 
 The following only work with subcommand {cmd:cl}
 
+{synopt :{opt cou:ntry:}(3-letter code)}List of {it:{help pip_countries##countries:country codes}} or {it:all}. Default is "{it:all}".{p_end}
 {synopt :{opt pops:hare:}(#)}List of quantiles. No default. Cannot be used with option {opt povline:(#)}{p_end}
 {synopt :{opt fill:gaps}}Loads country-level estimates (including extrapolations and interpolations) used to create regional and global aggregates.{p_end}
 {synoptline}

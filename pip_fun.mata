@@ -6,7 +6,7 @@
 
 cap mata: mata drop pip_*()
 
-version 16
+version 16.1
 mata:
 
 mata set mataoptimize on

@@ -17,7 +17,7 @@ References: https://pip.worldbank.org/home  https://pip.worldbank.org/api
 
 
 program define pip, rclass
-	version 16.0
+	version 16.1
 	/*==================================================
 	Program set up
 	==================================================*/

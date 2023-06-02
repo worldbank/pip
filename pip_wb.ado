@@ -28,7 +28,7 @@ program define pip_wb, rclass
 	n2disp(passthru)                ///
 	] 
 	
-	version 16.0
+	version 16.1
 	
 	pip_timer pip_wb, on
 	
@@ -94,7 +94,7 @@ end
 //------------ Build CL query
 
 program define pip_wb_query, rclass
-	version 16
+	version 16.1
 	syntax ///
 	[ ,                             /// 
 	REGion(string)                  /// 
@@ -168,7 +168,7 @@ end
 
 //------------Clean Cl data
 program define pip_wb_clean, rclass
-	version 16
+	version 16.1
 	if ("${pip_version}" == "") {
 		noi disp "{err}No version selected."
 		error

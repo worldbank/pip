@@ -18,7 +18,7 @@ Output:
 program define pip_set_server, rclass
 	syntax [, server(string) ] 
 	
-	version 16.0
+	version 16.1
 	
 	//========================================================
 	// Define server
