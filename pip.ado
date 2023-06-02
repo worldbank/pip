@@ -25,8 +25,41 @@ program define pip, rclass
 	
 	//------------ Parsing args
 	pip_parseopts `0'
-	mata: pip_retlist2locals("`r(optnames)'")
-	if ("`subcmd'" == "") local subcmd "cl"  // country-level       
+	noi ret list
+	local returnnames "`r(returnnames)'"
+	local optnames    "`r(optnames)'"
+	mata: pip_retlist2locals("`returnnames'")
+	if ("`subcmd'" == "") local subcmd "cl"  // country-level  
+	
+	
+	disp `"subcmd: `subcmd'"'
+	disp `"returnnames: `returnnames'"'
+	disp `"pipoptions: `pipoptions'"'
+	
+	local gen_opts "version ppp_year release identity server n2disp"
+	mata: pip_abb_regex(tokens("`gen_opts'"), 3, "patterns")
+	
+	foreach o of local optnames {
+		local bsgo 0 // belogs to selected general options
+		foreach p of local patterns {
+			if regexm("`o'", "^`p'") {
+				local sgo `"`sgo' `o'"' // selected general options
+				local bsgo 1
+				continue, break
+			}
+		}
+		if (`bsgo' == 0) local oo `"`oo' `o'"' // other options
+	}
+	
+	disp "`sgo'"
+	disp `"`oo'"'
+	mata: pip_locals2call("`sgo'", "general_opts")
+	mata: pip_locals2call("`oo'", "est_opts")
+	
+	disp "{res:general_opts:} {txt}`general_opts'"
+	disp "{res:est_opts:} {txt} `est_opts'"
+	
+	exit
 	
 	//------------ Print timer`
 	if ("`subcmd'" == "print") {
@@ -250,9 +283,9 @@ program define pip, rclass
 		pip_timer pip.pip_pov_check_args, on
 		noi pip_pov_check_args `subcmd', `country' `region' `year'         /*
 		*/         `povline' `popshare' `clear' `coverage' `fillgaps'
-		local optnames "`r(optnames)'"
-		mata: pip_retlist2locals("`optnames'")
-		mata: pip_locals2call("`optnames'", "povoptions")
+		local returnnames "`r(returnnames)'"
+		mata: pip_retlist2locals("`returnnames'")
+		mata: pip_locals2call("`returnnames'", "povoptions")
 		pip_timer pip.pip_pov_check_args, off
 		
 		
