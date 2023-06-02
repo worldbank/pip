@@ -23,7 +23,7 @@ program define pip_utils, rclass
 	//========================================================
 	
 	pip_parseopts `0'
-	mata: pip_retlist2locals("`r(optnames)'")
+	mata: pip_retlist2locals("`r(returnnames)'")
 	
 	if ustrregexm(`"`subcmd'"', "(.+) (if .+)") {
 		local subcmd = trim(ustrregexs(1))
