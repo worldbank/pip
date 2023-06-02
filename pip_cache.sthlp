@@ -22,7 +22,7 @@
 directory. Seldom used. {p_end}
 {synopt :{opt iscache}}Checks whether or not the data loaded has been cached{p_end}
 {synoptline}
-
+{synopt :{helpb pip##general_options: general options}}Options that apply to any subcommand{p_end}
 
 {marker description}{...}
 {title:Description}

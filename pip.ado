@@ -307,8 +307,9 @@ end  // end of pip
 //========================================================
 
 program define pip_split_options, rclass
-	syntax anything(name=optnames), [abblength(integer 3)]
+	syntax [anything(name=optnames)], [abblength(integer 3)]
 	
+	if ("`optnames'" == "") exit
 	// current General options (Hard coded)
 	local gen_opts "version ppp_year release identity server n2disp"
 	

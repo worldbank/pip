@@ -28,7 +28,7 @@ You can also use {cmd:pip print, {it:info}} or
 {synopt :{opt cache}}Equivalent to {cmd:pip cache, info}. 
 Displays interactive information of cache local memory.{p_end}
 {synoptline}
-
+{synopt :{helpb pip##general_options: general options}}Options that apply to any subcommand{p_end}
 
 {marker description}{...}
 {title:Description}
