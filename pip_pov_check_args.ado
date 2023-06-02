@@ -17,7 +17,8 @@ program define pip_pov_check_args, rclass
 	POVLine(numlist)                /// 
 	POPShare(numlist)	   	          /// 
 	CLEAR                           /// 
-	COVerage(string)                /// 
+	COVerage(string)                ///
+	fillgaps                        ///
 	] 
 	
 	version 16
@@ -167,6 +168,28 @@ program define pip_pov_check_args, rclass
 			}
 		}
 		
+		// Check if year is available
+		if ("`country'" != "" & "`fillgaps'" == "" & !inlist(lower("`year'"), "all", "")) {
+			
+			frame _pip_fw`_version' {
+				tempname CT o YR
+				mata :                                                   ; /*
+				*/	st_sview(`CT' = ., ., "country_code")                ; /*
+				*/	`o'  = selectindex(`CT' :== "`country'")             ; /*
+				*/	st_view(`YR' = ., `o', "year")                       ; /*
+				*/	st_local("av_year", strofreal(anyof(`YR', `year')))  
+				
+				
+				if (`av_year'== 0) {
+					noi disp in red "Survey year {ul:`year'} is not available in `country'." _n ///
+					"Only the following are available:"
+					noi pip_info, country(`country')
+					error
+				}
+			}
+		}
+		
+		
 		
 		
 		local country = stritrim(ustrtrim("`country' `region'"))
@@ -175,7 +198,7 @@ program define pip_pov_check_args, rclass
 		return local country = "country(`country')"
 		local optnames "`optnames' country"
 		
-	}
+	}  // end of cl subcmd
 	
 	
 	//========================================================
