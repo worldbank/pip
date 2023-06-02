@@ -29,9 +29,9 @@ if ("`subcmd'" == ",") {
 }
 else gettoken comma opts: opts, parse(",")
 
-if ("`subcmd'" != "") {
+if (`"`subcmd'"' != `""') {
 	local optnames "subcmd"
-	return local subcmd = "`subcmd'"
+	return local subcmd = trim(`"`subcmd'"')
 }
 
 

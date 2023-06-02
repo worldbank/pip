@@ -25,8 +25,11 @@ program define pip_utils, rclass
 	pip_parseopts `0'
 	mata: pip_retlist2locals("`r(optnames)'")
 	
-	
-	//========================================================
+	if ustrregexm(`"`subcmd'"', "(.+) (if .+)") {
+		local subcmd = trim(ustrregexs(1))
+		local if = trim(ustrregexs(2))
+	}
+		//========================================================
 	// Execute 
 	//========================================================
 	
@@ -56,7 +59,7 @@ program define pip_utils, rclass
 		pip_utils_keep_frame, `frame_prefix' `keepframes' `efficient'
 	}
 	if ustrregexm("`subcmd'", "^click"){
-		pip_utils_clicktable , `variable' `title' `statacode' `length' `width'
+		pip_utils_clicktable `if', `variable' `title' `statacode' `length' `width'
 	}
 	
 	
@@ -179,7 +182,7 @@ end
 
 program define pip_utils_clicktable
 	
-	syntax , VARiable(varname) ///
+	syntax [if] , VARiable(varname) ///
 	[                     ///
 	title(string)         ///
 	STATAcode(string)     ///
@@ -187,7 +190,7 @@ program define pip_utils_clicktable
 	width(integer 36)      ///
 	]
 	
-	quietly levelsof `variable' , local(tmp) clean
+	quietly levelsof `variable' `if', local(tmp) clean
 	if (`"`tmp'"' == `""') exit
 	
 	//------------ get length of string for formatting

@@ -55,6 +55,7 @@ program define pip_auxframes, rclass
 					rename welfare_type wt
 					label define welfare_type 1 "consumption" 2 "income"
 					encode wt, gen(welfare_type)
+					rename wb_region_code region_code 
 				}
 			}
 		} // end of previous existence condition
@@ -71,7 +72,7 @@ program define pip_auxframes, rclass
 	
 	local lkup "_pip_lkupb`_version'"
 	local fw   "_pip_fw`_version'"
-	pip_auxframes_lkup, lkup("`lkup'") fw("`fw'")
+	* pip_auxframes_lkup, lkup("`lkup'") fw("`fw'")
 	
 end
 
