@@ -30,6 +30,7 @@ program define pip_pov_check_args, rclass
 	
 	local version    = "${pip_version}"		
 	tokenize "`version'", parse("_")
+	local _version   = "_`1'_`3'_`9'"	
 	local ppp_year = `3'
 	
 	return local ppp_year = "ppp_year(`ppp_year')"
@@ -88,11 +89,7 @@ program define pip_pov_check_args, rclass
 			local region: subinstr local region "SAR" "SAS", word 
 		}
 		
-		tokenize "`version'", parse("_")
-		local _version   = "_`1'_`3'_`9'"
-		
 		//------------ Regions frame
-		pip_auxframes
 		local frpiprgn "_pip_regions`_version'" 
 		frame `frpiprgn' {
 			levelsof region_code, local(av_regions)  clean
@@ -149,6 +146,29 @@ program define pip_pov_check_args, rclass
 		
 		
 		*---------- Country
+		// check availability 
+		if ("`country'" != "") {
+			local country = upper("`country'")
+			frame _pip_fw`_version' {
+				qui levelsof country_code, local(av_cts)  clean
+			}
+			
+			// Add all to have the same functionality as in country(all)
+			local av_cts = "`av_cts'" + " ALL"
+			
+			local inct: list country in av_cts
+			if (`inct' == 0) {
+				
+				noi disp in red "Country `country' is not available." _n ///
+				"Only the following are available:"
+				noi pip_info
+				
+				error
+			}
+		}
+		
+		
+		
 		local country = stritrim(ustrtrim("`country' `region'"))
 		if (lower("`country'") != "all") local country = upper("`country'")
 		if ("`country'" == "") local country "all" // to modify

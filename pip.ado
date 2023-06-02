@@ -248,7 +248,7 @@ program define pip, rclass
 		
 		
 		pip_timer pip.pip_pov_check_args, on
-		pip_pov_check_args `subcmd', `country' `region' `year'         /*
+		noi pip_pov_check_args `subcmd', `country' `region' `year'         /*
 		*/         `povline' `popshare' `clear' `coverage' `fillgaps'
 		local optnames "`r(optnames)'"
 		mata: pip_retlist2locals("`optnames'")
