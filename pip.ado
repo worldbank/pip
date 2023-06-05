@@ -76,12 +76,20 @@ program define pip, rclass
 	
 	//------------ setup 
 	if ("`subcmd'" == "setup") {
+		if ("`create'" != "") {
+			pip_setup create
+			noi disp "{res:Setup done!}"
+			pip_timer pip, off 
+			exit
+		}
+		
 		if ("`cachedir'" != "") {
 			pip_setup cachedir, `cachedir'
+			pip_timer pip, off 
+			exit
 		}
-		noi disp "{res:Setup done!}"
-		pip_timer pip, off 
-		exit
+		
+		
 	}
 	
 	//------------Cleaup
@@ -209,12 +217,12 @@ program define pip, rclass
 			pip_timer pip, off 
 			exit
 		}
-		if ("`inventory'" != "") {
+		if ("`inventory'" != "" | "`metadata'" != "") {
 			pip_cache inventory
 			pip_timer pip, off 
 			exit
 		}
-		if ("`cachedir'" != "" & "`setup'" != "") {
+		if ("`setup'" != "") {
 			pip_setup cachedir, `cachedir'
 			pip_timer pip, off 
 			exit

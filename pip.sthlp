@@ -169,6 +169,13 @@ World Bank aggregation ({it:country()} is not available)
 {marker memory}{...}
 {title:Memory use and frames}:
 
+{pstd}
+{res:{cmd:pip} is a very invasive Stata command}. We say it upfront so you don't 
+get surprises in the future, {bf:pip is invasive}. Below you will find all the ways in which {cmd:pip}
+interacts wit you Stata session, your operating system, and your local storage. We 
+apologize in advance for this behavior, but we think it is for your own benefit to
+take fully advantage of {cmd:pip} efficiency. 
+
 {ul:Stata frames}
 
 {pstd}
@@ -189,9 +196,25 @@ required to either confirm the default cache directory or provide your own direc
 path. Also you can opt out and don't save cache data. Just follow the instructions of 
 the pop-up messages. 
 
-{err: add info about globals}
+{ul:pip_setup.do}
 
-{err: add info about pip_setup.do and Mata libraries}
+{pstd}
+The first time you execute {cmd:pip} in your session, it will search for the do-file 
+pip_setup.do. In case it is not found, it will be created in your PERSONAL directory.
+this do-file contains a set of global macros that store information relevant to the 
+performance of pip and to make it compatible with future versions. You can see the 
+contents of that file by typing {cmd:pip print, setup}. We highly recommend you do
+{err:NOT} modify this file. Yet, in case you can't resist the temptation and end up 
+modifying and breaking {cmd:pip}, you can recreate the pip_setup.do by typing 
+{cmd: pip setup, create}.
+
+{ul:Mata libraries}
+
+{pstd}
+{cmd:pip} relies heavily in a set of MATA functions stored in a {help lmbuild:library} called "lpip_fun". This library is built in your computer each time the library has
+been updated in a newer version of {cmd:pip}. All the Mata functions created by {cmd:pip} are named with the 
+{bf:pip_*} prefix. Yet, none of the functions is documented as they are intended
+for {cmd:pip} use only. 
 
 
 {marker return}{...}
@@ -201,7 +224,7 @@ the pop-up messages.
 {cmd:pip} is an {helpb return:rclass} command, which means that it stores the
 results in {cmd:r()}. Each subcommand has its own set of returned results, 
 and you can display them by typing {cmd:{ul:ret}urn list} after the execution
-of {cmd:pip}.
+of {cmd:pip}. 
 
 
 {marker povcal}{...}

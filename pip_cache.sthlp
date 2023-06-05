@@ -16,16 +16,20 @@
 {synoptset 27 tabbed}{...}
 {synopthdr:cache options}
 {synoptline}
+{synopt :{opt metadata|inventory}}Loads cache metadata file{p_end}
 {synopt :{opt info}}Displays interactive information of cache local memory.{p_end}
 {synopt :{opt delete}}Deletes cache local memory{p_end}
-{synopt :{opt cachedir(path)}}displays or deletes cache in that particular 
-directory. Seldom used. {p_end}
+{synopt :{opt setup}}Setup cache directory. Pair this option with 
+{opt cachedir(path)} {p_end}
+{synopt :{opt cachedir(path)}}Cache directory. It works in conjunction with other 
+options to manage cache storage.{p_end}
 {synopt :{opt iscache}}Checks whether or not the data loaded has been cached{p_end}
 {synoptline}
 {synopt :{helpb pip##general_options: general options}}Options that apply to any subcommand{p_end}
 
 {marker description}{...}
 {title:Description}
+
 {pstd}
 Caching is the process of storing data so that future requests for the same data
 can be served faster. Even though the PIP API is cached at different levels, it is 
@@ -52,47 +56,46 @@ cache data is useful for long time.
 
 {pstd}
 In software development, caching is usually a {it:temporary} storing data practice 
-because the speed you gain comes to the expense storage memory. You can either 
+because the speed you gain comes to the expense of storage memory. You can either 
 opt out altogether the caching mechanism of {cmd:pip} or you can manage your cache, 
 making use of the tools provided by {cmd:pip}.
-
-{err:TO BE COMPLETED}
-
-
 
 
 {marker opt_details}{...}
 {title:Options Details}
 
 {phang}
-{opt option(string)} Long description
+{opt metadata|inventory} Loads cache metadata file. Each time  {cmd:pip} saves cache data, it
+stores the metadata of the cache file into a text file in the same directory of your
+caches data. By typing {cmd:pip cache, inventory} or {cmd:pip cache, metadata} 
+you can load the text file in readable .dta format. 
 
 {phang}
-{opt option(string)} Long description
+{opt info} Displays a set of interactive tables to manage cache storage. When you type
+{cmd:pip cache, info}, {cmd:pip} will display the content of the metadata cache file 
+in the Stata console. You can click on the different options in order to filter the 
+content until you reach one single cache file. Only the categories with the 
+{it:(filterable)} label are suitable for filtering. Once you have single out one cache
+entry, you will be provided with information
+about the original query and also will be able to execute some actions like loading the
+cache file, see it in the browser, download the .csv original file or even delete it. 
 
-{err:TO BE COMPLETED}
-
-
-
-
-
-{marker examples}{...}
-{title:Examples}
-
-{ul:examples section}
 
 {phang}
-Explanation: clickable example
-
-{phang2}
-{stata pip, clear} 
+{opt delete} Deletes cache memory. If option {opt cachedir(path)} is not provided, the 
+cache will be deleted from the default cache directory. 
 
 {phang}
-Explanation: non-clickable example
+{opt iscache} Once you have loaded any PIP data using {cmd:pip}, you can type 
+{cmd:pip cache, iscache} to confirm whether or not the data loaded in memory has been
+cached by {cmd:pip}. The first time that you make a query and type {cmd:pip cache, iscache} you will see the data is not cached, because it was directly downloaded from
+the PIP API. It does not mean that your data has not been cached. What it means is that 
+the actual data in memory was loaded from the API and not from the cache directory. If
+you execute the same query and type {cmd:pip cache, iscache}, you will see that it has 
+been cached. If you pair this options with {cmd: pip {help pip_print:print}, timer}, 
+you will see how fast pip cache is. 
 
-{phang2}
-{cmd: pip, info}
-
-
-
+{phang}
+{opt setup} Sets up cache directory. This option should be pair with {opt cachedir(path)}. Typing {cmd:pip cache, setup {opt cachedir(path)}} is equivalent to 
+{cmd:pip setup, {opt cachedir(path)}}
 
