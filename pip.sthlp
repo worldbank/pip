@@ -169,13 +169,25 @@ World Bank aggregation ({it:country()} is not available)
 {marker memory}{...}
 {title:Memory use and frames}:
 
+{ul:Stata frames}
+
 {pstd}
 {cmd:pip} makes use of {help frames:Stata frames}--available since Stata 16--to store a lot of information in memory. This is partly the reason why the first call of pip in a new Stata session is slower compared to subsequent calls. When closing Stata, you may see a pop-up 
 message reading {bf:"Frames in memory have changed"}. That is perfectly normal and should not cause any concern. 
 However, make sure you save the frames that you created and wish to keep. You can do that by typing {stata frames dir}. 
 Frames created by {cmd:pip} are prefixed by {it:_pip} and are marked by an {it:*}, meaning they have not been saved. If you do not wish to save any frames in use, just click "Exit without saving." You can also delete all PIP data in memory using the command {stata pip cleanup}.
 
-{err: add usage of memory by cache}
+{ul:Cache memory}
+
+{pstd}
+By default, {cmd:pip} will create cache data of all the queries you make. The first you 
+use {cmd:pip} you will have the option to store cache data in your local machine
+or in any drive Stata has access to. By default, {cmd:pip} will check whether it could
+save cache data in your PERSONAL directory (see {help sysdir: search path}). In case it can't, it will try in PLUS, then
+in your current directory and then in SITE. The first time you execute {cmd:pip}, you are
+required to either confirm the default cache directory or provide your own directory
+path. Also you can opt out and don't save cache data. Just follow the instructions of 
+the pop-up messages. 
 
 {err: add info about globals}
 

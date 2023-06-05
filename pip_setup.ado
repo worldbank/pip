@@ -282,34 +282,34 @@ end
 
 //========================================================
 //  Program to create dates that will be used across PIP
-			//========================================================
-			
-			program define pip_setup_dates
-			
-			version 16.1
-			
-			
-			local date        = date("`c(current_date)'", "DMY")  // %tdDDmonCCYY
-			local time        = clock("`c(current_time)'", "hms") // %tcHH:MM:SS
-			local date_time   = `date'*24*60*60*1000 + `time'  // %tcDDmonCCYY_HH:MM:SS
-			local datetimeHRF:  disp %tcDDmonCCYY_HH:MM:SS `date_time'
-			local datetimeHRF = trim("`datetimeHRF'")
-			local dateHRF:      disp %tdDDmonCCYY `date'
-			local dateHRF     = trim("`dateHRF'")
-			
-			local date_file:   disp %tdCCYYNNDD `date'
-			local date_file   = trim("`date_file'")
-			
-			
-			global pip_date_file = "`date_file'"
-			global pip_date_file_format = "%tdDDmonCCYY"
-			
-			global pip_dateHRF = "`dateHRF'"
-			global pip_date_format = "%tdDDmonCCYY"
-			
-			global pip_datetimeHRF = "`datetimeHRF'"
-			global pip_datetime_format = "%tcDDmonCCYY_HH:MM:SS"
-			
+//========================================================
+
+program define pip_setup_dates
+	
+	version 16.1
+	
+	
+	local date        = date("`c(current_date)'", "DMY")  // %tdDDmonCCYY
+	local time        = clock("`c(current_time)'", "hms") // %tcHH:MM:SS
+	local date_time   = `date'*24*60*60*1000 + `time'  // %tcDDmonCCYY_HH:MM:SS
+	local datetimeHRF:  disp %tcDDmonCCYY_HH:MM:SS `date_time'
+	local datetimeHRF = trim("`datetimeHRF'")
+	local dateHRF:      disp %tdDDmonCCYY `date'
+	local dateHRF     = trim("`dateHRF'")
+	
+	local date_file:   disp %tdCCYYNNDD `date'
+	local date_file   = trim("`date_file'")
+	
+	
+	global pip_date_file = "`date_file'"
+	global pip_date_file_format = "%tdDDmonCCYY"
+	
+	global pip_dateHRF = "`dateHRF'"
+	global pip_date_format = "%tdDDmonCCYY"
+	
+	global pip_datetimeHRF = "`datetimeHRF'"
+	global pip_datetime_format = "%tcDDmonCCYY_HH:MM:SS"
+	
 end
 
 
