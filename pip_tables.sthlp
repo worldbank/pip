@@ -50,8 +50,6 @@ provide does not exist, {cmd:pip} returns error.
 {marker examples}{...}
 {title:Examples}
 
-{ul:examples section}
-
 {phang}
 Display clickable list of auxiliary tables
 

@@ -2,15 +2,13 @@
 {* *! version 1.0.0 dec 2022}{...}
 {vieweralsosee "" "--"}{...}
 {cmd:help pip tables}{right:{browse "https://pip.worldbank.org/":Poverty and Inequality Platform (PIP)}}
-{right:{browse "https://worldbank.github.io/pip/"}}
+{help pip:return to pip} {right:{browse "https://worldbank.github.io/pip/"}}
 {hline}
 
 {title:Syntax}
 
-
 {phang}
 {cmd:pip print, } [{it:{help pip_print##opts_desc:options}}]
-
 
 {marker opts_desc}{...}
 {title:Options}
@@ -27,44 +25,25 @@ You can also use {cmd:pip print, {it:info}} or
 {cmd:pip print, {it:availability}}{p_end}
 {synopt :{opt cache}}Equivalent to {cmd:pip cache, info}. 
 Displays interactive information of cache local memory.{p_end}
+{synopt :{opt setup}}Displays contents of pip_setup.do{p_end}
 {synoptline}
 {synopt :{helpb pip##general_options: general options}}Options that apply to any subcommand{p_end}
 
 {marker description}{...}
 {title:Description}
-{phang}
-Description starts here
 
+{pstd}
+The subcommand {cmd:print} is a convenient tool to display information about the
+{cmd:pip} command and its environment. Most of the instructions available with 
+{cmd:pip print} are available in other subcommands as well, but the {cmd:print} 
+subcommand just makes it easier to find and remember. 
 
 
 {marker opt_details}{...}
 {title:Options Details}
 
 {phang}
-{opt option(string)} Long description
-
-{phang}
-{opt option(string)} Long description
-
-
-
-{marker examples}{...}
-{title:Examples}
-
-{ul:examples section}
-
-{phang}
-Explanation: clickable example
-
-{phang2}
-{stata pip, clear} 
-
-{phang}
-Explanation: non-clickable example
-
-{phang2}
-{cmd: pip, info}
-
-
-
+{opt timer} Each time {cmd:pip} is executed it records the time lapsed in each of its
+subroutines. This function is intended for developers to make {cmd:pip} code more
+efficient. However, it can also be used to measure Internet speed to download PIP data.
 
