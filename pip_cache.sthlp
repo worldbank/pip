@@ -8,7 +8,7 @@
 {title:Syntax}
 
 {phang}
-{cmd:pip cache ,} [ {it:{help pip_cache##opts_desc:options}} ]
+{cmd:pip cache,} [ {it:{help pip_cache##opts_desc:options}} ]
 
 {marker opts_desc}{...}
 {title:Options}

@@ -22,7 +22,7 @@
 
 {marker description}{...}
 {title:Description}
-{phang}
+{pstd}
 Description starts here
 
 
@@ -43,13 +43,13 @@ Description starts here
 
 {ul:examples section}
 
-{phang}
+{pstd}
 Explanation: clickable example
 
 {phang2}
 {stata pip, clear} 
 
-{phang}
+{pstd}
 Explanation: non-clickable example
 
 {phang2}
