@@ -353,6 +353,14 @@ Notes:
 Version Control:
 
 *! version 0.10.4.dev    <2023Jun05>
+*! -- update format
+*! -- add help for pip wb (which points to pip_cl) and for pip setup (init)
+*! -- add cache info to help file
+*! -- info of cache memory
+*! -- update print and tables help file
+*! -- complete pip_tables help file
+*! -- fix issue with `pip cache, iscache` working now
+*! -- Allow user to see Cache inventory `pip cache, inventory`
 *! -- update to version 16.1
 *! -- update abbreviation of general and pip_cl help files
 *! -- replacre optnames for returnnames and add optnames only for options
