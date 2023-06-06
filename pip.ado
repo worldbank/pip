@@ -44,12 +44,18 @@ program define pip, rclass
 		}
 	}
 	
+	//------------ Test last query
+	if ("`subcmd'" == "test") {
+		pip_test
+		exit
+	}
+	
 	//------------ Start timer
 	pip_timer
 	pip_timer pip, on
 	
 	//------------ set server
-	* In case global server is specified
+	* In case local server is specified
 	if (`"`server'"' != `""') {
 		pip_set_server, `server'
 	}
@@ -255,7 +261,7 @@ program define pip, rclass
 		//========================================================
 		if regexm("`subcmd'", "^tab") {
 			pip_timer pip.pip_tables, on
-			noi pip_tables, `pipoptions'
+			noi pip_tables, `pipoptions' 
 			return add
 			pip_timer pip.pip_tables, off
 			noi pip_timer pip, off `printtimer'
@@ -279,19 +285,19 @@ program define pip, rclass
 		// retrieve and format estimates
 		//========================================================
 		
-		//------------ Coutry lavel
+		//------------ Country lavel
 		if ("`subcmd'" == "cl") {
-			noi pip_cl, `est_opts' `clear' `n2disp' `povcalnet_format'
+			noi pip_cl, `est_opts' `clear' `n2disp' `povcalnet_format' `cachedir'
 			noi pip_timer pip, off `printtimer' 
 		}
 		//------------ World Bank Aggregate
 		else if ("`subcmd'" == "wb") {
-			noi pip_wb, `est_opts' `clear' `n2disp' `povcalnet_format'
+			noi pip_wb, `est_opts' `clear' `n2disp' `povcalnet_format' `cachedir'
 			noi pip_timer pip, off `printtimer'
 		}
 		//------------ Country Profile
 		else if ("`subcmd'" == "cp") {
-			pip_cp, `est_opts' `clear' `n2disp'
+			pip_cp, `est_opts' `clear' `n2disp' `cachedir'
 			noi pip_timer pip, off `printtimer'
 		}
 		
@@ -319,7 +325,7 @@ program define pip_split_options, rclass
 	
 	if ("`optnames'" == "") exit
 	// current General options (Hard coded)
-	local gen_opts "version ppp_year release identity server n2disp"
+	local gen_opts "version ppp_year release identity server n2disp cachedir"
 	
 	// get abbreviation regex
 	mata: pip_abb_regex(tokens("`gen_opts'"), `abblength', "patterns")
