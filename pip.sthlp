@@ -103,6 +103,7 @@ these three parameters uniquely identifies a dataset.{p_end}
 {synopt :{opt ser:ver(string)}{err:*}}Name of server to query (e.g, prod, dev, qa). See description of each server {bf:{help pip_note:here}}.{p_end}
 {synopt :{opt clear}}Replaces data in memory.{p_end}
 {synopt :{opt n2d:isp}}Number of rows to display. (default 1).{p_end}
+{synopt :{opt cachedir(path)}}Cache directory{p_end}
 
 {pstd}
 {err:*Note}: The {cmd:server()} and {cmd:identity()} options are available internally only for World Bank staff upon request to the  

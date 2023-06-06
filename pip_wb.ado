@@ -18,7 +18,6 @@ program define pip_wb, rclass
 	REGion(string)                  /// 
 	Year(string)                    /// 
 	POVLine(numlist)                /// 
-	PPP_year(numlist)               ///
 	COVerage(string)                /// 
 	CLEAR                           /// 
 	pause                           /// 
@@ -26,6 +25,7 @@ program define pip_wb, rclass
 	replace                         ///
 	cacheforce                      ///
 	n2disp(passthru)                ///
+	cachedir(passthru)              ///
 	] 
 	
 	version 16.1
@@ -39,7 +39,13 @@ program define pip_wb, rclass
 		//========================================================
 		// setup
 		//========================================================
-		
+		//------------ setup 
+		if ("${pip_version}" == "") {
+			noi disp "{err}No version selected."
+			error
+		}
+		tokenize "${pip_version}", parse("_")
+		local ppp_year  `3'
 		//------------ Get auxiliary data
 		pip_auxframes
 		
@@ -55,7 +61,7 @@ program define pip_wb, rclass
 		
 		//------------ download
 		pip_timer pip_wb.pip_get, on
-		pip_get, `clear' `cacheforce'
+		pip_get, `clear' `cacheforce' `cachedir'
 		pip_timer pip_wb.pip_get, off
 		
 		//------------ clean

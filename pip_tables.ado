@@ -16,9 +16,10 @@ Output:
 0: Program set up
 ==================================================*/
 program define pip_tables, rclass
-	syntax , [ ///
+	syntax , [                       ///
 	table(string)                    ///
 	clear                            ///
+	cachedir(passthru)               ///
 	]
 	
 	version 16.1
@@ -39,18 +40,20 @@ program define pip_tables, rclass
 	
 	//------------ get query
 	if ("`table'" != "") {
-		local table_call = "aux?table=`table'&`version_qr'&format=csv"
+		global pip_last_queries = "aux?table=`table'&`version_qr'&format=csv"
+		local gname ""
 	}
 	else {
 		preserve  // to return users original frame
-		local table_call = "aux?`version_qr'&format=csv"
+		global pip_tables_call = "aux?`version_qr'&format=csv"
+		local gname pip_tables_call
+		local clear clear
 	}
 	
 	//------------Get table
-	global pip_last_queries = "`table_call'"
 	
 	pip_timer pip_tables.pip_get, on
-	pip_get, `clear' `cacheforce'
+	pip_get, `clear' `cacheforce' `cachedir' gname(`gname')
 	pip_timer pip_tables.pip_get, off
 	
 	return local table_call = "`table_call'"

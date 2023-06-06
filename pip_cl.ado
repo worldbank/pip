@@ -29,6 +29,7 @@ program define pip_cl, rclass
 	replace                         ///
 	cacheforce                      ///
 	n2disp(passthru)                ///
+	cachedir(passthru)              ///
 	] 
 	
 	version 16.1
@@ -65,7 +66,7 @@ program define pip_cl, rclass
 		
 		//------------ download
 		pip_timer pip_cl.pip_get, on
-		pip_get, `clear' `cacheforce'
+		pip_get, `clear' `cacheforce' `cachedir'
 		pip_timer pip_cl.pip_get, off
 		
 		//------------ clean

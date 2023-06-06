@@ -22,10 +22,10 @@
 {synopt :{opt setup}}Setup cache directory. Pair this option with 
 {opt cachedir(path)} {p_end}
 {synopt :{opt cachedir(path)}}Cache directory. It works in conjunction with other 
-options to manage cache storage.{p_end}
+options to manage cache storage. This is also a {help pip##general_options:general option}{p_end}
 {synopt :{opt iscache}}Checks whether or not the data loaded has been cached{p_end}
 {synoptline}
-{synopt :{helpb pip##general_options: general options}}Options that apply to any subcommand{p_end}
+{synopt :{helpb pip##general_options:general options}}Options that apply to any subcommand{p_end}
 
 {marker description}{...}
 {title:Description}
