@@ -46,8 +46,9 @@ features.{p_end}
 {p 4 4 2}Auxiliary subcommands{p_end}
 {synopt :{helpb pip_misc:info}}Display countries and regions availability{p_end}
 {synopt :{helpb pip_misc:cleanup}}Deletes all pip data from current stata memory.{p_end}
+{synopt :{helpb pip_misc:test}}Display in console last query metadata and
+provide actions to test it in browser.{p_end}
 {synopt :{helpb pip_misc:drop}}({it:Programmer's option}) Deletes objects from memory.{p_end}
-{synopt :{helpb pip_misc:test}}Open in browser last pip call. Type {cmd:disp "${pip_query}"} to see the parameters of the API query.{p_end}
 {synoptline}
 {pstd}
 {bf:Note}: {cmd:pip} requires an internet connection.
