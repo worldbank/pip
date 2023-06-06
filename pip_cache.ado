@@ -76,8 +76,15 @@ program define pip_cache, rclass
 			exit
 		}
 		
+		// use default of dir selected by user
+		if (`"`cachedir'"' == "") local cachedir  `"${pip_cachedir}"'
+		if (`"`cachedir'"' == "0") {
+			return local pc_exists = 0 
+			exit
+		}
+		
 		// check if cache already pc_exists
-		mata: st_local("pc_file", pathjoin("${pip_cachedir}", "`piphash'.dta"))
+		mata: st_local("pc_file", pathjoin("`cachedir'", "`piphash'.dta"))
 		cap confirm file "`pc_file'"
 		if _rc {        
 			return local pc_exists = 0 
@@ -97,7 +104,10 @@ program define pip_cache, rclass
 	==================================================*/
 	
 	if ("`subcmd'" == "save") {
-		mata: st_local("pc_file", pathjoin("${pip_cachedir}", "`piphash'.dta"))
+		if (`"`cachedir'"' == "") local cachedir  `"${pip_cachedir}"'
+		if (`"`cachedir'"' == "0")  exit
+		
+		mata: st_local("pc_file", pathjoin("`cachedir'", "`piphash'.dta"))
 		cap confirm new file "`pc_file'"
 		if (_rc == 0 | "`cacheforce'" != "") {
 			qui save "`pc_file'", replace
