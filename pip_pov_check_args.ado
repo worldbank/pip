@@ -244,7 +244,31 @@ program define pip_pov_check_args, rclass
 	//========================================================
 	//  Country profiles (cp)
 	//========================================================
-	
+	if ("`subcmd'" == "cp") {
+		
+		*---------- Country
+		local country = stritrim(ustrtrim("`country' `region'"))
+		if (lower("`country'") != "all") local country = upper("`country'")
+		if ("`country'" == "") local country "all" // to modify
+		return local country = "country(`country')"
+		local optnames "`optnames' country"
+		
+		
+		
+		// poverty line 
+		if ("`povline'" == "")  {
+			
+			if ("`ppp_year'" == "2005") local povline = 1.25
+			if ("`ppp_year'" == "2011") local povline = 1.9
+			if ("`ppp_year'" == "2017") local povline = 2.15
+		}
+		return local povline  = "povline(`povline')"
+		local optnames "`optnames' povline"
+		
+		return local coverage = ""
+		return local year     = ""
+		
+	}	
 	//========================================================
 	// Return options names
 	//========================================================
