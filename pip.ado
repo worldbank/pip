@@ -358,7 +358,12 @@ Notes:
 
 Version Control:
 
-*! version 0.10.4.dev    <2023Jun05>
+*! version 0.10.5    <2023Jun06>
+*! -- Incorporate pip_cp by Tefera
+*! -- update helpfile with new subcommand test
+*! -- add pip_test
+*! -- make local cachedir prevail over global pip_cachedir
+*! -- add cachedir in each pip_get call
 *! -- update format
 *! -- add help for pip wb (which points to pip_cl) and for pip setup (init)
 *! -- add cache info to help file
