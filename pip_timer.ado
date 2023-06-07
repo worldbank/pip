@@ -17,7 +17,7 @@ Output:
 ==================================================*/
 program define pip_timer
 syntax [anything(name=label)], [on off PRINTtimer]
-version 16
+version 16.1
 
 
 //========================================================

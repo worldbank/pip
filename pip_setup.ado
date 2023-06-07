@@ -16,7 +16,7 @@ Output:
 0: Program set up
 ==================================================*/
 program define pip_setup, rclass
-	version 16
+	version 16.1
 	
 	syntax [anything(name=subcmd)]  [, * ] 
 	
@@ -50,6 +50,14 @@ program define pip_setup, rclass
 		run  "`r(fn)'"
 		exit
 	}
+	// run pip_setup.do
+	if ("`subcmd'" == "display") {
+		cap findfile "pip_setup.do"
+		if (_rc)  pip_setup_create // if setup.do is not found
+		
+		type "`r(fn)'"
+		exit
+	}
 	
 	
 	// cche dir
@@ -78,7 +86,13 @@ program define pip_setup, rclass
 		
 		pip_cache gethash, query(`"`: disp `spipmata''"')
 		local pipmata_hash = "`r(piphash)'"
-		disp "`pipmata_hash'"
+		
+		// To avoid MATA library to be  built each time. 
+		if ("${pip_pipmata_hash}" == "") {
+			cap findfile "pip_setup.do"
+			if (_rc) global pip_pipmata_hash "000" // if setup.do is not found
+			else      run  "`r(fn)'"
+		}
 		
 		// If mata functions have changed, saved them again. 
 		if ("${pip_pipmata_hash}" != "`pipmata_hash'") {
@@ -177,7 +191,7 @@ end
 //========================================================
 
 program define pip_setup_replace, rclass
-	version 16
+	version 16.1
 	
 	syntax [anything(name=subcmd)],  [ ///
 	pattern(string)                    ///
@@ -198,7 +212,7 @@ end
 
 
 program define pip_setup_cachedir, rclass
-	version 16
+	version 16.1
 	
 	syntax [anything(name=subcmd)] , [ ///
 	cachedir(string)                   ///  
@@ -209,7 +223,10 @@ program define pip_setup_cachedir, rclass
 		tempname direxist
 		if ("`cachedir'" == "") {
 			// find folder to store setup.do
-			local pdirs `" "`c(sysdir_personal)'" "`c(sysdir_plus)'" "`c(pwd)'" "`c(sysdir_site)'" "'
+			if !inlist("${pip_cachedir}", "no", "") local oldcachedir `""${pip_cachedir}""'
+			else                                    local oldcachedir ""
+			
+			local pdirs `" `oldcachedir' "`c(sysdir_personal)'" "`c(sysdir_plus)'" "`c(pwd)'" "`c(sysdir_site)'" "'
 			
 			tokenize `"`pdirs'"'
 			scalar `direxist' = 0
@@ -236,14 +253,23 @@ program define pip_setup_cachedir, rclass
 		
 		
 		if ("`cachedir'" != "") {
-			if (lower("`cachedir'") == "no") local cachedir = 0
-			mata: st_numscalar("`direxist'", pip_check_folder("`cachedir'"))
+			if inlist(lower("`cachedir'"), "0", "no") {
+				local cachedir    = 0
+				scalar `direxist' = 1 // bypass condition
+			}
+			else mata: st_numscalar("`direxist'", pip_check_folder("`cachedir'"))
+			
 			if (`direxist' == 1 )  {
 				local pattern "pip_cachedir"
 				local newline `"global pip_cachedir = "`cachedir'""'
 				pip_setup replace, pattern(`"`pattern'"') new(`"`newline'"')
 				pip_setup run
-				noi disp "{res}Cache directory has been set up. If you want to change it, type {cmd:pip_setup cachedir}"
+				if ("`cachedir'" != "0") {
+					noi disp "{res}Cache directory has been set up. If you want to change it, type {cmd:pip_setup cachedir}"
+				}
+				else {
+					noi disp "{res}Cache has been {err}disabled{res}. If you want to change it, type {cmd:pip_setup cachedir}"
+				}
 			}
 		}
 		
@@ -260,7 +286,7 @@ end
 
 program define pip_setup_dates
 	
-	version 16
+	version 16.1
 	
 	
 	local date        = date("`c(current_date)'", "DMY")  // %tdDDmonCCYY

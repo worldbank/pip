@@ -41,16 +41,16 @@ local toins  "`as';`hs';`ms';`ds'"
 disp "`toins'"
 
 
-make pip, replace toc pkg                         ///  readme
-		version(0.10.3)                          ///
-    license("MIT")                                                          ///
-    author("R.Andres Castaneda")                                            ///
-    affiliation("The World Bank")                                           ///
-    email("acastanedaa@worldbank.org")                                      ///
-    url("")                                                                 ///
-    title("Poverty and Inequality Platform Stata wrapper")                  ///
-    description("World Bank PIP API Stata wrapper")                         ///
-    install("`toins'") ///
+make pip, replace toc pkg                                  ///  readme
+		version(0.10.5)                                        ///
+    license("MIT")                                         ///
+    author("R.Andres Castaneda")                           ///
+    affiliation("The World Bank")                          ///
+    email("acastanedaa@worldbank.org")                     ///
+    url("")                                                ///
+    title("Poverty and Inequality Platform Stata wrapper") ///
+    description("World Bank PIP API Stata wrapper")        ///
+    install("`toins'")                                     ///
     ancillary("")                                                         
 
 *##e

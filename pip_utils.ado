@@ -16,17 +16,20 @@ Output:
 0: Program set up
 ==================================================*/
 program define pip_utils, rclass
-	version 16
+	version 16.1
 	
 	//========================================================
 	//  SET UP
 	//========================================================
 	
 	pip_parseopts `0'
-	mata: pip_retlist2locals("`r(optnames)'")
+	mata: pip_retlist2locals("`r(returnnames)'")
 	
-	
-	//========================================================
+	if ustrregexm(`"`subcmd'"', "(.+) (if .+)") {
+		local subcmd = trim(ustrregexs(1))
+		local if = trim(ustrregexs(2))
+	}
+		//========================================================
 	// Execute 
 	//========================================================
 	
@@ -56,7 +59,7 @@ program define pip_utils, rclass
 		pip_utils_keep_frame, `frame_prefix' `keepframes' `efficient'
 	}
 	if ustrregexm("`subcmd'", "^click"){
-		pip_utils_clicktable , `variable' `title' `statacode' `length'
+		pip_utils_clicktable `if', `variable' `title' `statacode' `length' `width'
 	}
 	
 	
@@ -179,16 +182,33 @@ end
 
 program define pip_utils_clicktable
 	
-	syntax , VARiable(varname) ///
+	syntax [if] , VARiable(varname) ///
 	[                     ///
 	title(string)         ///
 	STATAcode(string)     ///
-	length(integer 8)     ///
+	length(numlist)     /// number of elements per row
+	width(integer 36)      ///
 	]
 	
-	quietly levelsof `variable' , local(tmp)
+	quietly levelsof `variable' `if', local(tmp) clean
 	if (`"`tmp'"' == `""') exit
-	noi disp in y  _n `"`title'"'
+	
+	//------------ get length of string for formatting
+	qui if ("`length'" == "") {
+		tempvar tvar
+		cap confirm string var `variable'
+		if (_rc) {
+			tostring `variable', gen(`tvar')
+		}
+		else clonevar `tvar' = `variable'
+	
+		local vtype: type `tvar'
+		local vtype: subinstr local vtype "str" ""
+		// 36 is a nice display length ()
+		local length = floor(`width'/(`vtype'+2))
+	}
+	
+	noi disp in y `"`title'"'
 	local statacode: subinstr local statacode "obsi" "`=uchar(96)'obsi`=uchar(39)'", all
 	
 	local current_line = 0
@@ -201,6 +221,8 @@ program define pip_utils_clicktable
 			local current_line = 0
 		}
 	}
+	
+	disp _n
 	
 end
 

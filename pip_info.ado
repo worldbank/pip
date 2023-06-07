@@ -5,11 +5,10 @@
 
 program define pip_info, rclass
 	
-	version 16.0
+	version 16.1
 	
 	syntax    [,          ///
 	COUntry(string)       ///
-	REGion                ///
 	pause                 /// debugging
 	clear                 ///
 	release(passthru)     ///
@@ -34,7 +33,6 @@ program define pip_info, rclass
 			pip_timer pip_info.pip_versions, off
 		}
 		
-		
 		local version_qr = "&version=${pip_version}"
 		tokenize "${pip_version}", parse("_")
 		local _version   = "_`1'_`3'_`9'"
@@ -43,46 +41,40 @@ program define pip_info, rclass
 		pip_auxframes
 		
 		local frlkupwr "_pip_lkup_wrk"
-		local frlkupb  "_pip_lkupb`_version'"
+		local frlkupb  "_pip_fw`_version'"
 		frame copy `frlkupb' `frlkupwr', replace
 		
 		***************************************************
 		* 2. Inital listing with countries and regions
 		***************************************************
 		
-		if  ("`country'" == "") & ("`region'" == "") {
+		if  ("`country'" == "")  {
 			
-			noi disp in y  _n "{title:Available Surveys}: " in g "Select a country or region" 
-			noi disp in y  _n "{title: Countries}"  
-			
+			noi disp in y  _n "{title:Data Availability}"_n
+
 			frame `frlkupwr' {
+				noi pip_utils click, variable(country_code)       /* 
+				*/ title("{res}{title:Countries}{txt} (Click to display survey availability)") /* 
+				*/ statacode(`"pip_info, country(obsi) clear"') /* 
+				*/ width(50)
 				
-				quietly levelsof country_code , local(countries) 
-				local current_line = 0
-				foreach cccc of local countries{
-					local current_line = `current_line' + 1 
-					local display_this = "{stata pip_info, country(`cccc') clear: `cccc'} "
-					if (`current_line' < 8) noi display in y `"`display_this'"' _continue 
-					else{
-						noi display in y `"`display_this'"' 
-						local current_line = 0
-					}
-				}
+				noi disp _n "{title:Global and Regions}{txt} (Select level of aggregation)" 
 				
-				noi disp in y  _n(2) "{title: Regions}"
-				quietly levelsof wb_region, local(regions)
+				levelsof region_code, local(regions)
 				
-				foreach i_reg of local regions{
-					local current_line = 0
-					local dipsthis "{stata  pip, region(`i_reg') year(all) aggregate clear:`i_reg' }"
-					noi disp " `dipsthis' " _c
-				}
+				local cl = "{stata pip cl, clear:Country-level}"
+				local wb = "{stata pip wb, clear:Aggregate-level}"
+				noi disp  "{ul:Global:}{col 10}`cl' | `wb'"
+				foreach i_reg of local regions {
+					local cl = "{stata pip cl, region(`i_reg') clear:Country-level}"
+					local wb = "{stata pip wb, region(`i_reg') clear:Aggregate-level}"
+					noi disp  "{ul:`i_reg':} {col 10}`cl' | `wb'"
+				} // end of loop 
 			} // end of frame
 			
-			noi display in y _n "{stata pip_info, region clear: World Bank regions by year}"		
-			noi display _n ""
+			* noi disp "{stata pip_info, region(region) clear: World Bank regions r}"		
+			noi disp _n ""
 			
-			cwf `curframe'
 			exit
 		} // end of condition
 		
@@ -90,89 +82,31 @@ program define pip_info, rclass
 		* 3. Listing of country surveys
 		***************************************************
 		
-		if  ("`country'" != "") & ("`region'" == "") {
+		if  ("`country'" != "") {
 			
 			frame `frlkupwr' {
 				
-				noi disp in y  _n "{title:Available Surveys for `country'}" 	
 				local country = upper("`country'")
 				keep if country_code == "`country'"
+				local country_name = country_name[1] 
+				noi disp _n "{res}{title:Available Surveys for `country_name' (`country')}{txt}" _n
 				
-				local link_detail = "https://pip.worldbank.org/country-details/`country'"
+				qui levelsof survey_coverage, local(levels)
 				
-				noi display `"{browse "`link_detail'" : Detailed information (browser)}"'
+				foreach l of local levels {
+					local all `"{stata  pip, country(`country') year(all) coverage(`l')  clear:All}"'
+					noi pip_utils click if survey_coverage == "`l'", /* 
+			     */	variable(year)  title("{ul:`l' level} (`all')")      /* 
+					 */ statacode(`"pip, country(`country') year(obsi) clear"') /* 
+					 */ width(50)
+				}
 				
-				local nobs = _N
-				local current_line = 0
-				local index_s = 1
-				
-				foreach n of numlist 1/`nobs' {
-					noi disp in y  _n "`=country_name[`index_s']'-`=coverage_level[`index_s']'" 	
-					noi disp in y  "survey year" 	
-					local years_current = "`=year[`index_s']'"
-					local coverage = "`=coverage_level[`index_s']'"
-					local years_current: subinstr local years_current "," " ", all 
-					local index_s = `index_s'+ 1 
-					
-					foreach ind_y of local years_current {
-						local current_line = `current_line' + 1 
-						local ind_y_c=substr("`ind_y'",1,4)
-						local stcall "pip, country(`country') year(`ind_y') server(${pip_server}) coverage(`coverage') version(${pip_version}) clear"
-						local display_this = `"{stata  `stcall': `ind_y_c' }"'
-						if (`current_line' < 7) noi display in y `"`display_this'"' _continue 
-						
-						else {
-							noi display in y `"`display_this'"' 
-							local current_line = 0		
-						}
-						
-					} // end of inner loop	
-					
-					noi display `"{stata  pip, country(`country') year(all) coverage(`coverage')  clear: All}"'
-					
-				} // end of loop
-				
-				
-				noi display _n ""
+				local ld = "https://pip.worldbank.org/country-details/`country'"
+				noi disp `"Click {browse "`ld'" :here} for detailed information of  `country_name' (`country')"'
 				
 			} // end of frame
 			
-			cwf `curframe'
 			exit	
-		}	 // end of condition 
-		
-		***************************************************
-		* 4. Listing of regions
-		***************************************************
-		if  ("`country'" == "") & ("`region'" != "") {
-			
-			frame `frlkupwr' {
-				noi disp in y  _n "{title:Available Surveys}" 
-				noi disp in y  _n "{title:Select a Year}" 	
-				
-				quietly levelsof wb_region, local(regions)
-				
-				foreach i_reg of local regions{
-					local current_line = 0
-					noi disp in y  _n "`i_reg'" 
-					local years_current = "$refyears"
-					foreach ind_y of local years_current {
-						local current_line = `current_line' + 1 
-						local display_this = "{stata  pip, region(`i_reg') year(`ind_y') clear: `ind_y'}"		
-						if (`current_line' < 7) noi display in y `"`display_this'"' _continue 
-						else{
-							noi display in y `"`display_this'"' 
-							local current_line = 0		
-						}
-					}
-					noi display in y "{stata  pip, region(`i_reg') year(all)  clear: All}"
-				} // end of loop 
-				
-			} // end of frame
-			noi display _n ""
-			cwf `curframe'
-			exit			
-			
 		}	 // end of condition 
 		
 	} // end of large quietly

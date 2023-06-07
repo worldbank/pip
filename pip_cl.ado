@@ -18,22 +18,21 @@ program define pip_cl, rclass
 	[ ,                             /// 
 	COUntry(string)                 /// 
 	REGion(string)                  /// 
-	YEAR(string)                    /// 
+	Year(string)                    /// 
 	POVLine(numlist)                /// 
 	POPShare(numlist)	   	          /// 
 	FILLgaps                        /// 
-	PPP_year(numlist)               ///
 	COVerage(string)                /// 
 	CLEAR                           /// 
-	SERver(string)                  /// 
 	pause                           /// 
 	POVCALNET_format                ///
 	replace                         ///
 	cacheforce                      ///
 	n2disp(passthru)                ///
+	cachedir(passthru)              ///
 	] 
 	
-	version 16.0
+	version 16.1
 	
 	pip_timer pip_cl, on
 	
@@ -67,7 +66,7 @@ program define pip_cl, rclass
 		
 		//------------ download
 		pip_timer pip_cl.pip_get, on
-		pip_get, `clear' `cacheforce'
+		pip_get, `clear' `cacheforce' `cachedir'
 		pip_timer pip_cl.pip_get, off
 		
 		//------------ clean
@@ -110,7 +109,7 @@ end
 //------------ Build CL query
 
 program define pip_cl_query, rclass
-	version 16
+	version 16.1
 	syntax ///
 	[ ,                             /// 
 	COUntry(string)                 /// 
@@ -195,7 +194,7 @@ end
 
 program define pip_cl_clean, rclass
 	
-	version 16
+	version 16.1
 	
 	//========================================================
 	//  setup

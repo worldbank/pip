@@ -24,7 +24,7 @@ program define pip_cache, rclass
 	*                               ///
 	]
 	
-	version 16.0
+	version 16.1
 	
 	/*++++++++++++++++++++++++++++++++++++++++++++++++++
 	SET UP
@@ -50,7 +50,17 @@ program define pip_cache, rclass
 		exit
 	}
 	
+	if ("`subcmd'" == "inventory") {
+		pip_cache_inventory
+		noi disp "{res:Cache inventory has been loaded}"
+		exit
+	}
 	
+	if (ustrregexm("`subcmd'","^iscache")) {
+		noi pip_cache_iscache
+		return add
+		exit
+	}
 	
 	/*==================================================
 	1:load
@@ -66,8 +76,15 @@ program define pip_cache, rclass
 			exit
 		}
 		
+		// use default of dir selected by user
+		if (`"`cachedir'"' == "") local cachedir  `"${pip_cachedir}"'
+		if (`"`cachedir'"' == "0") {
+			return local pc_exists = 0 
+			exit
+		}
+		
 		// check if cache already pc_exists
-		mata: st_local("pc_file", pathjoin("${pip_cachedir}", "`piphash'.dta"))
+		mata: st_local("pc_file", pathjoin("`cachedir'", "`piphash'.dta"))
 		cap confirm file "`pc_file'"
 		if _rc {        
 			return local pc_exists = 0 
@@ -76,6 +93,8 @@ program define pip_cache, rclass
 		else {
 			return local pc_exists = 1
 			use "`pc_file'", `clear'
+			char _dta[piphash] `piphash'
+			char _dta[pipquery] `query'
 			exit
 		}
 	}
@@ -85,11 +104,12 @@ program define pip_cache, rclass
 	==================================================*/
 	
 	if ("`subcmd'" == "save") {
-		mata: st_local("pc_file", pathjoin("${pip_cachedir}", "`piphash'.dta"))
+		if (`"`cachedir'"' == "") local cachedir  `"${pip_cachedir}"'
+		if (`"`cachedir'"' == "0")  exit
+		
+		mata: st_local("pc_file", pathjoin("`cachedir'", "`piphash'.dta"))
 		cap confirm new file "`pc_file'"
 		if (_rc == 0 | "`cacheforce'" != "") {
-			char _dta[piphash] `piphash'
-			char _dta[pipquery] `query'
 			qui save "`pc_file'", replace
 			
 			//------------ write cache infor file
@@ -109,18 +129,9 @@ program define pip_cache, rclass
 	//========================================================
 	
 	if ("`subcmd'" == "delete") {
-		noi pip_cache_delete, piphash(`piphash')
+		noi pip_cache_delete, piphash(`piphash') cachedir(`cachedir')
 		
 	}
-	
-	
-	if (ustrregexm("`subcmd'","^iscache")) {
-		noi pip_cache_iscache
-		return add
-		exit
-	}
-	
-	
 end
 
 
@@ -131,7 +142,7 @@ program define pip_cache_gethash, rclass
 	PREfix(string)              ///
 	]
 	
-	version 16.0
+	version 16.1
 	
 	qui {
 		if ("`prefix'" == "") local prefix = "pip"
@@ -164,10 +175,11 @@ end
 //------------ Delete
 
 program define pip_cache_delete, rclass
-	syntax [, piphash(string)]
+	syntax [, piphash(string) cachedir(string)]
 	
+	if ("`cachedir'" == "") local cachedir "${pip_cachedir}"
 	if ("`piphash'" == "") {
-		local pc_files: dir "${pip_cachedir}" files  "_pip*"
+		local pc_files: dir "`cachedir'" files  "_pip*"
 		local nfiles: word count `pc_files'
 		
 		noi disp "{err:Warning:} you will delete `nfiles' cache files." _n ///
@@ -175,14 +187,14 @@ program define pip_cache_delete, rclass
 		
 		if (lower("`confirm'") == "y") {
 			foreach f of local pc_files {
-				erase "${pip_cachedir}/`f'"
-				}
-			erase "${pip_cachedir}/pip_cache_info.txt"
+				erase "`cachedir'/`f'"
+			}
+			erase "`cachedir'/pip_cache_info.txt"
 		}
 	}
 	else {
 		local piphash = ustrtrim("`piphash'")
-		local f2delete "${pip_cachedir}/`piphash'.dta"
+		local f2delete "`cachedir'/`piphash'.dta"
 		
 		cap confirm file "`f2delete'"
 		if (_rc) {
@@ -192,7 +204,7 @@ program define pip_cache_delete, rclass
 			erase "`f2delete'"
 		}
 		// locals tempf and origf are created in MATA routine
-		local cfile "${pip_cachedir}/pip_cache_info.txt"
+		local cfile "`cachedir'/pip_cache_info.txt"
 		mata: pip_replace_in_pattern("`cfile'", `"`piphash'"', `""')
 		copy `tempf' "`origf'" , replace 
 		
@@ -215,71 +227,15 @@ program define pip_cache_info, rclass
 	if ("`frame'" != "") {
 		if ustrregexm("`frame'", "(.*)([0-9]{5}$)") local fname = ustrregexs(2)
 		while ("`rname'" == "`fname'") {
-	local rname = floor(runiform(1e4, 99999))
-	}
+			local rname = floor(runiform(1e4, 99999))
+		}
 	}
 	
 	if (`"`condition'"' == `""') {
 		mata: pip_drop_cache_info_frames()
-		
-		tempname cache_txt 
 		local frame "cache_info_`rname'"
 		frame create `frame'	
-		frame create `cache_txt'
-		
-		//========================================================
-		//  Call original Date
-		//========================================================
-		qui frame `cache_txt' {
-			import delimited hash query using "${pip_cachedir}/pip_cache_info.txt", /* 
-			*/ clear delimiters(",")
-			* pause on 
-			* pause cache_txt
-			split query, gen(ep) parse(?)
-			gen endpoint = ustrregexs(2) if ustrregexm(ep1, "(.*)/([^/]+)$")
-			split ep2, gen(par) parse(&)
-			qui ds par*
-			local level1 = "`r(varlist)'"
-			qui foreach v of local level1 {
-				split `v', gen(`v'_) parse(=)
-			}
-			
-			//------------Key for linking frames
-			gen n = _n
-			local cN = _N
-		}
-		
-		//========================================================
-		// Organize data into  readable format
-		//========================================================
-		
-		// Create a frame whose vars are each available parameter
-		// associated with a particular hash. 
-		
-		qui frame `frame' {
-			set obs `cN'
-			gen n = _n
-			frlink 1:1 n, frame(`cache_txt')
-			
-			forvalues i = 1/`cN' {  // for each observation
-				
-				foreach v of loca level1 {  // forech parameter
-					local vname  = _frval(`cache_txt', `v'_1, `i')
-					local vvalue = _frval(`cache_txt', `v'_2, `i')
-					
-					// if par does not exists of is format
-					if inlist("`vname'", "", "format") continue 
-					cap confirm var `vname'
-					if (_rc) gen     `vname' = "`vvalue'" in `i'
-					else     replace `vname' = "`vvalue'" in `i'
-				}
-				
-				* replace hash  = _frval(`cache_txt', hash, `i') in `i'
-				* replace query = _frval(`cache_txt', query, `i') in `i'
-			}
-			
-			frget hash query endpoint, from(`cache_txt')
-		}  // end of frame
+		qui frame `frame': pip_cache_inventory
 		
 	}  // end of condition == ""
 	
@@ -304,7 +260,7 @@ program define pip_cache_info, rclass
 		if (`nobs' > 1) {
 			
 			noi disp "{break}{title:{res:Cache data available}} " /* 
-			*/ "{txt:{it:(Filter your data by parameter)}}"
+			*/ "{txt:{it:(Filter your data by parameter)}}" _n
 			
 			
 			local novars "hash query n"
@@ -312,13 +268,7 @@ program define pip_cache_info, rclass
 			local vars = "`r(varlist)'"
 			local vars: list vars - novars
 			
-			foreach v of local vars {
-				//------------ get length of string for formatting
-				local vtype: type `v'
-				local vtype: subinstr local vtype "str" ""
-				// 36 is a nice display length ()
-				local l = floor(36/(`vtype'+2))
-				
+			foreach v of local vars {				
 				//------------ Unique values
 				tempvar uniq
 				qui bysort `v': gen byte `uniq' = (_n==_N) if `v' != ""
@@ -329,8 +279,8 @@ program define pip_cache_info, rclass
 				//------------ build call of pip_utils click
 				local condition = `"condition(`"`v' == "obsi""')"'
 				noi pip_utils click, variable(`v') title("{title:`v'} `filterable'") /* 
-				*/ statacode(`"pip_cache info, `condition' frame(`frame2')"') /* 
-				*/ length(`l')
+				*/ statacode(`"pip_cache info, `condition' frame(`frame2')"')
+				
 			} // end for parameters loop
 			disp _n
 			
@@ -395,6 +345,67 @@ program define pip_cache_info, rclass
 	
 end
 
+program define pip_cache_inventory, rclass
+	
+	tempname cache_txt 
+	frame create `cache_txt'
+	
+	//========================================================
+	//  Call original Date
+	//========================================================
+	qui frame `cache_txt' {
+		import delimited hash query using "${pip_cachedir}/pip_cache_info.txt", /* 
+		*/ clear delimiters(",")
+		* pause on 
+		* pause cache_txt
+		split query, gen(ep) parse(?)
+		gen endpoint = ustrregexs(2) if ustrregexm(ep1, "(.*)/([^/]+)$")
+		split ep2, gen(par) parse(&)
+		qui ds par*
+		local level1 = "`r(varlist)'"
+		qui foreach v of local level1 {
+			split `v', gen(`v'_) parse(=)
+		}
+		
+		//------------Key for linking frames
+		gen n = _n
+		local cN = _N
+	}
+	
+	//========================================================
+	// Organize data into  readable format
+	//========================================================
+	
+	// Create a frame whose vars are each available parameter
+	// associated with a particular hash. 
+	
+	qui  {
+		drop _all
+		set obs `cN'
+		gen n = _n
+		frlink 1:1 n, frame(`cache_txt')
+		
+		forvalues i = 1/`cN' {  // for each observation
+			
+			foreach v of loca level1 {  // forech parameter
+				local vname  = _frval(`cache_txt', `v'_1, `i')
+				local vvalue = _frval(`cache_txt', `v'_2, `i')
+				
+				// if par does not exists of is format
+				if inlist("`vname'", "", "format") continue 
+				cap confirm var `vname'
+				if (_rc) gen     `vname' = "`vvalue'" in `i'
+				else     replace `vname' = "`vvalue'" in `i'
+			}
+			
+			* replace hash  = _frval(`cache_txt', hash, `i') in `i'
+			* replace query = _frval(`cache_txt', query, `i') in `i'
+		}
+		
+		frget hash query endpoint, from(`cache_txt')
+	}  // end of qui
+	
+end
 
 exit
 /* End of do-file */

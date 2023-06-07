@@ -25,7 +25,7 @@ program define pip_versions, rclass
 	AVAILability                   ///
 	]
 	
-	version 16
+	version 16.1
 	
 	qui {
 		

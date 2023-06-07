@@ -13,14 +13,15 @@ program define pip_pov_check_args, rclass
 	[ ,                             /// 
 	COUntry(string)                 /// 
 	REGion(string)                  /// 
-	YEAR(string)                    /// 
+	Year(string)                    /// 
 	POVLine(numlist)                /// 
 	POPShare(numlist)	   	          /// 
 	CLEAR                           /// 
-	COVerage(string)                /// 
+	COVerage(string)                ///
+	FILLgaps                        ///
 	] 
 	
-	version 16
+	version 16.1
 	
 	
 	//========================================================
@@ -30,10 +31,8 @@ program define pip_pov_check_args, rclass
 	
 	local version    = "${pip_version}"		
 	tokenize "`version'", parse("_")
+	local _version   = "_`1'_`3'_`9'"	
 	local ppp_year = `3'
-	
-	return local ppp_year = "ppp_year(`ppp_year')"
-	local optnames "`optnames' ppp_year"
 	
 	//------------ Get auxiliary data
 	pip_timer pov_check_args.auxframes, on
@@ -64,7 +63,7 @@ program define pip_pov_check_args, rclass
 	
 	
 	*---------- Coverage
-	if ("`coverage'" == "") local coverage = ""
+	if (lower("`coverage'") == "all") local coverage = ""
 	local coverage = lower("`coverage'")
 	
 	foreach c of local coverage {	
@@ -88,16 +87,7 @@ program define pip_pov_check_args, rclass
 			local region: subinstr local region "SAR" "SAS", word 
 		}
 		
-		tokenize "`version'", parse("_")
-		local _version   = "_`1'_`3'_`9'"
-		
-		frame dir 
-		local av_frames "`r(frames)'"
-		local av_frames: subinstr local  av_frames " " "|", all
-		local av_frames = "^(" + "`av_frames'" + ")"
-		
 		//------------ Regions frame
-		pip_auxframes
 		local frpiprgn "_pip_regions`_version'" 
 		frame `frpiprgn' {
 			levelsof region_code, local(av_regions)  clean
@@ -154,13 +144,58 @@ program define pip_pov_check_args, rclass
 		
 		
 		*---------- Country
+		// check availability 
+		if ("`country'" != "") {
+			local country = upper("`country'")
+			frame _pip_fw`_version' {
+				qui levelsof country_code, local(av_cts)  clean
+			}
+			
+			// Add all to have the same functionality as in country(all)
+			local av_cts = "`av_cts'" + " ALL"
+			
+			local inct: list country in av_cts
+			if (`inct' == 0) {
+				
+				noi disp in red "Country `country' is not available." _n ///
+				"Only the following are available:"
+				noi pip_info
+				
+				error
+			}
+		}
+		
+		// Check if year is available
+		if ("`country'" != "" & "`fillgaps'" == "" & !inlist(lower("`year'"), "all", "")) {
+			
+			frame _pip_fw`_version' {
+				tempname CT o YR
+				mata :                                                   ; /*
+				*/	st_sview(`CT' = ., ., "country_code")                ; /*
+				*/	`o'  = selectindex(`CT' :== "`country'")             ; /*
+				*/	st_view(`YR' = ., `o', "year")                       ; /*
+				*/	st_local("av_year", strofreal(anyof(`YR', `year')))  
+				
+				
+				if (`av_year'== 0) {
+					noi disp in red "Survey year {ul:`year'} is not available in `country'." _n ///
+					"Only the following are available:"
+					noi pip_info, country(`country')
+					error
+				}
+			}
+		}
+		
+		
+		
+		
 		local country = stritrim(ustrtrim("`country' `region'"))
 		if (lower("`country'") != "all") local country = upper("`country'")
 		if ("`country'" == "") local country "all" // to modify
 		return local country = "country(`country')"
 		local optnames "`optnames' country"
 		
-	}
+	}  // end of cl subcmd
 	
 	
 	//========================================================
@@ -209,7 +244,31 @@ program define pip_pov_check_args, rclass
 	//========================================================
 	//  Country profiles (cp)
 	//========================================================
-	
+	if ("`subcmd'" == "cp") {
+		
+		*---------- Country
+		local country = stritrim(ustrtrim("`country' `region'"))
+		if (lower("`country'") != "all") local country = upper("`country'")
+		if ("`country'" == "") local country "all" // to modify
+		return local country = "country(`country')"
+		local optnames "`optnames' country"
+		
+		
+		
+		// poverty line 
+		if ("`povline'" == "")  {
+			
+			if ("`ppp_year'" == "2005") local povline = 1.25
+			if ("`ppp_year'" == "2011") local povline = 1.9
+			if ("`ppp_year'" == "2017") local povline = 2.15
+		}
+		return local povline  = "povline(`povline')"
+		local optnames "`optnames' povline"
+		
+		return local coverage = ""
+		return local year     = ""
+		
+	}	
 	//========================================================
 	// Return options names
 	//========================================================
