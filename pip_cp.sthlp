@@ -1,20 +1,20 @@
 {smcl}
 {* *! version 1.0.0 dec 2022}{...}
 {vieweralsosee "" "--"}{...}
-{cmd:help pip subcmd}{right:{browse "https://pip.worldbank.org/":Poverty and Inequality Platform (PIP)}}
+{cmd:help pip cp}{right:{browse "https://pip.worldbank.org/":Poverty and Inequality Platform (PIP)}}
 {help pip:return to pip} {right:{browse "https://worldbank.github.io/pip/"}}
 {hline}
 
 {title:Syntax}
 
 {phang}
-{cmd:pip subcmd,} [ {it:{help pip_subcmd##opts_desc:options}} ]
+{cmd:pip cp,} [ {it:{help pip_cp##opts_desc:options}} ]
 
 {marker opts_desc}{...}
 {title:Options}
 
 {synoptset 27 tabbed}{...}
-{synopthdr:subcmd options}
+{synopthdr:cp options}
 {synoptline}
 {synopt :{opt tops}}Desc.{p_end}
 {synoptline}
