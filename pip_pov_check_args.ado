@@ -13,7 +13,7 @@ program define pip_pov_check_args, rclass
 	[ ,                             /// 
 	COUntry(string)                 /// 
 	REGion(string)                  /// 
-	Year(string)                    /// 
+	YEAR(string)                    /// 
 	POVLine(numlist)                /// 
 	POPShare(numlist)	   	          /// 
 	CLEAR                           /// 
@@ -57,13 +57,9 @@ program define pip_pov_check_args, rclass
 		numlist "`year'"
 		local year = r(numlist)
 	}
-	
-	return local year = "year(`year')"
-	local optnames "`optnames' year"
-	
-	
+
 	*---------- Coverage
-	if (lower("`coverage'") == "all") local coverage = ""
+	if ("`coverage'" == "") local coverage = ""
 	local coverage = lower("`coverage'")
 	
 	foreach c of local coverage {	
