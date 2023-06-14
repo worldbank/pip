@@ -61,7 +61,7 @@ Country profile data for all countries can be generated with the following examp
 {stata pip cp, clear} 
 
 {pstd}
-Here is an example that shows how to generate country profile data for one country for three povery lines:
+Here is an example that shows how to generate country profile data for one country for three poverty lines:
 
 {phang2}
 {stata pip cp, country(arg) povline(1.90 2.15 3.65) clear}
