@@ -23,6 +23,7 @@ program define pip_versions, rclass
 	PPP_year(numlist)              ///
 	identity(string)               ///
 	AVAILability                   ///
+	*                              ///
 	]
 	
 	version 16.1

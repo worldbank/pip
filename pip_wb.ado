@@ -53,7 +53,7 @@ program define pip_wb, rclass
 		// Build query (queries returned in ${pip_last_queries}) 
 		//========================================================
 		pip_wb_query, region(`region') year(`year') povline(`povline')   /*
-		*/            ppp(`ppp_year') coverage(`coverage') 
+		*/            ppp_version(`ppp_year') coverage(`coverage') 
 		
 		//========================================================
 		// Getting data
@@ -106,7 +106,7 @@ program define pip_wb_query, rclass
 	REGion(string)                  /// 
 	YEAR(string)                    /// 
 	POVLine(numlist)                /// 
-	PPP(numlist)                    /// 
+	ppp_version(numlist)            /// 
 	COVerage(string)                /// 
 	] 
 	
@@ -134,7 +134,7 @@ program define pip_wb_query, rclass
 		//========================================================
 		
 		local params = "country year reporting_level " + /* 
-		*/             " version welfare_type" 
+		*/             " version welfare_type ppp_version" 
 		
 		
 		foreach p of local params {
