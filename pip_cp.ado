@@ -53,7 +53,7 @@ program define pip_cp, rclass
 		//========================================================
 		// Build query (queries returned in ${pip_last_queries}) 
 		//========================================================
-		pip_cp_query, country(`country') povline(`povline') ppp_year(`ppp_year') 
+		pip_cp_query, country(`country') povline(`povline') ppp_version(`ppp_year') 
 		
 		//========================================================
 		// Getting data
@@ -149,7 +149,7 @@ program define pip_cp_query, rclass
 	[ ,                             /// 
 	COUntry(string)                 /// 
 	POVLine(numlist)                /// 
-	PPP_year(numlist)                /// 
+	ppp_version(numlist)                /// 
 	] 
 	
 	//========================================================
@@ -164,7 +164,7 @@ program define pip_cp_query, rclass
 		// build query... THE ORDER IS VERY IMPORTANT
 		//========================================================
 		
-		local params = "country ppp_year" 
+		local params = "country ppp_version" 
 		
 		foreach p of local params {
 			if (`"``p''"' == `""') continue

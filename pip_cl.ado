@@ -58,7 +58,7 @@ program define pip_cl, rclass
 		//========================================================
 		pip_cl_query, country(`country') region(`region') year(`year') ///
 		povline(`povline') popshare(`popshare')  `fillgaps' ///
-		ppp(`ppp_year') coverage(`coverage') 
+		ppp_version(`ppp_year') coverage(`coverage') 
 		
 		//========================================================
 		// Getting data
@@ -117,7 +117,7 @@ program define pip_cl_query, rclass
 	YEAR(string)                    /// 
 	POVLine(numlist)                /// 
 	POPShare(numlist)	   	          /// 
-	PPP(numlist)                    /// 
+	ppp_version(numlist)            /// 
 	COVerage(string)                /// 
 	FILLgaps                        /// 
 	] 
@@ -148,7 +148,7 @@ program define pip_cl_query, rclass
 		// build query... THE ORDER IS VERY IMPORTANT
 		//========================================================
 		
-		local params = "country year ppp fill_gaps " + ///
+		local params = "country year ppp_version fill_gaps " + ///
 		"reporting_level version welfare_type" 
 		
 		

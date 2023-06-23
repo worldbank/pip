@@ -165,7 +165,7 @@ program define pip, rclass
 		//------------Tables
 		if ("`tables'" != "") {
 			pip_timer pip.pip_versions, on
-			pip_versions, `release' `ppp_year' `identity' `version'
+			pip_versions, `gen_opts'
 			pip_timer pip.pip_versions, off
 			
 			pip_timer pip.pip_tables, on
@@ -252,7 +252,7 @@ program define pip, rclass
 		// Set up version
 		//========================================================
 		pip_timer pip.pip_versions, on
-		noi pip_versions, `release' `ppp_year' `identity' `version'
+		noi pip_versions, `gen_opts'
 		return add
 		pip_timer pip.pip_versions, off
 		
@@ -358,6 +358,8 @@ Notes:
 
 Version Control:
 
+*! version 0.10.6    <2023Jun23>
+*! -- Fix big bug about ppp year and wrong url query. 
 *! version 0.10.5    <2023Jun06>
 *! -- Incorporate pip_cp by Tefera
 *! -- update helpfile with new subcommand test
