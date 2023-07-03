@@ -81,7 +81,7 @@ log close pip_test
 
 ## License
 
-MIT
+[Creative Commons Attribution 4.0 International]([url](https://creativecommons.org/licenses/by/4.0/))
 
 
 ## Author
