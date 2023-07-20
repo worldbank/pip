@@ -13,24 +13,13 @@ Output:             dta
 0: Program set up
 ==================================================*/
 program define pip_wb, rclass
-	syntax ///
-	[ ,                             /// 
-	REGion(string)                  /// 
-	Year(string)                    /// 
-	POVLine(numlist)                /// 
-	COVerage(string)                /// 
-	CLEAR                           /// 
-	pause                           /// 
-	POVCALNET_format                ///
-	replace                         ///
-	cacheforce                      ///
-	n2disp(passthru)                ///
-	cachedir(passthru)              ///
-	] 
-	
 	version 16.1
 	
 	pip_timer pip_wb, on
+	
+	pip_wb_check_args `0'
+	local optnames "`r(optnames)'" 
+	mata: pip_retlist2locals("`optnames'")
 	
 	if ("`pause'" == "pause") pause on
 	else                      pause off
@@ -91,6 +80,149 @@ program define pip_wb, rclass
 		
 	}
 	pip_timer pip_wb, off
+end
+
+program define pip_wb_check_args, rclass
+	version 16.1
+	syntax ///
+	[ ,                             /// 
+	REGion(string)                  /// 
+	Year(string)                    /// 
+	POVLine(numlist)                /// 
+	COVerage(string)                /// 
+	CLEAR *                         /// 
+	pause                           /// 
+	POVCALNET_format                ///
+	replace                         ///
+	cacheforce  *                   ///
+	n2disp(passthru)                ///
+	cachedir(passthru) *            ///
+	] 
+	
+	//========================================================
+	// setup
+	//========================================================
+	local version    = "${pip_version}"		
+	tokenize "`version'", parse("_")
+	local _version   = "_`1'_`3'_`9'"	
+	local ppp_year = `3'
+	
+	//------------ Get auxiliary data
+	pip_timer pov_check_args.auxframes, on
+	pip_auxframes
+	pip_timer pov_check_args.auxframes, off
+	
+	//========================================================
+	// General checks
+	//========================================================
+	//------------ year
+	if ("`year'" == "") local year "all"
+	else if (lower("`year'") == "all") local year "all"
+	else if (lower("`year'") == "last") local year "last"
+	else if (ustrregexm("`year'"), "[a-zA-Z]+") {
+		noi disp "{err} `year' is not a valid {it:year} value" _n /* 
+		*/  "only numeric values are accepted{txt}" _n
+		error
+	}
+	else {
+		numlist "`year'"
+		local year = r(numlist)
+	}
+	
+	return local year = "`year'"
+	local optnames "`optnames' year"
+	
+	*---------- Coverage
+	if (lower("`coverage'") == "all") local coverage = ""
+	local coverage = lower("`coverage'")
+
+	foreach c of local coverage {	
+		
+		if !inlist(lower("`c'"), "national", "rural", "urban", "") {
+			noi disp in red `"option {it:coverage()} must be "national", "rural",  "urban" or "all" "'
+			error
+		}	
+	}
+
+	return local coverage = "`coverage'"
+	local optnames "`optnames' coverage"
+	
+	//------------ Region
+	if ("`region'" != "") {
+		local region = upper("`region'")
+		
+		if (regexm("`region'", "SAR")) {
+			noi disp in red "Note: " in y "The official code of South Asia is" ///
+			"{it: SAS}, not {it:SAR}. We'll make the change for you"
+			local region: subinstr local region "SAR" "SAS", word 
+		}
+		
+		//------------ Regions frame
+		local frpiprgn "_pip_regions`_version'" 
+		frame `frpiprgn' {
+			levelsof region_code, local(av_regions)  clean
+		}
+		
+		// Add all to have the same functionality as in country(all)
+		local av_regions = "`av_regions'" + " ALL"
+		
+		local inregion: list region in av_regions
+		if (`inregion' == 0) {
+			
+			noi disp in red "region `region' is not available." _n ///
+			"Only the following are available:" _n "`av_regions'"
+			
+			error
+		}
+	}
+
+	return local region = "`region'"
+	local optnames "`optnames' region"
+	
+	//========================================================
+	//  Aggregate level (wb)
+	//========================================================
+
+	if ("`country'" != "") {
+		noi disp as err "option {it:country()} is not allowed with subcommand {it:wb}"
+		noi disp as res "Note: " as txt "subcommand {it:wb} only accepts options {it:region()} and {it:year()}"
+		error
+	}
+		
+	if ("`fillgaps'" != "") {
+		noi disp "{res}Note:{txt} option {it:fillgaps} not allowed with " /* 
+		*/  "subcommand {cmd:wb}."
+		error
+	}
+		
+	// poshare
+	if ("`popshare'" != "") {
+		noi disp in red "option {it:popshare()} can't be combined " /* 
+		*/ "with subcommand {it:wb}" _n
+		error
+	}
+		
+	if ("`region'" != "") {
+		return local region = "`region'"
+		local optnames "`optnames' region"
+	}
+		
+		// poverty line 
+		
+	if ("`povline'" == "")  {
+			
+		if ("`ppp_year'" == "2005") local povline = 1.25
+		if ("`ppp_year'" == "2011") local povline = 1.9
+		if ("`ppp_year'" == "2017") local povline = 2.15
+	}
+	return local povline  = "`povline'"
+	local optnames "`optnames' povline"
+
+	if ("`clear'" == "") local clear "clear"
+	return local clear = "`clear'"
+	local optnames "`optnames' clear"
+	return local optnames "`optnames'"
+
 end
 
 //========================================================
