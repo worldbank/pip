@@ -53,7 +53,6 @@ program define pip_cl, rclass
 		
 		//------------ download
 		pip_timer pip_cl.pip_get, on
-		noi dis "`clear'"
 		pip_get, `clear' `cacheforce' `cachedir'
 		pip_timer pip_cl.pip_get, off
 		
@@ -267,7 +266,7 @@ program define pip_cl_check_args, rclass
 	return local country = "`country'"
 	local optnames "`optnames' country"
 	return local optnames "`optnames'"
-   noi dis "`optnames'" 
+   
 end
 
 //========================================================

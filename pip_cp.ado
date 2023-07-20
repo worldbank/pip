@@ -14,22 +14,14 @@ Output:             dta
 0: Program set up
 ==================================================*/
 program define pip_cp, rclass
-	syntax ///
-	[ ,                             /// 
-	COUntry(string)                 /// 
-	POVLine(numlist)                /// 
-	PPP_year(numlist)               ///
-	CLEAR                           /// 
-	SERver(string)                  /// 
-	pause                           /// 
-	replace                         ///
-	cacheforce                      ///
-	n2disp(passthru)                ///
-	] 
-	
-	version 16.0
+	version 16.1
 	
 	pip_timer pip_cp, on
+	
+	pip_cp_check_args `0'
+	
+	local optnames "`r(optnames)'" 
+	mata: pip_retlist2locals("`optnames'")
 	
 	if ("`pause'" == "pause") pause on
 	else                      pause off
@@ -61,7 +53,7 @@ program define pip_cp, rclass
 		
 		//------------ download
 		pip_timer pip_cp.pip_get, on
-		pip_get, `clear' `cacheforce'
+		pip_get, `clear' `cacheforce' `cachedir'
 		pip_timer pip_cp.pip_get, off
 
 		//------------ clean
@@ -83,12 +75,66 @@ program define pip_cp, rclass
 end 
 
 
+//----------- Check arguments
+program define pip_cp_check_args, rclass
+	version 16.1
+	syntax ///
+	[ ,                             /// 
+	COUntry(string)                 /// 
+	POVLine(numlist)                /// 
+	PPP_year(numlist)               ///
+	CLEAR *                         /// 
+	SERver(string)                  /// 
+	pause                           /// 
+	replace                         ///
+	cacheforce *                    ///
+	n2disp(passthru)                ///
+	cachedir(passthru)  *           ///
+	] 
+	
+	//========================================================
+	// setup
+	//========================================================
+	local version    = "${pip_version}"		
+	tokenize "`version'", parse("_")
+	local _version   = "_`1'_`3'_`9'"	
+	local ppp_year = `3'
+	
+	//------------ Get auxiliary data
+	pip_timer pov_check_args.auxframes, on
+	pip_auxframes
+	pip_timer pov_check_args.auxframes, off
+	
+	//========================================================
+	//  Country profile (cp)
+	//========================================================
+		
+	*---------- Country
+	local country = stritrim(ustrtrim("`country' `region'"))
+	if (lower("`country'") != "all") local country = upper("`country'")
+	if ("`country'" == "") local country "all" // to modify
+	return local country = "`country'"
+	local optnames "`optnames' country"
+
+	// poverty line 
+	if ("`povline'" == "")  {
+		
+		if ("`ppp_year'" == "2005") local povline = 1.25
+		if ("`ppp_year'" == "2011") local povline = 1.9
+		if ("`ppp_year'" == "2017") local povline = 2.15
+	}
+	
+	return local povline  = "`povline'"
+	local optnames "`optnames' povline"
+	return local optnames "`optnames'"
+   
+end
+
+
 
 //------------Clean CP data
-
 program define pip_cp_clean, rclass
-	
-	version 16
+	version 16.1
 	
 	//========================================================
 	//  setup
@@ -114,17 +160,52 @@ program define pip_cp_clean, rclass
 		
 	
 		//------------ partial variable labels * it needs to be completed
-		label var country_code		  "country/economy code"
-		label var survey_coverage   "survey coverage"
-		label var reporting_year	  "year"
-		label var welfare_type 		  "welfare measured by income or consumption"
-		label var is_interpolated 	"data is interpolated"
-		label var survey_acronym 	     "survey acronym"
-		label var poverty_line 		  "poverty line in `ppp_version' PPP US\$ (per capita per day)"
-		label var headcount 		    "poverty headcount"
-		label var gini 				      "gini index"
-		label var survey_comparability "survey comparability"
-		label var comparable_spell 	   "comparability over time at country level" 
+		label var country_code	"country/economy code"
+		label var reporting_year  "year"
+		label var poverty_line  "poverty line in `ppp_version' PPP US\$ (per capita per day)"
+		label var headcount  "poverty headcount"
+		label var welfare_time  "Time income or consumption refers to"
+		label var survey_coverage  "Survey coverage"
+		label var is_interpolated "data is interpolated"
+		label var survey_acronym  "survey acronym"
+		label var survey_comparability "Survey comparability"
+		label var comparable_spell "Comparability over time at country level"
+		label var welfare_type  "welfare measured by income or consumption"
+		label var headcount_ipl "% of population living in households with consumption or income per person below the international poverty line (IPL) at {PPP Year} international prices. "
+		label var headcount_lmicpl  "% of population living in households with consumption or income per person below the global poverty line typical of Lower-middle-income countries (LMIC-PL) at {PPP Year} international prices. "
+		label var headcount_umicpl "% of population living in households with consumption or income per person below the global poverty line typical of Upper-middle-income countries (UMIC-PL ) at {PPP Year} international prices."
+		label var headcount_national  "National poverty headcount ratio is the percentage of the population living below the national poverty line. "
+		label var gini  "GINI index (World Bank estimate)"
+		label var theil  "Theil index (World Bank estimate)"
+		label var share_b40_female  "Proportional of female group in the bottom 40%"
+		label var share_t60_female  "Proportional of female group in the top 60%"
+		label var share_b40_male  "Proportional of male group in the bottom 40%"
+		label var share_t60_male  "Proportional of male group in the top 60%"
+		label var share_b40_rural  "Proportional of rural group in the bottom 40%"
+		label var share_t60_rural  "Proportional of rural group in the top 60%"
+		label var share_b40_urban  "Proportional of urban group in the bottom 40%"
+		label var share_t60_urban  "Proportional of urban group in the top 60%"
+		label var share_b40agecat_0_14  "Proportional of 0 to 14 years old group in the bottom 40%"
+		label var share_t60agecat_0_14  "Proportional of 0 to 14 years old group in the top 60%"
+		label var share_b40agecat_15_64  "Proportional of 15 to 64 years old group in the bottom 40%"
+		label var share_t60agecat_15_64  "Proportional of 15 to 64 years old group in the top 60%"
+		label var share_b40agecat_65p  "Proportional of 65 and older group in the bottom 40%"
+		label var share_t60agecat_65p  "Proportional of 65 and older group in the top 60%"
+		label var share_b40edu_noedu  "Proportional of no education group in the bottom 40%"
+		label var share_t60edu_noedu  "Proportional of no education group in the top 60%"
+		label var share_b40edu_pri  "Proportional of primary education group in the bottom 40%"
+		label var share_t60edu_pri  "Proportional of primary education group in the top 60%"
+		label var share_b40edu_sec  "Proportional of secondary education group in the bottom 40%"
+		label var share_t60edu_sec  "Proportional of secondary education group in the top 60%"
+		label var share_b40edu_ter  "Proportional of tertiary education group in the bottom 40%"
+		label var share_t60edu_ter  "Proportional of tertiary education group in the top 60%"
+		label var mpm_education_attainment  "Multidimensional poverty, educational attainment (% of population deprived) "
+		label var mpm_education_enrollment  "Multidimensional poverty, educational enrollment (% of population deprived)"
+		label var mpm_electricity  "Multidimensional poverty, electricity (% of population deprived)"
+		label var mpm_sanitation  "Multidimensional poverty, sanitation (% of population deprived)"
+		label var mpm_water  "Multidimensional poverty, drinking water (% of population deprived)"
+		label var mpm_monetary  "Multidimensional poverty, Monetary poverty (% of population deprived)"
+		label var mpm_headcount "Multidimensional poverty, headcount ratio (% of population)"
 
 		
 		//========================================================
