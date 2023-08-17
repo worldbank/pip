@@ -128,10 +128,11 @@ program define pip_cl_check_args, rclass
 	//------------ year
 	if ("`year'" == "") local year "all"
 	else if (lower("`year'") == "all") local year "all"
-	else if (lower("`year'") == "last") local year "last"
+	else if (lower("`year'") == "last") local year "MRV"
+	else if (lower("`year'") == "mrv") local year "MRV"
 	else if (ustrregexm("`year'"), "[a-zA-Z]+") {
 		noi disp "{err} `year' is not a valid {it:year} value" _n /* 
-		*/  "only numeric values are accepted{txt}" _n
+		*/  "only {it:all}, {it:MRV} or numeric values are accepted{txt}" _n
 		error
 	}
 	else {
