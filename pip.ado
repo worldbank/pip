@@ -358,6 +358,11 @@ Notes:
 
 Version Control:
 
+
+
+*! --fix problem with setting globals and not being able to use the general options.
+*! --fix messages when year is out of boundries
+*! --fix issue with last and mrv in year()
 *! version 0.10.6.9001    <2023Aug17>
 *! -- change ppp and ppp_year for ppp_version()
 *! -- fix getting pip_version stick
