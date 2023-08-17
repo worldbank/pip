@@ -47,7 +47,7 @@ program define pip_parseopts, rclass
 	
 	while (`"`opt'"' != `""') {
 		// identify type of option
-		if ustrregexm(`"`opt'"', "([a-zA-Z0-9]+)\(.*") {
+		if ustrregexm(`"`opt'"', "([a-zA-Z0-9_]+)\(.*") {
 			local optname = lower(ustrregexs(1))
 		}
 		else {
