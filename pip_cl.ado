@@ -244,10 +244,10 @@ program define pip_cl_check_args, rclass
 		
 		frame _pip_fw`_version' {
 			tempname CT o YR
-			mata :                                                   ; /*
-			*/	st_sview(`CT' = ., ., "country_code")                ; /*
-			*/	`o'  = selectindex(`CT' :== "`country'")             ; /*
-			*/	st_view(`YR' = ., `o', "year")                       ; /*
+			mata :                                      ; /*
+			*/	st_sview(`CT' = ., ., "country_code")   ; /*
+			*/	`o'  = selectindex(`CT' :== "`country'")   ; /*
+			*/	st_view(`YR' = ., `o', "year")             ; /*
 			*/	st_local("av_year", strofreal(anyof(`YR', `year')))  
 			
 			

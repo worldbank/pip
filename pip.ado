@@ -358,6 +358,9 @@ Notes:
 
 Version Control:
 
+*! version 0.10.6.9000    <2023Aug17>
+*! -- move pip_check_args to specific functions per subcmd
+*! -- fix issue with ppp_year()
 *! version 0.10.6    <2023Jun23>
 *! -- Fix big bug about ppp year and wrong url query. 
 *! version 0.10.5    <2023Jun06>
