@@ -78,7 +78,7 @@ program define pip_setup, rclass
 		//========================================================
 		//  compile mata code
 		//========================================================
-		
+		global pip_version ""
 		findfile "pip_fun.mata"
 		local pip_funmata_file = "`r(fn)'"
 		tempname spipmata

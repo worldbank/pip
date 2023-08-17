@@ -104,7 +104,7 @@ program define pip_cl_check_args, rclass
 	pause                           /// 
 	POVCALNET_format                ///
 	replace                         ///
-	cacheforce *                    ///
+	cacheforce                     ///
 	n2disp(passthru)                ///
 	cachedir(passthru)  *           ///
 	] 
@@ -128,10 +128,11 @@ program define pip_cl_check_args, rclass
 	//------------ year
 	if ("`year'" == "") local year "all"
 	else if (lower("`year'") == "all") local year "all"
-	else if (lower("`year'") == "last") local year "last"
+	else if (lower("`year'") == "last") local year "MRV"
+	else if (lower("`year'") == "mrv") local year "MRV"
 	else if (ustrregexm("`year'"), "[a-zA-Z]+") {
 		noi disp "{err} `year' is not a valid {it:year} value" _n /* 
-		*/  "only numeric values are accepted{txt}" _n
+		*/  "only {it:all}, {it:MRV} or numeric values are accepted{txt}" _n
 		error
 	}
 	else {
@@ -240,18 +241,43 @@ program define pip_cl_check_args, rclass
 	}
 		
 	// Check if year is available
-	if ("`country'" != "" & "`fillgaps'" == "" & !inlist(lower("`year'"), "all", "")) {
+	if ("`country'" != "" & "`fillgaps'" == "" & !inlist(lower("`year'"), "all", "last","mrv","")) {
 		
-		frame _pip_fw`_version' {
-			tempname CT o YR
-			mata :                                                   ; /*
-			*/	st_sview(`CT' = ., ., "country_code")                ; /*
-			*/	`o'  = selectindex(`CT' :== "`country'")             ; /*
-			*/	st_view(`YR' = ., `o', "year")                       ; /*
-			*/	st_local("av_year", strofreal(anyof(`YR', `year')))  
+		tempname fw_temp
+		frame copy _pip_fw_20230328_2017_PROD `fw_temp'
+		qui frame `fw_temp' {
 			
 			
-			if (`av_year'== 0) {
+			sum year, meanonly
+			local maxyear = r(max)
+			local minyear = r(min)
+			
+			local country = strtrim(stritrim("`country'"))
+			local country_: subinstr local country " " "|"
+			
+			local year = strtrim(stritrim("`year'"))
+			local year_: subinstr local year " " "|", all
+			local yearc: subinstr local year " " ",", all
+			
+			local isgt = max(`maxyear', `yearc') == `maxyear'
+			local islt = min(`minyear', `yearc') == `minyear'
+			
+			if (`isgt' == 0) {
+				noi disp in red "`=max(0,`yearc')' is not available. " _n ///
+				"The latest year available is {ul:`maxyear'}"
+				error
+			}
+			
+			if (`islt' == 0) {
+				noi disp in red "`=min(`yearc',9999)' is not available. " _n ///
+				"The first year available is {ul:`minyear'}"
+				error
+			}
+			
+			keep if regexm(country_code, "`country_'")
+			keep if regexm(strofreal(year), "`year_'")
+	  
+			if (_N== 0) {
 				noi disp in red "Survey year {ul:`year'} is not available in `country'." _n ///
 				"Only the following are available:"
 				noi pip_info, country(`country')
@@ -284,7 +310,7 @@ program define pip_cl_query, rclass
 	YEAR(string)                    /// 
 	POVLine(numlist)                /// 
 	POPShare(numlist)	   	          /// 
-	PPP(numlist)                    /// 
+	PPP_version(numlist)                    /// 
 	COVerage(string)                /// 
 	FILLgaps                        /// 
 	] 
@@ -316,7 +342,7 @@ program define pip_cl_query, rclass
 		//========================================================
 		noi disp "`country'"
 		noi disp "test country"
-		local params = "country year ppp fill_gaps " + ///
+		local params = "country year ppp_version fill_gaps " + ///
 		"reporting_level version welfare_type" 
 		
 		
@@ -348,7 +374,7 @@ program define pip_cl_query, rclass
 			// each povline or popshare + format
 			local queryp = "`endpoint'?`query'&`optname'=`v'&format=csv" 
 			if (`i' == 1) mata: `M' = "`queryp'"
-			else            mata: `M' = `M' , "`queryp'"
+			else          mata: `M' = `M' , "`queryp'"
 			local ++i
 		}
 		
