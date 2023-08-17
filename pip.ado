@@ -360,13 +360,12 @@ Version Control:
 
 
 
+*! version 0.10.7    <2023Aug17>
 *! --fix problem with setting globals and not being able to use the general options.
 *! --fix messages when year is out of boundries
 *! --fix issue with last and mrv in year()
-*! version 0.10.6.9001    <2023Aug17>
 *! -- change ppp and ppp_year for ppp_version()
 *! -- fix getting pip_version stick
-*! version 0.10.6.9000    <2023Aug17>
 *! -- move pip_check_args to specific functions per subcmd
 *! -- fix issue with ppp_year()
 *! version 0.10.6    <2023Jun23>
