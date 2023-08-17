@@ -271,15 +271,15 @@ program define pip, rclass
 		//========================================================
 		//  Check of arguments
 		//========================================================
-		
-		
+
+		/*
 		pip_timer pip.pip_pov_check_args, on
 		noi pip_pov_check_args `subcmd', `est_opts'
 		local optnames "`r(optnames)'" 
 		mata: pip_retlist2locals("`optnames'")
 		mata: pip_locals2call("`optnames'", "est_opts")
 		pip_timer pip.pip_pov_check_args, off
-		
+		*/
 		
 		//========================================================
 		// retrieve and format estimates

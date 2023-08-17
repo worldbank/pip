@@ -14,27 +14,14 @@ Output:             dta
 0: Program set up
 ==================================================*/
 program define pip_cl, rclass
-	syntax ///
-	[ ,                             /// 
-	COUntry(string)                 /// 
-	REGion(string)                  /// 
-	Year(string)                    /// 
-	POVLine(numlist)                /// 
-	POPShare(numlist)	   	          /// 
-	FILLgaps                        /// 
-	COVerage(string)                /// 
-	CLEAR                           /// 
-	pause                           /// 
-	POVCALNET_format                ///
-	replace                         ///
-	cacheforce                      ///
-	n2disp(passthru)                ///
-	cachedir(passthru)              ///
-	] 
-	
 	version 16.1
 	
 	pip_timer pip_cl, on
+
+	pip_cl_check_args `0'
+	
+	local optnames "`r(optnames)'" 
+	mata: pip_retlist2locals("`optnames'")
 	
 	if ("`pause'" == "pause") pause on
 	else                      pause off
@@ -58,7 +45,7 @@ program define pip_cl, rclass
 		//========================================================
 		pip_cl_query, country(`country') region(`region') year(`year') ///
 		povline(`povline') popshare(`popshare')  `fillgaps' ///
-		ppp_version(`ppp_year') coverage(`coverage') 
+		ppp(`ppp_year') coverage(`coverage') 
 		
 		//========================================================
 		// Getting data
@@ -102,6 +89,186 @@ program define pip_cl, rclass
 end 
 
 
+program define pip_cl_check_args, rclass
+	version 16.1
+	syntax ///
+	[ ,                             /// 
+	COUntry(string)                 /// 
+	REGion(string)                  /// 
+	Year(string)                    /// 
+	POVLine(numlist)                /// 
+	POPShare(numlist)	   	        /// 
+	FILLgaps                        /// 
+	COVerage(string)                /// 
+	CLEAR(string) *                 /// 
+	pause                           /// 
+	POVCALNET_format                ///
+	replace                         ///
+	cacheforce *                    ///
+	n2disp(passthru)                ///
+	cachedir(passthru)  *           ///
+	] 
+	
+	//========================================================
+	// setup
+	//========================================================
+	local version    = "${pip_version}"		
+	tokenize "`version'", parse("_")
+	local _version   = "_`1'_`3'_`9'"	
+	local ppp_year = `3'
+	
+	//------------ Get auxiliary data
+	pip_timer pov_check_args.auxframes, on
+	pip_auxframes
+	pip_timer pov_check_args.auxframes, off
+	
+	//========================================================
+	// General checks
+	//========================================================
+	//------------ year
+	if ("`year'" == "") local year "all"
+	else if (lower("`year'") == "all") local year "all"
+	else if (lower("`year'") == "last") local year "last"
+	else if (ustrregexm("`year'"), "[a-zA-Z]+") {
+		noi disp "{err} `year' is not a valid {it:year} value" _n /* 
+		*/  "only numeric values are accepted{txt}" _n
+		error
+	}
+	else {
+		numlist "`year'"
+		local year = r(numlist)
+	}
+	
+	return local year = "`year'"
+	local optnames "`optnames' year"
+	
+	*---------- Coverage
+	if (lower("`coverage'") == "all") local coverage = ""
+	local coverage = lower("`coverage'")
+
+	foreach c of local coverage {	
+		
+		if !inlist(lower("`c'"), "national", "rural", "urban", "") {
+			noi disp in red `"option {it:coverage()} must be "national", "rural",  "urban" or "all" "'
+			error
+		}	
+	}
+
+	return local coverage = "`coverage'"
+	local optnames "`optnames' coverage"
+	
+	//------------ Region
+	if ("`region'" != "") {
+		local region = upper("`region'")
+		
+		if (regexm("`region'", "SAR")) {
+			noi disp in red "Note: " in y "The official code of South Asia is" ///
+			"{it: SAS}, not {it:SAR}. We'll make the change for you"
+			local region: subinstr local region "SAR" "SAS", word 
+		}
+		
+		//------------ Regions frame
+		local frpiprgn "_pip_regions`_version'" 
+		frame `frpiprgn' {
+			levelsof region_code, local(av_regions)  clean
+		}
+		
+		// Add all to have the same functionality as in country(all)
+		local av_regions = "`av_regions'" + " ALL"
+		
+		local inregion: list region in av_regions
+		if (`inregion' == 0) {
+			
+			noi disp in red "region `region' is not available." _n ///
+			"Only the following are available:" _n "`av_regions'"
+			
+			error
+		}
+	}
+
+
+	//========================================================
+	//  Country Level (cl)
+	//========================================================
+
+	//------------ Poverty line 
+	// defined popshare and defined povline = error
+	if ("`popshare'" != "" & "`povline'" != "")  {
+		noi disp as err "povline and popshare cannot be used at the same time"
+		error
+	}
+	// Blank popshare and blank povline = default povline 1.9
+	else if ("`popshare'" == "" & "`povline'" == "")  {
+		
+		if ("`ppp_year'" == "2005") local povline = 1.25
+		if ("`ppp_year'" == "2011") local povline = 1.9
+		if ("`ppp_year'" == "2017") local povline = 2.15
+	}
+	
+	return local povline  = "`povline'"
+	return local popshare = "`popshare'"
+	local optnames "`optnames' povline popshare"
+		
+	//------------ fillgaps
+	return local fillgaps = "`fillgaps'"
+	local optnames "`optnames' fillgaps"
+
+	if ("`clear'" == "") local clear "clear"
+	return local clear = "`clear'"
+	local optnames "`optnames' clear"
+
+	*---------- Country
+	// check availability 
+	if ("`country'" != "") {
+		local country = upper("`country'")
+		frame _pip_fw`_version' {
+			qui levelsof country_code, local(av_cts)  clean
+		}
+		
+		// Add all to have the same functionality as in country(all)
+		local av_cts = "`av_cts'" + " ALL"
+		
+		local inct: list country in av_cts
+		if (`inct' == 0) {
+			
+			noi disp in red "Country `country' is not available." _n ///
+			"Only the following are available:"
+			noi pip_info
+			
+			error
+		}
+	}
+		
+	// Check if year is available
+	if ("`country'" != "" & "`fillgaps'" == "" & !inlist(lower("`year'"), "all", "")) {
+		
+		frame _pip_fw`_version' {
+			tempname CT o YR
+			mata :                                                   ; /*
+			*/	st_sview(`CT' = ., ., "country_code")                ; /*
+			*/	`o'  = selectindex(`CT' :== "`country'")             ; /*
+			*/	st_view(`YR' = ., `o', "year")                       ; /*
+			*/	st_local("av_year", strofreal(anyof(`YR', `year')))  
+			
+			
+			if (`av_year'== 0) {
+				noi disp in red "Survey year {ul:`year'} is not available in `country'." _n ///
+				"Only the following are available:"
+				noi pip_info, country(`country')
+				error
+			}
+		}
+	}
+		
+	local country = stritrim(ustrtrim("`country' `region'"))
+	if (lower("`country'") != "all") local country = upper("`country'")
+	if ("`country'" == "") local country "all" // to modify
+	return local country = "`country'"
+	local optnames "`optnames' country"
+	return local optnames "`optnames'"
+   
+end
+
 //========================================================
 // Sub programs
 //========================================================
@@ -117,7 +284,7 @@ program define pip_cl_query, rclass
 	YEAR(string)                    /// 
 	POVLine(numlist)                /// 
 	POPShare(numlist)	   	          /// 
-	ppp_version(numlist)            /// 
+	PPP(numlist)                    /// 
 	COVerage(string)                /// 
 	FILLgaps                        /// 
 	] 
@@ -147,8 +314,9 @@ program define pip_cl_query, rclass
 		//========================================================
 		// build query... THE ORDER IS VERY IMPORTANT
 		//========================================================
-		
-		local params = "country year ppp_version fill_gaps " + ///
+		noi disp "`country'"
+		noi disp "test country"
+		local params = "country year ppp fill_gaps " + ///
 		"reporting_level version welfare_type" 
 		
 		

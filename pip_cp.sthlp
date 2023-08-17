@@ -13,30 +13,52 @@
 {marker opts_desc}{...}
 {title:Options}
 
+{pstd}
+
+{marker cl_wb_options}{...}
 {synoptset 27 tabbed}{...}
 {synopthdr:cp options}
 {synoptline}
-{synopt :{opt tops}}Desc.{p_end}
-{synoptline}
-
+{synopt :{opt cou:ntry:}(3-letter code)}List of {it:{help pip_countries##countries:country codes}} or {it:all}. Default is "{it:all}".{p_end}
+{synopt :{opt povl:ine:}(#)}list of poverty lines (in PPP specified, see option {cmd:ppp_year(#)}) to calculate 
+ poverty measures. Default is 2.15 at 2017 PPPs.{p_end}
+ {pstd}
 
 {marker description}{...}
-{title:Description}
-{pstd}
-Description starts here
+{title:Description}:
 
+{pstd}
+{cmd:cp} subcommand provides country profile data. This dataset comes from the Global Monitoring Indicators (GMI). The Global Monitoring Indicators (GMI) 
+are a set of harmonized indicators produced from the Global Monitoring Database (GMD), which is the 
+World Bank’s repository of multitopic income and expenditure household surveys used to monitor global 
+poverty and shared prosperity. Selected variables have been harmonized so that levels and trends in 
+poverty and other key sociodemographic attributes can be compared across and within countries over time. 
+This includes indicators such as Multidimensional Poverty Measures, the Shared Prosperity index, and 
+poverty and inequality indicators at the national and subnational level. The data comes from household 
+surveys collected by the national statistical office in each country. It is then compiled, processed, 
+and harmonized. The process is coordinated by the Data for Goals (D4G) team and supported by the six 
+regional statistics teams in the Poverty and Equity Global Practice. The Global Poverty & Inequality 
+Data Team (GPID) in the Development Economics Data Group (DECDG) also contributes historical data from 
+before 1990 and recent survey data from the Luxemburg Income Study (LIS). 
 
 
 {marker opt_details}{...}
 {title:Options Details}
 
 {phang}
-{opt option(string)} Long description
+{opt country(string)} {help pip_countries##countries:Countries and Economies Abbreviations}.
+If specified with {opt year(#)}, this option will return all the countries for which there is
+actual survey data in the year specified.  When selecting multiple countries, use the corresponding
+three-letter codes separated by spaces. The option {it:all} is a shorthand for calling all countries.
 
 {phang}
-{opt option(string)} Long description
-
-
+{opt povline(#)} The poverty lines for which the poverty measures will be calculated.
+When selecting multiple poverty lines, use less than 4 decimals and separate
+each value with spaces. If left empty, the default poverty line of $2.15 is used.
+By default, poverty lines are expressed in 2017 PPP USD per capita per day.
+If option {opt ppp_ppp(2011)} is specified, the poverty lines are expressed in 2011 PPPs. {p_end}
+{synoptline}
+{synopt :{helpb pip##general_options: general options}}Options that apply to any subcommand{p_end}
 
 {marker examples}{...}
 {title:Examples}
@@ -44,17 +66,16 @@ Description starts here
 {ul:examples section}
 
 {pstd}
-Explanation: clickable example
+Country profile data for all countries can be generated with the following example:
 
 {phang2}
-{stata pip, clear} 
+{stata pip cp, clear} 
 
 {pstd}
-Explanation: non-clickable example
+Here is an example that shows how to generate country profile data for one country for three povery lines:
 
 {phang2}
-{cmd: pip, info}
-
+{stata pip cp, country(arg) povline(1.90 2.15 3.65) clear}
 
 
 
