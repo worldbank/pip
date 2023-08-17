@@ -287,7 +287,7 @@ program define pip, rclass
 		
 		//------------ Country lavel
 		if ("`subcmd'" == "cl") {
-			noi pip_cl, `est_opts' `clear' `n2disp' `povcalnet_format' `cachedir'
+			noi pip_cl, `est_opts' `n2disp' `povcalnet_format' `cachedir'
 			noi pip_timer pip, off `printtimer' 
 		}
 		//------------ World Bank Aggregate

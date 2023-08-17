@@ -241,18 +241,43 @@ program define pip_cl_check_args, rclass
 	}
 		
 	// Check if year is available
-	if ("`country'" != "" & "`fillgaps'" == "" & !inlist(lower("`year'"), "all", "")) {
+	if ("`country'" != "" & "`fillgaps'" == "" & !inlist(lower("`year'"), "all", "last","mrv","")) {
 		
-		frame _pip_fw`_version' {
-			tempname CT o YR
-			mata :                                      ; /*
-			*/	st_sview(`CT' = ., ., "country_code")   ; /*
-			*/	`o'  = selectindex(`CT' :== "`country'")   ; /*
-			*/	st_view(`YR' = ., `o', "year")             ; /*
-			*/	st_local("av_year", strofreal(anyof(`YR', `year')))  
+		tempname fw_temp
+		frame copy _pip_fw_20230328_2017_PROD `fw_temp'
+		qui frame `fw_temp' {
 			
 			
-			if (`av_year'== 0) {
+			sum year, meanonly
+			local maxyear = r(max)
+			local minyear = r(min)
+			
+			local country = strtrim(stritrim("`country'"))
+			local country_: subinstr local country " " "|"
+			
+			local year = strtrim(stritrim("`year'"))
+			local year_: subinstr local year " " "|", all
+			local yearc: subinstr local year " " ",", all
+			
+			local isgt = max(`maxyear', `yearc') == `maxyear'
+			local islt = min(`minyear', `yearc') == `minyear'
+			
+			if (`isgt' == 0) {
+				noi disp in red "`=max(0,`yearc')' is not available. " _n ///
+				"The latest year available is {ul:`maxyear'}"
+				error
+			}
+			
+			if (`islt' == 0) {
+				noi disp in red "`=min(`yearc',9999)' is not available. " _n ///
+				"The first year available is {ul:`minyear'}"
+				error
+			}
+			
+			keep if regexm(country_code, "`country_'")
+			keep if regexm(strofreal(year), "`year_'")
+	  
+			if (_N== 0) {
 				noi disp in red "Survey year {ul:`year'} is not available in `country'." _n ///
 				"Only the following are available:"
 				noi pip_info, country(`country')
