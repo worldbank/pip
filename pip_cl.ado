@@ -104,7 +104,7 @@ program define pip_cl_check_args, rclass
 	pause                           /// 
 	POVCALNET_format                ///
 	replace                         ///
-	cacheforce *                    ///
+	cacheforce                     ///
 	n2disp(passthru)                ///
 	cachedir(passthru)  *           ///
 	] 
@@ -284,7 +284,7 @@ program define pip_cl_query, rclass
 	YEAR(string)                    /// 
 	POVLine(numlist)                /// 
 	POPShare(numlist)	   	          /// 
-	PPP(numlist)                    /// 
+	PPP_version(numlist)                    /// 
 	COVerage(string)                /// 
 	FILLgaps                        /// 
 	] 
@@ -316,7 +316,7 @@ program define pip_cl_query, rclass
 		//========================================================
 		noi disp "`country'"
 		noi disp "test country"
-		local params = "country year ppp fill_gaps " + ///
+		local params = "country year ppp_version fill_gaps " + ///
 		"reporting_level version welfare_type" 
 		
 		
@@ -348,7 +348,7 @@ program define pip_cl_query, rclass
 			// each povline or popshare + format
 			local queryp = "`endpoint'?`query'&`optname'=`v'&format=csv" 
 			if (`i' == 1) mata: `M' = "`queryp'"
-			else            mata: `M' = `M' , "`queryp'"
+			else          mata: `M' = `M' , "`queryp'"
 			local ++i
 		}
 		

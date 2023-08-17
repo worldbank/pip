@@ -90,11 +90,11 @@ program define pip_wb_check_args, rclass
 	Year(string)                    /// 
 	POVLine(numlist)                /// 
 	COVerage(string)                /// 
-	CLEAR *                         /// 
+	CLEAR                           /// 
 	pause                           /// 
 	POVCALNET_format                ///
 	replace                         ///
-	cacheforce  *                   ///
+	cacheforce                      ///
 	n2disp(passthru)                ///
 	cachedir(passthru) *            ///
 	] 
