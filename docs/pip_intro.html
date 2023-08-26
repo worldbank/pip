@@ -1,0 +1,595 @@
+<p><!doctype html> <html> <head> <meta http-equiv="Content-Type" content="text/html; charset=utf-8" /></p>
+<script type="text/javascript" async 
+src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-MML-AM_CHTML">
+</script>
+<!-- SYNTAX HIGHLIGHTING CLASSES  -->
+<style type="text/css">
+body {
+    font-family: "Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
+    text-align:justify;
+    margin: 0 8%;
+    font-size: 14px;
+        background-color:white; 
+}
+
+a {
+   color: #1e6bb8;
+       text-decoration: none;
+}
+a:hover {
+       text-decoration: underline;
+}
+
+h1, h2, h3, h4, h5, h6 {
+    line-height: 1.5;
+}
+
+h1, h1 > a, h1 > a:link {
+        margin:0.67em 0;
+        padding: 0;
+        font-family: ;
+        color:#17365D;
+        font-size: 22px;
+        }
+
+h1 > a:hover, h1 > a:hover{
+color:#345A8A;
+} 
+
+h2, h2 > a, h2 > a, h2 > a:link {
+        margin:14px 0px 2px 0px;
+        padding: 0;
+        color:#345A8A;
+        font-size: 18px;
+        font-weight:bold;
+        }
+
+h3, h3 > a,h3 > a, h3 > a:link,h3 > a:link {
+        margin:14px 0px 0px 0px;
+        padding: 0;
+        color:#4F81BD;
+        font-size: 16px;
+        font-weight:bold;
+        }
+
+h4 {
+        margin:10px 0px 0px 0px;
+        padding: 0;
+        font-family: ;
+        font-size: 16px;
+        color:#4F81BD;
+        font-weight:bold;
+        font-style:italic;
+        }
+
+h5  {
+        font-size: 14px;
+        font-weight:normal;
+        color:#4F81BD;
+        }
+
+h6  {
+        font-size:14px;
+        font-weight:normal;
+        font-style:italic;
+        color:#4F81BD;
+        }
+
+p {
+        font-weight:normal;
+        font-size:14px;
+        line-height: 16px;
+        text-align:justify;
+        text-justify:inter-word;
+        margin:0 0 14px 0;
+        }
+
+.author {display:block;text-align:center;font-size:16px;margin-bottom:3px;}
+.date {display:block;text-align:center;font-size:12px;margin-bottom:3px;}
+.center, #center {
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+    -webkit-box-shadow: 0px 0px 2px rgba( 0, 0, 0, 0.5 );
+    -moz-box-shadow: 0px 0px 2px rgba( 0, 0, 0, 0.5 );
+    box-shadow: 0px 0px 2px rgba( 0, 0, 0, 0.5 );
+
+    padding: 0px;
+    border-width: 0px;
+    border-style: solid;
+    cursor:-webkit-zoom-in;
+    cursor:-moz-zoom-in;
+    }
+
+td > p {padding:0; margin:0;}
+
+
+header {
+        font-size:28px;
+        padding-bottom:5px; 
+        margin:0;
+        padding-top:150px; 
+        font-family: "Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
+        text-align:center;
+        display:block;
+        font-weight:bold;
+        }
+
+
+
+table {
+        border-collapse: collapse;
+        border-bottom:1px solid black;
+        padding:5px;
+        margin-top:5px;
+        margin-bottom: 16px;
+
+}
+.tble {
+        display:block;
+        margin-top: 10px;
+        margin-bottom: 0px;
+        margin-bottom: 0px;
+}
+
+.tblecenter {
+        display:block;
+        margin-top: 10px;
+        margin-bottom: 0px;
+        margin-bottom: 0px;
+        text-align:center;
+}
+
+span.tblecenter + table, span.tble + table, span.tble + img {
+        margin-top: 2px;
+}
+
+.figure, .caption {
+        text-align: center
+}
+
+th {
+        border-bottom:1px solid black;
+        border-top:1px solid black;
+        padding-right:20px;
+}
+
+td {
+        padding-right:20px;
+}
+
+pre code {
+       color: #6D6D6D;
+       font-size: 10px;
+       padding-top: 0;
+       padding-bottom: 0;
+       margin-top: 0;
+       margin-bottom: 0;
+      font-family: "menlo-regular","Consolas", "Liberation Mono", Menlo, Courier, monospace;
+   display: block;
+}
+
+.sh_stata {
+   font-size: 0.7rem;
+       padding-top: 0;
+       padding-bottom: 0;
+       margin-top: 0;
+       margin-bottom: 0;
+   display: block;
+   line-height: 1.5;
+}
+
+pre > code {
+   padding: 0;
+       margin: 0;
+       word-break: normal;
+   display: block;
+}
+
+.sh_stata + pre code {
+    margin:-10px 0 0 -10px;
+    line-height:8px;
+}
+
+blockquote {
+       padding: 0 1rem;
+       margin-left: 0;
+       color: #819198;
+       border-left: 0.3rem solid #dce6f0;
+}
+
+img {
+        margin: 5px 0 5px 0;
+        padding: 0px;
+        cursor:-webkit-zoom-in;
+        cursor:-moz-zoom-in;
+        display:inline-block;
+        clear: both;
+        }
+
+hr {
+       height: 2px;
+       margin: 1rem 0;
+       background-color: #eff0f1;
+       border: 0; 
+}
+
+ul li {
+       font-size:14px;
+}
+
+</style>
+<script type="text/javascript" src='http://haghish.com/statax/Statax.js'></script>
+</head>
+<body>
+<pre><code>      help pip intro                                                        Poverty and Inequality Platform (PIP)
+      return to pip                                                              https://worldbank.github.io/pip/
+      -----------------------------------------------------------------------------------------------------------
+
+          This entry aims to equip new users with basic knowledge of the most useful features of the pip
+          command. For a more detailed explanation of each subcommand, please visit the subcommand directory
+
+      Remarks
+
+          This introduction is presented under the following headings
+
+             Description
+             Basic Use
+                 Country-level
+                 Regional/global-level
+                 Poverty Lines
+                 Data Availability
+                 Towards distributional analysis
+                 Auxiliary Data
+             Examples
+
+
+      Description
+
+          The pip command allows Stata users to compute poverty and inequality indicators for over 160
+          countries in the World Bank's database of household surveys.  The Poverty and Inequality Platform
+          (PIP) is a computational tool that allows users to conduct country-specific, cross-country, as well
+          as global and regional poverty analyses.  Users are able to estimate rates over time and at any
+          poverty line specified.  pip reports a wide range of measures for poverty (at any chosen poverty
+          line) and inequality. See full list of indicators available in pip .
+
+          modular structure: The pip command works in a modular (subcommand, hereafter) fashion. There is no
+          instruction to pip that is executed outside a particular subcommand. When no subcommand is
+          invoked--as in pip, clear--the subcommand cl (country-level estimates) is in use. Thus, understanding
+          pip fully is equivalent to understand each subcommand and its options fully. For a list of all
+          subcommands and their corresponding help entries, visit the subcommand directory
+
+          welfare aggregate: To make estimates comparable across countries, the welfare aggregate is expressed
+          in PPP values of the most recent ICP round that has been approved for global poverty estimates by the
+          directives of the World Bank.  The detailed methodology of the welfare aggregate conversion can be
+          found in the  Poverty and Inequality Platform Methodology Handbook.
+
+          Collaboration: PIP is the result of a close collaboration between World Bank staff across the
+          Development Data Group, the Development Research Group, and the Poverty and Inequality Global
+          Practice.
+
+
+      Basic use
+
+          The main functionality of pip is to compute poverty and inequality indicators for over 160 countries
+          in the World Bank's database of household surveys. Poverty measures are estimated at two levels of
+          aggregation:  country-level and regional/global-level, which you can access using the subcommands cl
+          (the default) and wb, respectively. For a detailed explanation of cl and wb go here.
+
+      country-level
+
+          For instance, you can query poverty at $2.15-a-day poverty line for all countries in all survey years
+
+              . pip cl, clear
+
+          Yet, you can filter your query by country and survey year. For examples, for Morocco in 2013. Visit
+          the list of countries and regions.
+
+              . pip, country(mar) year(2013) clear // the default subcommand is cl
+
+          For extrapolated and interpolated data that underpin the global and regional poverty numbers, use
+          fillgaps option. There is no survey in Morocco in 2019, but you can estimate it
+
+              . pip, country(mar) year(2019) fillgaps clear
+
+              Note: Extrapolated and interpolated values are made available for transparency purposes only and
+                  are NOT intended to be use four country-level analysis, as they are originally calculated to
+                  estimated global poverty.
+
+      regional/global-level
+
+          To get poverty estimates at the regional/global-level, just switch the cl subcommand for wb
+
+              . pip wb, clear
+
+          Query a particular region using region() options. Visit the list of countries and regions.
+
+              . pip wb, clear region(LAC)
+
+      Poverty lines
+
+          By default, pip estimate poverty measures at the international poverty line of the current ICP round.
+          For the 2017 round, the value is $2.15-a-day.  However, you can poverty at different thresholds.
+
+              . pip, country(mar) year(2019) fillgaps povline(6.85)
+
+          You can query multiple poverty lines.
+
+              . pip, country(mar) year(2019) fillgaps povline(2.15 3.65 6.85 10)
+
+      Data availability
+
+          Display data availability by country and region
+
+              . pip info
+
+          If data is not available for a particular survey year, pip will return and error but will provide you
+          with a clickable hyperlink to find out the survey availability for the country of interest.
+
+              . pip, country(mar) year(2019) clear
+       Add error message
+
+      Towards distributional analysis
+
+          The default use of pip is to get the poverty headcount. However, the inverse operation is also
+          available in pip. You can provide the share of the population using popshare() and get in return the
+          monetary value of the welfare distribution. For example, you can estimate the median like this
+
+              .pip, country(mar) year(2013) clear popshare(0.5)
+
+      Auxiliary data
+
+          Though the main underlying data of PIP are the household surveys, it makes use of many other sources
+          such as GDP, CPI, population, among many others.  You can get the list of all auxiliary tables, and
+          click in the one you want.
+
+              .pip tables, clear
+
+          Or, you can provide the name of the table of interest directly,
+
+              .pip tables, table(cpi) clear
+
+
+      Examples
+
+          The examples below do not comprehend of pip's features.
+
+      1. Basic examples
+
+          1.1. Load latest available survey-year estimates for Colombia and Argentina
+
+              pip cl, country(col arg) year(last) clear
+
+          1.2. Load clickable menu
+
+              pip, info
+
+          1.3. Load only urban coverage level
+
+              pip cl, country(all) coverage(&quot;urban&quot;) clear
+
+
+      2. Differences between queries 
+
+          2.1. Country estimation at $2.15 in 2015. Since there are no surveys in ARG in 2015, results are
+              loaded only for COL, BRA and IND.
+
+              pip, country(COL BRA ARG IND) year(2015) clear
+
+          2.2. Reference-year estimation. Filling gaps for ARG and moving the IND estimate from 2015-2016 to
+              2015. Only works for reference years.
+
+              pip, country(COL BRA ARG IND) year(2015) clear fillgaps
+
+          2.4. World Bank aggregation (country() is not available)
+
+              pip wb, clear year(2015)
+              pip wb, clear region(SAR LAC)
+              pip wb, clear // all regions and reference years
+
+
+      3. Samples uniquely identified by country/year
+
+              3.1 Longest possible time series for each country, even if welfare type or survey coverage
+                  changes from one year to another (national coverage is preferred).
+
+
+                pip, clear
+              * Prepare reporting_level variable
+                label define level 3 &quot;national&quot; 2 &quot;urban&quot; 1 &quot;rural&quot;
+                encode reporting_level, gen(reporting_level_2) label(level)
+
+              * keep only national when more than one is available
+                bysort country_code welfare_type year: egen _ncover = count(reporting_level_2)
+                gen _tokeepn = ( (inlist(reporting_level_2, 3, 4) &amp; _ncover &gt; 1) | _ncover == 1)
+
+                keep if _tokeepn == 1
+
+              * Keep longest series per country
+                by country_code welfare_type, sort:  gen _ndtype = _n == 1
+                by country_code : replace _ndtype = sum(_ndtype)
+                by country_code : replace _ndtype = _ndtype[_N] // number of welfare_type per country
+
+                duplicates tag country_code year, gen(_yrep)  // duplicate year
+
+               bysort country_code welfare_type: egen _type_length = count(year) // length of type series
+               bysort country_code: egen _type_max = max(_type_length)   // longest type series
+               replace _type_max = (_type_max == _type_length)
+
+              * in case of same length in series, keep consumption
+                by country_code _type_max, sort:  gen _ntmax = _n == 1
+                by country_code : replace _ntmax = sum(_ntmax)
+                by country_code : replace _ntmax = _ntmax[_N]  // number of welfare_type per country
+
+
+                gen _tokeepl = ((_type_max == 1 &amp; _ntmax == 2) | ///
+                               (welfare_type == 1 &amp; _ntmax == 1 &amp; _ndtype == 2) | ///
+                               _yrep == 0)
+               
+               keep if _tokeepl == 1
+               drop _*
+
+            (click to run)
+
+              3.2 Longest possible time series for each country, restrict to same welfare type throughout, but
+                  letting survey coverage vary (preferring national).
+
+
+                pip, clear
+                
+              * Prepare reporting_level variable
+                label define level 3 &quot;national&quot; 2 &quot;urban&quot; 1 &quot;rural&quot;
+                encode reporting_level, gen(reporting_level_2) label(level)
+                
+                bysort country_code welfare_type year: egen _ncover = count(reporting_level_2)
+                gen _tokeepn = ( (inlist(reporting_level_2, 3, 4) &amp; _ncover &gt; 1) | _ncover == 1)
+
+                keep if _tokeepn == 1
+              * Keep longest series per country
+                by country_code welfare_type, sort:  gen _ndtype = _n == 1
+                by country_code : replace _ndtype = sum(_ndtype)
+                by country_code : replace _ndtype = _ndtype[_N] // number of welfare_type per country
+
+
+                bysort country_code welfare_type: egen _type_length = count(year)
+                bysort country_code: egen _type_max = max(_type_length)
+                replace _type_max = (_type_max == _type_length)
+
+              * in case of same length in series, keep consumption
+                by country_code _type_max, sort:  gen _ntmax = _n == 1
+                by country_code : replace _ntmax = sum(_ntmax)
+                by country_code : replace _ntmax = _ntmax[_N]  // max 
+
+
+                gen _tokeepl = ((_type_max == 1 &amp; _ntmax == 2) | ///
+                              (welfare_type == 1 &amp; _ntmax == 1 &amp; _ndtype == 2)) | ///
+                              _ndtype == 1
+
+                keep if _tokeepl == 1
+                drop _*
+
+            (click to run)
+
+              3.3 Longest series for a country with the same welfare type.  Not necessarily the latest
+
+
+              pip, clear
+              *Series length by welfare type
+              bysort country_code welfare_type:  gen series = _N
+              *Longest 
+              bysort country_code : egen longest_series=max(series)
+              tab country_code if series !=longest_series
+              keep if series == longest_series
+
+              *2. If same length: keep most recent 
+              bys country_code welfare_type series: egen latest_year=max(year)
+              bysort country_code: egen most_recent=max(latest_year)
+
+              tab country_code if longest_series==series &amp; latest_year!=most_recent 
+              drop if most_recent&gt;latest_year 
+
+              *3. Not Applicable: if equal length and most recent: keep consumption
+              bys country_code: egen preferred_welfare=min(welfare_type)
+              drop if welfare_type != preferred_welfare 
+
+            (click to run)
+
+      4. Analytical examples
+
+              4.1 Graph of trend in poverty headcount ratio and number of poor for the world
+
+
+                pip wb,  clear
+
+                keep if year &gt; 1989
+                keep if region_code == &quot;WLD&quot;  
+                gen poorpop = headcount*population / 1000000 
+                gen hcpercent = round(headcount*100, 0.1) 
+                gen poorpopround = round(poorpop, 1)
+
+                twoway (sc hcpercent year, yaxis(1) mlab(hcpercent)           ///
+                         mlabpos(7) mlabsize(vsmall) c(l))                    ///
+                       (sc poorpopround year, yaxis(2) mlab(poorpopround)     ///
+                         mlabsize(vsmall) mlabpos(1) c(l)),                   ///
+                       yti(&quot;Poverty Rate (%)&quot; &quot; &quot;, size(small) axis(1))       ///
+                       ylab(0(10)40, labs(small) nogrid angle(0) axis(1))     ///
+                       yti(&quot;Number of Poor (million)&quot;, size(small) axis(2))   ///
+                       ylab(0(400)2000, labs(small) angle(0) axis(2))         ///
+                       xlabel(,labs(small)) xtitle(&quot;Year&quot;, size(small))       ///
+                       graphregion(c(white)) ysize(5) xsize(5)                ///
+                       legend(order(                                          ///
+                       1 &quot;Poverty Rate (% of people living below $2.15)&quot;      ///
+                       2 &quot;Number of people who live below $2.15&quot;) si(vsmall)  ///
+                       row(2)) scheme(s2color)
+              
+            (click to run)
+
+              4.2 Graph of trends in poverty headcount ratio by region, multiple poverty lines ($2.15, $3.65,
+                  $6.85)
+
+              
+                pip wb, povline(2.15 3.65 6.85) clear
+                drop if inlist(region_code, &quot;OHI&quot;, &quot;WLD&quot;) | year&lt;1990
+                keep poverty_line region_name year headcount
+                replace poverty_line = poverty_line*100
+                replace headcount = headcount*100
+              
+                tostring poverty_line, replace format(%12.0f) force
+                reshape wide  headcount,i(year region_name) j(poverty_line) string
+              
+                local title &quot;Poverty Headcount Ratio (1990-2019), by region&quot;
+
+                twoway (sc headcount215 year, c(l) msiz(small))  ///
+                       (sc headcount365 year, c(l) msiz(small))  ///
+                       (sc headcount685 year, c(l) msiz(small)), ///
+                       by(reg,  title(&quot;`title'&quot;, si(med))        ///
+                              note(&quot;Source: pip&quot;, si(vsmall)) graphregion(c(white))) ///
+                       ylabel(, format(%2.0f)) ///
+                       xlab(1990(5)2019 , labsi(vsmall)) xti(&quot;Year&quot;, si(vsmall))     ///
+                       ylab(0(25)100, labsi(vsmall) angle(0))                        ///
+                       yti(&quot;Poverty headcount (%)&quot;, si(vsmall))                      ///
+                       leg(order(1 &quot;$2.15&quot; 2 &quot;$3.65&quot; 3 &quot;$6.85&quot;) r(1) si(vsmall))        ///
+                       sub(, si(small))       scheme(s2color)
+            (click to run)
+
+              4.3 Graph of population distribution across income categories in Latin America, by country
+
+
+                pip, region(lac) year(last) povline(2.15 3.65 6.85) clear 
+                keep if welfare_type==2 &amp; year&gt;=2014             // keep income surveys
+                keep poverty_line country_code country_name year headcount
+                replace poverty_line = poverty_line*100
+                replace headcount = headcount*100
+                tostring poverty_line, replace format(%12.0f) force
+                reshape wide  headcount,i(year country_code country_name ) j(poverty_line) string
+          
+                gen percentage_0 = headcount215
+                gen percentage_1 = headcount365 - headcount215
+                gen percentage_2 = headcount685 - headcount365
+                gen percentage_3 = 100 - headcount685
+              
+                keep country_code country_name year  percentage_*
+                reshape long  percentage_,i(year country_code country_name ) j(category) 
+                la define category 0 &quot;Extreme poor (&lt; $2.15)&quot; 1 &quot;Poor LIMIC ($2.15-$3.65)&quot; ///
+                                       2 &quot;Poor UMIC ($3.65-$6.85)&quot; 3 &quot;Non-poor (&gt; $6.85)&quot;
+                la val category category
+                la var category &quot;&quot;
+
+                local title &quot;Distribution of Income in Latin America and Caribbean, by country&quot;
+                local note &quot;Source: World Bank PIP, using the latest survey after 2014 for each country.&quot;
+                local yti  &quot;Population share in each income category (%)&quot;
+
+                graph bar (mean) percentage, inten(*0.7) o(category) o(country_code, ///
+                  lab(labsi(small) angle(vertical)) sort(1) descending) stack asy                      /// 
+                      blab(bar, pos(center) format(%3.1f) si(tiny))                     /// 
+                      ti(&quot;`title'&quot;, si(small)) note(&quot;`note'&quot;, si(*.7))                  ///
+                      graphregion(c(white)) ysize(6) xsize(6.5)                         ///
+                              legend(si(vsmall) r(3))  yti(&quot;`yti'&quot;, si(small))                ///
+                      ylab(,labs(small) nogrid angle(0)) scheme(s2color)
+            (click to run)
+
+
+                                              (Go up to Sections Menu)
+</code></pre>
+</body>
+</html>

@@ -1,11 +1,11 @@
-## [Home](index.md) --- [Get Started](get_started.md) --- [Visualizations examples](vis.md) --- [Help file](help_file.md) 
+## [Home](index.md) --- [PIP introduction](pip_intro.md) --- [Visualizations examples](vis.md) --- [Help file](help_file.md) 
 
 # Visualization Examples
 
 ## Global Poverty Trends 1990-2020 (reference year)
 
 ```stata
-pip wb,  clear
+pip wb,  clear 
 	
 local years = "1991|1993|1996|1999|2002|2005|2008|2010|2011|2012|2013|2015|2017|2019|2020"
 keep if regexm(strofreal(year), "`years'")
@@ -273,7 +273,6 @@ la var pop2014 "2014"
 graph hbar (asis) pop1990 pop2014, over(region_name, sort(1) descending) ///
 blab(bar, pos(outside) format(%2.1f) size(5.5pt)) graphregion(color(white)) ///
 ylabel(, nogrid) legend(size(small)) title(Population in Poverty by Region (%))
-graph export popinpoverty.png, as(png) hei(1000) replace
 ```
 
 <center>
