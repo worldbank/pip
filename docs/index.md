@@ -19,14 +19,14 @@ It also reports these inequality measures:
 - Mean log deviation
 - Decile shares
 
-The underlying welfare aggregate is per capita household income or consumption expressed in 2011 PPP-adjusted USD. Poverty lines are expressed in daily amounts, while means and medians are monthly.
+The underlying welfare aggregate is per capita household income or consumption expressed in 2017 PPP USD. Poverty lines are expressed in daily amounts, while means and medians are monthly.
 
 For more information on the definition of the indicators, click [here](http://iresearch.worldbank.org/PovcalNet/Docs/dictionary.html)
 For more information on the methodology, click [here](https://worldbank.github.io/PIP-Methodology/)
 
-[This note](http://documents.worldbank.org/curated/en/836101568994246528/) provides more detail on the Stata command and summarizes key features of the PovcalNet methodology
+[This note](http://documents.worldbank.org/curated/en/836101568994246528/) provides more detail on the Stata command and summarizes key features of the PIP methodology
 
-To download `pip` R package click [here](https://worldbank.github.io/pipr/)
+To download `pipr` R package click [here](https://worldbank.github.io/pipr/)
 
 ## Installation 
 
@@ -38,24 +38,58 @@ ssc install pip
 
 ### From GitHub 
 
-#### Recommended installation (Might not be available in your computer due to firewall restriction of your organization. In this case, see alternative installation below.):
-We recommend installing `povcalnet` using the [`github`](https://github.com/haghish/github) Stata command by [E. F. Haghish](https://github.com/haghish)
+We recommend installing the [`github`](https://github.com/haghish/github) Stata command by [E. F. Haghish](https://github.com/haghish)
 
 ```stata
 net install github, from("https://haghish.github.io/github/")
-github install PIP-Technical-Team/pip
+github install worldbank/pip
 ```
 
-Alternatively you can install the package by typing the followinf line, 
+If you get an error similar to the image below, it might be the case that downloading from Github is not available in your computer due to firewall restrictions. Try disconnecting from the VPN and installing `pip` again.
 
-```stata
-THIS OPTION IS NOT YET AVAILABLE
-net install pip, from("https://raw.githubusercontent.com/worldbank/pip/master/")
-```
+<center>
+<img src="/pip/img/error_message.png"/>
+</center>
 
-#### Alternative installation from GitHub in case the options above do not work due to firewall restrictions:
+If none of the options above worked, you could still install pip manually following these steps,
 
 1. In the [GitHub repository](https://github.com/worldbank/pip) of the `pip` Stata command, click on the green icon "Clone or Download" at the top. 
 2. Download the package as a zip file. 
 3. Extract the files with extension `.ado` and `.sthlp` only, and place them in the directory `c:/ado/plus/p`
 4. type `discard` in Stata. 
+
+#### Troubleshooting
+In case `pip` is not working correctly, try the following steps in order
+
+1. Uninstall `pip` by typing this
+```stata
+github uninstall pip
+```
+2. Execute the following and see if `pip` is still installed somewhere in your computer
+```stata
+which pip 
+```
+If it is installed, delete all the `pip` files from wherever they are in your computer until the command above returns error. The idea is to leave no trace of `pip` in your computer.
+
+3. Install `pip` again with the following code and check the version number. It should be the same as the most [recent release](https://github.com/worldbank/pip/releases)
+```stata
+github install worldbank/pip
+which pip
+```
+4. Try to run it again and see if `pip` fails.
+
+5. If it is still failing, please run the code below--making sure your replace the commented line--and send the test.log file to [pip@worldbank.org](https://github.com/worldbank/pip/blob/main/pip@worldbank.org)
+
+```stata
+log using "test.log", name(test) text replace // this is in your cd
+cret list
+clear all
+which pip
+set tracedepth 4
+set traceexpand on 
+set traceindent on 
+set tracenumber on
+set trace on
+// Insert here the pip directive that is failing
+set trace off
+```
