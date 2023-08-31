@@ -30,7 +30,7 @@ To download `pipr` R package click [here](https://worldbank.github.io/pipr/)
 
 ## Installation 
 
-### From SSC (Not yet available)
+### From SSC
 
 ```stata
 ssc install pip

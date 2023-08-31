@@ -164,6 +164,8 @@ pip,  country(chl gha tgo) year(all) clear
 		angle(verticle)) xlabel(,labs(small))                   ///
 		graphregion(c(white)) scheme(s2color)                   ///
 		legend(order(1 "Chile" 2 "Ghana" 3 "Togo") si(small) row(1)) 
+graph export Gini.png, as(png) hei(1000) replace		
+		
 ```
 
 <center>
