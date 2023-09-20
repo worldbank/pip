@@ -358,6 +358,11 @@ Version Control:
 
 
 
+*! version 0.10.7.9001    <2023Sep20>
+*! -- force proper formatting.
+*! -- improve message for setting up cache dir
+*! -- fix problem in scmd tables not working with server()
+
 *! version 0.10.7.9000    <2023Aug17>
 *! -- Add server to cache info
 *! version 0.10.7    <2023Aug17>
