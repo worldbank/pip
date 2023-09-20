@@ -94,8 +94,6 @@ program define pip, rclass
 			pip_timer pip, off 
 			exit
 		}
-		
-		
 	}
 	
 	//------------Cleaup
@@ -261,7 +259,7 @@ program define pip, rclass
 		//========================================================
 		if regexm("`subcmd'", "^tab") {
 			pip_timer pip.pip_tables, on
-			noi pip_tables, `pipoptions' 
+			noi pip_tables, `est_opts' // `table'  `cachedir' `clear'
 			return add
 			pip_timer pip.pip_tables, off
 			noi pip_timer pip, off `printtimer'
