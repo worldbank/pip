@@ -268,7 +268,7 @@ program define pip_setup_cachedir, rclass
 					noi disp "{res}Cache directory has been set up. If you want to change it, type {cmd:pip_setup cachedir}"
 				}
 				else {
-					noi disp "{res}Cache has been {err}disabled{res}. If you want to change it, type {cmd:pip_setup cachedir}"
+					noi disp "{res}Cache has been {err}disabled{res}. If you want to change it, type {cmd:pip cache, setup}"
 				}
 			}
 		}
