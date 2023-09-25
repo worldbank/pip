@@ -244,7 +244,7 @@ program define pip_cl_check_args, rclass
 	if ("`country'" != "" & "`fillgaps'" == "" & !inlist(lower("`year'"), "all", "last","mrv","")) {
 		
 		tempname fw_temp
-		frame copy _pip_fw_20230328_2017_PROD `fw_temp'
+		frame copy _pip_fw`_version' `fw_temp'
 		qui frame `fw_temp' {
 			
 			
