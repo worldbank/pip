@@ -358,6 +358,8 @@ Version Control:
 
 
 
+*! version 0.10.7.9002    <2023Sep25>
+*! -- fix bug with version in pip_cl.
 *! version 0.10.7.9001    <2023Sep20>
 *! -- force proper formatting.
 *! -- improve message for setting up cache dir
