@@ -358,6 +358,8 @@ Version Control:
 
 
 
+*! version 0.10.7.9003    <2024jan10>
+*! -- fix bug in pip-grp. Now group_by=wb is called explicitly.
 *! version 0.10.7.9002    <2023Sep25>
 *! -- fix bug with version in pip_cl.
 *! version 0.10.7.9001    <2023Sep20>
