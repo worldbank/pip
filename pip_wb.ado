@@ -284,7 +284,7 @@ program define pip_wb_query, rclass
 		
 		local endpoint "pip-grp"
 		if ("`povline'" == "") {
-			global pip_last_queries "`endpoint'?`query'&format=csv"
+			global pip_last_queries "`endpoint'?`query'&format=csv&group_by=wb"
 			exit
 		}
 		
@@ -293,7 +293,7 @@ program define pip_wb_query, rclass
 		local i = 1
 		foreach v of local povline {
 			// each povline or popshare + format
-			local queryp = "`endpoint'?`query'&povline=`v'&format=csv" 
+			local queryp = "`endpoint'?`query'&povline=`v'&format=csv&group_by=wb" 
 			if (`i' == 1) mata: `M' = "`queryp'"
 			else          mata: `M' = `M' , "`queryp'"
 			local ++i
