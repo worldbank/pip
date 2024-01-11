@@ -94,8 +94,6 @@ program define pip, rclass
 			pip_timer pip, off 
 			exit
 		}
-		
-		
 	}
 	
 	//------------Cleaup
@@ -261,7 +259,7 @@ program define pip, rclass
 		//========================================================
 		if regexm("`subcmd'", "^tab") {
 			pip_timer pip.pip_tables, on
-			noi pip_tables, `pipoptions' 
+			noi pip_tables, `est_opts' // `table'  `cachedir' `clear'
 			return add
 			pip_timer pip.pip_tables, off
 			noi pip_timer pip, off `printtimer'
@@ -360,6 +358,17 @@ Version Control:
 
 
 
+*! version 0.10.7.9003    <2024jan10>
+*! -- fix bug in pip-grp. Now group_by=wb is called explicitly.
+*! version 0.10.7.9002    <2023Sep25>
+*! -- fix bug with version in pip_cl.
+*! version 0.10.7.9001    <2023Sep20>
+*! -- force proper formatting.
+*! -- improve message for setting up cache dir
+*! -- fix problem in scmd tables not working with server()
+
+*! version 0.10.7.9000    <2023Aug17>
+*! -- Add server to cache info
 *! version 0.10.7    <2023Aug17>
 *! --fix problem with setting globals and not being able to use the general options.
 *! --fix messages when year is out of boundries

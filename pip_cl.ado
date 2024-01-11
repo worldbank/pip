@@ -244,7 +244,7 @@ program define pip_cl_check_args, rclass
 	if ("`country'" != "" & "`fillgaps'" == "" & !inlist(lower("`year'"), "all", "last","mrv","")) {
 		
 		tempname fw_temp
-		frame copy _pip_fw_20230328_2017_PROD `fw_temp'
+		frame copy _pip_fw`_version' `fw_temp'
 		qui frame `fw_temp' {
 			
 			
@@ -402,6 +402,21 @@ program define pip_cl_clean, rclass
 	local _version   = "_`1'_`3'_`9'"
 	local ppp_version = `3'
 	
+	
+	//========================================================
+	//   formating 
+	//========================================================
+	// string variables
+	local str_vars "region_name  region_code  country_name  country_code  reporting_level survey_acronym survey_acronym survey_coverage welfare_type comparable_spell is_interpolated distribution_type estimation_type"
+
+	ds
+	local all_vars "`r(varlist)'"
+
+	local num_vars: list all_vars - str_vars
+
+	destring `num_vars', replace force
+	tostring `str_vars', replace force
+
 	//========================================================
 	//  Dealing with invalid values
 	//========================================================

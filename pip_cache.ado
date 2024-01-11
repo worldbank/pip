@@ -391,7 +391,7 @@ program define pip_cache_inventory, rclass
 				local vname  = _frval(`cache_txt', `v'_1, `i')
 				local vvalue = _frval(`cache_txt', `v'_2, `i')
 				
-				// if par does not exists of is format
+				// if par does not exists or is format
 				if inlist("`vname'", "", "format") continue 
 				cap confirm var `vname'
 				if (_rc) gen     `vname' = "`vvalue'" in `i'
@@ -403,6 +403,12 @@ program define pip_cache_inventory, rclass
 		}
 		
 		frget hash query endpoint, from(`cache_txt')
+		
+		gen server  = ""
+		replace server = "qa"   if regexm(query,"${pip_svr_qa}")
+		replace server = "dev"  if regexm(query,"${pip_svr_dev}")
+		replace server = "prod" if regexm(query,"https://api.worldbank.org/pip")
+		
 	}  // end of qui
 	
 end

@@ -37,6 +37,7 @@ program define pip_get, rclass
 			if ("`pc_exists'" == "0" | "${pip_cachedir}" == "0") {	
 				cap import delimited  "`queryfull'", `clear' varn(1) asdouble
 				if  (_rc) noi pip_download_err_msg "`queryfull'"
+				
 				pip_cache save, piphash("`piphash'") query("`queryfull'") /* 
 				*/  `cacheforce' `cachedir'
 			}
