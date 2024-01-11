@@ -358,16 +358,12 @@ Version Control:
 
 
 
-*! version 0.10.7.9003    <2024jan10>
+*! version 0.10.8  <2024jan11>
 *! -- fix bug in pip-grp. Now group_by=wb is called explicitly.
-*! version 0.10.7.9002    <2023Sep25>
 *! -- fix bug with version in pip_cl.
-*! version 0.10.7.9001    <2023Sep20>
 *! -- force proper formatting.
 *! -- improve message for setting up cache dir
 *! -- fix problem in scmd tables not working with server()
-
-*! version 0.10.7.9000    <2023Aug17>
 *! -- Add server to cache info
 *! version 0.10.7    <2023Aug17>
 *! --fix problem with setting globals and not being able to use the general options.
