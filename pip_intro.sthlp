@@ -39,24 +39,25 @@ cross-country, as well as global and regional poverty analyses.
 Users are able to estimate rates  over time and at any poverty line specified.
 {cmd:pip} reports a  wide range of measures for poverty (at any chosen poverty
 line) and inequality. See {help pip####povcal:full list of indicators} 
-available in {cmd:pip} .
+available in {cmd:pip}.
 
 {pstd}
 {it:{ul:modular structure:}} The {cmd:pip} command works in a modular 
 (subcommand, hereafter) fashion. There is no instruction to {cmd:pip} that is 
 executed outside a particular subcommand. When no subcommand is invoked--as 
 in {cmd:pip, clear}--the subcommand {cmd:cl} (country-level estimates) 
-is in use. Thus, understanding {cmd:pip} fully is equivalent to understand each subcommand and its options fully. For a list of all subcommands and 
-their corresponding help entries, visit the {help pip##sbc_table:subcommand directory}
+is in use. Thus, understanding {cmd:pip} fully is equivalent to understand each subcommand and 
+all its options. For a list of all subcommands and 
+their corresponding help entries, visit the {help pip##sbc_table:subcommand directory}.
 
 {pstd}
 {it:{ul:welfare aggregate:}} To make estimates 
 comparable across countries, the welfare aggregate is expressed in PPP values
 of the most recent {browse "https://www.worldbank.org/en/programs/icp":ICP } 
 round that has been approved for global poverty estimates
-by the directives of the World Bank.  The detailed methodology of the welfare
-aggregate conversion can be found in the 
-{browse "https://datanalytics.worldbank.org/PIP-Methodology/convert.html": Poverty and Inequality Platform Methodology Handbook}.
+by the World Bank directives. The detailed methodology behind the welfare
+aggregate conversion can be found in the
+{browse "https://datanalytics.worldbank.org/PIP-Methodology/convert.html":Poverty and Inequality Platform Methodology Handbook}.
  
 {pstd}
 {it:{ul:Collaboration:}} PIP is the result of a close collaboration between World Bank staff across the Development Data Group, the Development Research Group, and the Poverty and Inequality Global Practice. 
@@ -68,26 +69,31 @@ aggregate conversion can be found in the
 {pstd}
 The main functionality of {cmd:pip} is to compute poverty and inequality
 indicators for over 160 countries in the World Bank's database of household
-surveys. Poverty measures are estimated at two  levels of aggregation:
-country-level and regional/global-level, which you can access using the
-subcommands {cmd:cl} (the default) and {cmd:wb}, respectively. For a detailed
-explanation of {cmd:cl} and {cmd:wb} go {help pip_cl:here}.
+surveys. Poverty measures are estimated at two  levels of aggregation: country-level 
+and regional/global-level. These can be accessed using the subcommands {cmd:cl} (default) 
+and {cmd:wb}, respectively. For a detailed explanation of {cmd:cl} and {cmd:wb} go {help pip_cl:here}.
 
 {marker cl}{...}
 {ul:country-level}
 
 {pstd}
-For instance, you can query poverty at $2.15-a-day poverty line for 
-all countries in all survey years
+For instance, you can query poverty at {help pip_intro##pl:$2.15-a-day} poverty line for 
+ALL countries in ALL survey years
 
 {p 8 16 2}
 {cmd:. pip cl,  clear} 
 
-{pstd}
-Yet, you can filter your query by country and survey year. For examples, for Morocco in 2013. Visit the {help pip_countries:list of countries and regions}.
+{pstd} or simply
 
 {p 8 16 2}
-{cmd:. pip, country(mar) year(2013) clear} // the default subcommand is {cmd:cl}
+{cmd:. pip,  clear}   // (since the default subcommand is {cmd:cl})
+
+{pstd}
+Yet, you can filter your query by specific country and survey year. For instance, Morocco in 2013:
+(Visit the {help pip_countries:list of countries and regions}).
+
+{p 8 16 2}
+{cmd:. pip, country(mar) year(2013) clear} 
 
 {pstd}
 For extrapolated and interpolated data that underpin the global and regional
@@ -100,7 +106,7 @@ poverty numbers, use {cmd:fillgaps} option. There is no survey in Morocco in
 {phang2}
 {err:Note:} Extrapolated and interpolated values are made available for transparency
 purposes only and are {bf:NOT} intended to be use four country-level analysis, as
-they are originally calculated to estimated global poverty. 
+they are originally calculated to estimated global poverty. See{help pip##disclaimer: disclaimer note}.
 
 {marker wb}{...}
 {ul:regional/global-level}
@@ -125,13 +131,13 @@ Query a particular region using {cmd:region()} options. Visit the {help pip_coun
 By default, {cmd:pip} estimate poverty measures at the international poverty
 line of the current {browse "https://www.worldbank.org/en/programs/icp":ICP}
 round. For the 2017 round, the value is  $2.15-a-day.
-However, you can poverty at different thresholds. 
+However, you can estimate poverty at different thresholds: 
 
 {p 8 16 2}
 {cmd:. pip, country(mar) year(2019) fillgaps povline(6.85)} 
 
 {pstd}
-You can query multiple poverty lines. 
+You can also query multiple poverty lines: 
 
 {p 8 16 2}
 {cmd:. pip, country(mar) year(2019) fillgaps povline(2.15 3.65 6.85 10)} 
@@ -140,7 +146,7 @@ You can query multiple poverty lines.
 {ul:Data availability}
 
 {pstd}
-Display data availability by country and region
+To display data availability by country and region, type:
 
 {p 8 16 2}
 {cmd:. pip info} 
@@ -148,17 +154,20 @@ Display data availability by country and region
 {pstd}
 If data is not available for a particular survey year, {cmd:pip} will return
 and error but will provide you with a clickable hyperlink to find out the 
-survey availability for the country of interest.
+survey availability for the country of interest. For example:
 
 {p 8 16 2}
 {cmd:. pip, country(mar) year(2019) clear}{p_end}
-{err: Add error message}
+{p 8 16 2}
+{err:  "Survey year 2019 is not available in MAR. Only the following are available: ..."}
 
 {marker ps}{...}
 {ul:Towards distributional analysis}
 
 {pstd}
-The default use of pip is to get the poverty headcount. However, the inverse operation is also available in {cmd:pip}. You can provide the share of the population using {cmd:popshare()} and get in return the monetary value of the welfare distribution. For example, you can estimate the median like this
+The default use of pip is to get the poverty headcount. However, the inverse operation is also available in {cmd:pip}. You can provide the share of the population using {cmd:popshare()} 
+and get in return the monetary value of the welfare distribution.
+For instace, you can estimate the median of the welfare vector like this:
 
 {p 8 16 2}
 {cmd:.pip, country(mar) year(2013) clear popshare(0.5)}{p_end}
@@ -167,15 +176,15 @@ The default use of pip is to get the poverty headcount. However, the inverse ope
 {ul:Auxiliary data}
 
 {pstd}
-Though the main underlying data of PIP are the household surveys, it makes
-use of many other sources such as GDP, CPI, population, among many others. 
-You can get the list of all auxiliary tables, and click in the one you want. 
+Though the main underlying data of PIP are the household surveys, {cmd:pip} makes
+use of many other auxiliary data sources such as GDP, CPI, population, among many others.
+You can access the list of all auxiliary tables with the following command, and click on the one of your interest: 
 
 {p 8 16 2}
 {cmd:.pip tables, clear}{p_end}
 
 {pstd}
-Or, you can provide the name of the table of interest directly,
+Alternatively, you can provide the name of the specific table of interest directly in the command:
 
 {p 8 16 2}
 {cmd:.pip tables, table(cpi) clear}{p_end}
@@ -196,7 +205,7 @@ The examples below do not comprehend of {cmd:pip}'s features.
 {stata pip cl, country(col arg) year(last) clear} 
 
 {phang}
-1.2. Load clickable menu
+1.2. Load clickable menu of data available
 
 {phang2}
 {stata pip, info}
@@ -211,7 +220,7 @@ The examples below do not comprehend of {cmd:pip}'s features.
 {ul:2. Differences between queries }
 
 {phang}
-2.1. Country estimation at $2.15 in 2015. Since there are no surveys in ARG in 
+2.1. Country estimation at $2.15 in 2015. In this example, since there are no ARG surveys in 
 2015, results are loaded only for COL, BRA and IND.
 
 {phang2}

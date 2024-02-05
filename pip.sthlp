@@ -35,7 +35,7 @@
 {p 4 4 2}Main subcommands{p_end}
 {synopt :{helpb pip_cl:cl}}Country-level poverty and inequality estimates. {help pip_cl##options:options}{p_end}
 {synopt :{helpb pip_cl:wb}}World Bank's regional and global aggregation. {help pip_cl##options:options}{p_end}
-{synopt :{helpb pip_cp:cp}}Country Profile estimates{help pip_cl##options:options}{p_end}
+{synopt :{helpb pip_cp:cp}}Country Profile estimates. {help pip_cl##options:options}{p_end}
 {synopt :{helpb pip_tables:tables}}Clickable list of auxiliary tables. {help pip_tables##options:options}{p_end}
 {synopt :{helpb pip_cache:cache}}Manage local cache. {help pip_cache##options:options}{p_end}
 {synopt :{helpb pip_print:print}}Print useful information. {help pip_print##options:options}{p_end}
@@ -236,8 +236,9 @@ of {cmd:pip}.
 {title:List of pip and povcalnet variables}{p 50 20 2}{p_end}
 
 {pstd}
-The following list compares the variables names available in {cmd:pip} with its predecessor command {cmd:povcalnet}.
-Only the variables available in povcalnet are listed.
+The first part of the following list compares the variables names available in {cmd:pip}
+with its predecessor command {cmd:povcalnet}.
+Additional pip variables are listed at the bottom.
 
 		{hline 43}
 		pip variable    {col 40}povcalnet variable
@@ -274,7 +275,20 @@ Only the variables available in povcalnet are listed.
 		distribution_type {col 40}usemicrodata
 		survey_coverage  {col 40}coveragetype
 		{hline 43}
-
+		Other pip variables   {col 40}
+		{hline 20}{col 40}
+		region_name      {col 40}
+		reporting_level  {col 40}
+		cpi				 {col 40}
+		gdp				 {col 40}
+		hfce			 {col 40}
+		survey_comparability {col 40}
+		survey_acronym   {col 40}
+		survey_time      {col 40}
+		comparable_spell {col 40}
+		spl				 {col 40}
+		spr				 {col 40}
+		{hline 43}
 
 
 {marker general_troubleshooting}{...}
@@ -393,12 +407,12 @@ All the files are available in the {browse "https://github.com/worldbank/pip":Gi
 
 {title:Thanks for citing {cmd:pip} data as follows}
 
-{p 4 8 2} World Bank. (2022). Poverty and Inequality Platform (version {version_ID}) 
+{p 4 8 2} World Bank. (2023). Poverty and Inequality Platform (version {version_ID}) 
 [Data set]. World Bank Group. www.pip.worldbank.org. Accessed  {date}{p_end}
 
 {p 4 8 2}Available version_IDs:{p_end}
-{p 4 8 2}2017 PPPs: 20220909_2017_01_02_PROD{p_end}
-{p 4 8 2}2011 PPPs: 20220909_2011_02_02_PROD{p_end}
+{p 4 8 2}2017 PPPs: 20230919_2017_01_02_PROD{p_end}
+{p 4 8 2}2011 PPPs: 20230919_2011_02_02_PROD{p_end}
 
 {pstd}
 Please make reference to the date when the database was downloaded, as statistics may change.
