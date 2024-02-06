@@ -8,7 +8,7 @@
 {pstd}
 {res}This entry aims to equip new  users with basic knowledge of the most
 useful features of the {cmd:pip} command. For a more detailed explanation 
-of each subcommand, please visit the {help pip##sbc_table:subcommand directory}.
+of each subcommand, please visit the {help pip##sbc_table:subcommand directory}. 
 {txt}
 
 {title:Remarks}

@@ -19,7 +19,7 @@
 {hline}
 
 {phang}
-{res:If you're new to {cmd:pip}, please start by reading {help pip_intro:pip intro}}.
+{res:If you're new to {cmd:pip}, please start by reading {help pip_intro:pip intro}}. 
 
 {title:Syntax}
 
