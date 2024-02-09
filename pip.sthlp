@@ -19,7 +19,7 @@
 {hline}
 
 {phang}
-{res:If you're new to {cmd:pip}, please start by reading {help pip_intro:pip intro}} 
+{res:If you're new to {cmd:pip}, please start by reading {help pip_intro:pip intro}}. 
 
 {title:Syntax}
 
@@ -40,15 +40,15 @@
 {synopt :{helpb pip_cache:cache}}Manage local cache. {help pip_cache##options:options}{p_end}
 {synopt :{helpb pip_print:print}}Print useful information. {help pip_print##options:options}{p_end}
 {synopt :{helpb pip_install:[un]install}}Installs the stable version of pip from SSC 
-({cmd:pip install ssc}) or the development version from GitHub ({cmd:pip install gh}){p_end}
+({cmd:pip install ssc}) or the development version from GitHub ({cmd:pip install gh}).{p_end}
 {synopt :{helpb pip_setup:setup}}Utility function to set {cmd:pip} options and 
 features.{p_end}
 
 {p 4 4 2}Auxiliary subcommands{p_end}
-{synopt :{helpb pip_misc:info}}Display countries and regions availability{p_end}
+{synopt :{helpb pip_misc:info}}Displays countries and regions availability.{p_end}
 {synopt :{helpb pip_misc:cleanup}}Deletes all pip data from current stata memory.{p_end}
-{synopt :{helpb pip_misc:test}}Display in console last query metadata and
-provide actions to test it in browser.{p_end}
+{synopt :{helpb pip_misc:test}}Displays metadata from the last query and provides actions to see output in 
+browser (api) or download as .csv.{p_end}
 {synopt :{helpb pip_misc:drop}}({it:Programmer's option}) Deletes objects from memory.{p_end}
 {synoptline}
 {pstd}
@@ -66,7 +66,7 @@ users to conduct country-specific, cross-country, as well as global and regional
 
 {pstd}
 {res:If you're new to {cmd:pip}, please start by reading {help pip_intro:pip intro}}. 
-If you want to understand the details and functionalities of each subcommand, please click on the corresponding subcommand of the table {help pip##sbc_table:above}.
+To better understand the details and functionalities of each subcommand, please click on the corresponding subcommand in the table {help pip##sbc_table:above}.
 
 
 {marker remarks}{...}
@@ -95,7 +95,7 @@ The options below work for any subcommad that returns vintaged data
 {synopthdr:General Options}
 {synoptline}
 {synopt :{opt ver:sion(string)}}Combination of numbers in the format %Y%m%d_YYYY_RV_AV_SSS
-(click {bf:{help pip_note:here}} for explanation of each component). 
+(click {bf:{help pip_note:here}} for an explanation of each component). 
 Option {it:version()} takes prevalence over the next 3 options 
 {it:ppp_year()}, {it:release()} & {it:identity()}, as the combination of 
 these three parameters uniquely identifies a dataset.{p_end}
@@ -109,10 +109,9 @@ these three parameters uniquely identifies a dataset.{p_end}
 
 {pstd}
 {err:*Note}: The {cmd:server()} and {cmd:identity()} options are available internally only for World Bank staff upon request to the  
-{browse "pip@worldbank.org":  PIP technical team}.
-For a detailed description of the {cmd:server()} and {cmd:identity()} options see {bf:{help pip_note:here}}.{p_end}
+{browse "mailto: pip@worldbank.org":PIP Technical Team}. For a detailed description of the {cmd:server()} and
+{cmd:identity()} options see {bf:{help pip_note:here}}.{p_end}
 {synoptline}
-
 
 
 {marker examples}{...}
@@ -120,7 +119,7 @@ For a detailed description of the {cmd:server()} and {cmd:identity()} options se
 
 {pstd}
 The examples below do not comprehend all {cmd:pip}'s features. Please refer 
-to the {it:examples} section of the help file of {help pip##sbc_table:each subcommad}.
+to the {it:examples} section of {help pip##sbc_table:each subcommad}'s help file.
 
 {ul:Basic examples}
 
@@ -317,7 +316,7 @@ the {cmd:pip} files from wherever they are in your computer until the command ab
 you're adding all the necessary steps to reproduce the problem. 
 
 {pmore} 6. Once the issue is created, run the code below--making sure you replace the commented line--and send the test.log file, along with the issue
-number created in the previous step, to {browse "pip@worldbank.org":pip@worldbank.org}. 
+number created in the previous step, to {browse "mailto: pip@worldbank.org":pip@worldbank.org}. 
 
 	{cmd}
 		log using "test.log", name(pip_test) text replace {result:// this is in your cd}
