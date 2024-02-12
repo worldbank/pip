@@ -424,7 +424,7 @@ Not necessarily the latest
 {txt}      ({stata "pip_examples pip_example03":click to run})
 
 
-{p 40 20 2}(Go up to {it:{help pip##sections:Sections Menu}}){p_end}
+{p 40 20 2}(Go back to {it:{help pip##sections:pip's main menu}}){p_end}
 
 
 

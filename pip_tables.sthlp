@@ -2,7 +2,7 @@
 {* *! version 1.0.0 dec 2022}{...}
 {vieweralsosee "" "--"}{...}
 {cmd:help pip tables}{right:{browse "https://pip.worldbank.org/":Poverty and Inequality Platform (PIP)}}
-{help pip:return to pip} {right:{browse "https://worldbank.github.io/pip/"}}
+{help pip:(return to pip)} {right:{browse "https://worldbank.github.io/pip/"}}
 {hline}
 
 {title:Syntax}
@@ -24,17 +24,18 @@
 {title:Description}
 
 {pstd}
-Even Though household surveys are the main data that underpins poverty and inequality estimates at
-the country, regional and global levels, there are several other types of data that underlie the calculations. You can access all these data with the {cmd:tables} subcommand. 
+While household surveys are the main data that underpins poverty and inequality estimates at
+the country, regional and global levels, calculations rely on several other types of data, such as cpi, gdp, population, et ce. 
+You can access all these auxiliary data with the {cmd:tables} subcommand. 
 
 {pstd}
-This subcommand has two main uses. You can either display a clickable list of all the tables available by typing 
+This subcommand has two main uses. You can either display a clickable list of all the tables available by typing: 
 
 {phang2}
 {cmd: pip tables} 
 
 {pstd}
-Or you can load a specific table by using the  options {it:table()} as in 
+Or you can load a specific table by using the option {it:table()} as in 
 
 {phang2}
 {cmd:pip tables, table({it:table_name})}
@@ -51,7 +52,7 @@ provide does not exist, {cmd:pip} returns error.
 {title:Examples}
 
 {phang}
-Display clickable list of auxiliary tables
+Display clickable list of all auxiliary tables
 
 {phang2}
 {stata pip tables} 
@@ -69,5 +70,5 @@ Load GDP data
 {stata pip tables, table(gdp)} 
 
 
-
+{p 40 20 2}(Go back to {it:{help pip##sections:pip's main menu}}){p_end}
 
