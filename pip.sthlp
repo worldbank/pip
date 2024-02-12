@@ -173,19 +173,21 @@ World Bank aggregation ({it:country()} is not available)
 {title:Memory use and frames}:
 
 {pstd}
-{res:{cmd:pip} is a very invasive Stata command}. We say it upfront so you don't 
-get surprises in the future, {bf:pip is invasive}. Below you will find all the ways in which {cmd:pip}
-interacts wit you Stata session, your operating system, and your local storage. We 
-apologize in advance for this behavior, but we think it is for your own benefit to
-take fully advantage of {cmd:pip} efficiency. 
+It is important for users to know beforehand that {res: {cmd:pip} is a very invasive Stata command}. 
+An explanation of all the ways in which {cmd:pip} interacts with the Stata session, 
+operating system, and local storage is provided below. We apologize in advance for the way in which this command works; 
+however, we truly believe it allows to take full advantage of {cmd:pip}'s efficiency. 
 
 {ul:Stata frames}
 
 {pstd}
-{cmd:pip} makes use of {help frames:Stata frames}--available since Stata 16--to store a lot of information in memory. This is partly the reason why the first call of pip in a new Stata session is slower compared to subsequent calls. When closing Stata, you may see a pop-up 
-message reading {bf:"Frames in memory have changed"}. That is perfectly normal and should not cause any concern. 
-However, make sure you save the frames that you created and wish to keep. You can do that by typing {stata frames dir}. 
-Frames created by {cmd:pip} are prefixed by {it:_pip} and are marked by an {it:*}, meaning they have not been saved. If you do not wish to save any frames in use, just click "Exit without saving." You can also delete all PIP data in memory using the command {stata pip cleanup}.
+{cmd:pip} makes use of {help frames:Stata frames}--available since Stata 16--to store a lot of information in memory. 
+This is partly the reason why the first call of pip in a new Stata session is slower compared to subsequent calls.
+When closing Stata, you may see a pop-up message reading {bf:"Frames in memory have changed"}. That is perfectly normal
+and should not cause any concern. However, make sure you save the frames that you created and wish to keep.
+You can do that by typing {stata frames dir}. Frames created by {cmd:pip} are prefixed by {it:_pip} and are
+marked by an {it:*}, meaning they have not been saved. If you do not wish to save any frames in use, just click
+"Exit without saving." You can also delete all PIP data in memory using the command {stata pip cleanup}.
 
 {ul:Cache memory}
 
@@ -206,18 +208,17 @@ The first time you execute {cmd:pip} in your session, it will search for the do-
 pip_setup.do. In case it is not found, it will be created in your PERSONAL directory.
 this do-file contains a set of global macros that store information relevant to the 
 performance of pip and to make it compatible with future versions. You can see the 
-contents of that file by typing {cmd:pip print, setup}. We highly recommend you do
-{err:NOT} modify this file. Yet, in case you can't resist the temptation and end up 
-modifying and breaking {cmd:pip}, you can recreate the pip_setup.do by typing 
-{cmd: pip setup, create}.
+contents of that file by typing {cmd:pip print, setup}. We highly recommend that you do
+{err:NOT} modify this file. Yet, in the event that you end up modifying it and breaking {cmd:pip}, 
+you can recreate the pip_setup.do by typing {cmd: pip setup, create}.
 
 {ul:Mata libraries}
 
 {pstd}
-{cmd:pip} relies heavily in a set of MATA functions stored in a {help lmbuild:library} called "lpip_fun". This library is built in your computer each time the library has
-been updated in a newer version of {cmd:pip}. All the Mata functions created by {cmd:pip} are named with the 
-{bf:pip_*} prefix. Yet, none of the functions is documented as they are intended
-for {cmd:pip} use only. 
+{cmd:pip} relies heavily in a set of MATA functions stored in a {help lmbuild:library} called "lpip_fun". 
+This library is built in your computer each time the library has been updated in a newer version of {cmd:pip}.
+All the Mata functions created by {cmd:pip} are named with the {bf:pip_*} prefix. Yet, none of the
+functions are documented as they are intended for {cmd:pip} use only. 
 
 
 {marker return}{...}
@@ -294,7 +295,7 @@ Additional pip variables are listed at the bottom.
 {title:General Troubleshooting}
 
 {p 4 4 2} 
-In case {cmd:pip} is not working correctly, try the following steps in order
+In case {cmd:pip} is not working correctly, try the following steps in the given order:
 {p_end}
 
 {pmore} 1. Uninstall {cmd:pip} by typing  {cmd: pip uninstall}
@@ -361,7 +362,7 @@ but refers to any territory for which authorities report separate social or econ
 
 {p 4 8 2}Castaneda Aguilar, R.Andres, T. Fujs, C. Lakner, S. K. Tetteh-Baah(2023)
 "Estimating Global Poverty in Stata: The PIP command", 
-Global Poverty Monitoring Technical Notes, World Bank, Washington, DC{p_end}
+Global Poverty Monitoring Technical Notes, World Bank, Washington, DC.{p_end}
 
 {marker acknowled}{...}
 {title:Acknowledgments}
@@ -378,7 +379,7 @@ povcalnet command, which was developed with the help of Espen Prydz, Jorge Soler
 {marker authors}{...}
 {title:Author}
 {p 4 4 4}R.Andres Castaneda, The World Bank{p_end}
-{p 6 6 4}Email: {browse "acastanedaa@worldbank.org":  acastanedaa@worldbank.org}{p_end}
+{p 6 6 4}Email: {browse "mailto: acastanedaa@worldbank.org":  acastanedaa@worldbank.org}{p_end}
 {p 6 6 4}GitHub:{browse "https://github.com/randrescastaneda": randrescastaneda }{p_end}
 
 {title:Contributor}
@@ -387,14 +388,14 @@ Tefera Bekele Degefu
 
 {title:Maintainer}
 {p 4 4 4}PIP Technical Team, The World Bank{p_end}
-{p 6 6 4}Email: {browse "pip@worldbank.org":  pip@worldbank.org}{p_end}
+{p 6 6 4}Email: {browse "mailto: pip@worldbank.org":  pip@worldbank.org}{p_end}
 
 {marker contact}{...}
 {title:Contact}
 {pstd}
 Any comments, suggestions, or bugs can be reported in the 
 {browse "https://github.com/worldbank/pip/issues":GitHub issues page}.
-All the files are available in the {browse "https://github.com/worldbank/pip":GitHub repository}
+All the files are available in the {browse "https://github.com/worldbank/pip":GitHub repository}.
 
 {marker howtocite}{...}
 {title:Thanks for citing this Stata command as follows}

@@ -1,8 +1,8 @@
 {smcl}
 {* *! version 1.0.0 dec 2022}{...}
 {vieweralsosee "" "--"}{...}
-{cmd:help pip cl} and {cmd:help pip wb}{right:{browse "https://pip.worldbank.org/":Poverty and Inequality Platform (PIP)}}
-{help pip:return to pip} {right:{browse "https://worldbank.github.io/pip/"}}
+{cmd:help pip cl} & {cmd:help pip wb}{right:{browse "https://pip.worldbank.org/":Poverty and Inequality Platform (PIP)}}
+{help pip:(return to pip)} {right:{browse "https://worldbank.github.io/pip/"}}
 {hline}
 
 {title:syntax}
@@ -30,20 +30,20 @@
 {synoptset 27 tabbed}{...}
 {synopthdr:cl and wb options}
 {synoptline}
-{synopt :{opt reg:ion}(3-letter WB code)}List of {it:{help pip_countries##regions:region code}} or {it:all}. Default is "{it:all}".{p_end}
-{synopt :{opt cov:erage(string)}}Coverage level ("national", "urban", "rural", "all"). Default "all".{p_end}
-{synopt :{opt y:ear}(numlist|string)}{it:{help numlist}} of years  or {it:all}, or {it:last}. Default is "all".{p_end}
-{synopt :{opt povl:ine:}(#)}list of poverty lines (in PPP specified, see option {cmd:ppp_year(#)}) to calculate 
- poverty measures (accepts up to 5). Default is 2.15 at 2017 PPPs.{p_end}
+{synopt :{opt reg:ion}(3-letter WB code)}List of {help pip_countries##regions:region code} or "all". Default is "{it:all}".{p_end}
+{synopt :{opt cov:erage(string)}}Coverage level ("national", "urban", "rural", "all"). Default "{it:all}".{p_end}
+{synopt :{opt y:ear}(numlist|string)}{help numlist} of years  or "all", or "last". Default is "{it:all}".{p_end}
+{synopt :{opt povl:ine:}(#)}List of poverty lines (accepts up to 5) in specified PPP (see option {help pip##general_options:ppp_year(#)}) to calculate 
+poverty. Default is 2.15 at 2017 PPPs.{p_end}
  {pstd}
  
-The following only work with subcommand {cmd:cl}
+{p 4 4 2}The following options only work at the country level:{p_end}
 
-{synopt :{opt cou:ntry:}(3-letter code)}List of {it:{help pip_countries##countries:country codes}} or {it:all}. Default is "{it:all}".{p_end}
-{synopt :{opt pops:hare:}(#)}List of quantiles. No default. Cannot be used with option {opt povline:(#)}{p_end}
+{synopt :{opt cou:ntry:}(3-letter code)}List of {help pip_countries##countries:country codes} or "all". Default is "{it:all}".{p_end}
+{synopt :{opt pops:hare:}(#)}List of quantiles. No default. Cannot be used with option {opt povline:(#)}.{p_end}
 {synopt :{opt fill:gaps}}Loads country-level estimates (including extrapolations and interpolations) used to create regional and global aggregates.{p_end}
 {synoptline}
-{synopt :{helpb pip##general_options: general options}}Options that apply to any subcommand{p_end}
+{synopt :{helpb pip##general_options: general options}}Options that apply to any subcommand.{p_end}
 
 
 {marker description}{...}
@@ -54,9 +54,9 @@ the {cmd:cl} (the default) and {cmd:wb} subcommands are the main modules of {cmd
 {cmd:cl} provides the country-level poverty and inequality estimates, whereas 
 {cmd:wb} provides regional and global level poverty estimates. As of now, the
 underlying welfare aggregate is the per capita household income or consumption
-expressed in 2017 PPP USD (with option {cmd:ppp_year(2011)} you can select
-estimates in 2011 PPPs values). Poverty lines, means, and medians are expressed in
-daily amounts. 
+expressed in 2017 PPP USD (the option {cmd:ppp_year(2011)} allows to
+estimate values in 2011 PPPs). Poverty lines, means, and medians are expressed in
+{cmd:daily amounts}. 
 
 {phang}
 {res:{ul:Country-level estimates:} }The PIP API reports two types of results:
@@ -64,9 +64,9 @@ daily amounts.
 {pmore}
 {opt 1.Survey-year}: Refers to poverty and inequality estimates for the year 
 in which the survey was conducted (i.e., survey period). This is the default 
-behavior of {cmd:pip cl}. Details of the poverty and inequality estimates 
-methodology can be found 
-{browse "https://datanalytics.worldbank.org/PIP-Methodology/surveyestimates.html": here}.
+in {cmd:pip cl}. Details of the poverty and inequality estimates 
+methodology can be found
+{browse "https://datanalytics.worldbank.org/PIP-Methodology/surveyestimates.html":here}.
 
 {pmore}
 {opt 2.Lineup-year}: In order to estimate regional and global poverty measures, 
@@ -74,12 +74,13 @@ it is necessary to have country-level poverty measures in a reference year that
 is common across countries. Since there is no single year in which all countries in
 the world have conducted a household survey suitable for national poverty estimates,
 it is necessary to {it: fill the gaps} by interpolating or extrapolating 
-poverty measures for those countries with no survey in the reference year. 
+poverty measures for those countries with no survey in the reference year.
 This process of {it:filling the gaps} is known as {it:lining up} the welfare
 aggregate, and hence {it:lineup years} estimates. You can get the lineup estimates
 by using the option {it:fillgaps}, as in {cmd:pip cl, fillgaps}. Methodological 
 details of the lineup can be found
-{browse "https://datanalytics.worldbank.org/PIP-Methodology/lineupestimates.html": here}.
+{browse "https://datanalytics.worldbank.org/PIP-Methodology/lineupestimates.html":here}.
+Users are cautioned in the use of lineup values (see{help pip##disclaimer: disclaimer note}).
 
 {pin}
 {res:Note 1}: The option {it:fillgaps} reports the underlying country estimates for a lineup-year.
@@ -89,7 +90,7 @@ interpolated between two surveys.
 
 {pin}
 {res:Note 2}: Poverty measures that are calculated for both survey-years and
-lineup-years  include the headcount ratio, poverty gap, and squared poverty gap.
+lineup-years  include the headcount ratio, poverty gap, squared poverty gap and societal poverty.
 Inequality measures, including the Gini index, the mean log deviation and decile
 shares, are calculated only in survey-years and are not reported for lineup-years.
 
@@ -105,14 +106,13 @@ assumptions:
 2. All parts of the distribution grow at the same rate.{...}
 
 
-
 {marker opt_details}{...}
 {title:Options Details}
 
 {phang}
 {opt country(string)} {help pip_countries##countries:Countries and Economies Abbreviations}. 
 If specified with {opt year(#)}, this option will return all the countries for which there is
-actual survey data in the year specified.  When selecting multiple countries, use the corresponding
+actual survey data in the year specified. When selecting multiple countries, use the corresponding
 three-letter codes separated by spaces. The option {it:all} is a shorthand for calling all countries.
 
 {phang}
@@ -121,7 +121,7 @@ specified with {opt year(#)}, this option will return all the countries in the s
 that have a survey in that year. For example, {opt region(LAC)} will return all countries in Latin
 America and the Caribbean that have a survey in the specific year. When selecting multiple regions,
 use the corresponding three-letter codes separated by spaces. The  option {it:all} is a shorthand
-for calling all regions, which is equivalent to  calling all countries.
+for calling all regions, which is equivalent to calling all countries.
 
 {phang}
 {opt coverage(string)} Selects the geographic coverage of the estimates. By default, all coverage
@@ -135,11 +135,10 @@ years, while the {it:last} option will download the latest available year
 for each country.
 
 {phang}
-{opt povline(#)} The poverty lines for which the poverty measures will be calculated.
-When selecting multiple poverty lines, use less than 4 decimals and separate
-each value with spaces. If left empty, the default poverty line of $2.15 is used.
-By default, poverty lines are expressed in 2017 PPP USD per capita per day.
-If option {opt ppp_ppp(2011)} is specified, the poverty lines are expressed in 2011 PPPs.
+{opt povline(#)} The poverty lines for which the poverty measures will be calculated. When selecting
+multiple poverty lines, use less than 4 decimals and separate each value with spaces. If
+left empty, the default poverty line of $2.15 is used. By default, poverty lines are expressed in
+2017 PPP USD per capita per day. If option {opt ppp_ppp(2011)} is specified, the poverty lines will be expressed in 2011 PPPs.
 
 {phang}
 {ul:{it:The following options only apply to cl}}
@@ -150,7 +149,7 @@ decile as the value of the poverty line. In other words, the estimated poverty l
 nearest income or consumption level such that the incomes of 10% of the population fall below it.
 This has no default, and cannot be combined with {opt povline}. The quantile (recorded in the variable
 poverty_line) is expressed in 2017 PPP USD per capita per day (unless option {opt ppp_year(2011)} is specified,
-in which case it is reported in 2011 PPPs).
+in which case it will be reported in 2011 PPP values).
 
 {phang}
 {opt fillgaps} Loads all country-level estimates that are used to create the  
@@ -161,14 +160,12 @@ extrapolated or interpolated using national accounts growth rates and assuming
 distribution-neutrality (see Chapter 6
 {browse "https://openknowledge.worldbank.org/bitstream/handle/10986/20384/9781464803611.pdf":here}).
 Therefore, changes at the country-level from one reference year to the next need 
-to be interpreted carefully and may not be the result of a new household survey.{p_end}
-
+to be interpreted carefully and may not be the result of a new household survey.
 
 
 {marker examples}{...}
 {title:Examples}
 
-{err:TO BE COMPLETED}
 
 
 
