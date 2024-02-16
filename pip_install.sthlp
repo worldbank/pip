@@ -77,30 +77,6 @@ used in a session takes longer than subsequently). If you want to get the
 latest version without leaving your Stata session, type {cmd:pip update}.
 {p_end}
 
-
-{marker opt_details}{...}
-{title:Options Details}
-
-{phang}
-{opt option(string)} Long description
-
-
-
-{marker examples}{...}
-{title:Examples}
-
-{phang}
-Clickable example
-
-{phang2}
-{stata pip, clear} 
-
-{phang}
-Non-clickable example
-
-{phang2}
-{cmd: pip, info}
-
 {marker installation_process}{...}
 {title:Installation process}
 
