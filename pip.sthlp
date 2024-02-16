@@ -42,7 +42,7 @@
 {synopt :{helpb pip_install:[un]install}}Installs the stable version of pip from SSC 
 ({cmd:pip install ssc}) or the development version from GitHub ({cmd:pip install gh}).{p_end}
 {synopt :{helpb pip_setup:setup}}Utility function to set {cmd:pip} options and 
-features.{p_end}
+features ({res:coming soon}).{p_end}
 
 {p 4 4 2}Auxiliary subcommands{p_end}
 {synopt :{helpb pip_misc:info}}Displays countries and regions availability.{p_end}
