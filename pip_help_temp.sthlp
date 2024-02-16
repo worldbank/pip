@@ -2,7 +2,7 @@
 {* *! version 1.0.0 dec 2022}{...}
 {vieweralsosee "" "--"}{...}
 {cmd:help pip subcmd}{right:{browse "https://pip.worldbank.org/":Poverty and Inequality Platform (PIP)}}
-{help pip:return to pip} {right:{browse "https://worldbank.github.io/pip/"}}
+{help pip:(return to pip)} {right:{browse "https://worldbank.github.io/pip/"}}
 {hline}
 
 {title:Syntax}
@@ -16,22 +16,19 @@
 {synoptset 27 tabbed}{...}
 {synopthdr:subcmd options}
 {synoptline}
-{synopt :{opt tops}}Desc.{p_end}
+{synopt :{opt tops}}.{p_end}
 {synoptline}
 
 
 {marker description}{...}
 {title:Description}
 {pstd}
-Description starts here
+.
 
 
 
 {marker opt_details}{...}
 {title:Options Details}
-
-{phang}
-{opt option(string)} Long description
 
 {phang}
 {opt option(string)} Long description
@@ -56,5 +53,6 @@ Explanation: non-clickable example
 {cmd: pip, info}
 
 
+{p 40 20 2}(Go back to {it:{help pip##sections:pip's main menu}}){p_end}
 
 

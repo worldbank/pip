@@ -19,7 +19,7 @@
 {hline}
 
 {phang}
-{res:If you're new to {cmd:pip}, please start by reading {help pip_intro:pip intro}}
+{res:If you're new to {cmd:pip}, please start by reading {help pip_intro:pip intro}}. 
 
 {title:Syntax}
 
@@ -35,20 +35,20 @@
 {p 4 4 2}Main subcommands{p_end}
 {synopt :{helpb pip_cl:cl}}Country-level poverty and inequality estimates. {help pip_cl##options:options}{p_end}
 {synopt :{helpb pip_cl:wb}}World Bank's regional and global aggregation. {help pip_cl##options:options}{p_end}
-{synopt :{helpb pip_cp:cp}}Country Profile estimates{help pip_cl##options:options}{p_end}
+{synopt :{helpb pip_cp:cp}}Country Profile estimates. {help pip_cl##options:options}{p_end}
 {synopt :{helpb pip_tables:tables}}Clickable list of auxiliary tables. {help pip_tables##options:options}{p_end}
 {synopt :{helpb pip_cache:cache}}Manage local cache. {help pip_cache##options:options}{p_end}
 {synopt :{helpb pip_print:print}}Print useful information. {help pip_print##options:options}{p_end}
 {synopt :{helpb pip_install:[un]install}}Installs the stable version of pip from SSC 
-({cmd:pip install ssc}) or the development version from GitHub ({cmd:pip install gh}){p_end}
+({cmd:pip install ssc}) or the development version from GitHub ({cmd:pip install gh}).{p_end}
 {synopt :{helpb pip_setup:setup}}Utility function to set {cmd:pip} options and 
-features.{p_end}
+features ({res:coming soon}).{p_end}
 
 {p 4 4 2}Auxiliary subcommands{p_end}
-{synopt :{helpb pip_misc:info}}Display countries and regions availability{p_end}
+{synopt :{helpb pip_misc:info}}Displays countries and regions availability.{p_end}
 {synopt :{helpb pip_misc:cleanup}}Deletes all pip data from current stata memory.{p_end}
-{synopt :{helpb pip_misc:test}}Display in console last query metadata and
-provide actions to test it in browser.{p_end}
+{synopt :{helpb pip_misc:test}}Displays metadata from the last query and provides actions to see output in 
+browser (api) or download as .csv.{p_end}
 {synopt :{helpb pip_misc:drop}}({it:Programmer's option}) Deletes objects from memory.{p_end}
 {synoptline}
 {pstd}
@@ -66,7 +66,7 @@ users to conduct country-specific, cross-country, as well as global and regional
 
 {pstd}
 {res:If you're new to {cmd:pip}, please start by reading {help pip_intro:pip intro}}. 
-If you want to understand the details and functionalities of each subcommand, please click on the corresponding subcommand of the table {help pip##sbc_table:above}.
+To better understand the details and functionalities of each subcommand, please click on the corresponding subcommand in the table {help pip##sbc_table:above}.
 
 
 {marker remarks}{...}
@@ -95,7 +95,7 @@ The options below work for any subcommad that returns vintaged data
 {synopthdr:General Options}
 {synoptline}
 {synopt :{opt ver:sion(string)}}Combination of numbers in the format %Y%m%d_YYYY_RV_AV_SSS
-(click {bf:{help pip_note:here}} for explanation of each component). 
+(click {bf:{help pip_note:here}} for an explanation of each component). 
 Option {it:version()} takes prevalence over the next 3 options 
 {it:ppp_year()}, {it:release()} & {it:identity()}, as the combination of 
 these three parameters uniquely identifies a dataset.{p_end}
@@ -109,10 +109,9 @@ these three parameters uniquely identifies a dataset.{p_end}
 
 {pstd}
 {err:*Note}: The {cmd:server()} and {cmd:identity()} options are available internally only for World Bank staff upon request to the  
-{browse "pip@worldbank.org":  PIP technical team}.
-For a detailed description of the {cmd:server()} and {cmd:identity()} options see {bf:{help pip_note:here}}.{p_end}
+{browse "mailto: pip@worldbank.org":PIP Technical Team}. For a detailed description of the {cmd:server()} and
+{cmd:identity()} options see {bf:{help pip_note:here}}.{p_end}
 {synoptline}
-
 
 
 {marker examples}{...}
@@ -120,7 +119,7 @@ For a detailed description of the {cmd:server()} and {cmd:identity()} options se
 
 {pstd}
 The examples below do not comprehend all {cmd:pip}'s features. Please refer 
-to the {it:examples} section of the help file of {help pip##sbc_table:each subcommad}.
+to the {it:examples} section of {help pip##sbc_table:each subcommad}'s help file.
 
 {ul:Basic examples}
 
@@ -174,19 +173,21 @@ World Bank aggregation ({it:country()} is not available)
 {title:Memory use and frames}:
 
 {pstd}
-{res:{cmd:pip} is a very invasive Stata command}. We say it upfront so you don't 
-get surprises in the future, {bf:pip is invasive}. Below you will find all the ways in which {cmd:pip}
-interacts wit you Stata session, your operating system, and your local storage. We 
-apologize in advance for this behavior, but we think it is for your own benefit to
-take fully advantage of {cmd:pip} efficiency. 
+It is important for users to know beforehand that {res: {cmd:pip} is a very invasive Stata command}. 
+An explanation of all the ways in which {cmd:pip} interacts with the Stata session, 
+operating system, and local storage is provided below. We apologize in advance for the way in which this command works; 
+however, we truly believe it allows to take full advantage of {cmd:pip}'s efficiency. 
 
 {ul:Stata frames}
 
 {pstd}
-{cmd:pip} makes use of {help frames:Stata frames}--available since Stata 16--to store a lot of information in memory. This is partly the reason why the first call of pip in a new Stata session is slower compared to subsequent calls. When closing Stata, you may see a pop-up 
-message reading {bf:"Frames in memory have changed"}. That is perfectly normal and should not cause any concern. 
-However, make sure you save the frames that you created and wish to keep. You can do that by typing {stata frames dir}. 
-Frames created by {cmd:pip} are prefixed by {it:_pip} and are marked by an {it:*}, meaning they have not been saved. If you do not wish to save any frames in use, just click "Exit without saving." You can also delete all PIP data in memory using the command {stata pip cleanup}.
+{cmd:pip} makes use of {help frames:Stata frames}--available since Stata 16--to store a lot of information in memory. 
+This is partly the reason why the first call of pip in a new Stata session is slower compared to subsequent calls.
+When closing Stata, you may see a pop-up message reading {bf:"Frames in memory have changed"}. That is perfectly normal
+and should not cause any concern. However, make sure you save the frames that you created and wish to keep.
+You can do that by typing {stata frames dir}. Frames created by {cmd:pip} are prefixed by {it:_pip} and are
+marked by an {it:*}, meaning they have not been saved. If you do not wish to save any frames in use, just click
+"Exit without saving." You can also delete all PIP data in memory using the command {stata pip cleanup}.
 
 {ul:Cache memory}
 
@@ -207,18 +208,17 @@ The first time you execute {cmd:pip} in your session, it will search for the do-
 pip_setup.do. In case it is not found, it will be created in your PERSONAL directory.
 this do-file contains a set of global macros that store information relevant to the 
 performance of pip and to make it compatible with future versions. You can see the 
-contents of that file by typing {cmd:pip print, setup}. We highly recommend you do
-{err:NOT} modify this file. Yet, in case you can't resist the temptation and end up 
-modifying and breaking {cmd:pip}, you can recreate the pip_setup.do by typing 
-{cmd: pip setup, create}.
+contents of that file by typing {cmd:pip print, setup}. We highly recommend that you do
+{err:NOT} modify this file. Yet, in the event that you end up modifying it and breaking {cmd:pip}, 
+you can recreate the pip_setup.do by typing {cmd: pip setup, create}.
 
 {ul:Mata libraries}
 
 {pstd}
-{cmd:pip} relies heavily in a set of MATA functions stored in a {help lmbuild:library} called "lpip_fun". This library is built in your computer each time the library has
-been updated in a newer version of {cmd:pip}. All the Mata functions created by {cmd:pip} are named with the 
-{bf:pip_*} prefix. Yet, none of the functions is documented as they are intended
-for {cmd:pip} use only. 
+{cmd:pip} relies heavily in a set of MATA functions stored in a {help lmbuild:library} called "lpip_fun". 
+This library is built in your computer each time the library has been updated in a newer version of {cmd:pip}.
+All the Mata functions created by {cmd:pip} are named with the {bf:pip_*} prefix. Yet, none of the
+functions are documented as they are intended for {cmd:pip} use only. 
 
 
 {marker return}{...}
@@ -236,11 +236,12 @@ of {cmd:pip}.
 {title:List of pip and povcalnet variables}{p 50 20 2}{p_end}
 
 {pstd}
-The following list compares the variables names available in {cmd:pip} with its predecessor command {cmd:povcalnet}.
-Only the variables available in povcalnet are listed.
+The first part of the following list compares the variables names available in {cmd:pip}
+with its predecessor command {cmd:povcalnet}.
+Additional pip variables are listed at the bottom.
 
 		{hline 43}
-		pip variable    {col 40}povcalnet variable
+		{bf:pip variable}    {col 40}{bf:povcalnet variable}
 		{hline 20}{col 40}{hline 20}
 		country_code     {col 40}countrycode
 		country_name     {col 40}countryname
@@ -274,14 +275,28 @@ Only the variables available in povcalnet are listed.
 		distribution_type {col 40}usemicrodata
 		survey_coverage  {col 40}coveragetype
 		{hline 43}
-
+		
+		{bf:Other pip variables}   {col 40}
+		{hline 20}{col 40}
+		region_name      {col 40}
+		reporting_level  {col 40}
+		cpi				 {col 40}
+		gdp				 {col 40}
+		hfce			 {col 40}
+		survey_comparability {col 40}
+		survey_acronym   {col 40}
+		survey_time      {col 40}
+		comparable_spell {col 40}
+		spl				 {col 40}
+		spr				 {col 40}
+		{hline 43}
 
 
 {marker general_troubleshooting}{...}
 {title:General Troubleshooting}
 
 {p 4 4 2} 
-In case {cmd:pip} is not working correctly, try the following steps in order
+In case {cmd:pip} is not working correctly, try the following steps in the given order:
 {p_end}
 
 {pmore} 1. Uninstall {cmd:pip} by typing  {cmd: pip uninstall}
@@ -303,7 +318,7 @@ the {cmd:pip} files from wherever they are in your computer until the command ab
 you're adding all the necessary steps to reproduce the problem. 
 
 {pmore} 6. Once the issue is created, run the code below--making sure you replace the commented line--and send the test.log file, along with the issue
-number created in the previous step, to {browse "pip@worldbank.org":pip@worldbank.org}. 
+number created in the previous step, to {browse "mailto: pip@worldbank.org":pip@worldbank.org}. 
 
 	{cmd}
 		log using "test.log", name(pip_test) text replace {result:// this is in your cd}
@@ -348,7 +363,7 @@ but refers to any territory for which authorities report separate social or econ
 
 {p 4 8 2}Castaneda Aguilar, R.Andres, T. Fujs, C. Lakner, S. K. Tetteh-Baah(2023)
 "Estimating Global Poverty in Stata: The PIP command", 
-Global Poverty Monitoring Technical Notes, World Bank, Washington, DC{p_end}
+Global Poverty Monitoring Technical Notes, World Bank, Washington, DC.{p_end}
 
 {marker acknowled}{...}
 {title:Acknowledgments}
@@ -365,23 +380,25 @@ povcalnet command, which was developed with the help of Espen Prydz, Jorge Soler
 {marker authors}{...}
 {title:Author}
 {p 4 4 4}R.Andres Castaneda, The World Bank{p_end}
-{p 6 6 4}Email: {browse "acastanedaa@worldbank.org":  acastanedaa@worldbank.org}{p_end}
+{p 6 6 4}Email: {browse "mailto: acastanedaa@worldbank.org":  acastanedaa@worldbank.org}{p_end}
 {p 6 6 4}GitHub:{browse "https://github.com/randrescastaneda": randrescastaneda }{p_end}
 
-{title:Contributor}
+{title:Contributors}
 {pstd}
-Tefera Bekele Degefu
+- Tefera Bekele Degefu{p_end}
+{pstd}
+- Martha Viveros{p_end}
 
 {title:Maintainer}
 {p 4 4 4}PIP Technical Team, The World Bank{p_end}
-{p 6 6 4}Email: {browse "pip@worldbank.org":  pip@worldbank.org}{p_end}
+{p 6 6 4}Email: {browse "mailto: pip@worldbank.org":  pip@worldbank.org}{p_end}
 
 {marker contact}{...}
 {title:Contact}
 {pstd}
 Any comments, suggestions, or bugs can be reported in the 
 {browse "https://github.com/worldbank/pip/issues":GitHub issues page}.
-All the files are available in the {browse "https://github.com/worldbank/pip":GitHub repository}
+All the files are available in the {browse "https://github.com/worldbank/pip":GitHub repository}.
 
 {marker howtocite}{...}
 {title:Thanks for citing this Stata command as follows}
@@ -393,12 +410,12 @@ All the files are available in the {browse "https://github.com/worldbank/pip":Gi
 
 {title:Thanks for citing {cmd:pip} data as follows}
 
-{p 4 8 2} World Bank. (2022). Poverty and Inequality Platform (version {version_ID}) 
+{p 4 8 2} World Bank. (2023). Poverty and Inequality Platform (version {version_ID}) 
 [Data set]. World Bank Group. www.pip.worldbank.org. Accessed  {date}{p_end}
 
 {p 4 8 2}Available version_IDs:{p_end}
-{p 4 8 2}2017 PPPs: 20220909_2017_01_02_PROD{p_end}
-{p 4 8 2}2011 PPPs: 20220909_2011_02_02_PROD{p_end}
+{p 4 8 2}2017 PPPs: 20230919_2017_01_02_PROD{p_end}
+{p 4 8 2}2011 PPPs: 20230919_2011_02_02_PROD{p_end}
 
 {pstd}
 Please make reference to the date when the database was downloaded, as statistics may change.
