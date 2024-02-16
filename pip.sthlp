@@ -241,7 +241,7 @@ with its predecessor command {cmd:povcalnet}.
 Additional pip variables are listed at the bottom.
 
 		{hline 43}
-		pip variable    {col 40}povcalnet variable
+		{bf:pip variable}    {col 40}{bf:povcalnet variable}
 		{hline 20}{col 40}{hline 20}
 		country_code     {col 40}countrycode
 		country_name     {col 40}countryname
@@ -275,7 +275,8 @@ Additional pip variables are listed at the bottom.
 		distribution_type {col 40}usemicrodata
 		survey_coverage  {col 40}coveragetype
 		{hline 43}
-		Other pip variables   {col 40}
+		
+		{bf:Other pip variables}   {col 40}
 		{hline 20}{col 40}
 		region_name      {col 40}
 		reporting_level  {col 40}
@@ -382,9 +383,11 @@ povcalnet command, which was developed with the help of Espen Prydz, Jorge Soler
 {p 6 6 4}Email: {browse "mailto: acastanedaa@worldbank.org":  acastanedaa@worldbank.org}{p_end}
 {p 6 6 4}GitHub:{browse "https://github.com/randrescastaneda": randrescastaneda }{p_end}
 
-{title:Contributor}
+{title:Contributors}
 {pstd}
-Tefera Bekele Degefu
+- Tefera Bekele Degefu{p_end}
+{pstd}
+- Martha Viveros{p_end}
 
 {title:Maintainer}
 {p 4 4 4}PIP Technical Team, The World Bank{p_end}
