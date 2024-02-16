@@ -12,18 +12,14 @@
 {phang}
 {cmd:pip info}
 
-
 {phang}
 {cmd:pip drop,} [options]
-
 
 {phang}
 {cmd:pip test}
 
-
 {phang}
 {cmd:pip cleanup}
-
 
 {marker description}{...}
 {title:Description}
@@ -46,14 +42,6 @@ downloadable.
 {phang}
 {opt cleanup} Deletes all PIP data from Stata's memory. 
 
-
-{marker opt_details}{...}
-{title:Options Details}
-
-{phang}
-{opt option(string)} Long description
-
-
 {marker examples}{...}
 {title:Examples}
 
@@ -62,13 +50,6 @@ Clickable example
 
 {phang2}
 {stata pip info} 
-
-{phang}
-Non-clickable example
-
-{phang2}
-{cmd: pip, info}
-
 
 {p 40 20 2}(Go back to {it:{help pip##sections:pip's main menu}}){p_end}
 
