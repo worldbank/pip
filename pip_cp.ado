@@ -83,11 +83,11 @@ program define pip_cp_check_args, rclass
 	COUntry(string)                 /// 
 	POVLine(numlist)                /// 
 	PPP_year(numlist)               ///
-	CLEAR *                         /// 
+	CLEAR                           /// 
 	SERver(string)                  /// 
 	pause                           /// 
 	replace                         ///
-	cacheforce *                    ///
+	cacheforce                      ///
 	n2disp(passthru)                ///
 	cachedir(passthru)  *           ///
 	] 
