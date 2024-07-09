@@ -284,7 +284,7 @@ end
 //------------ display results
 program define pip_cp_display_results
 
-	syntax , [n2disp(scalar 1)]
+	syntax , [n2disp(integer 1)]
 
 	local n2disp = min(`c(N)', `n2disp')  
 
