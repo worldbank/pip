@@ -365,21 +365,16 @@ end
 //------------ display results
 program define pip_wb_display_results
 	
-	syntax , [n2disp(numlist)]
-	
-	if ("`n2disp'" == "") local n2disp 1
+	syntax , [n2disp(scalar 1)]
+
 	local n2disp = min(`c(N)', `n2disp')
+	//Display header
+	if      `n2disp'==1 local MSG "first observation"
+	else if `n2disp' >1 local MSG "first `n2disp' observations"
+	else                local MSG "No observations available"
+	noi dis as result _n "{ul:`MSG'}"
 	
-	if (`n2disp' > 1) {
-		noi di as res _n "{ul: first `n2disp' observations}"
-	} 
-	else	if (`n2disp' == 1) {
-		noi di as res _n "{ul: first observation}"
-	}
-	else {
-		noi di as res _n "{ul: No observations available}"
-	}	
-	
+	//Display contents
 	sort region_code year 
 	
 	tempname tolist
@@ -395,7 +390,6 @@ program define pip_wb_display_results
 		noi list region_code year poverty_line headcount mean ///
 		in 1/`n2disp',  abbreviate(12) noobs
 	}
-	
 end
 
 

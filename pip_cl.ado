@@ -590,21 +590,18 @@ end
 //------------ display results
 program define pip_cl_display_results
 	
-	syntax , [n2disp(numlist)]
-	
-	if ("`n2disp'" == "") local n2disp 1
+	syntax , [n2disp(scalar 1)]
+
 	local n2disp = min(`c(N)', `n2disp')
 	
-	if (`n2disp' > 1) {
-		noi di as res _n "{ul: first `n2disp' observations}"
-	} 
-	else	if (`n2disp' == 1) {
-		noi di as res _n "{ul: first observation}"
-	}
-	else {
-		noi di as res _n "{ul: No observations available}"
-	}	
-	
+	//Display header
+	if      `n2disp'==1 local MSG "first observation"
+	else if `n2disp' >1 local MSG "first `n2disp' observations"
+	else                local MSG "No observations available"
+	noi dis as result _n "{ul:`MSG'}" 
+
+
+	//Display contents
 	sort country_code year
 	local varstodisp "country_code year poverty_line headcount mean median welfare_type"
 	local sepby "country_code"
@@ -613,11 +610,8 @@ program define pip_cl_display_results
 		cap confirm var `v', exact
 		if _rc continue 
 		local v2d "`v2d' `v'"
-	}
-	
+	}	
 	noi list `v2d' in 1/`n2disp',  abbreviate(12)  sepby(`sepby') noobs
-	
-	
 end
 
 
