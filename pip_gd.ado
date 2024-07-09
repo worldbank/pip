@@ -43,11 +43,18 @@ program define pip_gd, rclass
         }
         tokenize $pip_version, parse("_")
         local ppp_year `3'
-	
+
         //Build query [go to (2) sub-program pip_gd_query]
         noisily pip_gd_query, cum_welfare(`cum_welfare') cum_population(`cum_population')	
 
+        //Download
+        
+        //Clean?
 
+        //Add data notes
+
+        //Display results
+        noi pip_gd_display_results, `n2disp'
     }
 	pip_timer pip_gd, off
 end
@@ -113,7 +120,7 @@ program define pip_gd_query, rclass
 	
 
 	// grouped-data
-	local endpoint "grouped-stats"
+h	local endpoint "grouped-stats"
     if "`povline'"=="" {
         global pip_last_queries "`endpoint'?`query'&format=csv"
         noisily dis "$pip_last_queries"
@@ -129,12 +136,11 @@ program define pip_gd_query, rclass
         local ++i
 	}
 	mata: st_global("pip_last_queries", invtokens(`M')) 
-	
-	
+		
 end
 
 program define pip_gd_display_results
-	syntax , [n2disp(scalar 1)]
+	syntax  [, n2disp(integer 1)]
 
 	local n2disp = min(`c(N)', `n2disp')
 	
