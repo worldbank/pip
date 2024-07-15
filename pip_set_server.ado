@@ -28,8 +28,8 @@ program define pip_set_server, rclass
 	
 	//------------ If shortcut used
 	local current_server "https://api.worldbank.org/pip/v1" // production
-	
-	if (inlist(lower("`server'"), "qa", "dev"))  {
+	local server = lower("`server'")
+	if (inlist("`server'", "qa", "dev"))  {
 		local url "${pip_svr_`server'}"
 	}
 	
