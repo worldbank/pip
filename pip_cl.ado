@@ -52,11 +52,13 @@ program define pip_cl, rclass
 		//========================================================
 		
 		//------------ download
+		pause cl> before get data 
 		pip_timer pip_cl.pip_get, on
 		pip_get, `clear' `cacheforce' `cachedir'
 		pip_timer pip_cl.pip_get, off
-		
 		//------------ clean
+
+		pause cl> before clean data 
 		pip_timer pip_cl_clean, on
 		pip_cl_clean
 		pip_timer pip_cl_clean, off
@@ -125,6 +127,11 @@ program define pip_cl_check_args, rclass
 	//========================================================
 	// General checks
 	//========================================================
+	// -------pause 
+	if ("`pause'" == "pause") {
+		return local pause = "pause"
+		local optnames "`optnames' pause"
+	}
 	//------------ year
 	if ("`year'" == "") local year "all"
 	else if (lower("`year'") == "all") local year "all"
@@ -407,7 +414,7 @@ program define pip_cl_clean, rclass
 	//   formating 
 	//========================================================
 	// string variables
-	local str_vars "region_name  region_code  country_name  country_code  reporting_level survey_acronym survey_acronym survey_coverage welfare_type comparable_spell is_interpolated distribution_type estimation_type"
+	local str_vars "region_name  region_code  country_name  country_code  reporting_level survey_acronym survey_acronym survey_coverage welfare_type comparable_spell is_interpolated distribution_type estimation_type estimate_type"
 
 	ds
 	local all_vars "`r(varlist)'"
@@ -456,27 +463,27 @@ program define pip_cl_clean, rclass
 		label values welfare_type welfare_type
 		
 		//------------ All variables
-		label var country_code		  "country/economy code"
-		label var country_name 		  "country/economy name"
-		label var region_code 		  "region code"
-		label var region_name 		  "region name"
+		label var country_code		"country/economy code"
+		label var country_name 		"country/economy name"
+		label var region_code 		"region code"
+		label var region_name 		"region name"
 		label var survey_coverage   "survey coverage"
-		label var reporting_year	  "year"
-		label var survey_year 		  "survey year"
-		label var welfare_type 		  "welfare measured by income or consumption"
+		label var reporting_year	"year"
+		label var survey_year 		"survey year"
+		label var welfare_type 		"welfare measured by income or consumption"
 		label var is_interpolated 	"data is interpolated"
 		label var distribution_type "data comes from grouped or microdata"
-		label var ppp 				      "`ppp_version' purchasing power parity"
-		label var poverty_line 		  "poverty line in `ppp_version' PPP US\$ (per capita per day)"
-		label var mean				      "average daily per capita income/consumption `ppp_version' PPP US\$"
-		label var headcount 		    "poverty headcount"
-		label var poverty_gap 		  "poverty gap"
+		label var ppp 				"`ppp_version' purchasing power parity"
+		label var poverty_line 		"poverty line in `ppp_version' PPP US\$ (per capita per day)"
+		label var mean				"average daily per capita income/consumption `ppp_version' PPP US\$"
+		label var headcount 		"poverty headcount"
+		label var poverty_gap 		"poverty gap"
 		label var poverty_severity 	"squared poverty gap"
-		label var watts 			      "watts index"
-		label var gini 				      "gini index"
-		label var median 			      "median daily per capita income/consumption in `ppp_version' PPP US\$"
-		label var mld 				      "mean log deviation"
-		label var reporting_pop 	  "polarization"
+		label var watts 			"watts index"
+		label var gini 				"gini index"
+		label var median 			"median daily per capita income/consumption in `ppp_version' PPP US\$"
+		label var mld 				"mean log deviation"
+		label var reporting_pop 	"polarization"
 		label var reporting_pop     "population in year"
 		
 		ds decile*
@@ -487,12 +494,13 @@ program define pip_cl_clean, rclass
 		}
 		
 		label var reporting_level 	   "reporting data level"
-		label var survey_acronym 	     "survey acronym"     
+		label var survey_acronym 	   "survey acronym"     
 		label var survey_comparability "survey comparability"
 		label var comparable_spell 	   "comparability over time at country level"   
-		label var cpi 				         "consumer price index (CPI) in `ppp_version' base"
-		label var reporting_gdp 	     "GDP per capita in constant 2015 US\$, annual calendar year"
-		label var reporting_pce 	     "HFCE per capita in constant 2015 US\$, annual calendar year"
+		label var cpi 				   "consumer price index (CPI) in `ppp_version' base"
+		label var reporting_gdp 	   "GDP per capita in constant 2015 US\$, annual calendar year"
+		label var reporting_pce 	   "HFCE per capita in constant 2015 US\$, annual calendar year"
+		label var estimate_type        "type of estimate"
 		
 		//========================================================
 		//  Sorting and Formatting
