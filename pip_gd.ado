@@ -44,13 +44,25 @@ program define pip_gd, rclass
         tokenize $pip_version, parse("_")
         local ppp_year `3'
 
-        //Build query [go to (2) sub-program pip_gd_query]
-        noisily pip_gd_query, cum_welfare(`cum_welfare') cum_population(`cum_population')	
-
-        //Download
+        // Import auxiliary data
+        pip_auxframes
         
-        //Clean?
+        //Build query [go to (2) sub-program pip_gd_query]
+        noisily pip_gd_query, cum_welfare(`cum_welfare') ///
+                              cum_population(`cum_population') ///
+                              requested_mean(`requested_mean') ///
+                              povline(`povline') 
 
+        //Download [UNCOMMENT pip_get WHEN HAVING ACCESS TO SERVER]
+        pip_timer pip_gd.pip_get, on
+        //pip_get, `cacheforce' `clear' `cachedir' 
+        pip_timer pip_gd.pip_get, off
+
+        //Clean?
+        pip_timer pip_gd_clean, on
+        pip_gd_clean
+        pip_timer pip_gd_clean, off
+        
         //Add data notes
 
         //Display results
@@ -79,19 +91,45 @@ program define pip_gd_check_args, rclass
 	cachedir(passthru)  *           ///  
 	]
 
+	//Set-up
+	local version = "${pip_version}"
+	tokenize "`version'", parse("_")
+	local _version   = "_`1'_`3'_`9'"
+	local ppp_year = `3'
 	
+
 	//Place-holder -- need to check whether certain options are mandatory
+	
+	//Cumulative welfare
 	if "`cum_welfare'"=="" local cum_welfare 0.1 0.2 0.3
+	local nwelfare : word count `cum_welfare'
 	return local cum_welfare = "`cum_welfare'"	
 	local optnames "`optnames' cum_welfare"
 	
+	//Cumulative population
 	if "`cum_population'"=="" local cum_population 0.1 0.2 0.3
+	local npopulation : word count `cum_population'
 	return local cum_population = "`cum_population'"	
 	local optnames "`optnames' cum_population"
-
 	
-	return local optnames "`optnames'"
+	if `npopulation'!=`nwelfare' {
+        dis as error "cum_population and cum_welfare must be identical lengths."
+        exit 122
+	}
 
+	//Requested mean	
+	return local requested_mean = "`requested_mean'"
+	local optnames "`optnames' requested_mean"
+	
+	// poverty line 
+	if "`povline'"=="" {
+        if ("`ppp_year'" == "2005") local povline = 1.25
+        if ("`ppp_year'" == "2011") local povline = 1.9
+        if ("`ppp_year'" == "2017") local povline = 2.15
+    }
+	return local povline  = "`povline'"
+	local optnames "`optnames' povline"
+	return local optnames "`optnames'"
 end
 
 
@@ -99,30 +137,34 @@ end
 *-------------------------------------------------------------------------------
 *--- (2) Sub-programs
 *-------------------------------------------------------------------------------
+//---------- 2(a) Build GD Query  ---------------------------------------------- 
 program define pip_gd_query, rclass
 	version 16.1
 	syntax                             ///
 	[ ,                                ///
 	  cum_population(numlist)          ///
 	  cum_welfare(numlist)             ///	  
+	  requested_mean(real 1)           ///
+	  POVLine(numlist)	               ///
 	]
 
 	//Build query
 	//  Note: test below is to confirm that particular contents should be in API
 	//  Could consider changing test for ease of reading
-	local params "cum_welfare cum_population requested_mean povline"
+	local params "cum_welfare cum_population requested_mean"
 	foreach p of local params {
         if `"``p''"'==`""' continue
-        local query "`query'`p'=``p'' "
+        local query "`query'`p'=``p''&"
 	}
-	local query = ustrtrim("`query'")	
-	local query : subinstr local query " " "&", all
+	local query = ustrtrim("`query'")
+	dis "`query'"
+	local query : subinstr local query " " ",", all
 	
 
 	// grouped-data
-h	local endpoint "grouped-stats"
+	local endpoint "grouped-stats"
     if "`povline'"=="" {
-        global pip_last_queries "`endpoint'?`query'&format=csv"
+        global pip_last_queries "`endpoint'?`query'format=csv"
         noisily dis "$pip_last_queries"
         exit
     }
@@ -136,8 +178,45 @@ h	local endpoint "grouped-stats"
         local ++i
 	}
 	mata: st_global("pip_last_queries", invtokens(`M')) 
+	noisily dis "$pip_last_queries"
 		
 end
+
+
+//---------- 2(b) Clean GD data  ----------------------------------------------- 
+program define pip_gd_clean, rclass
+	version 16.1
+	
+	//Setup
+	if ("${pip_version}" == "") {
+        noisily dis as error "No version selected."
+        exit 197
+	}
+	local version = "${pip_version}"
+	tokenize "`version'", parse("_")
+	local _version   = "_`1'_`3'_`9'"
+	local ppp_version = `3'
+	
+	//Formatting?
+	
+	//Dealing with invalid values?
+	
+	//Labeling [**CURRENTLY WITH CAPTURE WHILE SERVER CONNECTION NOT SETUP]
+	cap lab var poverty_line     "poverty line in `ppp_version' PPP US\$ (per capita per day)"
+	cap lab var mean             "average daily per capita income/consumption `ppp_version' PPP US\$"
+	cap lab var median           "median daily per capita income/consumption in `ppp_version' PPP US\$"
+	cap lab var headcount        "poverty headcount"
+	cap lab var poverty_gap      "poverty gap"
+	cap lab var poverty_severity "squared poverty gap"
+	cap lab var watts            "watts index"
+	cap lab var gini             "gini index"
+	cap lab var mld              "mean log deviation"
+	cap lab var polarization     "polarization"
+	
+end
+
+
+//---------- 2(c) Display results  --------------------------------------------- 
 
 program define pip_gd_display_results
 	syntax  [, n2disp(integer 1)]
@@ -164,10 +243,10 @@ exit
 Notes:
     1. API test example is as follows
        http://127.0.0.1:8080/api/v1/grouped-stats?cum_welfare=0.0002,0.0006,0.0011,0.0021,0.0031,0.0048,0.0066,0.0095,0.0128,0.0177,0.0229,0.0355,0.0513,0.0689,0.0882&cum_population=0.001,0.003,0.005,0.009,0.013,0.019,0.025,0.034,0.044,0.0581,0.0721,0.1041,0.1411,0.1792,0.2182&requested_mean=2.911786&povline=1.9
-    2. Does requested mean have default option(s), or just ignored if not specified?
-    3. Need to build for Lorenz
-    4. Should MSG "No observations available" not return an error instead of display?
-    5. Ensure that numlists are unpacked in check_args
+    2. Does requested mean have default option(s)?  And is it a scalar?
+    3. Does program revert to error if no cum_population() and cum_welfare() specified?
+    4. Need to build for Lorenz
+    5. Should MSG "No observations available" not return an error instead of display?
+    6. Remove instances of capture in pip_gd_clean
     
-
 Version Control:
