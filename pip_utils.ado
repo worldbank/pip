@@ -109,9 +109,19 @@ program define pip_utils_dropvars
 	
 	ds
 	local varlist `r(varlist)'
-	foreach v of local varlist { 
-		count if missing(`v') 
-		if r(N) == c(N) { 
+	foreach v of local varlist {
+
+        cap confirm numeric variable `v'
+        if (_rc) {
+            count if `v' == "."
+            local Ndots = r(N)
+        }
+        else local Ndots = 0
+		count if missing(`v')
+        local Nmiss = r(N)
+        local Tmiss = `Nmiss' + `Ndots'
+
+		if (`Tmiss' == c(N)) { 
 			local droplist `droplist' `v' 
 		} 
 	}
