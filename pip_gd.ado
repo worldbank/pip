@@ -14,6 +14,7 @@ Dev notes [DCC]: See end of file. Also note program drop is temporal for tests
 cap program drop pip_gd
 cap program drop pip_gd_check_args
 cap program drop pip_gd_query
+cap program drop pip_gd_clean
 cap program drop pip_gd_display_results
 
 *-------------------------------------------------------------------------------
@@ -21,9 +22,10 @@ cap program drop pip_gd_display_results
 *-------------------------------------------------------------------------------
 program define pip_gd, rclass
 	version 16.1
-
+	
+	//pip_gd not yet included in pip as pip gd, set must run pip_timer to set struct
+	pip_timer
 	pip_timer pip_gd, on
-
 
 	pip_gd_check_args `0'
 	
@@ -36,7 +38,7 @@ program define pip_gd, rclass
 	
 	
 	quietly {
-        //Set-up [Written, but actually seems do not need ppp_year for gd]
+        //Set-up
         if "$pip_version"=="" {
             noisily dis as error "No version selected."
             exit 197
@@ -51,20 +53,23 @@ program define pip_gd, rclass
         noisily pip_gd_query, cum_welfare(`cum_welfare') ///
                               cum_population(`cum_population') ///
                               requested_mean(`requested_mean') ///
-                              povline(`povline') 
+                              povline(`povline') ///
+                              ppp_year(`ppp_year') ///
 
         //Download [UNCOMMENT pip_get WHEN HAVING ACCESS TO SERVER]
         pip_timer pip_gd.pip_get, on
         //pip_get, `cacheforce' `clear' `cachedir' 
         pip_timer pip_gd.pip_get, off
 
-        //Clean?
+        //Clean
         pip_timer pip_gd_clean, on
         pip_gd_clean
         pip_timer pip_gd_clean, off
         
         //Add data notes
-
+        local datalabel "Grouped Statistics"
+        local data "`datalabel' (`c(current_date)')"
+        
         //Display results
         noi pip_gd_display_results, `n2disp'
     }
@@ -76,6 +81,9 @@ end
 *-------------------------------------------------------------------------------
 *--- (1) Syntax check
 *-------------------------------------------------------------------------------
+//Place-holder -- need to check whether certain options are mandatory.
+//  This should be viewed as a structure conditional on determining all required
+//  elements and potential further consistency checks
 program define pip_gd_check_args, rclass
 	version 16.1
 	syntax                          ///
@@ -84,11 +92,12 @@ program define pip_gd_check_args, rclass
 	cum_population(numlist)         ///
 	requested_mean(real 1)          ///
 	POVLine(numlist)	            ///
+	PPP_year(numlist)	            ///
 	pause                           ///
 	replace                         /// 
 	cacheforce                      ///
 	n2disp(passthru)                ///
-	cachedir(passthru)  *           ///  
+	cachedir(passthru) *            ///  
 	]
 
 	//Set-up
@@ -98,8 +107,6 @@ program define pip_gd_check_args, rclass
 	local ppp_year = `3'
 	
 
-	//Place-holder -- need to check whether certain options are mandatory
-	
 	//Cumulative welfare
 	if "`cum_welfare'"=="" local cum_welfare 0.1 0.2 0.3
 	local nwelfare : word count `cum_welfare'
@@ -146,10 +153,11 @@ program define pip_gd_query, rclass
 	  cum_welfare(numlist)             ///	  
 	  requested_mean(real 1)           ///
 	  POVLine(numlist)	               ///
+	  ppp_year(numlist)	               ///
 	]
 
 	//Build query
-	//  Note: test below is to confirm that particular contents should be in API
+	//  Note: Maps particular contents to format for API
 	//  Could consider changing test for ease of reading
 	local params "cum_welfare cum_population requested_mean"
 	foreach p of local params {
@@ -157,11 +165,10 @@ program define pip_gd_query, rclass
         local query "`query'`p'=``p''&"
 	}
 	local query = ustrtrim("`query'")
-	dis "`query'"
 	local query : subinstr local query " " ",", all
 	
 
-	// grouped-data
+	// grouped-data [REMOVE 1ST BLOCK IF THIS IS NOT NEEDED FOR LORENZ]
 	local endpoint "grouped-stats"
     if "`povline'"=="" {
         global pip_last_queries "`endpoint'?`query'format=csv"
@@ -172,7 +179,7 @@ program define pip_gd_query, rclass
 	tempname M
 	local i = 1
 	foreach v of local povline {
-	    local queryp = "`endpoint'?`query'&povline=`v'&format=csv" 
+	    local queryp = "`endpoint'?`query'povline=`v'&format=csv" 
         if `i'==1 mata: `M' = "`queryp'"
         else      mata: `M' = `M' , "`queryp'"
         local ++i
@@ -197,7 +204,7 @@ program define pip_gd_clean, rclass
 	local _version   = "_`1'_`3'_`9'"
 	local ppp_version = `3'
 	
-	//Formatting?
+	//Type confirmation?
 	
 	//Dealing with invalid values?
 	
@@ -212,7 +219,18 @@ program define pip_gd_clean, rclass
 	cap lab var gini             "gini index"
 	cap lab var mld              "mean log deviation"
 	cap lab var polarization     "polarization"
-	
+
+	cap ds decile*
+	local dec_var = "`r(varlist)'"
+	foreach var of local dec_var {
+        if regexm("`var'", "([0-9]+)") local q = regexs(1)
+        cap lab var `var' "decile `q' welfare share"
+	}    
+	//Sorting?
+		
+	//Formatting?
+		
+	qui compress	
 end
 
 
@@ -233,7 +251,6 @@ program define pip_gd_display_results
 	//Display contents
 	local varstodisp 
 	noi list `varstodisp' in 1/`n2disp', abbreviate(12) noobs
-		
 end
 
 exit
@@ -248,5 +265,6 @@ Notes:
     4. Need to build for Lorenz
     5. Should MSG "No observations available" not return an error instead of display?
     6. Remove instances of capture in pip_gd_clean
+    7. Check whether we need ppp_year as an argument, or just internally accessed always
     
 Version Control:
