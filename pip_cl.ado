@@ -499,7 +499,7 @@ program define pip_cl_clean, rclass
 		label var gini 				"gini index"
 		label var median 			"median daily per capita income/consumption in `ppp_version' PPP US\$"
 		label var mld 				"mean log deviation"
-		label var reporting_pop 	"polarization"
+		label var polarization 	    "polarization"
 		label var reporting_pop     "population in year"
 		
 		ds decile*
