@@ -49,8 +49,7 @@ program define pip_cp, rclass
 		
 		//========================================================
 		// Getting data
-		//========================================================
-		
+		//========================================================		
 		//------------ download
 		pip_timer pip_cp.pip_get, on
 		pip_get, `clear' `cacheforce' `cachedir'
@@ -67,9 +66,15 @@ program define pip_cp, rclass
 		
 		label data "`datalabel' (`c(current_date)')"
 		
+		//========================================================
+		// Getting data
+		//========================================================		
 		//------------ display results
 		noi pip_cp_display_results, `n2disp'
-		
+		//noi pip_utils output, `n2disp' ///
+        //sortvars(country_code reporting_year) ///
+        //dispvars(country_code reporting_year poverty_line headcount welfare_time) ///
+        //sepvar(country_code)
 	}
 	pip_timer pip_cp, off
 end 
@@ -223,7 +228,6 @@ end
 //========================================================
 
 //------------ Build CP query
-
 program define pip_cp_query, rclass
 	version 16
 	syntax ///

@@ -66,7 +66,10 @@ program define pip_wb, rclass
 		
 		//------------ Display results
 		noi pip_wb_display_results, `n2disp'
-		
+		//noi pip_utils output, `n2disp' worldcheck ///
+		//sortvars(region_code year)                ///
+		//dispvars(region_code year poverty_line headcount mean)
+        
 		//------------ Povcalnet format
 		
 		if ("`povcalnet_format'" != "") {
