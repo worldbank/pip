@@ -16,6 +16,9 @@
 {synoptset 27 tabbed}{...}
 {synopthdr:gd options}
 {synoptline}
+{synopt :{opt stats}} Requests grouped data statistics (the default option of {cmd:pip_gd}.{p_end}
+{synopt :{opt params}} Requests regression parameters corresponding to grouped data.{p_end}
+{synopt :{opt lorenz}} Requests Lorenz curve data points.{p_end}
 {synopt :{opt cum_welfare(numlist)}} List indicating the cuulative welfare shares in particular groups of the population.{p_end}
 {synopt :{opt cum_population(numlist)}} List indicating the cumulative population contained in the same groups for which {opt cum_welfare()} is indicated.{p_end}
 {synopt :{opt requested_mean(#)}} Scalar value indicating the mean welfare in the population.{p_end}
@@ -30,7 +33,7 @@ poverty. Default is 2.15 at 2017 PPPs.{p_end}
 The {cmd:gd} subcommand provides poverty and inequality indices when provided with grouped
 data.  Grouped data consist of some measure of cumulative welfare such as consumption expenditure
 or income, along with population shares by groups such as deciles or percentiles.  Provided
-that information is provided about some measure of central tendency such as the mean, and a
+that information is available about some measure of central tendency such as the mean, and a
 distributional assumption such as the Lorenz curve is adopted, poverty and inequality measures
 can be estimated from grouped data.  The {cmd: pip_gd} subcommand provides these aggregate
 statistics based on grouped statistics.
@@ -46,6 +49,23 @@ expressed in {cmd:daily amounts}.
 
 {marker opt_details}{...}
 {title:Options Details}
+
+{phang}
+{opt stats} Indicates that group statistics are desired based on the provided inputs. By
+default, it is assumed that group statistics are desired, and so if neither {opt stats},
+{opt params} or {opt lorenz} is indicated, {cmd:gd} defaults to the stats option.
+
+{phang}
+{opt params} Indicates that regression parameters are desired based on the provided inputs.
+One of {opt stats} (group statistics) {opt params} (regression parameters) or {opt lorenz}
+(Lorenz curve data points) is required, and if none of these are required, {opt stats} is
+assumed as default.  More than one of these options cannot be indicated.
+
+{phang}
+{opt lorenz} Indicates that Lorenz curve data points are desired based on the provided inputs.
+One of {opt stats} (group statistics) {opt params} (regression parameters) or {opt lorenz}
+(Lorenz curve data points) is required, and if none of these are required, {opt stats} is
+assumed as default.  More than one of these options cannot be indicated.
 
 {phang}
 {opt cum_welfare(numlist)} A list containing the cumulative welfare shares of different groups

@@ -26,25 +26,24 @@ program define pip_gd, rclass
 	//pip_gd not yet included in pip as pip gd, set must run pip_timer to set struct
 	pip_timer
 	pip_timer pip_gd, on
-
-	pip_gd_check_args `0'
 	
+	pip_gd_check_args `0'
+
 	// grab saved locals
 	local optnames "`r(optnames)'"
 	mata: pip_retlist2locals("`optnames'")
 	
 	if "`pause'"=="pause" pause on
 	else                  pause off
-	
-	
+
 	quietly {
-        //Set-up
-        if "$pip_version"=="" {
-            noisily dis as error "No version selected."
-            exit 197
-        }
-        tokenize $pip_version, parse("_")
-        local ppp_year `3'
+		//Set-up
+		if "$pip_version"=="" {
+			noisily dis as error "No version selected."
+			exit 197
+		}
+		tokenize $pip_version, parse("_")
+		local ppp_year `3'
 
         // Import auxiliary data
         pip_auxframes
@@ -55,7 +54,8 @@ program define pip_gd, rclass
                               requested_mean(`requested_mean') ///
                               povline(`povline') ///
                               ppp_year(`ppp_year') ///
-
+        					  endpoint(`endpoint') ///
+        
         //Download [UNCOMMENT pip_get WHEN HAVING ACCESS TO SERVER]
         pip_timer pip_gd.pip_get, on
         //pip_get, `cacheforce' `clear' `cachedir' 
@@ -88,6 +88,9 @@ program define pip_gd_check_args, rclass
 	version 16.1
 	syntax                          ///
 	[ ,                             ///
+	stats                           ///
+	lorenz                          ///
+	params                          ///
 	cum_welfare(numlist)            ///
 	cum_population(numlist)         ///
 	requested_mean(real 1)          ///
@@ -104,15 +107,35 @@ program define pip_gd_check_args, rclass
 	local version = "${pip_version}"
 	tokenize "`version'", parse("_")
 	local _version   = "_`1'_`3'_`9'"
-	local ppp_year = `3'
-	
+	local ppp_year = `3'	
+
+	//Over-arching options: either stats, lorenz or params must be specified
+	if "`stats'"==""&"`lorenz'"==""&"`params'"=="" {
+		//If nothing is specified, stats is assumed
+		local stats stats
+	}
+	//Only one of these options can be provided
+	local j=0
+	if "`stats'" !="" local ++j
+	if "`lorenz'"!="" local ++j
+	if "`params'"!="" local ++j
+	if `j'>1 {
+    	dis as error "Only one of stats, lorenz or params can be specified."
+		exit 184
+	}
+	//Return end-point name (one must be returned by construction)
+	if "`stats'" !="" local endpoint "grouped-stats"
+	if "`lorenz'"!="" local endpoint "lorenz-curve"
+	if "`params'"!="" local endpoint "regression-params"
+	return local endpoint = "`endpoint'"
+	local optnames "`optnames' endpoint"
 
 	//Cumulative welfare
 	if "`cum_welfare'"=="" local cum_welfare 0.1 0.2 0.3
 	local nwelfare : word count `cum_welfare'
 	return local cum_welfare = "`cum_welfare'"	
 	local optnames "`optnames' cum_welfare"
-	
+
 	//Cumulative population
 	if "`cum_population'"=="" local cum_population 0.1 0.2 0.3
 	local npopulation : word count `cum_population'
@@ -127,7 +150,7 @@ program define pip_gd_check_args, rclass
 	//Requested mean	
 	return local requested_mean = "`requested_mean'"
 	local optnames "`optnames' requested_mean"
-	
+
 	// poverty line 
 	if "`povline'"=="" {
         if ("`ppp_year'" == "2005") local povline = 1.25
@@ -149,6 +172,7 @@ program define pip_gd_query, rclass
 	version 16.1
 	syntax                             ///
 	[ ,                                ///
+	  endpoint(string)                 ///
 	  cum_population(numlist)          ///
 	  cum_welfare(numlist)             ///	  
 	  requested_mean(real 1)           ///
@@ -169,7 +193,6 @@ program define pip_gd_query, rclass
 	
 
 	// grouped-data [REMOVE 1ST BLOCK IF THIS IS NOT NEEDED FOR LORENZ]
-	local endpoint "grouped-stats"
     if "`povline'"=="" {
         global pip_last_queries "`endpoint'?`query'format=csv"
         noisily dis "$pip_last_queries"
@@ -259,10 +282,9 @@ exit
 ><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><
 Notes:
     1. API test example is as follows
-       http://127.0.0.1:8080/api/v1/grouped-stats?cum_welfare=0.0002,0.0006,0.0011,0.0021,0.0031,0.0048,0.0066,0.0095,0.0128,0.0177,0.0229,0.0355,0.0513,0.0689,0.0882&cum_population=0.001,0.003,0.005,0.009,0.013,0.019,0.025,0.034,0.044,0.0581,0.0721,0.1041,0.1411,0.1792,0.2182&requested_mean=2.911786&povline=1.9
+       http://127.0.0.1:8080/api/v1/grouped-stats?cum_welfare=0.0002,0.0006,0.0011,0.0021,0.0031,0.0048,0.0066,0.0095,0.0128,0.0177,0.0229,0.0355,0.0513,0.0689,0.0882&cum_population=0.001,0.003,0.005,0.009,0.013,0.019,0.025,0.034,0.044,0.0581,0.0721,0.1041,0.1411,0.1792,0.2182&requested_mean=2.911786&povline=1.9  -- This can be implemented as: pip_gd,stats cum_welfare(0.0002,0.0006,0.0011,0.0021,0.0031,0.0048,0.0066,0.0095,0.0128,0.0177,0.0229,0.0355,0.0513,0.0689,0.0882) cum_population(0.001,0.003,0.005,0.009,0.013,0.019,0.025,0.034,0.044,0.0581,0.0721,0.1041,0.1411,0.1792,0.2182) requested_mean(2.911786) povline(1.9)
     2. Does requested mean have default option(s)?  And is it a scalar?
     3. Does program revert to error if no cum_population() and cum_welfare() specified?
-    4. Need to build for Lorenz
     5. Should MSG "No observations available" not return an error instead of display?
     6. Remove instances of capture in pip_gd_clean
     7. Check whether we need ppp_year as an argument, or just internally accessed always
