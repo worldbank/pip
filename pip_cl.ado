@@ -25,7 +25,7 @@ program define pip_cl, rclass
 	
 	if ("`pause'" == "pause") pause on
 	else                      pause off
-	
+
 	qui {
 		//========================================================
 		// setup
@@ -71,13 +71,12 @@ program define pip_cl, rclass
 		local datalabel = substr("`datalabel'", 1, 80)
 		
 		label data "`datalabel' (`c(current_date)')"
-		
+
 		//------------ display results
-		noi pip_cl_display_results, `n2disp'
-		//noi pip_utils output, `n2disp' /// 
-		//sortvars(country_code year) /// 
-		//dispvars(country_code year poverty_line headcount mean median welfare_type) ///
-		//sepvar(country_code)		
+		noi pip_utils output, `n2disp' /// 
+		 sortvars(country_code year) /// 
+		 dispvars(country_code year poverty_line headcount mean median welfare_type) ///
+		 sepvar(country_code)		
 		
 		//------------ Povcalnet format
 		
@@ -302,8 +301,13 @@ program define pip_cl_check_args, rclass
 	if ("`country'" == "") local country "all" // to modify
 	return local country = "`country'"
 	local optnames "`optnames' country"
+
+	// allow n2disp as undocumented option
+	if ("`n2disp'" != "") {
+		return local n2disp = "`n2disp'"
+		local optnames "`optnames' n2disp"
+	}
 	return local optnames "`optnames'"
-   
 end
 
 //========================================================
@@ -320,8 +324,8 @@ program define pip_cl_query, rclass
 	REGion(string)                  /// 
 	YEAR(string)                    /// 
 	POVLine(numlist)                /// 
-	POPShare(numlist)	   	          /// 
-	PPP_version(numlist)                    /// 
+	POPShare(numlist)	   	        /// 
+	PPP_version(numlist)            /// 
 	COVerage(string)                /// 
 	FILLgaps                        /// 
 	] 
@@ -520,7 +524,7 @@ program define pip_cl_clean, rclass
 		label var cpi 				   "consumer price index (CPI) in `ppp_version' base"
 		label var reporting_gdp 	   "GDP per capita in constant 2015 US\$, annual calendar year"
 		label var reporting_pce 	   "HFCE per capita in constant 2015 US\$, annual calendar year"
-		cap label var estimate_type        "type of estimate"
+		cap label var estimate_type    "type of estimate"
 		
 		//========================================================
 		//  Sorting and Formatting
@@ -590,34 +594,6 @@ program define pip_cl_clean, rclass
 		
 	}			
 end
-
-//------------ display results
-program define pip_cl_display_results
-	
-	syntax , [n2disp(integer 1)]
-
-	local n2disp = min(`c(N)', `n2disp')
-	
-	//Display header
-	if      `n2disp'==1 local MSG "first observation"
-	else if `n2disp' >1 local MSG "first `n2disp' observations"
-	else                local MSG "No observations available"
-	noi dis as result _n "{ul:`MSG'}" 
-
-
-	//Display contents
-	sort country_code year
-	local varstodisp "country_code year poverty_line headcount mean median welfare_type"
-	local sepby "country_code"
-	
-	foreach v of local varstodisp {
-		cap confirm var `v', exact
-		if _rc continue 
-		local v2d "`v2d' `v'"
-	}	
-	noi list `v2d' in 1/`n2disp',  abbreviate(12)  sepby(`sepby') noobs
-end
-
 
 program define pip_cl_povcalnet
 	ren year       requestyear

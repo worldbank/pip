@@ -70,11 +70,10 @@ program define pip_cp, rclass
 		// Getting data
 		//========================================================		
 		//------------ display results
-		noi pip_cp_display_results, `n2disp'
-		//noi pip_utils output, `n2disp' ///
-        //sortvars(country_code reporting_year) ///
-        //dispvars(country_code reporting_year poverty_line headcount welfare_time) ///
-        //sepvar(country_code)
+		noi pip_utils output, `n2disp' ///
+          sortvars(country_code reporting_year) ///
+          dispvars(country_code reporting_year poverty_line headcount welfare_time) ///
+          sepvar(country_code)
 	}
 	pip_timer pip_cp, off
 end 
@@ -131,6 +130,13 @@ program define pip_cp_check_args, rclass
 	
 	return local povline  = "`povline'"
 	local optnames "`optnames' povline"
+
+	// allow n2disp as undocumented option
+	if ("`n2disp'"!="" ) {
+		return local n2disp = "`n2disp'"
+		local optnames "`optnames' n2disp"
+	}
+	
 	return local optnames "`optnames'"
    
 end
@@ -282,33 +288,6 @@ program define pip_cp_query, rclass
 		mata: st_global("pip_last_queries", invtokens(`M'))
 	}
 	
-end
-
-
-//------------ display results
-program define pip_cp_display_results
-
-	syntax , [n2disp(integer 1)]
-
-	local n2disp = min(`c(N)', `n2disp')  
-
-	//Display header
-	if      `n2disp'==1 local MSG "first observation" 
-	else if `n2disp' >1 local MSG "first `n2disp' observations"
-	else                local MSG "No observations available"
-	noi dis as result _n "{ul:`MSG'}"
-	
-	//Display contents
-	sort country_code reporting_year
-	local varstodisp "country_code reporting_year poverty_line headcount welfare_time"
-	local sepby "country_code"
-	
-	foreach v of local varstodisp {
-		cap confirm var `v', exact
-		if _rc continue 
-		local v2d "`v2d' `v'"
-	}	
-	noi list `v2d' in 1/`n2disp',  abbreviate(12)  sepby(`sepby') noobs
 end
 
 exit

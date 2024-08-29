@@ -61,8 +61,7 @@ program define pip_utils, rclass
 	if ustrregexm("`subcmd'", "^click"){
 		pip_utils_clicktable `if', `variable' `title' `statacode' `length' `width'
 	}
-
-	//------------ Output result disply
+	//------------ Output result display
 	if ("`subcmd'" == "output") {
 		noi pip_utils_output, `n2disp' `sortvars' `dispvars' `sepvar' `worldcheck'
 	}
