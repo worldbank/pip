@@ -3,17 +3,58 @@
 // DO NOT FORGET to update the version of the package, if changed!
 // for more information visit http://github.com/haghish/github
 
-make pip, replace toc pkg                         ///  readme
-		version(0.3.9)                          ///
-    license("MIT")                                                          ///
-    author("R.Andres Castaneda")                                            ///
-    affiliation("The World Bank")                                           ///
-    email("acastanedaa@worldbank.org")                                      ///
-    url("")                                                                 ///
-    title("Poverty and Inequality Platform Stata wrapper")                  ///
-    description("World Bank PIP API Stata wrapper")                         ///
-    install("pip.ado;pip.sthlp;pip_cl.ado;pip_clean.ado;pip_countries.sthlp;pip_note.sthlp;pip_drop.ado;pip_examples.ado;pip_info.ado;pip_new_session.ado;pip_povcalnet_format.ado;pip_query.ado;pip_set_server.ado;pip_cache.ado;pip_versions.ado;pip_tables.ado;pip_cleanup.ado;pip_cite.ado;pip_gh.ado;pip_ssc.ado;pip_install.ado") ///
+*##s
+
+cap program drop getfiles
+program define getfiles, rclass
+
+args mask
+
+local f2add: dir . files "`mask'", respectcase
+
+foreach a of local f2add {
+	local as "`as' `a'"
+}
+local as = trim("`as'")
+local as: subinstr local as " " ";", all
+
+return local files = "`as'"
+end
+
+
+cd "c:/Users/`c(username)'/OneDrive - WBG/WorldBank/DECDG/PIP/pip"
+getfiles "*.ado"
+local as = "`r(files)'"
+
+getfiles "*.sthlp"
+local hs = "`r(files)'"
+
+getfiles "*.mata"
+local ms = "`r(files)'"
+
+
+getfiles "*.dlg"
+local ds = "`r(files)'"
+
+
+local toins  "`as';`hs';`ms';`ds'"
+disp "`toins'"
+
+
+make pip, replace toc pkg                                  ///  readme
+		version(0.10.8.9002)                               ///
+    license("MIT")                                         ///
+    author("R.Andres Castaneda")                           ///
+    affiliation("The World Bank")                          ///
+    email("acastanedaa@worldbank.org")                     ///
+    url("")                                                ///
+    title("Poverty and Inequality Platform Stata wrapper") ///
+    description("World Bank PIP API Stata wrapper")        ///
+    install("`toins'")                                     ///
     ancillary("")                                                         
+
+*##e
+
 
 * ------------------------------------------------------------------------------
 * Testing basic examples
@@ -77,7 +118,7 @@ pip version
 global options = "server(qa)"
 
 // Function to avoid errors and scale up check
-*##s
+
 cap program drop pip_prod_dev
 program define pip_prod_dev
 syntax , ///
@@ -265,4 +306,4 @@ cmd("tables, table(region_coverage) clear") ///
 sorting_vars("year pcn_region_code") ///
 test_label("Auxilary table - regions_coverage") 
 
-*##e
+

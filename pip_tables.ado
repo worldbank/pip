@@ -16,44 +16,53 @@ Output:
 0: Program set up
 ==================================================*/
 program define pip_tables, rclass
-syntax [anything(name=table)], [ ///
-server(string)                   ///
-version(string)                  ///
-release(numlist)                 ///
-PPP_year(numlist)                ///
-identity(string)                 ///
-clear                            ///
-]
-
-version 16
-
-
-/*==================================================
-1: SET UP
-==================================================*/
-qui {
+	syntax , [                       ///
+	table(string)                    ///
+	clear                            ///
+	cachedir(passthru)               ///
+	]
 	
-	*---------- API defaults
-	qui pip_versions,                      ///
-	      server(`server')                 ///
-	      version(`version')               ///
-	      release(`release')               ///
-	      ppp_year(`ppp_year')             ///
-	      identity(`identity')             
+	version 16.1
 	
-	local server     = "`r(server)'"
-	local url        = "`r(url)'"
-	local version    = "`r(version)'"
-	local version_qr = "`r(version_qr)'"
 	
 	/*==================================================
-	2: If table is selected
+	1: SET UP
 	==================================================*/
 	
+	*---------- API defaults
+	local version_qr = "version=${pip_version}"
+	tokenize "${pip_version}", parse("_")
+	local _version   = "_`1'_`3'_`9'"
+	
+	/*==================================================
+	get table
+	==================================================*/
+	
+	//------------ get query
 	if ("`table'" != "") {
-		local table_call = "`url'/aux?table=`table'&`version_qr'&format=csv"
-		import delimit "`table_call'", varn(1) `clear' asdouble
-		return local table_call = "`table_call'"
+		global pip_last_queries = "aux?table=`table'&`version_qr'&format=csv"
+		local gname ""
+	}
+	else {
+		preserve  // to return users original frame
+		global pip_tables_call = "aux?`version_qr'&format=csv"
+		local gname pip_tables_call
+		local clear clear
+	}
+	
+	//------------Get table
+	
+	pip_timer pip_tables.pip_get, on
+	pip_get, `clear' `cacheforce' `cachedir' gname(`gname')
+	pip_timer pip_tables.pip_get, off
+	
+	return local table_call = "`table_call'"
+	
+	//========================================================
+	// Formatting table
+	//========================================================
+	
+	if ("`table'" != "") {
 		
 		* rename vars. Modify the following locals
 		local oldvars "reporting_year survey_year"
@@ -72,7 +81,7 @@ qui {
 		
 		* to lower cases
 		local tolvars "welfare_type"
-		foreach t of local tolvars {
+		qui foreach t of local tolvars {
 			cap confirm new var `t', exact
 			if (_rc) replace `t' = lower(`t')		
 		}
@@ -81,14 +90,9 @@ qui {
 	}
 	
 	/*==================================================
-	3: If table is NOT selected
+	If table is NOT selected
 	==================================================*/
 	if ("`table'" == "") {
-		preserve
-		local table_call = "`url'/aux?`version_qr'&format=csv"
-		import delimit "`table_call'", varn(1) clear asdouble
-		return local table_call = "`table_call'"
-		
 		noi disp in y "Auxiliary tables available for `version':"
 		local _N = _N
 		forvalues i = 1/`_N' {
@@ -96,13 +100,12 @@ qui {
 			else                     local j = "`i'"
 			
 			local table = tables[`i']
-			local pip_code "pip tables, table(`table') server(`server') version(`version') clear"
+			local pip_code "pip tables, table(`table') clear"
 			
 			noi disp _col(6) `"`j' {c |} {stata `pip_code':`table'}"'
 		}
 	}
-} // end qui
-
+	
 end
 exit
 /* End of do-file */

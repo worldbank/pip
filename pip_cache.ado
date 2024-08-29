@@ -1,277 +1,417 @@
 /*==================================================
-project:       submit the most popular queries
+project:       Cache previous results of pip command
 Author:        R.Andres Castaneda 
 E-email:       acastanedaa@worldbank.org
 url:           
 Dependencies:  The World Bank
 ----------------------------------------------------
-Creation Date:     2 Feb 2022 - 11:05:15
-Modification Date:   
-Do-file version:    01
-References:          
-Output:             
+Creation Date:     3 May 2023 - 11:06:35
+Modification Date:          
 ==================================================*/
 
 /*==================================================
 0: Program set up
 ==================================================*/
 program define pip_cache, rclass
-syntax [anything(name=subcmd)],         [ ///
-STime(integer 100) /// Sleep Time
-server(string)     ///
-]
-version 16
-
-
-/*==================================================
-1: 
-==================================================*/
-
-qui {
+	syntax [anything(name=subcmd)], ///
+	[                               ///
+	query(string)                   ///
+	PREfix(string)                  ///
+	cachedir(string)                ///
+	piphash(string)                 ///
+	clear                           ///
+	cacheforce                      ///
+	*                               ///
+	]
 	
-	*----------1.1:
-	global pip_cmds_ssc = 1  // make sure it does not execute again per session
-	local pp = round(runiform()*100, .01)  // random poverty line
-	local stime 100
+	version 16.1
 	
-	if ("`subcmd'" == "") local subcmd "all"
+	/*++++++++++++++++++++++++++++++++++++++++++++++++++
+	SET UP
+	++++++++++++++++++++++++++++++++++++++++++++++++++*/
 	
-	*----------1.2:
+	if ("`subcmd'" == "info") {
+		noi pip_cache_info, `options'
+		return add
+		exit
+	}
 	
-	if (inlist("`subcmd'"), "all", "global") {
-		timer clear 1
-		timer on 1
-		pip, povline(`pp') clear server(`server')
-		pip wb, povline(`pp') clear  server(`server')
-		timer off 1
-		timer list 1
+	
+	if ("${pip_cachedir}" == "0") {
+		return local piphash = "0"
+		return local pc_exists = 0 
+		exit
+	}
+	
+	
+	if ("`subcmd'" == "gethash") {
+		pip_cache_gethash, query(`"`query'"')
+		return add
+		exit
+	}
+	
+	if ("`subcmd'" == "inventory") {
+		pip_cache_inventory
+		noi disp "{res:Cache inventory has been loaded}"
+		exit
+	}
+	
+	if (ustrregexm("`subcmd'","^iscache")) {
+		noi pip_cache_iscache
+		return add
+		exit
+	}
+	
+	/*==================================================
+	1:load
+	==================================================*/
+	
+	if ("`subcmd'" == "load") {
+		pip_cache gethash, query(`query')
+		local piphash = "`r(piphash)'"
+		return local piphash = "`piphash'"
 		
-		local first_time = r(t1)
-		disp `first_time'
-		
-		numlist "0.1(0.1)10"
-		local pvcents = "`r(numlist)'"
-		local npvc: word count `pvcents'
-		
-		
-		numlist "10(1)50"
-		local pvdollar = "`r(numlist)'"
-		local npvd: word count `pvdollar'
-		
-		local est_time = `first_time'*`npvc' + ///   time on cents loop
-		`first_time'*`npvd' + ///   time on dollars loop 
-		(`npvd'+`npvc') * (`stime'/1000) // extra time if leep between calls
-		
-		
-		/*=============================
-		// Loop over poverty lines by cents
-		=============================*/
-		
-		noi disp as txt ". " in y "= saved successfully"
-		noi disp as txt "s " in y "= skipped - already exists (unchanged)"
-		noi disp as err "x " in y "= skipped - already exists (changed)"
-		noi disp as err "e " in y "= error"
-		noi disp ""
-		
-		local i = 0
-		noi _dots 0, title(Caching all countries and WB request from \$0.1 to \$10 by increments of 10 cents) reps(`npvc')	
-		
-		
-		noi pip_time_convertor `est_time', type(Estimated)
-		
-		timer clear 2
-		timer on 2
-		foreach pv of local pvcents {
-			local ++i
-			
-			cap {
-				pip wb,  povline(`pv') clear  server(`server')
-				sleep `stime'
-				pip,  povline(`pv') clear  server(`server')
-				sleep `stime'
-			}
-			if (_rc) {
-				noi _dots `i' 2
-			}
-			else {
-				noi _dots `i' 0
-			}
+		if ("`cacheforce'" != "") {
+			return local pc_exists = 0 
+			exit
 		}
 		
-		//========================================================
-		//  loop over poverty lines by dollars
-		//========================================================
-		
-		
-		local i = 0
-		noi _dots 0, title(Caching all countries and WB request from \$10 to \$50 by dollar) reps(`npvd')	
-		
-		foreach pv of local pvdollar {
-			local ++i
-			cap {
-				pip wb,  povline(`pv') clear  server(`server')
-				sleep `stime'
-				pip,  povline(`pv') clear  server(`server')
-				sleep `stime'
-			}
-			if (_rc) {
-				noi _dots `i' 2
-			}
-			else {
-				noi _dots `i' 0
-			}
-			
+		// use default of dir selected by user
+		if (`"`cachedir'"' == "") local cachedir  `"${pip_cachedir}"'
+		if (`"`cachedir'"' == "0") {
+			return local pc_exists = 0 
+			exit
 		}
 		
-		timer off 2
-		timer list 2
-		local act_time = r(t2)
-		
-		noi pip_time_convertor `act_time', type(Actual)
-		
-	} // end of global condition
+		// check if cache already pc_exists
+		mata: st_local("pc_file", pathjoin("`cachedir'", "`piphash'.dta"))
+		cap confirm file "`pc_file'"
+		if _rc {        
+			return local pc_exists = 0 
+			exit
+		} 
+		else {
+			return local pc_exists = 1
+			use "`pc_file'", `clear'
+			char _dta[piphash] `piphash'
+			char _dta[pipquery] `query'
+			exit
+		}
+	}
 	
-	if (inlist("`subcmd'"), "all", "country", "countries") {
+	/*==================================================
+	3: save
+	==================================================*/
+	
+	if ("`subcmd'" == "save") {
+		if (`"`cachedir'"' == "") local cachedir  `"${pip_cachedir}"'
+		if (`"`cachedir'"' == "0")  exit
 		
-		
-		timer clear 3
-		timer on 3
-		pip, countr(COL) povline(`pp') clear         server(`server') // to initiate 
-		pip, countr(COL) povline(`=`pp'+.01') clear  server(`server') // to initiate 
-		pip, countr(COL) povline(`=`pp'+.01') clear  server(`server') // to initiate 
-		timer off 3
-		timer list 3
-		
-		local cty_time = r(t3)
-		
-		
-		
-		frame _pip_cts {
-			levelsof country_code, local(countries) clean 
-		}
-		
-		local ncty: word count `countries'
-		
-		* seconds of number of queries per country and poverty lines
-		local cty_n_queries = `cty_time'*`ncty'*3  + ///   
-		(`ncty'*3) * (`stime'/1000) // extra time if sleep between calls
-		
-		
-		
-		noi disp as txt ". " in y "= saved successfully"
-		noi disp as txt "s " in y "= skipped - already exists (unchanged)"
-		noi disp as err "x " in y "= skipped - already exists (changed)"
-		noi disp as err "e " in y "= error"
-		noi disp ""
-		
-		local i = 0
-		noi _dots 0, title(caching country queries with basic poverty liens 1.90, 3.20, and 5.50) reps(`ncty')	
-		
-		
-		noi pip_time_convertor `cty_n_queries', type(Estimated)
-		
-		timer clear 4
-		timer on 4
-		
-		foreach country of local countries {
-			local ++i
+		mata: st_local("pc_file", pathjoin("`cachedir'", "`piphash'.dta"))
+		cap confirm new file "`pc_file'"
+		if (_rc == 0 | "`cacheforce'" != "") {
+			qui save "`pc_file'", replace
 			
-			cap {
-				pip, countr(`country') clear  server(`server')
-				sleep `stime'
-				pip, countr(`country') povline(3.2)  clear  server(`server')
-				sleep `stime'
-				pip, countr(`country') povline(5.5)  clear  server(`server')
-				sleep `stime'
+			//------------ write cache infor file
+			
+			mata: st_local("fuse", pathjoin("${pip_cachedir}", "pip_cache_info.txt"))
+			tempname hd
+			file open `hd' using "`fuse'", write append
+			file write `hd' "`piphash' , `query'" _n
+			file close `hd'
+			
+		}
+		exit
+	}
+	
+	//========================================================
+	// Delete cache
+	//========================================================
+	
+	if ("`subcmd'" == "delete") {
+		noi pip_cache_delete, piphash(`piphash') cachedir(`cachedir')
+		
+	}
+end
+
+
+//------------ Get Hash based on string 
+program define pip_cache_gethash, rclass
+	syntax [anything(name=subcmd)], [   ///
+	query(string)               ///
+	PREfix(string)              ///
+	]
+	
+	version 16.1
+	
+	qui {
+		if ("`prefix'" == "") local prefix = "pip"
+		tempname spiphash
+		
+		mata:  st_numscalar("`spiphash'", hash1(`"`prefix'`query'"', ., 2)) 
+		local piphash = "_pip" + strofreal(`spiphash', "%12.0g")
+		return local piphash = "`piphash'"
+	}
+	
+end
+
+//------------ Check if it is cached
+
+program define pip_cache_iscache, rclass
+	
+	local iscache: char _dta[piphash]
+	if ("`iscache'" != "") {
+		disp "{res}Yes! {txt}this is cached data :)"
+		local query: char _dta[pipquery]
+		return local query = "`query'"	
+	}
+	else {
+		disp "{err}No. {txt} this is not cached data :("
+	}
+	
+	return local hash = "`iscache'"
+end
+
+//------------ Delete
+
+program define pip_cache_delete, rclass
+	syntax [, piphash(string) cachedir(string)]
+	
+	if ("`cachedir'" == "") local cachedir "${pip_cachedir}"
+	if ("`piphash'" == "") {
+		local pc_files: dir "`cachedir'" files  "_pip*"
+		local nfiles: word count `pc_files'
+		
+		noi disp "{err:Warning:} you will delete `nfiles' cache files." _n ///
+		"Do you want to continue? (Y/n)", _n(2)  _request(_confirm)
+		
+		if (lower("`confirm'") == "y") {
+			foreach f of local pc_files {
+				erase "`cachedir'/`f'"
 			}
-			if (_rc) {
+			erase "`cachedir'/pip_cache_info.txt"
+		}
+	}
+	else {
+		local piphash = ustrtrim("`piphash'")
+		local f2delete "`cachedir'/`piphash'.dta"
+		
+		cap confirm file "`f2delete'"
+		if (_rc) {
+			noi disp "{err:Cache file }{cmd:`piphash'.dta }{err:not found}"
+		}
+		else {
+			erase "`f2delete'"
+		}
+		// locals tempf and origf are created in MATA routine
+		local cfile "`cachedir'/pip_cache_info.txt"
+		mata: pip_replace_in_pattern("`cfile'", `"`piphash'"', `""')
+		copy `tempf' "`origf'" , replace 
+		
+		noi disp "cache {res:`piphash'} deleted"
+		
+	}
+	
+end
+
+//========================================================
+// Cache info
+//========================================================
+
+program define pip_cache_info, rclass
+	syntax [, condition(string) frame(string)]
+	
+	local rname = floor(runiform(1e4, 99999))
+	
+	// Make sure name is not repeated (very rare)
+	if ("`frame'" != "") {
+		if ustrregexm("`frame'", "(.*)([0-9]{5}$)") local fname = ustrregexs(2)
+		while ("`rname'" == "`fname'") {
+			local rname = floor(runiform(1e4, 99999))
+		}
+	}
+	
+	if (`"`condition'"' == `""') {
+		mata: pip_drop_cache_info_frames()
+		local frame "cache_info_`rname'"
+		frame create `frame'	
+		qui frame `frame': pip_cache_inventory
+		
+	}  // end of condition == ""
+	
+	
+	//========================================================
+	// Treat frames for new stage 
+	//========================================================
+	local frame2 "cache_info_`rname'"
+	if ("`frame'" != "`frame2'") frame copy `frame' `frame2'
+	
+	if (`"`condition'"' != `""') {
+		qui frame `frame2': keep if `condition'
+	}
+	
+	//========================================================
+	// Display initial conditions
+	//========================================================
+	// sleep number 18007179503
+	frame `frame2' {
+		local nobs = _N
+		
+		if (`nobs' > 1) {
+			
+			noi disp "{break}{title:{res:Cache data available}} " /* 
+			*/ "{txt:{it:(Filter your data by parameter)}}" _n
+			
+			
+			local novars "hash query n"
+			qui ds, has(type string)
+			local vars = "`r(varlist)'"
+			local vars: list vars - novars
+			
+			foreach v of local vars {				
+				//------------ Unique values
+				tempvar uniq
+				qui bysort `v': gen byte `uniq' = (_n==_N) if `v' != ""
+				qui summ `uniq', meanonly
+				if (r(sum) > 1) local filterable = "{txt:{it:(filterable)}}"
+				else            local filterable = ""
 				
-				local cty_err "`cty_err' `country'"
+				//------------ build call of pip_utils click
+				local condition = `"condition(`"`v' == "obsi""')"'
+				noi pip_utils click, variable(`v') title("{title:`v'} `filterable'") /* 
+				*/ statacode(`"pip_cache info, `condition' frame(`frame2')"')
+				
+			} // end for parameters loop
+			disp _n
 			
-				noi _dots `i' 2
+		} // end if more than one data available
+		else {
+			*##s
+			local incsv = ustrtrim(query[1])
+			local injson: subinstr local incsv "&format=csv" ""
+			if ustrregexm("`incsv'","(.+)/(.+)\?(.+)") {
+				local host       = ustrregexs(1)
+				local endpoint   = ustrregexs(2)
+				local parameters = ustrregexs(3)
 			}
-			else {
-				noi _dots `i' 0
-			}
+			local hash =  ustrtrim(hash[1])
 			
-		}
-		
-		
-		timer off 4
-		timer list 4
-		
-		local cty_actual = r(t4)
-		noi pip_time_convertor `cty_actual', type(Actual)
-		
-		if ("`cty_err'" != "") {
-			noi disp in red "countries with errors:" _n "`cty_err'"
-		}
-		
-	} // end of countries condition
+			noi disp _n "{title:Cache information for selected query}" _n
+			noi disp "{p2col 10 36 36 30:attribute}{dup 8: }value{p_end}" /*  
+			*/   "{p2colset 10 30 32 30}" /* 
+			*/   "{p2line}" /* 
+			*/   "{p2col :{res:hash}}{txt:`hash'}{p_end}"  /* 
+			*/   "{p2col :{res:host}} {txt:`host'}{p_end}" /* 
+			*/   "{p2col :{res:endpoint}} {txt:`endpoint'}{p_end}" 
+			
+			tokenize "`parameters'", parse("&")
+			local i = 1
+			while ("`1'" != "") {
+				if ("`1'" == "&") {
+					macro shift
+					continue
+				}
+				if (`i' == 1) {
+					local aname "parameters"
+					local i = `i' + 1
+				}
+				else          local aname "."
+				noi disp "{p2col :{res:`aname'}} `1'{p_end}" 
+				macro shift
+			}
+			noi disp "{p2line}" 
+			
+			//------------ Build  Stata calls
+			mata: st_local("fuse", pathjoin("${pip_cachedir}", "`hash'.dta"))
+			local duse    `"use "`fuse'", clear "'
+			local ddelete `"pip_cache delete,  piphash(`hash')"'
+			
+			noi disp "{break}{pstd}{ul:{res:ACTION}}{p_end}"        _n /* 
+			*/ `"{pmore}{stata `"`duse'"':use}{p_end}"'             _n /* 
+			*/ `"{pmore}{browse "`injson'":see in browser}{p_end}"' _n /* 
+			*/ `"{pmore}{browse "`incsv'":download .csv}{p_end}"'   _n /* 
+			*/ `"{pmore}{stata `"`ddelete'"':delete}{err: {it: (use with caution)}}{p_end}"' 
+			
+			*##e
+		} // end of else 
+	} // end of frame2
 	
-}
-
-/*==================================================
-2: 
-==================================================*/
-
-
-*----------2.1:
-
-
-*----------2.2:
-
-
-
-
-
+	return local cache_file = "`fuse'"
+	return local piphash    = "`hash'"
+	return local f_json     = "`injson'"
+	return local f_csv      = "`incsv'"
+	return local host       = "`host'"
+	return local endpoint   = "`endpoint'"
+	
 end
 
-
-//========================================================
-// Extra programs
-//========================================================
-
-
-program define pip_time_convertor , rclass
-syntax anything(name=time id="time in seconds"), ///
-type(string)                                     ///
-[                                                ///
-noPRINT                                          ///
-]
-
-
-if (mod(`time'/(3600), 2) >= 1) {
+program define pip_cache_inventory, rclass
 	
-	local hour   = `time'/3600 - mod(`time'/3600,2) + 1
-	local min_dec = 60*(mod(`time'/3600,2) - 1)
-	local minute = round(`min_dec')
-	local second = round(60*mod(`min_dec',1))
-} 
-
-else if (mod(`time'/60, 2) >= 1) {
-	local hour     = 0
-	local minute   = `time'/60 - mod(`time'/60,2) + 1
-	local second   = round(60*(mod(`time'/60,2) - 1))		
-} 
-else {
-	local hour     = 0
-	local minute   = `time'/60 - mod(`time'/60,2) 
-	local second = round(60*mod(`time'/60,2))
-}
-
-if ("`print'" == "") {
-	disp _n "`type' time"
-	disp in y "hours: `hour'" _n "minutes: `minute'" _n "seconds: `second'"
-}
-
-return local hours   = `hour'
-return local minutes = `minute'
-return local seconds = `second'
-
-
+	tempname cache_txt 
+	frame create `cache_txt'
+	
+	//========================================================
+	//  Call original Date
+	//========================================================
+	qui frame `cache_txt' {
+		import delimited hash query using "${pip_cachedir}/pip_cache_info.txt", /* 
+		*/ clear delimiters(",")
+		* pause on 
+		* pause cache_txt
+		split query, gen(ep) parse(?)
+		gen endpoint = ustrregexs(2) if ustrregexm(ep1, "(.*)/([^/]+)$")
+		split ep2, gen(par) parse(&)
+		qui ds par*
+		local level1 = "`r(varlist)'"
+		qui foreach v of local level1 {
+			split `v', gen(`v'_) parse(=)
+		}
+		
+		//------------Key for linking frames
+		gen n = _n
+		local cN = _N
+	}
+	
+	//========================================================
+	// Organize data into  readable format
+	//========================================================
+	
+	// Create a frame whose vars are each available parameter
+	// associated with a particular hash. 
+	
+	qui  {
+		drop _all
+		set obs `cN'
+		gen n = _n
+		frlink 1:1 n, frame(`cache_txt')
+		
+		forvalues i = 1/`cN' {  // for each observation
+			
+			foreach v of loca level1 {  // forech parameter
+				local vname  = _frval(`cache_txt', `v'_1, `i')
+				local vvalue = _frval(`cache_txt', `v'_2, `i')
+				
+				// if par does not exists or is format
+				if inlist("`vname'", "", "format") continue 
+				cap confirm var `vname'
+				if (_rc) gen     `vname' = "`vvalue'" in `i'
+				else     replace `vname' = "`vvalue'" in `i'
+			}
+			
+			* replace hash  = _frval(`cache_txt', hash, `i') in `i'
+			* replace query = _frval(`cache_txt', query, `i') in `i'
+		}
+		
+		frget hash query endpoint, from(`cache_txt')
+		
+		gen server  = ""
+		replace server = "qa"   if regexm(query,"${pip_svr_qa}")
+		replace server = "dev"  if regexm(query,"${pip_svr_dev}")
+		replace server = "prod" if regexm(query,"https://api.worldbank.org/pip")
+		
+	}  // end of qui
+	
 end
-
 
 exit
 /* End of do-file */

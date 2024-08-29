@@ -16,7 +16,7 @@ Output:
               0: Program set up
 ==================================================*/
 program define pip_gh, rclass
-version 16.0
+version 16.1
 
 
 syntax [anything(name=subcommand)]  ///
@@ -52,7 +52,7 @@ if ("`subcommand'" == "update") {
 		github install `username'/`cmd', replace
 		cap window stopbox note "pip command has been reinstalled to " ///
 		"keep record of new updates. Please type {stata discard} and retry."
-		global pip_cmds_ssc = ""
+		global pip_old_session = ""
 		exit 
 	}
 	local ghfile "`r(fn)'"
@@ -68,11 +68,11 @@ if ("`subcommand'" == "update") {
 			github install `username'/`cmd', replace
 			cap window stopbox note "pip command has been reinstalled to " ///
 			"keep record of new updates. Please type discard and retry."
-			global pip_cmds_ssc = ""
+			global pip_old_session = ""
 			exit 
 		}
 		if _N > 1 {
-			di as err "{p}multiple packages with this name are found!"      ///
+			di as err "{p}multiple {cmd:pip} packages found!"      ///
 			"this can be caused if you had installed multiple "     ///
 			"packages from different repositories, but with an "    ///
 			"identical name..." _n
@@ -107,7 +107,7 @@ if ("`subcommand'" == "update") {
 	}
 	if ("`crrDevel'" == "") local crrDevel 0
 	local current = `crrMajor'`crrMinor'`crrPatch'.`crrDevel'
-	disp "`current'"
+	* disp "`current'"
 	
 	* force installation 
 	if ("`crrtversion'" == "") {
@@ -115,7 +115,7 @@ if ("`subcommand'" == "update") {
 		github install `username'/`cmd', replace version(`latestversion')
 		cap window stopbox note "pip command has been reinstalled to " ///
 		"keep record of new updates. Please type discard and retry."
-		global pip_cmds_ssc = ""
+		global pip_old_session = ""
 		exit 
 	}
 	
