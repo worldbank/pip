@@ -338,7 +338,7 @@ program define pip_wb_clean, rclass
 		label var pop_in_poverty   "population in poverty"
 		label var watts            "watts index"
 		label var region_name      "world bank region"
-		label var estimate_type    "type of estimate"
+		cap label var estimate_type    "type of estimate"
 		
 		order region_name region_code reporting_year  poverty_line ///
 		mean headcount poverty_gap  poverty_severity watts   ///

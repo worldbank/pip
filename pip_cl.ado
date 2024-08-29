@@ -421,8 +421,24 @@ program define pip_cl_clean, rclass
 
 	local num_vars: list all_vars - str_vars
 
-	destring `num_vars', replace force
-	tostring `str_vars', replace force
+	* make sure all numeric variables are numeric -----------
+	foreach var of local num_vars {
+		cap destring `var', replace force
+		if (_rc) {
+			noi disp in red "{it:`var'}" in y "is not numeric or does not exist." ///
+			"You're probably calling an old version of the PIP data"
+		}
+	}
+
+	//------------  string variables
+	foreach var of local str_vars {
+		cap  tostring `var', replace force
+		if (_rc) {
+			noi disp in red "{it:`var'}" in y "is not string or does not exist." ///
+			"You're probably calling an old version of the PIP data"
+		}
+	}
+
 
 	//========================================================
 	//  Dealing with invalid values
@@ -500,7 +516,7 @@ program define pip_cl_clean, rclass
 		label var cpi 				   "consumer price index (CPI) in `ppp_version' base"
 		label var reporting_gdp 	   "GDP per capita in constant 2015 US\$, annual calendar year"
 		label var reporting_pce 	   "HFCE per capita in constant 2015 US\$, annual calendar year"
-		label var estimate_type        "type of estimate"
+		cap label var estimate_type        "type of estimate"
 		
 		//========================================================
 		//  Sorting and Formatting
