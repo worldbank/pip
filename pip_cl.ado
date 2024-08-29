@@ -425,7 +425,7 @@ program define pip_cl_clean, rclass
 	foreach var of local num_vars {
 		cap destring `var', replace force
 		if (_rc) {
-			noi disp in red "{it:`var'}" in y "is not numeric or does not exist." ///
+			noi disp as error "{it:`var'} is not numeric or does not exist." _n ///
 			"You're probably calling an old version of the PIP data"
 		}
 	}
