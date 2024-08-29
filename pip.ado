@@ -358,6 +358,10 @@ Version Control:
 
 
 
+*! version 0.10.8.9002  <2024aug28>
+*! -- Allow upper case in server option
+*! -- add pause message in formating 
+*! -- Add estiamte_type as string variable and leave it optional for now
 *! version 0.10.8.9001  <2024feb16>
 *! -- Update help file.
 *! version 0.10.8  <2024jan11>
