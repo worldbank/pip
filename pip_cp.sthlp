@@ -57,7 +57,7 @@ three-letter codes separated by spaces. The option {it:all} is a shorthand for c
 When selecting multiple poverty lines, use less than 4 decimals and separate
 each value with spaces. If left empty, the default poverty line of $2.15 is used.
 By default, poverty lines are expressed in 2017 PPP USD per capita per day.
-If option {opt ppp_ppp(2011)} is specified, the poverty lines will be expressed in 2011 PPPs. {p_end}
+If option {opt ppp_year(2011)} is specified, the poverty lines will be expressed in 2011 PPPs. {p_end}
 {synoptline}
 {synopt :{helpb pip##general_options: general options}}Options that apply to any subcommand{p_end}
 
