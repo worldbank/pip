@@ -192,13 +192,13 @@ marked by an {it:*}, meaning they have not been saved. If you do not wish to sav
 {ul:Cache memory}
 
 {pstd}
-By default, {cmd:pip} will create cache data of all the queries you make. The first you 
-use {cmd:pip} you will have the option to store cache data in your local machine
+By default, {cmd:pip} will create cache data of all the queries you make. The first time you 
+use {cmd:pip} you will have the option to store cache data on your local machine
 or in any drive Stata has access to. By default, {cmd:pip} will check whether it could
 save cache data in your PERSONAL directory (see {help sysdir: search path}). In case it can't, it will try in PLUS, then
 in your current directory and then in SITE. The first time you execute {cmd:pip}, you are
 required to either confirm the default cache directory or provide your own directory
-path. Also you can opt out and don't save cache data. Just follow the instructions of 
+path. Also you can opt out and not save cache data. Just follow the instructions of 
 the pop-up messages. 
 
 {ul:pip_setup.do}
