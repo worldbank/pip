@@ -71,7 +71,11 @@ program define pip_gd, rclass
         local data "`datalabel' (`c(current_date)')"
         
         //Display results
-        noi pip_gd_display_results, `n2disp'
+        //noi pip_gd_display_results, `n2disp'
+        noi pip_utils output, `n2disp' ///
+          sortvars(country_code year) ///
+          dispvars(country_code year) ///
+          sepvar(country_code)
     }
 	pip_timer pip_gd, off
 end
@@ -159,6 +163,15 @@ program define pip_gd_check_args, rclass
     }
 	return local povline  = "`povline'"
 	local optnames "`optnames' povline"
+
+	//allow n2disp as undocumented option
+	if ("`n2disp'"!="" ) {
+		return local n2disp = "`n2disp'"
+		local optnames "`optnames' n2disp"
+	}
+
+
+	// Return all options as local
 	return local optnames "`optnames'"
 end
 
@@ -230,7 +243,7 @@ program define pip_gd_clean, rclass
 	//Type confirmation?
 	
 	//Dealing with invalid values?
-	
+
 	//Labeling [**CURRENTLY WITH CAPTURE WHILE SERVER CONNECTION NOT SETUP]
 	cap lab var poverty_line     "poverty line in `ppp_version' PPP US\$ (per capita per day)"
 	cap lab var mean             "average daily per capita income/consumption `ppp_version' PPP US\$"
@@ -256,36 +269,14 @@ program define pip_gd_clean, rclass
 	qui compress	
 end
 
-
-//---------- 2(c) Display results  --------------------------------------------- 
-
-program define pip_gd_display_results
-	syntax  [, n2disp(integer 1)]
-
-	local n2disp = min(`c(N)', `n2disp')
-	
-	//Display header
-	if      `n2disp'==1 local MSG "first observation"
-	else if `n2disp' >1 local MSG "first `n2disp' observations"
-	else                local MSG "No observations available"	
-	noi dis as result _n "{ul:`MSG'}"
-
-
-	//Display contents
-	local varstodisp 
-	noi list `varstodisp' in 1/`n2disp', abbreviate(12) noobs
-end
-
 exit
 
 
 ><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><
 Notes:
     1. API test example is as follows
-       http://127.0.0.1:8080/api/v1/grouped-stats?cum_welfare=0.0002,0.0006,0.0011,0.0021,0.0031,0.0048,0.0066,0.0095,0.0128,0.0177,0.0229,0.0355,0.0513,0.0689,0.0882&cum_population=0.001,0.003,0.005,0.009,0.013,0.019,0.025,0.034,0.044,0.0581,0.0721,0.1041,0.1411,0.1792,0.2182&requested_mean=2.911786&povline=1.9  -- This can be implemented as: pip_gd,stats cum_welfare(0.0002,0.0006,0.0011,0.0021,0.0031,0.0048,0.0066,0.0095,0.0128,0.0177,0.0229,0.0355,0.0513,0.0689,0.0882) cum_population(0.001,0.003,0.005,0.009,0.013,0.019,0.025,0.034,0.044,0.0581,0.0721,0.1041,0.1411,0.1792,0.2182) requested_mean(2.911786) povline(1.9)
+       http://127.0.0.1:8080/api/v1/grouped-stats?cum_welfare=0.0002,0.0006,0.0011,0.0021,0.0031,0.0048,0.0066,0.0095,0.0128,0.0177,0.0229,0.0355,0.0513,0.0689,0.0882&cum_population=0.001,0.003,0.005,0.009,0.013,0.019,0.025,0.034,0.044,0.0581,0.0721,0.1041,0.1411,0.1792,0.2182&requested_mean=2.911786&povline=1.9  -- This can be implemented as: pip_gd,stats cum_welfare(0.0002,0.0006,0.0011,0.0021,0.0031,0.0048,0.0066,0.0095,0.0128,0.0177,0.0229,0.0355,0.0513,0.0689,0.0882) cum_population(0.001,0.003,0.005,0.009,0.013,0.019,0.025,0.034,0.044,0.0581,0.0721,0.1041,0.1411,0.1792,0.2182) requested_mean(2.911786) povline(1.9)  NOTE: THIS IS A SKELETON WHICH DOES NOT YET CONNECT TO THE DEV SERVER.  IT WILL ONLY WORK AT PRESENT IF RUN AFTER SOME OTHER PIP COMMAND.  EG RUN pip_cl, THEN ABOVE
     2. Does requested mean have default option(s)?  And is it a scalar?
-    3. Does program revert to error if no cum_population() and cum_welfare() specified?
-    5. Should MSG "No observations available" not return an error instead of display?
     6. Remove instances of capture in pip_gd_clean
     7. Check whether we need ppp_year as an argument, or just internally accessed always
     
