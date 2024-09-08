@@ -54,6 +54,7 @@ program define pip_gd, rclass
                               requested_mean(`requested_mean') ///
                               povline(`povline') ///
                               ppp_year(`ppp_year') ///
+							  `n_bins' ///
         					  endpoint(`endpoint') ///
         
         //Download [UNCOMMENT pip_get WHEN HAVING ACCESS TO SERVER]
@@ -85,21 +86,19 @@ end
 *-------------------------------------------------------------------------------
 *--- (1) Syntax check
 *-------------------------------------------------------------------------------
-//Place-holder -- need to check whether certain options are mandatory.
-//  This should be viewed as a structure conditional on determining all required
-//  elements and potential further consistency checks
 program define pip_gd_check_args, rclass
 	version 16.1
 	syntax                          ///
-	[ ,                             ///
+	, cum_welfare(numlist)          ///
+	  cum_population(numlist)       ///
+	[                               ///
 	stats                           ///
 	lorenz                          ///
 	params                          ///
-	cum_welfare(numlist)            ///
-	cum_population(numlist)         ///
-	requested_mean(real 1)          ///
+	requested_mean(numlist max=1 >0 <1e10) ///
 	POVLine(numlist)	            ///
 	PPP_year(numlist)	            ///
+	n_bins(numlist max=1 >0 <1000 integer) ///
 	pause                           ///
 	replace                         /// 
 	cacheforce                      ///
@@ -127,6 +126,7 @@ program define pip_gd_check_args, rclass
     	dis as error "Only one of stats, lorenz or params can be specified."
 		exit 184
 	}
+
 	//Return end-point name (one must be returned by construction)
 	if "`stats'" !="" local endpoint "grouped-stats"
 	if "`lorenz'"!="" local endpoint "lorenz-curve"
@@ -134,14 +134,24 @@ program define pip_gd_check_args, rclass
 	return local endpoint = "`endpoint'"
 	local optnames "`optnames' endpoint"
 
+	//requested_mean is required if stats is indicated
+	if "`stats'"!="" & "`requested_mean'"=="" {
+		dis as error "option requested_mean() required"
+		exit 198
+	}
+
+	//n_bins is required if lorenz is indicated
+	if "`lorenz'"!="" & "`n_bins'"=="" {
+		dis as error "option n_bins() required"
+		exit 198
+	}
+
 	//Cumulative welfare
-	if "`cum_welfare'"=="" local cum_welfare 0.1 0.2 0.3
 	local nwelfare : word count `cum_welfare'
 	return local cum_welfare = "`cum_welfare'"	
 	local optnames "`optnames' cum_welfare"
 
 	//Cumulative population
-	if "`cum_population'"=="" local cum_population 0.1 0.2 0.3
 	local npopulation : word count `cum_population'
 	return local cum_population = "`cum_population'"	
 	local optnames "`optnames' cum_population"
@@ -169,7 +179,6 @@ program define pip_gd_check_args, rclass
 		return local n2disp = "`n2disp'"
 		local optnames "`optnames' n2disp"
 	}
-
 
 	// Return all options as local
 	return local optnames "`optnames'"
@@ -327,12 +336,14 @@ exit
 
 ><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><
 Notes:
+DCC:
     1. API test example is as follows
-       http://127.0.0.1:8080/api/v1/grouped-stats?cum_welfare=0.0002,0.0006,0.0011,0.0021,0.0031,0.0048,0.0066,0.0095,0.0128,0.0177,0.0229,0.0355,0.0513,0.0689,0.0882&cum_population=0.001,0.003,0.005,0.009,0.013,0.019,0.025,0.034,0.044,0.0581,0.0721,0.1041,0.1411,0.1792,0.2182&requested_mean=2.911786&povline=1.9  -- This can be implemented as: pip_gd,stats cum_welfare(0.0002,0.0006,0.0011,0.0021,0.0031,0.0048,0.0066,0.0095,0.0128,0.0177,0.0229,0.0355,0.0513,0.0689,0.0882) cum_population(0.001,0.003,0.005,0.009,0.013,0.019,0.025,0.034,0.044,0.0581,0.0721,0.1041,0.1411,0.1792,0.2182) requested_mean(2.911786) povline(1.9)  NOTE: THIS IS A SKELETON WHICH DOES NOT YET CONNECT TO THE DEV SERVER.  IT WILL ONLY WORK AT PRESENT IF RUN AFTER SOME OTHER PIP COMMAND.  EG RUN pip_cl, THEN ABOVE
-    2. Remove instances of capture in pip_gd_clean.  CHECK HOW TO LABEL ymean
-    3. Check whether we need ppp_year as an argument, or just internally accessed always
-    4. 2 Sep 2024: Start looking at number of bins in lorenz curve on https://github.com/PIP-Technical-Team/pipapi/blob/DEV/inst/plumber/v1/endpoints.R    
-    5. Test is pip_gd,stats cum_welfare(0.0002,0.0006,0.0011,0.0021,0.0031,0.0048,0.0066,0.0095,0.0128,0.0177,0.0229,0.0355,0.0513,0.0689,0.0882) cum_population(0.001,0.003,0.005,0.009,0.013,0.019,0.025,0.034,0.044,0.0581,0.0721,0.1041,0.1411,0.1792,0.2182) requested_mean(2.911786) povline(1.9)
-	6. Do we add new PAUSE debugging structures as in other programs?
-	7. Add more descriptive labels than lq and lb ("General Quadratic Lorenz function" and "Beta Lorenz function")?
+       http://127.0.0.1:8080/api/v1/grouped-stats?cum_welfare=0.0002,0.0006,0.0011,0.0021,0.0031,0.0048,0.0066,0.0095,0.0128,0.0177,0.0229,0.0355,0.0513,0.0689,0.0882&cum_population=0.001,0.003,0.005,0.009,0.013,0.019,0.025,0.034,0.044,0.0581,0.0721,0.1041,0.1411,0.1792,0.2182&requested_mean=2.911786&povline=1.9 
+    2. Test is pip_gd,stats cum_welfare(0.0002,0.0006,0.0011,0.0021,0.0031,0.0048,0.0066,0.0095,0.0128,0.0177,0.0229,0.0355,0.0513,0.0689,0.0882) cum_population(0.001,0.003,0.005,0.009,0.013,0.019,0.025,0.034,0.044,0.0581,0.0721,0.1041,0.1411,0.1792,0.2182) requested_mean(2.911786) povline(1.9)  -- NOTE: THIS IS DOES NOT YET CONNECT TO THE DEV SERVER (requires uncommenting "get").  IT WILL ONLY WORK AT PRESENT IF RUN AFTER SOME OTHER PIP COMMAND.  EG RUN pip_cl, THEN ABOVE
+    3. Remove instances of capture in pip_gd_clean.  
+CHECK:
+    4. Check whether we need ppp_year as an argument, or just internally accessed always
+ 	5. Do we add new PAUSE debugging structures as in other programs?
+	6. Add more descriptive labels than lq and lb ("General Quadratic Lorenz function" and "Beta Lorenz function")?
+	7. Check how to label ymean
 Version Control:
