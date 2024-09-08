@@ -9,7 +9,7 @@
 
 {phang}
 {cmd:pip gd,} {opt cum_welfare(numlist)} {opt cum_population(numlist)} [ {it:{help pip_subcmd##opts_desc:options}} ]
-
+        
 {marker opts_desc}{...}
 {title:Options}
 
@@ -22,6 +22,7 @@
 {synopt :{opt cum_welfare(numlist)}} List indicating the cuulative welfare shares in particular groups of the population.{p_end}
 {synopt :{opt cum_population(numlist)}} List indicating the cumulative population contained in the same groups for which {opt cum_welfare()} is indicated.{p_end}
 {synopt :{opt requested_mean(#)}} Scalar value indicating the mean welfare in the population.{p_end}
+{synopt :{opt n_bins(#)}} Scalar value indicating the number of bins requested when Lorenz curve estimates are requested.{p_end}
 {synopt :{opt povl:ine:}(numlist)} List of poverty lines in specified PPP (see option {help pip##general_options:ppp_year(#)}) to calculate
 poverty. Default is 2.15 at 2017 PPPs.{p_end}
 {synoptline}
@@ -84,7 +85,15 @@ population share should be identical to that in {opt: cum_welfare}. Values shoul
 {phang}
 {opt requested_mean(#)} Should indicate the average daily welfare in the population to be 
 considered.  When combined with cumulative welfare and population, as well as a particular
-parametrization of the Lorenz curve, poverty and inequality measures are generated.
+parametrization of the Lorenz curve, poverty and inequality measures are generated.  if
+{opt stats} is indicated, this is a required option.  This value must be strictly contained
+between 0 and 1e10.
+
+{phang}
+{opt n_bins(#)} Indicates the number of bins requested of cumulative population and cumulative
+welfare when Lorenz curve output is provided.  For example, if {opt n_bins(100)} is indicated,
+population percentiles will be returned. If {opt lorenz} is indicated, this is a required
+option.  A scalar value should be indicated, strictly between 0 and 1,000.
 
 {phang}
 {opt povline(numlist)} The poverty lines for which the poverty measures will be calculated.
