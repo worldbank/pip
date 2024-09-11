@@ -54,12 +54,11 @@ program define pip_gd, rclass
                               requested_mean(`requested_mean') ///
                               povline(`povline') ///
                               ppp_year(`ppp_year') ///
-							  `n_bins' ///
+							  n_bins(`n_bins') ///
         					  endpoint(`endpoint') ///
         
-        //Download [UNCOMMENT pip_get WHEN HAVING ACCESS TO SERVER]
         pip_timer pip_gd.pip_get, on
-        *pip_get, `cacheforce' `clear' `cachedir' 
+        pip_get, `cacheforce' `clear' `cachedir' 
         pip_timer pip_gd.pip_get, off
 
         //Clean
@@ -72,11 +71,7 @@ program define pip_gd, rclass
         local data "`datalabel' (`c(current_date)')"
         
         //Display results
-        //noi pip_gd_display_results, `n2disp'
-        noi pip_utils output, `n2disp' ///
-          sortvars(country_code year) ///
-          dispvars(country_code year) ///
-          sepvar(country_code)
+        noi pip_utils output, `n2disp'
     }
 	pip_timer pip_gd, off
 end
@@ -162,17 +157,27 @@ program define pip_gd_check_args, rclass
 	}
 
 	//Requested mean	
-	return local requested_mean = "`requested_mean'"
-	local optnames "`optnames' requested_mean"
+	if "`stats'"!="" {
+		return local requested_mean = "`requested_mean'"
+		local optnames "`optnames' requested_mean"
+	}
 
 	// poverty line 
-	if "`povline'"=="" {
-        if ("`ppp_year'" == "2005") local povline = 1.25
-        if ("`ppp_year'" == "2011") local povline = 1.9
-        if ("`ppp_year'" == "2017") local povline = 2.15
-    }
-	return local povline  = "`povline'"
-	local optnames "`optnames' povline"
+	if "`stats'"!=""|"`params'"!="" {
+		if "`povline'"=="" {
+        	if ("`ppp_year'" == "2005") local povline = 1.25
+        	if ("`ppp_year'" == "2011") local povline = 1.9
+        	if ("`ppp_year'" == "2017") local povline = 2.15
+		}
+		return local povline  = "`povline'"
+		local optnames "`optnames' povline"
+	}
+
+	//n_bins
+	if "`n_bins'"!="" {
+		return local n_bins = "`n_bins'"
+		local optnames "`optnames' n_bins"
+	}
 
 	//allow n2disp as undocumented option
 	if ("`n2disp'"!="" ) {
@@ -197,9 +202,10 @@ program define pip_gd_query, rclass
 	  endpoint(string)                 ///
 	  cum_population(numlist)          ///
 	  cum_welfare(numlist)             ///	  
-	  requested_mean(real 1)           ///
+	  requested_mean(numlist)          ///
 	  POVLine(numlist)	               ///
 	  ppp_year(numlist)	               ///
+	  n_bins(numlist)	               ///
 	]
 
 	//Build query
@@ -213,14 +219,14 @@ program define pip_gd_query, rclass
 	local query = ustrtrim("`query'")
 	local query : subinstr local query " " ",", all
 	
-
-	// grouped-data [REMOVE 1ST BLOCK IF THIS IS NOT NEEDED FOR LORENZ]
+	// Single poverty line
     if "`povline'"=="" {
         global pip_last_queries "`endpoint'?`query'format=csv"
         noisily dis "$pip_last_queries"
         exit
     }
-		
+
+	// Multiple poverty lines		
 	tempname M
 	local i = 1
 	foreach v of local povline {
@@ -272,47 +278,50 @@ program define pip_gd_clean, rclass
 		}
 	}
 
-	//Labeling [**CURRENTLY WITH CAPTURE WHILE SERVER CONNECTION NOT SETUP]
+	//Labeling
 	if `"`endpoint'"'=="grouped-stats" {
-		cap lab var poverty_line     "poverty line in `ppp_version' PPP US\$ (per capita per day)"
-		cap lab var mean             "average daily per capita income/consumption `ppp_version' PPP US\$"
-		cap lab var median           "median daily per capita income/consumption in `ppp_version' PPP US\$"
-		cap lab var headcount        "poverty headcount"
-		cap lab var poverty_gap      "poverty gap"
-		cap lab var poverty_severity "squared poverty gap"
-		cap lab var watts            "watts index"
-		cap lab var gini             "gini index"
-		cap lab var mld              "mean log deviation"
-		cap lab var polarization     "polarization"
+		lab var poverty_line     "poverty line in `ppp_version' PPP US\$ (per capita per day)"
+		lab var mean             "average daily per capita income/consumption `ppp_version' PPP US\$"
+		lab var median           "median daily per capita income/consumption in `ppp_version' PPP US\$"
+		lab var headcount        "poverty headcount"
+		lab var poverty_gap      "poverty gap"
+		lab var poverty_severity "squared poverty gap"
+		lab var watts            "watts index"
+		lab var gini             "gini index"
+		lab var mld              "mean log deviation"
+		lab var polarization     "polarization"
 
-		cap ds decile*
+		ds decile*
 		local dec_var = "`r(varlist)'"
 		foreach var of local dec_var {
 			if regexm("`var'", "([0-9]+)") local q = regexs(1)
-			cap lab var `var' "decile `q' welfare share"
+			lab var `var' "decile `q' welfare share"
 		}    
 	}
 	else if `"`endpoint'"'=="lorenz-curve" {
-		cap lab var welfare "cumulative welfare share"
-		cap lab var weight  "cumulative population share"
+		lab var welfare "cumulative welfare share"
+		lab var weight  "cumulative population share"
 	}
 	else if `"`endpoint'"'=="regression-params" {
-		cap lab var lorenz              "Lorenz function"
-		cap lab var A					"Parameter one estimate (A or theta)" 
-		cap lab var B					"Parameter two estimate (B or gamma)"
-		cap lab var C					"Parameter three estimate (C or delta)"
-		cap lab var ymean				"ymean"
-		cap lab var sst					"Total sum of square"
-		cap lab var sse					"Residual sum of square"
-		cap lab var r2					"R-squared"
-		cap lab var mse					"Mean squared error"
-		cap lab var se_A				"Parameter one standard error"
-		cap lab var se_B				"Parameter two standard error"
-		cap lab var se_C				"Parameter three standard error"
-		cap lab var validity			"Model passes validity tests"
-		cap lab var normality			"Model passes normality tests"
-		cap lab var selected_for_dist	"Model selected for disributional statistics"
-		cap lab var selected_for_pov	"Model selected for povery statistics"
+		cap rename (a b c) (A B C)
+		cap rename (se_a se_b se_c) (se_A se_B se_C)
+
+		lab var lorenz              "Lorenz function"
+		lab var A					"Parameter one estimate (A or theta)" 
+		lab var B					"Parameter two estimate (B or gamma)"
+		lab var C					"Parameter three estimate (C or delta)"
+		lab var ymean				"ymean"
+		lab var sst					"Total sum of square"
+		lab var sse					"Residual sum of square"
+		lab var r2					"R-squared"
+		lab var mse					"Mean squared error"
+		lab var se_A				"Parameter one standard error"
+		lab var se_B				"Parameter two standard error"
+		lab var se_C				"Parameter three standard error"
+		lab var validity			"Model passes validity tests"
+		lab var normality			"Model passes normality tests"
+		lab var selected_for_dist	"Model selected for disributional statistics"
+		lab var selected_for_pov	"Model selected for povery statistics"
 	}	
 		
 	//Formatting
@@ -323,10 +332,10 @@ program define pip_gd_clean, rclass
 		format poverty_line %6.2f
 	}
 	else if `"`endpoint'"'=="lorenz-curve" {
-		cap format welfare weight %08.6f
+		format welfare weight %08.6f
 	}
 	else if `"`endpoint'"'=="lorenz-curve" {
-		cap format A B C ymean sst sse r2 mse se_A se_B se_C %8.4f
+		format A B C ymean sst sse r2 mse se_A se_B se_C %8.4f
 	}
 	qui compress	
 end
