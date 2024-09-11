@@ -11,11 +11,6 @@ Output:
 
 Dev notes [DCC]: See end of file. Also note program drop is temporal for tests
 ------------------------------------------------------------------------------*/
-cap program drop pip_gd
-cap program drop pip_gd_check_args
-cap program drop pip_gd_query
-cap program drop pip_gd_clean
-cap program drop pip_gd_display_results
 
 *-------------------------------------------------------------------------------
 *--- (0) Program set-up
@@ -24,7 +19,6 @@ program define pip_gd, rclass
 	version 16.1
 	
 	//pip_gd not yet included in pip as pip gd, set must run pip_timer to set struct
-	pip_timer
 	pip_timer pip_gd, on
 	
 	pip_gd_check_args `0'
@@ -58,7 +52,8 @@ program define pip_gd, rclass
         					  endpoint(`endpoint') ///
         
         pip_timer pip_gd.pip_get, on
-        pip_get, `cacheforce' `clear' `cachedir' 
+
+        pip_get, `cacheforce' `clear' `cachedir'
         pip_timer pip_gd.pip_get, off
 
         //Clean
@@ -94,6 +89,7 @@ program define pip_gd_check_args, rclass
 	POVLine(numlist)	            ///
 	PPP_year(numlist)	            ///
 	n_bins(numlist max=1 >0 <1000 integer) ///
+	CLEAR(string)                   /// 
 	pause                           ///
 	replace                         /// 
 	cacheforce                      ///
@@ -185,6 +181,12 @@ program define pip_gd_check_args, rclass
 		local optnames "`optnames' n2disp"
 	}
 
+	// clear
+	if ("`clear'" == "") local clear "clear"
+	return local clear = "`clear'"
+	local optnames "`optnames' clear"
+
+
 	// Return all options as local
 	return local optnames "`optnames'"
 end
@@ -222,7 +224,7 @@ program define pip_gd_query, rclass
 	// Single poverty line
     if "`povline'"=="" {
         global pip_last_queries "`endpoint'?`query'format=csv"
-        noisily dis "$pip_last_queries"
+        //noisily dis "$pip_last_queries"
         exit
     }
 
@@ -236,8 +238,7 @@ program define pip_gd_query, rclass
         local ++i
 	}
 	mata: st_global("pip_last_queries", invtokens(`M')) 
-	noisily dis "$pip_last_queries"
-		
+	//noisily dis "$pip_last_queries"
 end
 
 

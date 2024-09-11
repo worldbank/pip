@@ -117,7 +117,6 @@ program define pip, rclass
 		exit
 	}
 	
-	
 	//------------Install and Uninstall
 	if regexm("`subcmd'", "^install") {
 		if ( ("`gh'" == "" & "`ssc'" == "") | /* 
@@ -146,7 +145,7 @@ program define pip, rclass
 		pip_timer pip, off
 		exit
 	}
-	
+
 	//========================================================
 	//  Print information
 	//========================================================
@@ -296,6 +295,11 @@ program define pip, rclass
 		//------------ Country Profile
 		else if ("`subcmd'" == "cp") {
 			pip_cp, `est_opts' `clear' `n2disp' `cachedir'
+			noi pip_timer pip, off `printtimer'
+		}
+		//------------ Grouped data
+		else if ("`subcmd'" == "gd") {
+			noi pip_gd, `est_opts' `clear' `n2disp' `cachedir'
 			noi pip_timer pip, off `printtimer'
 		}
 		
