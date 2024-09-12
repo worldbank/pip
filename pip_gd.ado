@@ -347,13 +347,12 @@ exit
 ><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><
 Notes:
 DCC:
-    1. API test example is as follows
-       http://127.0.0.1:8080/api/v1/grouped-stats?cum_welfare=0.0002,0.0006,0.0011,0.0021,0.0031,0.0048,0.0066,0.0095,0.0128,0.0177,0.0229,0.0355,0.0513,0.0689,0.0882&cum_population=0.001,0.003,0.005,0.009,0.013,0.019,0.025,0.034,0.044,0.0581,0.0721,0.1041,0.1411,0.1792,0.2182&requested_mean=2.911786&povline=1.9 
-    2. Test is pip_gd,stats cum_welfare(0.0002,0.0006,0.0011,0.0021,0.0031,0.0048,0.0066,0.0095,0.0128,0.0177,0.0229,0.0355,0.0513,0.0689,0.0882) cum_population(0.001,0.003,0.005,0.009,0.013,0.019,0.025,0.034,0.044,0.0581,0.0721,0.1041,0.1411,0.1792,0.2182) requested_mean(2.911786) povline(1.9)  -- NOTE: THIS IS DOES NOT YET CONNECT TO THE DEV SERVER (requires uncommenting "get").  IT WILL ONLY WORK AT PRESENT IF RUN AFTER SOME OTHER PIP COMMAND.  EG RUN pip_cl, THEN ABOVE
-    3. Remove instances of capture in pip_gd_clean.  
+    1. Test is pip_gd,stats cum_welfare(0.0002,0.0006,0.0011,0.0021,0.0031,0.0048,0.0066,0.0095,0.0128,0.0177,0.0229,0.0355,0.0513,0.0689,0.0882) cum_population(0.001,0.003,0.005,0.009,0.013,0.019,0.025,0.034,0.044,0.0581,0.0721,0.1041,0.1411,0.1792,0.2182) requested_mean(2.911786) povline(1.9) 
+    2. Allow variables for cum_population and cum_welfare
+	3. Check consistency of cumulative values (monotonic and sum to 1)
+	4. Add more descriptive labels than lq and lb ("General Quadratic Lorenz function" and "Beta Lorenz function")
+ 	5. Add PAUSE debugging structures as in other programs 
+	6. Document as a part of help pip
 CHECK:
-    4. Check whether we need ppp_year as an argument, or just internally accessed always
- 	5. Do we add new PAUSE debugging structures as in other programs?
-	6. Add more descriptive labels than lq and lb ("General Quadratic Lorenz function" and "Beta Lorenz function")?
 	7. Check how to label ymean
 Version Control:
