@@ -35,7 +35,8 @@
 {p 4 4 2}Main subcommands{p_end}
 {synopt :{helpb pip_cl:cl}}Country-level poverty and inequality estimates. {help pip_cl##options:options}{p_end}
 {synopt :{helpb pip_cl:wb}}World Bank's regional and global aggregation. {help pip_cl##options:options}{p_end}
-{synopt :{helpb pip_cp:cp}}Country Profile estimates. {help pip_cl##options:options}{p_end}
+{synopt :{helpb pip_cp:cp}}Country Profile estimates. {help pip_cp##options:options}{p_end}
+{synopt :{helpb pip_gd:gd}}Grouped Data estimates. {help pip_gd##options:options}{p_end}
 {synopt :{helpb pip_tables:tables}}Clickable list of auxiliary tables. {help pip_tables##options:options}{p_end}
 {synopt :{helpb pip_cache:cache}}Manage local cache. {help pip_cache##options:options}{p_end}
 {synopt :{helpb pip_print:print}}Print useful information. {help pip_print##options:options}{p_end}
@@ -88,7 +89,7 @@ The rest of this document contains general information about PIP and the {cmd:pi
 
 {pstd}
 The options below work for any subcommad that returns vintaged data 
-(e.g., {cmd:cl}, {cmd:wb}, {cmd:tables})
+(e.g., {cmd:cl}, {cmd:wb}, {cmd:cp}, {cmd:gd}, {cmd:tables})
 
 {marker general_options}{...}
 {synoptset 27 tabbed}{...}
@@ -118,8 +119,9 @@ these three parameters uniquely identifies a dataset.{p_end}
 {title:Examples}
 
 {pstd}
-The examples below do not comprehend all {cmd:pip}'s features. Please refer 
-to the {it:examples} section of {help pip##sbc_table:each subcommad}'s help file.
+The examples below should not be considered as a comprehensive documentation of
+{cmd:pip}'s features. Please refer 
+to the {it:examples} section of {help pip##sbc_table:each subcommand}'s help file.
 
 {ul:Basic examples}
 

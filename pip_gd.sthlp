@@ -8,19 +8,19 @@
 {title:Syntax}
 
 {phang}
-{cmd:pip gd,} {opt cum_welfare(numlist)} {opt cum_population(numlist)} [ {it:{help pip_subcmd##opts_desc:options}} ]
+{cmd:pip gd,} {opt cum_welfare(numlist|varname)} {opt cum_population(numlist|varname)} [ {it:{help pip_gd##opts_desc:options}} ]
         
 {marker opts_desc}{...}
 {title:Options}
 
-{synoptset 27 tabbed}{...}
+{synoptset 32 tabbed}{...}
 {synopthdr:gd options}
 {synoptline}
-{synopt :{opt stats}} Requests grouped data statistics (the default option of {cmd:pip_gd}.{p_end}
+{synopt :{opt stats}} Requests grouped data statistics (the default option for {cmd:pip_gd}).{p_end}
 {synopt :{opt params}} Requests regression parameters corresponding to grouped data.{p_end}
-{synopt :{opt lorenz}} Requests Lorenz curve data points.{p_end}
-{synopt :{opt cum_welfare(numlist)}} List indicating the cuulative welfare shares in particular groups of the population.{p_end}
-{synopt :{opt cum_population(numlist)}} List indicating the cumulative population contained in the same groups for which {opt cum_welfare()} is indicated.{p_end}
+{synopt :{opt lorenz}} Requests Lorenz curve data points corresponding to grouped data.{p_end}
+{synopt :{opt cum_welfare(numlist|varname)}} List indicating the cumulative welfare shares in particular groups of the population.{p_end}
+{synopt :{opt cum_population(numlist|varname)}} List indicating the cumulative population contained in the same groups for which {opt cum_welfare()} is indicated.{p_end}
 {synopt :{opt requested_mean(#)}} Scalar value indicating the mean welfare in the population.{p_end}
 {synopt :{opt n_bins(#)}} Scalar value indicating the number of bins requested when Lorenz curve estimates are requested.{p_end}
 {synopt :{opt povl:ine:}(numlist)} List of poverty lines in specified PPP (see option {help pip##general_options:ppp_year(#)}) to calculate
@@ -31,9 +31,10 @@ poverty. Default is 2.15 at 2017 PPPs.{p_end}
 {marker description}{...}
 {title:Description}
 {pstd}
-The {cmd:gd} subcommand provides poverty and inequality indices when provided with grouped
-data.  Grouped data consist of some measure of cumulative welfare such as consumption expenditure
-or income, along with population shares by groups such as deciles or percentiles.  Provided
+The {cmd:gd} subcommand provides information on poverty and inequality indices when provided with 
+aggregate values from grouped data.  Grouped data consist of some measure of cumulative welfare 
+such as consumption expenditure or income, along with population shares by groups such as deciles 
+or percentiles.  Provided
 that information is available about some measure of central tendency such as the mean, and a
 distributional assumption such as the Lorenz curve is adopted, poverty and inequality measures
 can be estimated from grouped data.  The {cmd: pip_gd} subcommand provides these aggregate
@@ -69,18 +70,27 @@ One of {opt stats} (group statistics) {opt params} (regression parameters) or {o
 assumed as default.  More than one of these options cannot be indicated.
 
 {phang}
-{opt cum_welfare(numlist)} A list containing the cumulative welfare shares of different groups
+{opt cum_welfare(numlist|varname)} A {help numlist} or the name of a variable containing the 
+cumulative welfare shares of different groups
 of the population.  For example, if the cumulative welfare of deciles are known, the total welfare
 of decile 1 should be listed first, then the total cumulative welfare of the population up to
-decile 2, and so forth.  Values should be presented as a list, and so separated by white space.
+decile 2, and so forth.  If a {help numlist} is provided, values should be presented as a list, 
+and so separated by white space (or follow alternative valid list formats).  Alternatively, if 
+a variable in memory contains cumulative welfare values, the variable name should be listed, 
+ensuring that the variable is ordered from lowest to highest.
 
 {phang}
-{opt cum_population(numlist)} A list containing the cumulative population contained in the groups
+{opt cum_population(numlist|varname)}  A {help numlist} or the name of a variable containing the 
+cumulative population contained in the groups
 indicated by the cumulative welfare measures above.  For example, if the values in {opt: cum_welfare}
 are deciles of the population, this list should simply indicate 0.1(0.1)1.  Generically, population
 shares corresponding to cumulative welfare should be provided, and the number of elements in the
-population share should be identical to that in {opt: cum_welfare}. Values should be presented as a
-{help:numlist}, and so separated by white space (or follow alternative valid list formats).
+population share should be identical to that in {opt: cum_welfare}. 
+If a {help numlist} is provided, values should be presented as a list, 
+and so separated by white space (or follow alternative valid list formats).  Alternatively, if 
+a variable in memory contains cumulative population values, the variable name should be listed, 
+ensuring that the variable is ordered from lowest to highest, with observations corresponding to
+the values for the variable indicated in {opt cum_welfare()}.
 
 {phang}
 {opt requested_mean(#)} Should indicate the average daily welfare in the population to be 
@@ -109,21 +119,26 @@ poverty lines are expressed in 2017 PPP USD per capita per day. If option
 {ul:Basic examples}
 
 {pstd}
-Request poverty and inequality statistics for a particular welfare and population distribution (deciles provided in syntax), with a mean welfare of 2.911786.
+Request poverty and inequality statistics for a particular welfare and population distribution, with a mean welfare of 2.911786.
 
 {phang2}
 {stata pip_gd, cum_welfare(.0002 .0006 .0011 .0021 .0031 .0048 .0066 .0095 .0128 .0177 .0229 .0355 .0513 .0689 .0882) cum_population(.001 .003 .005 .009 .013 .019 .025 .034 .044 .0581 .0721 .1041 .1411 .1792 .2182) requested_mean(2.911786)} 
 
-{ul:Read in a data file containing cumulative welfare and population in columns, and pass this information to {cmd:pip_gd}}
-
 {pstd}
-This example considers a csv containing two columns of data: welfare, and population...
+Request the fitted Lorenz curve based on the cumulative population and welfare shares above, with 50 points and graph resulting Lorenz curve.
 
 {phang2}
-{cmd}
-        UNDER CONSTRUCTION
+{stata pip_gd, lorenz cum_welfare(.0002 .0006 .0011 .0021 .0031 .0048 .0066 .0095 .0128 .0177 .0229 .0355 .0513 .0689 .0882) cum_population(.001 .003 .005 .009 .013 .019 .025 .034 .044 .0581 .0721 .1041 .1411 .1792 .2182) n_bins(50) n2disp(10)} 
 
-{txt}      ({stata "pip_examples pip_example12":click to run})
+{phang2}
+{stata twoway line welfare weight} 
+
+{pstd}
+Request the regression parameters used to estimate the Lorenz curve based on the cumulative population and welfare shares above.
+
+{phang2}
+{stata pip_gd, params cum_welfare(.0002 .0006 .0011 .0021 .0031 .0048 .0066 .0095 .0128 .0177 .0229 .0355 .0513 .0689 .0882) cum_population(.001 .003 .005 .009 .013 .019 .025 .034 .044 .0581 .0721 .1041 .1411 .1792 .2182)} 
+
 
 
 {p 40 20 2}(Go back to {it:{help pip##sections:pip's main menu}}){p_end}

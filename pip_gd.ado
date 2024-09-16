@@ -137,17 +137,22 @@ program define pip_gd_check_args, rclass
 		exit 198
 	}
 
-	//Cumulative welfare
+	//Parse cumulative welfare and cumulative population
+
+	//Check if numlists
+	cap numlist "`cum_welfare'"
+	if _rc==0 local cum_welfare `r(numlist)'
 	local nwelfare : word count `cum_welfare'
 
-	//Cumulative population
+	cap numlist "`cum_population'"
+	if _rc==0 local cum_population `r(numlist)'
 	local npopulation : word count `cum_population'
 	
 	if `npopulation'!=`nwelfare' {
         dis as error "cum_population and cum_welfare must be identical lengths."
         exit 122
 	}
-	//Check if there is a single element, and if so this implies variables
+	//Check if there is a single element, if so this implies variables
 	if `npopulation'==1 {
 		// Confirm both cum_population and cum_welfare are variables
 		cap ds `cum_population'
@@ -200,14 +205,13 @@ program define pip_gd_check_args, rclass
 	local sum_pop = 0
 	tokenize `cum_population'
 	forval element = 2/`npopulation' {
-		dis ``element''
 		local element_1 = `element'-1
 		if ``element'' < ``element_1'' {
 			dis as error "cum_population is not monotonic."
 			dis as error "Ensure population shares are entered from lowest to highest."
 			exit 124
 		}
-		local sum_pop = `sum_pop' + ``element''
+		local sum_pop = ``element''
 	}
 	local sum_wel = 0
 	tokenize `cum_welfare'
@@ -218,7 +222,7 @@ program define pip_gd_check_args, rclass
 			dis as error "Ensure welfare shares are entered from lowest to highest."
 			exit 124
 		}
-		local sum_wel = `sum_wel' + ``element''
+		local sum_wel = ``element''
 	}
 
 	if `sum_pop'!=1|`sum_wel'!=1 {
@@ -428,8 +432,8 @@ exit
 ><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><
 
 Notes:
-1. Test is pip_gd,stats cum_welfare(0.0002,0.0006,0.0011,0.0021,0.0031,0.0048,0.0066,0.0095,0.0128,0.0177,0.0229,0.0355,0.0513,0.0689,0.0882) cum_population(0.001,0.003,0.005,0.009,0.013,0.019,0.025,0.034,0.044,0.0581,0.0721,0.1041,0.1411,0.1792,0.2182) requested_mean(2.911786) povline(1.9) 
-2. Document as a part of help pip
+1. 
+2. 
 3. 
 
 Version Control:
