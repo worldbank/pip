@@ -79,8 +79,8 @@ end
 program define pip_gd_check_args, rclass
 	version 16.1
 	syntax                          ///
-	, cum_welfare(numlist)          ///
-	  cum_population(numlist)       ///
+	, cum_welfare(string)           ///
+	  cum_population(string)        ///
 	[                               ///
 	stats                           ///
 	lorenz                          ///
@@ -139,18 +139,100 @@ program define pip_gd_check_args, rclass
 
 	//Cumulative welfare
 	local nwelfare : word count `cum_welfare'
-	return local cum_welfare = "`cum_welfare'"	
-	local optnames "`optnames' cum_welfare"
 
 	//Cumulative population
 	local npopulation : word count `cum_population'
-	return local cum_population = "`cum_population'"	
-	local optnames "`optnames' cum_population"
 	
 	if `npopulation'!=`nwelfare' {
         dis as error "cum_population and cum_welfare must be identical lengths."
         exit 122
 	}
+	//Check if there is a single element, and if so this implies variables
+	if `npopulation'==1 {
+		// Confirm both cum_population and cum_welfare are variables
+		cap ds `cum_population'
+		if _rc {
+			dis as error "cum_population() requires either a numlist or a variable name"
+			dis as error "variable `cum_population' not found."
+			exit 111
+		}
+		cap ds `cum_welfare'
+		if _rc {
+			dis as error "cum_welfare() requires either a numlist or a variable name"
+			dis as error "variable `cum_welfare' not found."
+			exit 111
+		}
+		// Check that the variables are the same length
+		qui sum `cum_population'
+		local Npop = r(N)
+		qui sum `cum_welfare'
+		local Nwelf = r(N)
+		if `Npop'!=`Nwelf' {
+			dis as error "Variables indicated in cum_population and cum_welfare must be identical lengths."
+			exit 197
+		}
+		qui count if `cum_population'==. in 1/`Npop'
+		if r(N)>0 {
+			dis as error "cum_population contains missing values."
+			dis as error "Ensure all valid values are provided in first `Npop' observations."
+			exit 616
+		}
+		qui count if `cum_welfare'==. in 1/`Nwelf'
+		if r(N)>0 {
+			dis as error "cum_welfare contains missing values."
+			dis as error "Ensure all valid values are provided in first `Nwelf' observations."
+			exit 416
+		}
+		// Unpack variables and store as numlists
+		local cum_pop_update
+		local cum_wel_update
+		forval i = 1/`Npop' {
+			local cum_pop_update `cum_pop_update' `=`cum_population'[`i']'
+			local cum_wel_update `cum_wel_update' `=`cum_welfare'[`i']'
+		}
+		local cum_population `cum_pop_update'
+		local cum_welfare `cum_wel_update'
+		local nwelfare : word count `cum_welfare'
+		local npopulation : word count `cum_population'
+	}
+	
+	//Check that cumulative values are monotonic and sum to 1
+	local sum_pop = 0
+	tokenize `cum_population'
+	forval element = 2/`npopulation' {
+		dis ``element''
+		local element_1 = `element'-1
+		if ``element'' < ``element_1'' {
+			dis as error "cum_population is not monotonic."
+			dis as error "Ensure population shares are entered from lowest to highest."
+			exit 124
+		}
+		local sum_pop = `sum_pop' + ``element''
+	}
+	local sum_wel = 0
+	tokenize `cum_welfare'
+	forval element = 2/`nwelfare' {
+		local element_1 = `element'-1
+		if ``element'' < ``element_1'' {
+			dis as error "cum_welfare is not monotonic."
+			dis as error "Ensure welfare shares are entered from lowest to highest."
+			exit 124
+		}
+		local sum_wel = `sum_wel' + ``element''
+	}
+
+	if `sum_pop'!=1|`sum_wel'!=1 {
+		local sp = string(`sum_pop', "%05.3f")
+		local sw = string(`sum_wel', "%05.3f")
+		dis "Warning: cum_population sums to `sp' and cumulative welfare sums to `sw'."
+	}
+
+	//Return cumulative welfare and population arguments
+	return local cum_welfare = "`cum_welfare'"	
+	local optnames "`optnames' cum_welfare"
+
+	return local cum_population = "`cum_population'"	
+	local optnames "`optnames' cum_population"
 
 	//Requested mean	
 	if "`stats'"!="" {
@@ -212,7 +294,6 @@ program define pip_gd_query, rclass
 
 	//Build query
 	//  Note: Maps particular contents to format for API
-	//  Could consider changing test for ease of reading
 	local params "cum_welfare cum_population requested_mean"
 	foreach p of local params {
         if `"``p''"'==`""' continue
@@ -307,7 +388,7 @@ program define pip_gd_clean, rclass
 		cap rename (a b c) (A B C)
 		cap rename (se_a se_b se_c) (se_A se_B se_C)
 
-		lab var lorenz              "Lorenz function"
+		lab var lorenz              "Lorenz function (lq=General quadratic, Lb=Beta Lorenz)"
 		lab var A					"Parameter one estimate (A or theta)" 
 		lab var B					"Parameter two estimate (B or gamma)"
 		lab var C					"Parameter three estimate (C or delta)"
@@ -345,14 +426,10 @@ exit
 
 
 ><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><
+
 Notes:
-DCC:
-    1. Test is pip_gd,stats cum_welfare(0.0002,0.0006,0.0011,0.0021,0.0031,0.0048,0.0066,0.0095,0.0128,0.0177,0.0229,0.0355,0.0513,0.0689,0.0882) cum_population(0.001,0.003,0.005,0.009,0.013,0.019,0.025,0.034,0.044,0.0581,0.0721,0.1041,0.1411,0.1792,0.2182) requested_mean(2.911786) povline(1.9) 
-    2. Allow variables for cum_population and cum_welfare
-	3. Check consistency of cumulative values (monotonic and sum to 1)
-	4. Add more descriptive labels than lq and lb ("General Quadratic Lorenz function" and "Beta Lorenz function")
- 	5. Add PAUSE debugging structures as in other programs 
-	6. Document as a part of help pip
-CHECK:
-	7. Check how to label ymean
+1. Test is pip_gd,stats cum_welfare(0.0002,0.0006,0.0011,0.0021,0.0031,0.0048,0.0066,0.0095,0.0128,0.0177,0.0229,0.0355,0.0513,0.0689,0.0882) cum_population(0.001,0.003,0.005,0.009,0.013,0.019,0.025,0.034,0.044,0.0581,0.0721,0.1041,0.1411,0.1792,0.2182) requested_mean(2.911786) povline(1.9) 
+2. Document as a part of help pip
+3. 
+
 Version Control:
