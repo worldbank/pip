@@ -595,9 +595,10 @@ program define pip_cl_clean, rclass
 				 poverty_severity watts median population ppp gdp hfce /// 
 				 survey_time is_interpolated distribution_type spl spr /// 
 				 pg estimate_type
-		}
-		if ("`nowcasts'" == "") {
-			drop if estimate_type == "nowcast"
+				 
+			if ("`nowcasts'" == "") {
+				drop if estimate_type == "nowcast"
+			}
 		}
 		
 		//missings dropvars, force

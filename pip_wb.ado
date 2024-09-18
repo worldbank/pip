@@ -55,7 +55,7 @@ program define pip_wb, rclass
 		
 		//------------ clean
 		pip_timer pip_wb_clean, on
-		pip_wb_clean
+		pip_wb_clean, `nowcasts' `fillgaps'
 		pip_timer pip_wb_clean, off
 		
 		//------------ Add data notes
@@ -95,6 +95,8 @@ program define pip_wb_check_args, rclass
 	POVCALNET_format                ///
 	replace                         ///
 	cacheforce                      ///
+	FILLgaps                        ///
+	NOWcasts						///
 	n2disp(passthru)                ///
 	cachedir(passthru) *            ///
 	] 
@@ -190,11 +192,17 @@ program define pip_wb_check_args, rclass
 		error
 	}
 		
-	if ("`fillgaps'" != "") {
-		noi disp "{res}Note:{txt} option {it:fillgaps} not allowed with " /* 
-		*/  "subcommand {cmd:wb}."
-		error
+	//------------ nowcasts
+	if ("`nowcasts'" != "") {
+		// if nowcasts is selected, fillgaps is also selected
+		local fillgaps = "fillgaps"
 	}
+	return local nowcasts = "`nowcasts'"
+	local optnames "`optnames' nowcasts"
+	
+	//------------ fillgaps
+	return local fillgaps = "`fillgaps'"
+	local optnames "`optnames' fillgaps"
 		
 	// poshare
 	if ("`popshare'" != "") {
@@ -307,7 +315,9 @@ end
 
 //------------Clean Cl data
 program define pip_wb_clean, rclass
-	version 16.1
+	
+	syntax  [, NOWcasts fillgaps ]
+	
 	if ("${pip_version}" == "") {
 		noi disp "{err}No version selected."
 		error
@@ -354,6 +364,19 @@ program define pip_wb_clean, rclass
 		local old "reporting_year"
 		local new  "year"
 		rename (`old') (`new')
+
+		//------------drop unnecesary variables
+		keep region_name region_code year poverty_line mean headcount ///
+			 poverty_gap poverty_severity watts population spr pg estimate_type ///
+			 pop_in_poverty
+		
+		//------------ Nowcasts and fillgaps
+		if ("`fillgaps'" == "") {
+			drop if estimate_type == "projection"
+		}
+		if ("`nowcasts'" == "") {
+			drop if estimate_type == "nowcast"
+		}
 		
 		//------------ drop vars with missing value
 		pip_utils dropvars
