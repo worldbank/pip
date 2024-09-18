@@ -35,13 +35,17 @@
 {synopt :{opt y:ear}(numlist|string)}{help numlist} of years  or "all", or "last". Default is "{it:all}".{p_end}
 {synopt :{opt povl:ine:}(#)}List of poverty lines (accepts up to 5) in specified PPP (see option {help pip##general_options:ppp_year(#)}) to calculate 
 poverty. Default is 2.15 at 2017 PPPs.{p_end}
- {pstd}
- 
+{synopt :{opt fill:gaps}}Loads extrapolations and interpolations at the country
+level and year estimates with NOT enough data coverage at the regional level 
+({it:see details {help pip_cl##fillgaps:below}}).{p_end}
+{synopt :{opt now:casts}}Loads nowcast estimates at the country-level, 
+regional, and global levels.{p_end}
+{pstd}
+
 {p 4 4 2}The following options only work at the country level:{p_end}
 
 {synopt :{opt cou:ntry:}(3-letter code)}List of {help pip_countries##countries:country codes} or "all". Default is "{it:all}".{p_end}
 {synopt :{opt pops:hare:}(#)}List of quantiles. No default. Cannot be used with option {opt povline:(#)}.{p_end}
-{synopt :{opt fill:gaps}}Loads country-level estimates (including extrapolations and interpolations) used to create regional and global aggregates.{p_end}
 {synoptline}
 {synopt :{helpb pip##general_options: general options}}Options that apply to any subcommand.{p_end}
 
@@ -135,33 +139,51 @@ years, while the {it:last} option will download the latest available year
 for each country.
 
 {phang}
-{opt povline(#)} The poverty lines for which the poverty measures will be calculated. When selecting
-multiple poverty lines, use less than 4 decimals and separate each value with spaces. If
-left empty, the default poverty line of $2.15 is used. By default, poverty lines are expressed in
-2017 PPP USD per capita per day. If option {opt ppp_ppp(2011)} is specified, the poverty lines will be expressed in 2011 PPPs.
+{opt povline(#)} The poverty lines for which the poverty measures will be
+ calculated. When selecting multiple poverty lines, use less than 4 decimals 
+ and separate each value with spaces. If left empty, the default poverty line of 
+ $2.15 is used. By default, poverty lines  are expressed in 2017 PPP USD per capita
+ per day. If option {opt ppp_ppp(2011)} is specified, the poverty lines will be
+ expressed in 2011 PPPs.
 
 {phang}
-{ul:{it:The following options only apply to cl}}
+{opt popshare(#)} The desired quantile. For example, specifying 
+popshare(0.1) returns the first decile as the value of the poverty 
+line. In other words, the estimated poverty line will be the nearest 
+income or consumption level such that the incomes of 10% of the 
+population fall below it. This has no default, and cannot be combined 
+with {opt povline}. The quantile (recorded in the variable poverty_line) 
+is expressed in 2017 PPP USD per capita per day (unless option 
+{opt ppp_year(2011)} is specified, in which case it will be reported in 
+2011 PPP values) ({err:Note: }{it:this option only applies to subcommand 
+{cmd:cl}}).
+
+{marker fillgaps}{...}
+{phang}
+{opt fill:gaps} This option works differently depending on the level of aggregation:
 
 {phang}
-{opt popshare(#)} The desired quantile. For example, specifying popshare(0.1) returns the first
-decile as the value of the poverty line. In other words, the estimated poverty line will be the
-nearest income or consumption level such that the incomes of 10% of the population fall below it.
-This has no default, and cannot be combined with {opt povline}. The quantile (recorded in the variable
-poverty_line) is expressed in 2017 PPP USD per capita per day (unless option {opt ppp_year(2011)} is specified,
-in which case it will be reported in 2011 PPP values).
+{res:{ul:Country-level:} } {opt fillgaps} loads all country-level estimates that are 
+used to create the global and regional aggregates in the reference years. This
+includes estimates that are extrapolated or interpolated for those years where 
+nor survey data is available, year estimates for those surveys whose welfare 
+aggregate was collected over multiple years.
 
-{phang}
-{opt fillgaps} Loads all country-level estimates that are used to create the  
-global and regional aggregates in the reference years.
-
-{p 8 8 2}{err:Note}: Countries without a survey in the reference-year have been 
+{p 8 8 2}{res:Note}: Countries without a survey in the reference-year have been 
 extrapolated or interpolated using national accounts growth rates and assuming
 distribution-neutrality (see Chapter 6
 {browse "https://openknowledge.worldbank.org/bitstream/handle/10986/20384/9781464803611.pdf":here}).
 Therefore, changes at the country-level from one reference year to the next need 
 to be interpreted carefully and may not be the result of a new household survey.
 
+{phang}
+{res:{ul:Regional/Global-level:} } {opt fillgaps} loads estimates for all the years
+at all levels of aggregation, even if there is not enough survey coverage in that 
+years for a specific region aggregate (e.g., region or global). ({err:We highly discourage the use of these estimates for any analysis}).
+
+{phang}
+{opt now:casts} This option loads nowcast estimates at the country-level, regional,
+ and global levels. Activating {opt nowcasts} activates {opt fillgaps} as well.
 
 {marker examples}{...}
 {title:Examples}
@@ -215,6 +237,22 @@ from 2015-2016 to 2015. Only works for reference years.
 {stata pip wb, clear  region(SAR LAC)}{p_end}
 {phang2}
 {stata pip wb, clear}       // all regions and reference years{p_end}
+
+{phang}
+2.5. {opt fillgaps} and {opt nowcasts} 
+
+{phang2}
+{stata pip, clear}          // survey estimates{p_end}
+{phang2}
+{stata pip, clear fillgaps} // interpolations and extrapolations{p_end}
+{phang2}
+{stata pip, clear nowcasts}  // {opt fillgaps} plus nowcasts{p_end}
+{phang2}
+{stata pip wb, clear}       // Official regional and global data{p_end}
+{phang2}
+{stata pip wb, fillgaps}  // aggregates for years with no survey coverage{p_end}
+{phang2}
+{stata pip wb, nowcasts}   // {opt fillgaps} plus nowcasts{p_end}
 
 
 {ul:3. Samples uniquely identified by country/year}
