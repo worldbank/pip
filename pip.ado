@@ -25,7 +25,7 @@ program define pip, rclass
 	
 	//------------ Parsing args
 	pip_parseopts `0'   // parse whatever the user gives
-	local returnnames "`r(returnnames)'" // name of all return object
+	local returnnames "`r(returnnames)'" // name of all returned object
 	local optnames    "`r(optnames)'"    // names of options (after the comma)
 	mata: pip_retlist2locals("`returnnames'") // convert return to locals
 	
