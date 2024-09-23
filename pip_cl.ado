@@ -60,7 +60,7 @@ program define pip_cl, rclass
 
 		pause cl> before clean data 
 		pip_timer pip_cl_clean, on
-		pip_cl_clean
+		pip_cl_clean, `fillgaps' `nowcasts'
 		pip_timer pip_cl_clean, off
 		
 		//------------ Add data notes
@@ -103,7 +103,8 @@ program define pip_cl_check_args, rclass
 	Year(string)                    /// 
 	POVLine(numlist)                /// 
 	POPShare(numlist)	   	        /// 
-	FILLgaps                        /// 
+	FILLgaps                        ///
+	NOWcasts                        /// 
 	COVerage(string)                /// 
 	CLEAR(string) *                 /// 
 	pause                           /// 
@@ -220,10 +221,19 @@ program define pip_cl_check_args, rclass
 	return local popshare = "`popshare'"
 	local optnames "`optnames' povline popshare"
 		
+	//------------ nowcasts
+	if ("`nowcasts'" != "") {
+		// if nowcasts is selected, fillgaps is also selected
+		local fillgaps = "fillgaps"
+	}
+	return local nowcasts = "`nowcasts'"
+	local optnames "`optnames' nowcasts"
+	
 	//------------ fillgaps
 	return local fillgaps = "`fillgaps'"
 	local optnames "`optnames' fillgaps"
 
+	//------------ clear
 	if ("`clear'" == "") local clear "clear"
 	return local clear = "`clear'"
 	local optnames "`optnames' clear"
@@ -402,9 +412,12 @@ end
 //------------Clean Cl data
 
 program define pip_cl_clean, rclass
+	syntax  [, NOWcasts fillgaps ]
+		
+	noi disp "{ul:Cleaning data}: `fillgaps' `nowcasts'. zero `0'"
 	
-	version 16.1
-	
+
+
 	//========================================================
 	//  setup
 	//========================================================
@@ -452,6 +465,7 @@ program define pip_cl_clean, rclass
 	//  Dealing with invalid values
 	//========================================================
 	*rename  prmld  mld
+	noi disp "{ul:Cleaning data}: `fillgaps' `nowcasts'. zero `0'"
 	qui {
 		
 		foreach v of varlist polarization median gini mld decile? decile10 {
@@ -584,7 +598,15 @@ program define pip_cl_clean, rclass
 		cap drop estimation_type
 		
 		if ("`fillgaps'" != "") {
-			drop ppp survey_time distribution_type gini mld polarization decile* median
+			keep country_code country_name region_code region_name reporting_level /// 
+				 year welfare_type poverty_line mean headcount poverty_gap /// 
+				 poverty_severity watts median population ppp gdp hfce /// 
+				 survey_time is_interpolated distribution_type spl spr /// 
+				 pg estimate_type
+				 
+			if ("`nowcasts'" == "") {
+				drop if estimate_type == "nowcast"
+			}
 		}
 		
 		//missings dropvars, force
@@ -592,7 +614,8 @@ program define pip_cl_clean, rclass
 		
 		pip_utils dropvars
 		
-	}			
+	}
+				
 end
 
 program define pip_cl_povcalnet

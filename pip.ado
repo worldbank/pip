@@ -25,7 +25,7 @@ program define pip, rclass
 	
 	//------------ Parsing args
 	pip_parseopts `0'   // parse whatever the user gives
-	local returnnames "`r(returnnames)'" // name of all return object
+	local returnnames "`r(returnnames)'" // name of all returned object
 	local optnames    "`r(optnames)'"    // names of options (after the comma)
 	mata: pip_retlist2locals("`returnnames'") // convert return to locals
 	
@@ -362,6 +362,8 @@ Version Control:
 
 
 
+*! version 0.10.9.9000  <2024sep18>
+*! -- implement fillgaps and nowcasts options at both country and regional levels
 *! version 0.10.9  <2024aug28>
 *! -- Allow upper case in server option
 *! -- add pause message in formating 
