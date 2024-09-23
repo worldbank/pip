@@ -6,7 +6,7 @@ url:
 Dependencies:  The World Bank
 ----------------------------------------------------
 Creation Date:    16 May 2023 - 18:14:47
-Modification Date:   
+Modification Date:   21 Jul 2024 - 20:39:11 (DClarke)
 Do-file version:    01
 References:          
 Output:             
@@ -29,7 +29,7 @@ program define pip_utils, rclass
 		local subcmd = trim(ustrregexs(1))
 		local if = trim(ustrregexs(2))
 	}
-		//========================================================
+	//========================================================
 	// Execute 
 	//========================================================
 	
@@ -61,7 +61,10 @@ program define pip_utils, rclass
 	if ustrregexm("`subcmd'", "^click"){
 		pip_utils_clicktable `if', `variable' `title' `statacode' `length' `width'
 	}
-	
+	//------------ Output result display
+	if ("`subcmd'" == "output") {
+		noi pip_utils_output, `n2disp' `sortvars' `dispvars' `sepvar' `worldcheck'
+	}
 	
 	
 end
@@ -235,6 +238,46 @@ program define pip_utils_clicktable
 	disp _n
 	
 end
+
+//------------ Final display message
+program define pip_utils_output
+	syntax  [, ///
+		n2disp(integer 1) ///
+		sortvars(varlist) ///
+		dispvars(varlist) ///
+		sepvar(varlist)   ///
+		worldcheck        ///
+	]
+	local n2disp = min(`c(N)', `n2disp')
+	
+	//Display header
+	if      `n2disp'==1 local MSG "first observation"
+	else if `n2disp' >1 local MSG "first `n2disp' observations"
+	else                local MSG "No observations available"
+	noi dis as result _n "{ul:`MSG'}"
+
+	//Worldcheck checks if observations should be displayed only for WLD region
+	local rflag=0
+	if "`worldcheck'"!="" {
+		qui count if region_code=="WLD"
+		if `r(N)'>=`n2disp' {
+            preserve
+            qui keep if region_code=="WLD"
+            local rflag=1
+        }
+	}
+	
+	//DISPLAY OUTPUT
+	//Arguments below could be generalised to argument if desired
+	local dispopts abbreviate(12) noobs
+	//Sort if specified [could also use gsort if and remove varlist]
+	if "`sortvars'"!="" sort `sortvars'
+	//Print output
+	if `n2disp'!=0 noi list `dispvars' in 1/`n2disp', `dispopts' sepby(`sepvars')
+	if `rflag'==1 restore
+
+end
+
 
 
 exit
