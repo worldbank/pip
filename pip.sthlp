@@ -35,7 +35,8 @@
 {p 4 4 2}Main subcommands{p_end}
 {synopt :{helpb pip_cl:cl}}Country-level poverty and inequality estimates. {help pip_cl##options:options}{p_end}
 {synopt :{helpb pip_cl:wb}}World Bank's regional and global aggregation. {help pip_cl##options:options}{p_end}
-{synopt :{helpb pip_cp:cp}}Country Profile estimates. {help pip_cl##options:options}{p_end}
+{synopt :{helpb pip_cp:cp}}Country Profile estimates. {help pip_cp##options:options}{p_end}
+{synopt :{helpb pip_gd:gd}}Grouped Data estimates. {help pip_gd##options:options}{p_end}
 {synopt :{helpb pip_tables:tables}}Clickable list of auxiliary tables. {help pip_tables##options:options}{p_end}
 {synopt :{helpb pip_cache:cache}}Manage local cache. {help pip_cache##options:options}{p_end}
 {synopt :{helpb pip_print:print}}Print useful information. {help pip_print##options:options}{p_end}
@@ -88,7 +89,7 @@ The rest of this document contains general information about PIP and the {cmd:pi
 
 {pstd}
 The options below work for any subcommad that returns vintaged data 
-(e.g., {cmd:cl}, {cmd:wb}, {cmd:tables})
+(e.g., {cmd:cl}, {cmd:wb}, {cmd:cp}, {cmd:gd}, {cmd:tables})
 
 {marker general_options}{...}
 {synoptset 27 tabbed}{...}
@@ -118,8 +119,9 @@ these three parameters uniquely identifies a dataset.{p_end}
 {title:Examples}
 
 {pstd}
-The examples below do not comprehend all {cmd:pip}'s features. Please refer 
-to the {it:examples} section of {help pip##sbc_table:each subcommad}'s help file.
+The examples below should not be considered as a comprehensive documentation of
+{cmd:pip}'s features. Please refer 
+to the {it:examples} section of {help pip##sbc_table:each subcommand}'s help file.
 
 {ul:Basic examples}
 
@@ -192,13 +194,13 @@ marked by an {it:*}, meaning they have not been saved. If you do not wish to sav
 {ul:Cache memory}
 
 {pstd}
-By default, {cmd:pip} will create cache data of all the queries you make. The first you 
-use {cmd:pip} you will have the option to store cache data in your local machine
+By default, {cmd:pip} will create cache data of all the queries you make. The first time you 
+use {cmd:pip} you will have the option to store cache data on your local machine
 or in any drive Stata has access to. By default, {cmd:pip} will check whether it could
 save cache data in your PERSONAL directory (see {help sysdir: search path}). In case it can't, it will try in PLUS, then
 in your current directory and then in SITE. The first time you execute {cmd:pip}, you are
 required to either confirm the default cache directory or provide your own directory
-path. Also you can opt out and don't save cache data. Just follow the instructions of 
+path. Also you can opt out and not save cache data. Just follow the instructions of 
 the pop-up messages. 
 
 {ul:pip_setup.do}
