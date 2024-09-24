@@ -15,7 +15,7 @@ Dev notes [DCC]: See end of file. Also note program drop is temporal for tests
 *-------------------------------------------------------------------------------
 *--- (0) Program set-up
 *-------------------------------------------------------------------------------
-program define pip_gd, sclass
+program define pip_gd,  rclass
 	version 16.1
 	
 	//pip_gd not yet included in pip as pip gd, set must run pip_timer to set struct
@@ -85,15 +85,18 @@ program define pip_gd, sclass
 
 		// Restore frame
 		if (`restoreframe' == 0) {
-			sreturn local frame `curframe'
+			return local frame `curframe'
 			frame copy _pip_gd `curframe', replace
 			
 			noi disp "{res:NOTE: }You are currently working in frame {res: _pip_gd}" _n ///
-			"to return to the original frame, type: {stata frame change `s(frame)'}"
+			"to return to the original frame, type: {stata frame change `r(frame)'}"
 		}
 		else {
-
-			noi disp "{res:NOTE: }Results are available in frame {stata frame change _pip_gd:_pip_gd}"
+			frame _pip_gd: pip_utils frame2locals
+			return add
+			noi disp "{res:NOTE: }Results are available in frame {stata frame change _pip_gd:_pip_gd}," ///
+			" or by typing {stata ret list}"
+			
 		}
 
     }

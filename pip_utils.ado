@@ -42,28 +42,42 @@ program define pip_utils, rclass
 	
 	if ("`subcmd'" == "dispquery") {
 		pip_uitls_disp_query
+		exit
+	}
+
+	//  -------------- frame to locals
+	if ("`subcmd'" == "frame2locals") {
+		pip_utils_frame2locals
+		return add
+		exit
 	}
 	
 	
+	// frame exists
 	if ustrregexm("`subcmd'", "^frame") {
 		pip_utils_frameexists, `frame'
 		return add
+		exit
 	}
 	
 	if ("`subcmd'" == "finalmsg") {
 		noi pip_utils_final_msg
 		return add
+		exit
 	}
 	
 	if ("`subcmd'" == "keepframes") {
 		pip_utils_keep_frame, `frame_prefix' `keepframes' `efficient'
+		exit
 	}
 	if ustrregexm("`subcmd'", "^click"){
 		pip_utils_clicktable `if', `variable' `title' `statacode' `length' `width'
+		exit
 	}
 	//------------ Output result display
 	if ("`subcmd'" == "output") {
 		noi pip_utils_output, `n2disp' `sortvars' `dispvars' `sepvar' `worldcheck'
+		exit
 	}
 	
 	
@@ -278,7 +292,18 @@ program define pip_utils_output
 
 end
 
-
+//  -------------- frame to locals
+program define pip_utils_frame2locals, rclass
+	qui ds
+	local vars = "`r(varlist)'"
+	numlist "1/`c(N)'"
+	local obs = r(numlist)
+	foreach var of local vars {
+		foreach ob of local obs {
+			return local `var'_`ob' = `var'[`ob']
+		}
+	}
+end 
 
 exit
 /* End of do-file */
