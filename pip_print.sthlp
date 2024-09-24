@@ -47,5 +47,29 @@ subroutines. This function is intended for developers to make {cmd:pip} code mor
 efficient. However, it can also be used to measure Internet speed to download PIP data.
 
 
+{marker examples}{...}
+{title:Examples}
+
+{phang}
+{stata pip print, versions} 
+
+{phang}
+{stata pip print, tables} 
+
+{phang}
+{stata pip print, available} 
+
+{phang}
+{stata pip print, cache} 
+
+{phang}
+{stata pip print, setup} 
+
+{phang}
+{stata pip print, timer} 
+
+
+
+
 {p 40 20 2}(Go back to {it:{help pip##sections:pip's main menu}}){p_end}
 
