@@ -60,7 +60,16 @@ label var R "Relative share of expenditure"
 note: Source: Datt, Gaurav. {it:Computational tools for poverty measurement and analysis.} (1998): 1-29.
 note: Source linnk: {browse "https://ageconsearch.umn.edu/record/94862/?v=pdf"}
 
+char _dta[mean_lcu]  109.90
+char _dta[povline_lcu] 89.00
+char _dta[FGT0] 45.06
+char _dta[FGT1] 12.47
+char _dta[FGT2] 4.752
+char _dta[gini] 0.289
 
+// char _dta[ppp]  109.90
+// char _dta[mean_ppp]  109.90
+// char _dta[povline_ppp] 89.00
 
 /*==================================================
               3: Save
