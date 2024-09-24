@@ -116,19 +116,19 @@ poverty lines are expressed in 2017 PPP USD per capita per day. If option
 {marker examples}{...}
 {title:Examples}
 
-{ul:Basic examples}
+{ul:Provide vectors}
 
 {pstd}
 Request poverty and inequality statistics for a particular welfare and population distribution, with a mean welfare of 2.911786.
 
 {phang2}
-{stata pip_gd, cum_welfare(.0002 .0006 .0011 .0021 .0031 .0048 .0066 .0095 .0128 .0177 .0229 .0355 .0513 .0689 .0882) cum_population(.001 .003 .005 .009 .013 .019 .025 .034 .044 .0581 .0721 .1041 .1411 .1792 .2182) requested_mean(2.911786)} 
+{stata pip gd, cum_welfare(.0002 .0006 .0011 .0021 .0031 .0048 .0066 .0095 .0128 .0177 .0229 .0355 .0513 .0689 .0882) cum_population(.001 .003 .005 .009 .013 .019 .025 .034 .044 .0581 .0721 .1041 .1411 .1792 .2182) requested_mean(2.911786)} 
 
 {pstd}
 Request the fitted Lorenz curve based on the cumulative population and welfare shares above, with 50 points and graph resulting Lorenz curve.
 
 {phang2}
-{stata pip_gd, lorenz cum_welfare(.0002 .0006 .0011 .0021 .0031 .0048 .0066 .0095 .0128 .0177 .0229 .0355 .0513 .0689 .0882) cum_population(.001 .003 .005 .009 .013 .019 .025 .034 .044 .0581 .0721 .1041 .1411 .1792 .2182) n_bins(50) n2disp(10)} 
+{stata pip gd, lorenz cum_welfare(.0002 .0006 .0011 .0021 .0031 .0048 .0066 .0095 .0128 .0177 .0229 .0355 .0513 .0689 .0882) cum_population(.001 .003 .005 .009 .013 .019 .025 .034 .044 .0581 .0721 .1041 .1411 .1792 .2182) n_bins(50) n2disp(10)} 
 
 {phang2}
 {stata twoway line welfare weight} 
@@ -137,8 +137,34 @@ Request the fitted Lorenz curve based on the cumulative population and welfare s
 Request the regression parameters used to estimate the Lorenz curve based on the cumulative population and welfare shares above.
 
 {phang2}
-{stata pip_gd, params cum_welfare(.0002 .0006 .0011 .0021 .0031 .0048 .0066 .0095 .0128 .0177 .0229 .0355 .0513 .0689 .0882) cum_population(.001 .003 .005 .009 .013 .019 .025 .034 .044 .0581 .0721 .1041 .1411 .1792 .2182)} 
+{stata pip gd, params cum_welfare(.0002 .0006 .0011 .0021 .0031 .0048 .0066 .0095 .0128 .0177 .0229 .0355 .0513 .0689 .0882) cum_population(.001 .003 .005 .009 .013 .019 .025 .034 .044 .0581 .0721 .1041 .1411 .1792 .2182)} 
 
+{ul:Using current frame}
+
+{pstd}
+Request poverty and inequality statistics to replicate the results of Datt (1998) using the provided data ({res:replace current frame with results}).
+
+    {cmd}
+        local pip_temp = c(frame)
+        sysuse pip_datt, clear {res:// Load provided Datt data}
+        pip gd, cum_welfare(L) cum_population(P)  ///
+            requested_mean(109.9) povline(89) {err:clear} {res:// Use options {it:clear} to replace current frame}
+        frame change `pip_temp' {res:// if you want too return to original data}
+        list
+        {txt}      ({stata "pip_examples pip_example12":click to run})
+
+{pstd}
+Request poverty and inequality statistics to replicate the results of Datt (1998) using the provided data ({res:Store results in frame and {bf: ret list}}).
+
+    {cmd}
+        sysuse pip_datt, clear {res://Load provided Datt data}
+        pip gd, cum_welfare(L) cum_population(P)  ///
+            requested_mean(109.9) povline(89) {res:// NO option {it:clear}.}
+        list  {res:// disp original data}
+        ret list {res:// results from calculations}
+        frame change _pip_gd {res:// change to _pip_gd frame to see results}
+        list {res:// calculations frame}
+        {txt}      ({stata "pip_examples pip_example13":click to run})
 
 
 {p 40 20 2}(Go back to {it:{help pip##sections:pip's main menu}}){p_end}

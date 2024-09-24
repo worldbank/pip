@@ -85,20 +85,17 @@ program define pip_gd,  rclass
 
 		// Restore frame
 		if (`restoreframe' == 0) {
-			return local frame `curframe'
-			frame copy _pip_gd `curframe', replace
-			
+			//return local frame `curframe'
+			frame change _pip_gd 
 			noi disp "{res:NOTE: }You are currently working in frame {res: _pip_gd}" _n ///
-			"to return to the original frame, type: {stata frame change `r(frame)'}"
+			"to return to the original frame, type: {stata frame change `curframe'}"
 		}
 		else {
 			frame _pip_gd: pip_utils frame2locals
 			return add
 			noi disp "{res:NOTE: }Results are available in frame {stata frame change _pip_gd:_pip_gd}," ///
 			" or by typing {stata ret list}"
-			
 		}
-
     }
 	pip_timer pip_gd, off
 end
