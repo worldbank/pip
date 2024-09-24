@@ -15,7 +15,7 @@ Dev notes [DCC]: See end of file. Also note program drop is temporal for tests
 *-------------------------------------------------------------------------------
 *--- (0) Program set-up
 *-------------------------------------------------------------------------------
-program define pip_gd, rclass
+program define pip_gd, sclass
 	version 16.1
 	
 	//pip_gd not yet included in pip as pip gd, set must run pip_timer to set struct
@@ -43,30 +43,59 @@ program define pip_gd, rclass
         pip_auxframes
         
         //Build query [go to (2) sub-program pip_gd_query]
-        noisily pip_gd_query, cum_welfare(`cum_welfare') ///
+        noisily pip_gd_query, cum_welfare(`cum_welfare')       ///
                               cum_population(`cum_population') ///
                               requested_mean(`requested_mean') ///
-                              povline(`povline') ///
-                              ppp_year(`ppp_year') ///
-							  n_bins(`n_bins') ///
-        					  endpoint(`endpoint') ///
+                              povline(`povline')               ///
+                              ppp_year(`ppp_year')             ///
+							  n_bins(`n_bins')                 ///
+        					  endpoint(`endpoint') 
         
-        pip_timer pip_gd.pip_get, on
 
-        pip_get, `cacheforce' `clear' `cachedir'
-        pip_timer pip_gd.pip_get, off
+		// If clear is empty, saver current frame in temp frame
+		// then restore at the end.
+		local curframe = c(frame)
+		if ("`clear'" == "") {
+			local restoreframe = 1
+		} 
+		else {
+			local restoreframe = 0
+		}
+		local clear "clear"
+		
+		cap frame drop _pip_gd
+		qui frame create _pip_gd
+		frame _pip_gd {
+			pip_timer pip_gd.pip_get, on
+			pip_get, `cacheforce' `clear' `cachedir'
+			pip_timer pip_gd.pip_get, off
 
-        //Clean
-        pip_timer pip_gd_clean, on
-        pip_gd_clean, endpoint(`endpoint')
-        pip_timer pip_gd_clean, off
-        
-        //Add data notes
-        local datalabel "Grouped Statistics"
-        local data "`datalabel' (`c(current_date)')"
-        
-        //Display results
-        noi pip_utils output, `n2disp'
+			//Clean
+			pip_timer pip_gd_clean, on
+			pip_gd_clean, endpoint(`endpoint')
+			pip_timer pip_gd_clean, off
+			
+			//Add data notes
+			local datalabel "Grouped Statistics"
+			local data "`datalabel' (`c(current_date)')"
+			
+			//Display results
+			noi pip_utils output, `n2disp'
+		}
+
+		// Restore frame
+		if (`restoreframe' == 0) {
+			sreturn local frame `curframe'
+			frame copy _pip_gd `curframe', replace
+			
+			noi disp "{res:NOTE: }You are currently working in frame {res: _pip_gd}" _n ///
+			"to return to the original frame, type: {stata frame change `s(frame)'}"
+		}
+		else {
+
+			noi disp "{res:NOTE: }Results are available in frame {stata frame change _pip_gd:_pip_gd}"
+		}
+
     }
 	pip_timer pip_gd, off
 end
@@ -89,7 +118,7 @@ program define pip_gd_check_args, rclass
 	POVLine(numlist)	            ///
 	PPP_year(numlist)	            ///
 	n_bins(numlist max=1 >0 <1000 integer) ///
-	CLEAR(string)                   /// 
+	clear                           /// 
 	pause                           ///
 	replace                         /// 
 	cacheforce                      ///
@@ -268,7 +297,6 @@ program define pip_gd_check_args, rclass
 	}
 
 	// clear
-	if ("`clear'" == "") local clear "clear"
 	return local clear = "`clear'"
 	local optnames "`optnames' clear"
 

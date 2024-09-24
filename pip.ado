@@ -300,6 +300,7 @@ program define pip, rclass
 		//------------ Grouped data
 		else if ("`subcmd'" == "gd") {
 			noi pip_gd, `est_opts' `clear' `n2disp' `cachedir'
+			return add
 			noi pip_timer pip, off `printtimer'
 		}
 		
