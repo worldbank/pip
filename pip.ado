@@ -470,3 +470,9 @@ Version Control:
 *! version 0.10.9.9001  <2024sep23>
 *! -- Add Datt data
 *! -- Add add gd subcommand
+*! version 0.10.9.9002  <2024sep24>
+*! -- Add Datt data from scratch
+*! -- save results of pip_gd in separate frames
+*! -- add pip_utils_frame2locals
+*! -- add examples
+*! -- Update help file
