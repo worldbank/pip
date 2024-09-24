@@ -25,6 +25,7 @@
 {synopt :{opt n_bins(#)}} Scalar value indicating the number of bins requested when Lorenz curve estimates are requested.{p_end}
 {synopt :{opt povl:ine:}(numlist)} List of poverty lines in specified PPP (see option {help pip##general_options:ppp_year(#)}) to calculate
 poverty. Default is 2.15 at 2017 PPPs.{p_end}
+{synopt :{opt clear}}Clear results.{res: NOTE: }This options has a special use. See details {help pip_gd##clear:below}{p_end}
 {synoptline}
 
 
@@ -112,6 +113,21 @@ with spaces. If left empty, the default poverty line of $2.15 is used. By defaul
 poverty lines are expressed in 2017 PPP USD per capita per day. If option
 {opt ppp_year(2011)} is specified, the poverty lines will be expressed in 2011 PPPs.
 
+{marker clear}{...}
+{phang}
+{opt clear} As usual, {it:clear} will clear the results of the current frame. 
+If that is the case, {cmd:pip gd} will create frame {it:_pip_gd} with the results of
+the calculations. If you want to comeback to the original data, you can use type 
+{cmd:frame change {it::your_frame}}, where {it::your_frame} stands for the name of 
+the frame where you had the original data.{p_end}
+
+{pin}
+ If {it:clear} is not indicated, the results will be stored in frame {it:_pip_gd}, 
+ which you can access by typing {cmd:frame change _pip_gd}.  Moreover, the 
+ resuls are stored in {cmd:ret list}. The results correspond to the name of the 
+ variables in {it:_pip_gd} and to the observation number. So, for example, 
+ {it:r(headcount_1)} correponds to the result of the {it:headcount} variables in
+ observations 1. See examples {help pip_gd##ex_frame:below}.{p_end}
 
 {marker examples}{...}
 {title:Examples}
@@ -139,6 +155,7 @@ Request the regression parameters used to estimate the Lorenz curve based on the
 {phang2}
 {stata pip gd, params cum_welfare(.0002 .0006 .0011 .0021 .0031 .0048 .0066 .0095 .0128 .0177 .0229 .0355 .0513 .0689 .0882) cum_population(.001 .003 .005 .009 .013 .019 .025 .034 .044 .0581 .0721 .1041 .1411 .1792 .2182)} 
 
+{marker ex_frame}{...}
 {ul:Using current frame}
 
 {pstd}
