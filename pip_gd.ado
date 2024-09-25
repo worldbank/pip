@@ -9,7 +9,6 @@ Do-file version:   01
 References:
 Output:
 
-Dev notes [DCC]: See end of file. Also note program drop is temporal for tests
 ------------------------------------------------------------------------------*/
 
 *-------------------------------------------------------------------------------
@@ -18,7 +17,6 @@ Dev notes [DCC]: See end of file. Also note program drop is temporal for tests
 program define pip_gd,  rclass
 	version 16.1
 	
-	//pip_gd not yet included in pip as pip gd, set must run pip_timer to set struct
 	pip_timer pip_gd, on
 	
 	pip_gd_check_args `0'
@@ -48,8 +46,8 @@ program define pip_gd,  rclass
                               requested_mean(`requested_mean') ///
                               povline(`povline')               ///
                               ppp_year(`ppp_year')             ///
-							  n_bins(`n_bins')                 ///
-        					  endpoint(`endpoint') 
+                              n_bins(`n_bins')                 ///
+                              endpoint(`endpoint') 
         
 
 		// If clear is empty, saver current frame in temp frame
