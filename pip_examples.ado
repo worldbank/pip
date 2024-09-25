@@ -357,7 +357,7 @@ end
 
 program pip_example11
 
-	ip cleanup 
+	pip cleanup 
 	global country_code "NAM"
 
 	//Load survey poverty estimates 
