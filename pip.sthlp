@@ -380,10 +380,16 @@ povcalnet command, which was developed with the help of Espen Prydz, Jorge Soler
 
 {p 40 20 2}(Go up to {it:{help pip##sections:Sections Menu}}){p_end}
 {marker authors}{...}
-{title:Author}
+{title:Authors}
+
 {p 4 4 4}R.Andres Castaneda, The World Bank{p_end}
 {p 6 6 4}Email: {browse "mailto: acastanedaa@worldbank.org":  acastanedaa@worldbank.org}{p_end}
 {p 6 6 4}GitHub:{browse "https://github.com/randrescastaneda": randrescastaneda }{p_end}
+
+{p 4 4 4}Damian Clarke, Department of Economics, University of Exeter{p_end}
+{p 6 6 4}Email: {browse "mailto: dclarke4@worldbank.org":  dclarke4@worldbank.org}{p_end}
+{p 6 6 4}Email: {browse "mailto: dclarke@fen.uchile.cl":  dclarke@fen.uchile.cl}{p_end}
+{p 6 6 4}GitHub:{browse "https://github.com/damiancclarke": damiancclarke }{p_end}
 
 {title:Contributors}
 {pstd}
@@ -405,9 +411,9 @@ All the files are available in the {browse "https://github.com/worldbank/pip":Gi
 {marker howtocite}{...}
 {title:Thanks for citing this Stata command as follows}
 
-{p 4 8 2}Castaneda, R.Andres. (2023) 
+{p 4 8 2}Castaneda, R.Andres and Damian Clarke. (2024) 
 "pip: Stata Module to Access World Bank’s Global Poverty and Inequality Data" 
-				(version 0.9.0). Stata. Washington, DC: World Bank Group.
+				(version 0.11.0). Stata. Washington, DC: World Bank Group.
         https://worldbank.github.io/pip/ {p_end}
 
 {title:Thanks for citing {cmd:pip} data as follows}

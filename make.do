@@ -36,13 +36,16 @@ local ms = "`r(files)'"
 getfiles "*.dlg"
 local ds = "`r(files)'"
 
+getfiles "*.dta"
+local dtas = "`r(files)'"
 
-local toins  "`as';`hs';`ms';`ds'"
+
+local toins  "`as';`hs';`ms';`ds';`dtas'"
 disp "`toins'"
 
 
 make pip, replace toc pkg                                  ///  readme
-		version(0.10.9.9000)                               ///
+	version(0.10.9.9002)                                   ///
     license("MIT")                                         ///
     author("R.Andres Castaneda")                           ///
     affiliation("The World Bank")                          ///

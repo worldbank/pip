@@ -25,6 +25,7 @@
 {synopt :{opt n_bins(#)}} Scalar value indicating the number of bins requested when Lorenz curve estimates are requested.{p_end}
 {synopt :{opt povl:ine:}(numlist)} List of poverty lines in specified PPP (see option {help pip##general_options:ppp_year(#)}) to calculate
 poverty. Default is 2.15 at 2017 PPPs.{p_end}
+{synopt :{opt clear}}Clear results.{res: NOTE: }This options has a special use. See details {help pip_gd##clear:below}{p_end}
 {synoptline}
 
 
@@ -112,23 +113,38 @@ with spaces. If left empty, the default poverty line of $2.15 is used. By defaul
 poverty lines are expressed in 2017 PPP USD per capita per day. If option
 {opt ppp_year(2011)} is specified, the poverty lines will be expressed in 2011 PPPs.
 
+{marker clear}{...}
+{phang}
+{opt clear} As usual, {it:clear} will clear the results of the current frame. 
+If that is the case, {cmd:pip gd} will create frame {it:_pip_gd} with the results of
+the calculations. If you want to comeback to the original data, you can use type 
+{cmd:frame change {it::your_frame}}, where {it::your_frame} stands for the name of 
+the frame where you had the original data.{p_end}
+
+{pin}
+ If {it:clear} is not indicated, the results will be stored in frame {it:_pip_gd}, 
+ which you can access by typing {cmd:frame change _pip_gd}.  Moreover, the 
+ results are stored in {cmd:ret list}. The results correspond to the name of the 
+ variables in {it:_pip_gd} and to the observation number. So, for example, 
+ {it:r(headcount_1)} corresponds to the result of the {it:headcount} variable in
+ observation 1. See examples {help pip_gd##ex_frame:below}.{p_end}
 
 {marker examples}{...}
 {title:Examples}
 
-{ul:Basic examples}
+{ul:Provide vectors}
 
 {pstd}
 Request poverty and inequality statistics for a particular welfare and population distribution, with a mean welfare of 2.911786.
 
 {phang2}
-{stata pip_gd, cum_welfare(.0002 .0006 .0011 .0021 .0031 .0048 .0066 .0095 .0128 .0177 .0229 .0355 .0513 .0689 .0882) cum_population(.001 .003 .005 .009 .013 .019 .025 .034 .044 .0581 .0721 .1041 .1411 .1792 .2182) requested_mean(2.911786)} 
+{stata pip gd, cum_welfare(.0002 .0006 .0011 .0021 .0031 .0048 .0066 .0095 .0128 .0177 .0229 .0355 .0513 .0689 .0882) cum_population(.001 .003 .005 .009 .013 .019 .025 .034 .044 .0581 .0721 .1041 .1411 .1792 .2182) requested_mean(2.911786)} 
 
 {pstd}
 Request the fitted Lorenz curve based on the cumulative population and welfare shares above, with 50 points and graph resulting Lorenz curve.
 
 {phang2}
-{stata pip_gd, lorenz cum_welfare(.0002 .0006 .0011 .0021 .0031 .0048 .0066 .0095 .0128 .0177 .0229 .0355 .0513 .0689 .0882) cum_population(.001 .003 .005 .009 .013 .019 .025 .034 .044 .0581 .0721 .1041 .1411 .1792 .2182) n_bins(50) n2disp(10)} 
+{stata pip gd, lorenz cum_welfare(.0002 .0006 .0011 .0021 .0031 .0048 .0066 .0095 .0128 .0177 .0229 .0355 .0513 .0689 .0882) cum_population(.001 .003 .005 .009 .013 .019 .025 .034 .044 .0581 .0721 .1041 .1411 .1792 .2182) n_bins(50) n2disp(10)} 
 
 {phang2}
 {stata twoway line welfare weight} 
@@ -137,8 +153,35 @@ Request the fitted Lorenz curve based on the cumulative population and welfare s
 Request the regression parameters used to estimate the Lorenz curve based on the cumulative population and welfare shares above.
 
 {phang2}
-{stata pip_gd, params cum_welfare(.0002 .0006 .0011 .0021 .0031 .0048 .0066 .0095 .0128 .0177 .0229 .0355 .0513 .0689 .0882) cum_population(.001 .003 .005 .009 .013 .019 .025 .034 .044 .0581 .0721 .1041 .1411 .1792 .2182)} 
+{stata pip gd, params cum_welfare(.0002 .0006 .0011 .0021 .0031 .0048 .0066 .0095 .0128 .0177 .0229 .0355 .0513 .0689 .0882) cum_population(.001 .003 .005 .009 .013 .019 .025 .034 .044 .0581 .0721 .1041 .1411 .1792 .2182)} 
 
+{marker ex_frame}{...}
+{ul:Using current frame}
+
+{pstd}
+Request poverty and inequality statistics to replicate the results of Datt (1998) using the provided data ({res:replace current frame with results}).
+
+    {cmd}
+        local pip_temp = c(frame)
+        sysuse pip_datt, clear {res:// Load provided Datt data}
+        pip gd, cum_welfare(L) cum_population(P)  ///
+            requested_mean(109.9) povline(89) {err:clear} {res:// Use options {it:clear} to replace current frame}
+        frame change `pip_temp' {res:// if you want to return to original data}
+        list
+        {txt}      ({stata "pip_examples pip_example12":click to run})
+
+{pstd}
+Request poverty and inequality statistics to replicate the results of Datt (1998) using the provided data ({res:Store results in frame and {bf: ret list}}).
+
+    {cmd}
+        sysuse pip_datt, clear {res://Load provided Datt data}
+        pip gd, cum_welfare(L) cum_population(P)  ///
+            requested_mean(109.9) povline(89) {res:// NO option {it:clear}.}
+        list  {res:// disp original data}
+        ret list {res:// results from calculations}
+        frame change _pip_gd {res:// change to _pip_gd frame to see results}
+        list {res:// calculations frame}
+        {txt}      ({stata "pip_examples pip_example13":click to run})
 
 
 {p 40 20 2}(Go back to {it:{help pip##sections:pip's main menu}}){p_end}

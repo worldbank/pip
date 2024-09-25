@@ -289,39 +289,39 @@ end
 
 program define pip_example09
 
-pip, clear
+	pip, clear
 
-* Prepare reporting_level variable
-label define level 3 "national" 2 "urban" 1 "rural"
-encode reporting_level, gen(reporting_level_2) label(level)
+	* Prepare reporting_level variable
+	label define level 3 "national" 2 "urban" 1 "rural"
+	encode reporting_level, gen(reporting_level_2) label(level)
 
-* keep only national
-bysort country_code welfare_type  year: egen _ncover = count(reporting_level_2 )
-gen _tokeepn = ( (inlist(reporting_level_2 , 3, 4) & _ncover > 1) | _ncover == 1)
+	* keep only national
+	bysort country_code welfare_type  year: egen _ncover = count(reporting_level_2 )
+	gen _tokeepn = ( (inlist(reporting_level_2 , 3, 4) & _ncover > 1) | _ncover == 1)
 
-keep if _tokeepn == 1
-* Keep longest series per country
-by country_code welfare_type , sort:  gen _ndtype = _n == 1
-by country_code : replace _ndtype = sum(_ndtype)
-by country_code : replace _ndtype = _ndtype[_N] // number of welfare_type  per country
-
-
-bysort country_code welfare_type : egen _type_length = count(year)
-bysort country_code: egen _type_max = max(_type_length)
-replace _type_max = (_type_max == _type_length)
-
-* in case of same length in series, keep consumption
-by country_code _type_max, sort:  gen _ntmax = _n == 1
-by country_code : replace _ntmax = sum(_ntmax)
-by country_code : replace _ntmax = _ntmax[_N]  // max 
+	keep if _tokeepn == 1
+	* Keep longest series per country
+	by country_code welfare_type , sort:  gen _ndtype = _n == 1
+	by country_code : replace _ndtype = sum(_ndtype)
+	by country_code : replace _ndtype = _ndtype[_N] // number of welfare_type  per country
 
 
-gen _tokeepl = ((_type_max == 1 & _ntmax == 2) | ///
-	             (welfare_type  == 1 & _ntmax == 1 & _ndtype == 2)) | ///
-               _ndtype == 1
+	bysort country_code welfare_type : egen _type_length = count(year)
+	bysort country_code: egen _type_max = max(_type_length)
+	replace _type_max = (_type_max == _type_length)
 
-keep if _tokeepl == 1
-drop _*
+	* in case of same length in series, keep consumption
+	by country_code _type_max, sort:  gen _ntmax = _n == 1
+	by country_code : replace _ntmax = sum(_ntmax)
+	by country_code : replace _ntmax = _ntmax[_N]  // max 
+
+
+	gen _tokeepl = ((_type_max == 1 & _ntmax == 2) | ///
+					(welfare_type  == 1 & _ntmax == 1 & _ndtype == 2)) | ///
+				_ndtype == 1
+
+	keep if _tokeepl == 1
+	drop _*
 
 end
 
@@ -357,60 +357,92 @@ end
 
 program pip_example11
 
-ip cleanup 
-global country_code "NAM"
+	pip cleanup 
+	global country_code "NAM"
 
-//Load survey poverty estimates 
-tempname pip
-frame create `pip'
-frame `pip' {
-  pip, country(${country_code}) clear coverage(national)
-  decode welfare_type, gen(wt)
-}
+	//Load survey poverty estimates 
+	tempname pip
+	frame create `pip'
+	frame `pip' {
+	pip, country(${country_code}) clear coverage(national)
+	decode welfare_type, gen(wt)
+	}
 
-// merge with pip results
-pip tables, table(interpolated_means) clear   
-frlink m:1  country_code welfare_time welfare_type, ///
-  frame(`pip' country_code welfare_time wt)
+	// merge with pip results
+	pip tables, table(interpolated_means) clear   
+	frlink m:1  country_code welfare_time welfare_type, ///
+	frame(`pip' country_code welfare_time wt)
 
-//Poverty line to query
-gen double pl_to_query = 2.15 * frval(`pip', mean)/predicted_mean_ppp
-keep if pl_to_query  < .
+	//Poverty line to query
+	gen double pl_to_query = 2.15 * frval(`pip', mean)/predicted_mean_ppp
+	keep if pl_to_query  < .
 
-//Weights for interpolated means
-gen double interpol_wt   = 1 / abs(welfare_time - year)
-egen double interpol_wtt = total(interpol_wt),by(year)
-gen double interpol_shr  = interpol_wt/interpol_wtt
-gen double survey_year   = floor(welfare_time)  
-sort country_code year welfare_time 
+	//Weights for interpolated means
+	gen double interpol_wt   = 1 / abs(welfare_time - year)
+	egen double interpol_wtt = total(interpol_wt),by(year)
+	gen double interpol_shr  = interpol_wt/interpol_wtt
+	gen double survey_year   = floor(welfare_time)  
+	sort country_code year welfare_time 
 
-keep if inrange(year, 2000, 2015)  // modify to take less time
-//Initialize empty data set to store results
-tempname results dtloop
-frame create `results' str3 country_code double(year hc wgt)
-frame copy `c(frame)' `dtloop'
-local N = _N
-forvalues row=1/`N' {
-  
-  loc ccc  = _frval(`dtloop', country_code, `row')
-  loc yy   = _frval(`dtloop', year, `row')
-  loc yyyy = _frval(`dtloop', survey_year, `row')
-  loc pl   = _frval(`dtloop', pl_to_query, `row')
-  loc wgt  = _frval(`dtloop', interpol_shr, `row')
-  
-  pip, clear country(`ccc') year(`yyyy') coverage(national) povline(`pl')
-  frame post `results' ("`ccc'") (`yy') (headcount[1]) (`wgt')
-}
+	keep if inrange(year, 2000, 2015)  // modify to take less time
+	//Initialize empty data set to store results
+	tempname results dtloop
+	frame create `results' str3 country_code double(year hc wgt)
+	frame copy `c(frame)' `dtloop'
+	local N = _N
+	forvalues row=1/`N' {
+	
+	loc ccc  = _frval(`dtloop', country_code, `row')
+	loc yy   = _frval(`dtloop', year, `row')
+	loc yyyy = _frval(`dtloop', survey_year, `row')
+	loc pl   = _frval(`dtloop', pl_to_query, `row')
+	loc wgt  = _frval(`dtloop', interpol_shr, `row')
+	
+	pip, clear country(`ccc') year(`yyyy') coverage(national) povline(`pl')
+	frame post `results' ("`ccc'") (`yy') (headcount[1]) (`wgt')
+	}
 
-//Apply weights for interpolated poverty estimates
-frame `results': collapse  (mean) headcount=hc [w = wgt], by( country_code year)
+	//Apply weights for interpolated poverty estimates
+	frame `results': collapse  (mean) headcount=hc [w = wgt], by( country_code year)
 
-//Check results 
-pip, clear country(${country_code}) fillgaps
-keep country_code year headcount 
-frlink 1:1 country_code year, frame(`results')
-gen double d_hc = headcount/frval(`results', headcount, .a)
-sum d_hc 
-
-
+	//Check results 
+	pip, clear country(${country_code}) fillgaps
+	keep country_code year headcount 
+	frlink 1:1 country_code year, frame(`results')
+	gen double d_hc = headcount/frval(`results', headcount, .a)
+	sum d_hc 
 end 
+
+program pip_example12
+	local curframe = c(frame)
+	frame `curframe': preserve
+	tempname pip_temp
+	frame create `pip_temp'
+	frame change `pip_temp'
+	sysuse pip_datt, clear
+	pip gd, cum_welfare(L) cum_population(P)  requested_mean(109.9) povline(89) clear
+	// return to the original data
+	frame change `pip_temp'
+	list
+
+end
+
+program pip_example13
+	local curframe = c(frame)
+	frame `curframe': preserve
+	// temporary frame
+	tempname pip_temp
+	frame create `pip_temp'
+	frame change `pip_temp'
+	sysuse pip_datt, clear
+	// NO options {it:clear}. Thus, results stored in separate frame and ret list
+	pip gd, cum_welfare(L) cum_population(P)  requested_mean(109.9) povline(89)
+	// disp original data
+	list
+	// results from calculations
+	ret list
+	// change to _pip_gd frame to see results
+	frame change _pip_gd
+	list
+
+end
