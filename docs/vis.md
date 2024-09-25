@@ -27,8 +27,8 @@ twoway (sc hcpercent year, ///
   graphregion(c(white)) ysize(5) xsize(5)  ///
 xlabel(1990(5)2020) xscale(range(1990 2020) noextend)  ///
   legend(order( ///
-  1 "Poverty Rate (% of people living below $1.90)"  ///
-  2 "Number of people who live below $1.90") si(vsmall) row(2)) scheme(s2color)
+  1 "Poverty Rate (% of people living below $2.15)"  ///
+  2 "Number of people who live below $2.15") si(vsmall) row(2)) scheme(s2color)
 ```
 
 <center>
@@ -82,27 +82,27 @@ alt="Millionsofpoor" width="550" height="500" />
 ## Distribution of Income in Latin America and Caribbean, by country
 
 ```stata
-pip, region(lac) year(last) povline(3.2 5.5 15) fillgaps clear  
+pip, region(lac) year(last) povline(2.15 3.65 6.85) fillgaps clear  
 keep if welfare_type==2 & year>=2014 // keep income surveys
 keep poverty_line country_code country_name year headcount
 replace poverty_line = poverty_line*100
 replace headcount = headcount*100
 tostring poverty_line, replace format(%12.0f) force
 reshape wide  headcount,i(year country_code country_name ) j(poverty_line) string
-gen percentage_0 = headcount320
-gen percentage_1 = headcount550 - headcount320
-gen percentage_2 = headcount1500 - headcount550
-gen percentage_3 = 100 - headcount1500
+gen percentage_0 = headcount215
+gen percentage_1 = headcount365 - headcount215 
+gen percentage_2 = headcount685 - headcount365
+gen percentage_3 = 100 - headcount685
 keep country_code country_name year  percentage_*
 reshape long  percentage_,i(year country_code country_name ) j(category) 
-la define category 0 "Poor LMI (<$3.2)" 1 "Poor UMI ($3.2-$5.5)" ///
-2 "Vulnerable ($5.5-$15)" 3 "Middle class (>$15)"
+la define category 0 "Poor IPL (<$2.15)" 1 "Poor LMI ($2.15-$3.65)" 2 "Poor UMI ($3.65-$6.85)" ///
+3 "Non-poor (>$6.85)"
 la val category category
 la var category ""
 
-graph bar (mean) percentage, inten(*0.7) o(category) ///
-o(country_code, lab(labsi(small) angle(vertical))) stack asy /// 
-blab(bar, pos(center) format(%3.1f) size(8pt)) /// 
+graph bar (mean) percentage, inten(*0.7) o(category)  ///
+o(country_code, lab(labsi(small) angle(vertical)) sort(1) descending) stack asy /// 
+blab(bar, pos(center) format(%3.1f) size(6.5pt)) /// 
 ti("Distribution of Income in Latin America and Caribbean, by country", si(small)) ///
 note("Source: PIP, using the latest survey after 2014 for each country. ", si(*.7)) ///
 graphregion(c(white)) ysize(6) xsize(6.5) legend(si(vsmall) r(3))  ///
@@ -119,6 +119,9 @@ alt="LAC" width="550" height="500" />
 
 ```stata
  pip, country(chl gha tgo) year(all)  clear
+ keep if (country_code == "CHL" & survey_comparability == 1) | ///
+ (country_code == "GHA" & survey_comparability == 1) | ///
+ (country_code == "TGO" & survey_comparability == 0) 
  reshape long decile, i(country_code welfare_time) j(dec)
  egen panelid = group(country_code dec)
  replace welfare_time = int(welfare_time)
@@ -135,7 +138,7 @@ alt="LAC" width="550" height="500" />
  		(sc g dec if welfare_time == 2015 & country_code == "TGO", c(l)),   ///
  		yti("Annual growth in decile average income (%)" " ",      ///
  		size(small))  xlabel(0(10)100,labs(small))                 ///
- 		xtitle("Decile group", size(small)) graphregion(c(white))  ///
+ 		xtitle("Decile group", size(small)) graphregion(c(white)) ///
  		legend(order(1 "Chile (2011-2017)"                      ///
  		2 "Ghana(1998-2005)" 3 "Togo (2011-2015)")              ///
  		si(vsmall) row(1)) scheme(s2color)
@@ -155,6 +158,7 @@ pip,  country(chl gha tgo) year(all) clear
 	twoway (connected gini welfare_time if country_code == "CHL")  ///
 		(connected gini welfare_time if country_code == "GHA")       ///
 		(connected gini welfare_time if country_code == "TGO"),      /// 
+		ylabel(, format(%2.0f)) ///
 		ytitle("Gini Index" " ", size(small))                   ///
 		xtitle(" " "", size(small)) ylabel(,labs(small) nogrid  ///
 		angle(verticle)) xlabel(,labs(small))                   ///
@@ -176,17 +180,22 @@ rename countrycode country_code
 tempfile PerCapitaGDP
 save `PerCapitaGDP', replace
 
-pip, povline(1.9) country(all) year(last) clear
+pip, country(all) year(last) clear
 keep country_code country_name year gini
 drop if gini == -1
 * Merge Gini coefficient with per capita GDP
 merge m:1 country_code year using `PerCapitaGDP', keep(match)
 replace gini = gini * 100
 drop if ny_gdp_pcap_pp_kd == .
-twoway (scatter gini ny_gdp_pcap_pp_kd, mfcolor(%0) ///
-msize(vsmall)) (lfit gini ny_gdp_pcap_pp_kd), ///
+
+gen loggdp = log10(ny_gdp_pcap_pp_kd)
+
+twoway (scatter gini loggdp, mfcolor(%0) ///
+msize(vsmall)) (lfit gini loggdp), ///
+ylabel(, format(%2.0f)) ///
 ytitle("Gini Index" " ", size(small))  ///
-xtitle(" " "GDP per Capita per Year (in 2011 USD PPP)", size(small))  ///
+xtitle(" " "GDP per Capita per Year (in 2017 USD PPP, log scale)", size(small))  ///
+xlab(3 "1,000" 3.3 "2,000" 3.7 "5,000" 4 "10,000" 4.3 "20,000" 4.7 "50,000" 5 "100,000") ///
 graphregion(c(white)) ysize(5) xsize(7)  ///
 ylabel(,labs(small) nogrid angle(verticle)) xlabel(,labs(small)) ///
 legend(order(1 "Gini Index" 2 "Fitted Value") si(small)) scheme(s2color)
@@ -200,37 +209,36 @@ alt="Gini&GDP" width="550" height="500" />
 ## Distribution of Income in Sub-Saharan Africa and East Asia and Pacific over time
 
 ```stata
-pip wb, povline(1.9 3.2 5.5 15) clear
-keep if year>=1995 
+pip wb, povline(2.15 3.65 6.85) clear
+keep if year >= 2000 
 keep poverty_line region_code region_name year headcount
 replace poverty_line = poverty_line*100
 replace headcount = headcount*100
 tostring poverty_line, replace format(%12.0f) force
 reshape wide  headcount,i(year region_code region_name) j(poverty_line) string
-gen percentage_0 = headcount190
-gen percentage_1 = headcount320 - headcount190 
-gen percentage_2 = headcount550 - headcount320
-gen percentage_3 = headcount1500 - headcount550
-gen percentage_4 = 100 - headcount1500
+gen percentage_0 = headcount215
+gen percentage_1 = headcount365 - headcount215 
+gen percentage_2 = headcount685 - headcount365
+gen percentage_3 = 100 - headcount685
 keep region_code region_name year  percentage_*
 reshape long  percentage_,i(year region_code region_name) j(category) 
-la define category 0 "Poor IPL (<$1.9)" 1 "Poor LMIC ($1.9-$3.2)" 2 "Poor UMIC ($3.2-$5.5)" ///
-3 "$5.5-$15" 4 "Middle class (>$15)"
+la define category 0 "Poor IPL (<$2.15)" 1 "Poor LMI ($2.15-$3.65)" 2 "Poor UMI ($3.65-$6.85)" ///
+3 "Non-poor (>$6.85)"
 la val category category
 la var category ""
 
-graph bar (mean) percentage if region_code=="SSA" & (year>=1995 & year<=2019), inten(*0.7) o(category) ///
+graph bar (mean) percentage if region_code=="SSA" & (year >= 2000 & year<=2019), inten(*0.7) o(category) ///
 o(year, lab(labsi(small) angle(vertical))) stack asy /// 
-blab(bar, pos(center) format(%3.1f) size(7pt)) /// 
+blab(bar, pos(center) format(%3.1f) size(6.5pt)) /// 
 ti("Distribution of Income in Sub-Saharan Africa over time", si(small)) ///
 graphregion(c(white)) ysize(6) xsize(6.5) legend(si(vsmall) r(2) symxsize(*.4))  ///
 yti("Population share in each income category (%)", si(small)) ///
 ylab(,labs(small) nogrid angle(0)) scheme(s2color) name(ssa, replace)
 graph export ssa.png, as(png) hei(1000) replace
 
-graph bar (mean) percentage if region_code=="EAP" & (year>=1995 & year<=2019), inten(*0.7) o(category) ///
+graph bar (mean) percentage if region_code=="EAP" & (year >= 2000 & year<=2019), inten(*0.7) o(category) ///
 o(year, lab(labsi(small) angle(vertical))) stack asy /// 
-blab(bar, pos(center) format(%3.1f) size(7pt)) /// 
+blab(bar, pos(center) format(%3.1f) size(6.5pt)) /// 
 ti("Distribution of Income in East Asia and Pacific over time", si(small)) ///
 graphregion(c(white)) ysize(6) xsize(6.5) legend(si(vsmall) r(2) symxsize(*.4)) ///
 yti("Population share in each income category (%)", si(small)) ///
@@ -247,3 +255,27 @@ alt="Gini&GDP" width="550" height="500" />
 </center>
 
 
+## Population in poverty by region for 1990 and 2014
+
+```stata
+pip wb, year(1990 2014) clear
+drop if region_code=="WLD"
+keep region_name year pop_in_poverty
+egen tot1990 = sum(pop_in_poverty) if year == 1990
+egen tot2014 = sum(pop_in_poverty) if year == 2014
+gen pop = (pop_in_poverty /tot1990) * 100
+replace pop = (pop_in_poverty /tot2014) * 100 if pop ==.
+drop pop_in_poverty tot1990 tot2014
+reshape wide pop , i(region_name ) j( year)
+
+la var pop1990 "1990"
+la var pop2014 "2014"
+graph hbar (asis) pop1990 pop2014, over(region_name, sort(1) descending) ///
+blab(bar, pos(outside) format(%2.1f) size(5.5pt)) graphregion(color(white)) ///
+ylabel(, nogrid) legend(size(small)) title(Population in Poverty by Region (%))
+```
+
+<center>
+<img src="/pip/img/popinpoverty.png" 
+alt="Gini&GDP" width="550" height="500" />
+</center>
