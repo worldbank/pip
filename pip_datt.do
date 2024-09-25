@@ -58,7 +58,7 @@ label var L "cumulative proportion of expenditure"
 label var R "Relative share of expenditure"
 
 note: Source: Datt, Gaurav. {it:Computational tools for poverty measurement and analysis.} (1998): 1-29.
-note: Source linnk: {browse "https://ageconsearch.umn.edu/record/94862/?v=pdf"}
+note: Source link: {browse "https://ageconsearch.umn.edu/record/94862/?v=pdf"}
 
 char _dta[mean_lcu]  109.90
 char _dta[povline_lcu] 89.00
