@@ -124,10 +124,10 @@ the frame where you had the original data.{p_end}
 {pin}
  If {it:clear} is not indicated, the results will be stored in frame {it:_pip_gd}, 
  which you can access by typing {cmd:frame change _pip_gd}.  Moreover, the 
- resuls are stored in {cmd:ret list}. The results correspond to the name of the 
+ results are stored in {cmd:ret list}. The results correspond to the name of the 
  variables in {it:_pip_gd} and to the observation number. So, for example, 
- {it:r(headcount_1)} correponds to the result of the {it:headcount} variables in
- observations 1. See examples {help pip_gd##ex_frame:below}.{p_end}
+ {it:r(headcount_1)} corresponds to the result of the {it:headcount} variable in
+ observation 1. See examples {help pip_gd##ex_frame:below}.{p_end}
 
 {marker examples}{...}
 {title:Examples}
@@ -166,7 +166,7 @@ Request poverty and inequality statistics to replicate the results of Datt (1998
         sysuse pip_datt, clear {res:// Load provided Datt data}
         pip gd, cum_welfare(L) cum_population(P)  ///
             requested_mean(109.9) povline(89) {err:clear} {res:// Use options {it:clear} to replace current frame}
-        frame change `pip_temp' {res:// if you want too return to original data}
+        frame change `pip_temp' {res:// if you want to return to original data}
         list
         {txt}      ({stata "pip_examples pip_example12":click to run})
 
