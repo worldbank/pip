@@ -1,4 +1,4 @@
-[![](https://img.shields.io/badge/devel%20version-0.10.9-blue.svg)](https://github.com/worldbank/pip)
+[![](https://img.shields.io/badge/devel%20version-0.10.10-blue.svg)](https://github.com/worldbank/pip)
 
 
 # `pip` : Stata module to access World Bank’s Global Poverty and Inequality data
@@ -10,7 +10,7 @@ World Bank PIP API Stata wrapper
 
 ## Installation
 
-### From SSC (NOT AVAILABLE YET)
+### From SSC (Current version is out of date)
 
 ```stata
 ssc install pip
