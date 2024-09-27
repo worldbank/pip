@@ -61,6 +61,11 @@ program define pip_gd,  rclass
 		}
 		local clear "clear"
 		
+		// If current frame is called _pip_gd, frame drop will fail, so rename
+		cap frame drop _pip_gd_old
+		if c(frame)=="_pip_gd" {
+			frame rename _pip_gd _pip_gd_old
+		}
 		cap frame drop _pip_gd
 		qui frame create _pip_gd
 		frame _pip_gd {
