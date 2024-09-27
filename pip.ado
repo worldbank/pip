@@ -465,13 +465,10 @@ Version Control:
 *! -- Add estiamte_type as string variable and leave it optional for now
 *! -- add pause message in formating 
 *! -- Allow upper case in server option
-*! version 0.10.9.9000  <2024sep18>
+*! version 0.10.10  <2024sep27>
 *! -- implement fillgaps and nowcasts options at both country and regional levels
-*! version 0.10.9.9001  <2024sep23>
 *! -- Add Datt data
 *! -- Add add gd subcommand
-*! version 0.10.9.9002  <2024sep24>
-*! -- Add Datt data from scratch
 *! -- save results of pip_gd in separate frames
 *! -- add pip_utils_frame2locals
 *! -- add examples
