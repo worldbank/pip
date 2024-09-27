@@ -35,7 +35,8 @@
 {p 4 4 2}Main subcommands{p_end}
 {synopt :{helpb pip_cl:cl}}Country-level poverty and inequality estimates. {help pip_cl##options:options}{p_end}
 {synopt :{helpb pip_cl:wb}}World Bank's regional and global aggregation. {help pip_cl##options:options}{p_end}
-{synopt :{helpb pip_cp:cp}}Country Profile estimates. {help pip_cl##options:options}{p_end}
+{synopt :{helpb pip_cp:cp}}Country Profile estimates. {help pip_cp##options:options}{p_end}
+{synopt :{helpb pip_gd:gd}}Grouped Data estimates. {help pip_gd##options:options}{p_end}
 {synopt :{helpb pip_tables:tables}}Clickable list of auxiliary tables. {help pip_tables##options:options}{p_end}
 {synopt :{helpb pip_cache:cache}}Manage local cache. {help pip_cache##options:options}{p_end}
 {synopt :{helpb pip_print:print}}Print useful information. {help pip_print##options:options}{p_end}
@@ -88,7 +89,7 @@ The rest of this document contains general information about PIP and the {cmd:pi
 
 {pstd}
 The options below work for any subcommad that returns vintaged data 
-(e.g., {cmd:cl}, {cmd:wb}, {cmd:tables})
+(e.g., {cmd:cl}, {cmd:wb}, {cmd:cp}, {cmd:gd}, {cmd:tables})
 
 {marker general_options}{...}
 {synoptset 27 tabbed}{...}
@@ -118,8 +119,9 @@ these three parameters uniquely identifies a dataset.{p_end}
 {title:Examples}
 
 {pstd}
-The examples below do not comprehend all {cmd:pip}'s features. Please refer 
-to the {it:examples} section of {help pip##sbc_table:each subcommad}'s help file.
+The examples below should not be considered as a comprehensive documentation of
+{cmd:pip}'s features. Please refer 
+to the {it:examples} section of {help pip##sbc_table:each subcommand}'s help file.
 
 {ul:Basic examples}
 
@@ -192,13 +194,13 @@ marked by an {it:*}, meaning they have not been saved. If you do not wish to sav
 {ul:Cache memory}
 
 {pstd}
-By default, {cmd:pip} will create cache data of all the queries you make. The first you 
-use {cmd:pip} you will have the option to store cache data in your local machine
+By default, {cmd:pip} will create cache data of all the queries you make. The first time you 
+use {cmd:pip} you will have the option to store cache data on your local machine
 or in any drive Stata has access to. By default, {cmd:pip} will check whether it could
 save cache data in your PERSONAL directory (see {help sysdir: search path}). In case it can't, it will try in PLUS, then
 in your current directory and then in SITE. The first time you execute {cmd:pip}, you are
 required to either confirm the default cache directory or provide your own directory
-path. Also you can opt out and don't save cache data. Just follow the instructions of 
+path. Also you can opt out and not save cache data. Just follow the instructions of 
 the pop-up messages. 
 
 {ul:pip_setup.do}
@@ -378,10 +380,16 @@ povcalnet command, which was developed with the help of Espen Prydz, Jorge Soler
 
 {p 40 20 2}(Go up to {it:{help pip##sections:Sections Menu}}){p_end}
 {marker authors}{...}
-{title:Author}
+{title:Authors}
+
 {p 4 4 4}R.Andres Castaneda, The World Bank{p_end}
 {p 6 6 4}Email: {browse "mailto: acastanedaa@worldbank.org":  acastanedaa@worldbank.org}{p_end}
 {p 6 6 4}GitHub:{browse "https://github.com/randrescastaneda": randrescastaneda }{p_end}
+
+{p 4 4 4}Damian Clarke, Department of Economics, University of Exeter{p_end}
+{p 6 6 4}Email: {browse "mailto: dclarke4@worldbank.org":  dclarke4@worldbank.org}{p_end}
+{p 6 6 4}Email: {browse "mailto: dclarke@fen.uchile.cl":  dclarke@fen.uchile.cl}{p_end}
+{p 6 6 4}GitHub:{browse "https://github.com/damiancclarke": damiancclarke }{p_end}
 
 {title:Contributors}
 {pstd}
@@ -403,9 +411,9 @@ All the files are available in the {browse "https://github.com/worldbank/pip":Gi
 {marker howtocite}{...}
 {title:Thanks for citing this Stata command as follows}
 
-{p 4 8 2}Castaneda, R.Andres. (2023) 
+{p 4 8 2}Castaneda, R.Andres and Damian Clarke. (2024) 
 "pip: Stata Module to Access World Bank’s Global Poverty and Inequality Data" 
-				(version 0.9.0). Stata. Washington, DC: World Bank Group.
+				(version 0.11.0). Stata. Washington, DC: World Bank Group.
         https://worldbank.github.io/pip/ {p_end}
 
 {title:Thanks for citing {cmd:pip} data as follows}

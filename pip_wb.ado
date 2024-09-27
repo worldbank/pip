@@ -55,7 +55,7 @@ program define pip_wb, rclass
 		
 		//------------ clean
 		pip_timer pip_wb_clean, on
-		pip_wb_clean
+		pip_wb_clean, `nowcasts' `fillgaps'
 		pip_timer pip_wb_clean, off
 		
 		//------------ Add data notes
@@ -65,8 +65,10 @@ program define pip_wb, rclass
 		label data "`datalabel' (`c(current_date)')"
 		
 		//------------ Display results
-		noi pip_wb_display_results, `n2disp'
-		
+		noi pip_utils output, `n2disp' worldcheck   ///
+		  sortvars(region_code year)                ///
+		  dispvars(region_code year poverty_line headcount mean)
+        
 		//------------ Povcalnet format
 		
 		if ("`povcalnet_format'" != "") {
@@ -95,6 +97,8 @@ program define pip_wb_check_args, rclass
 	POVCALNET_format                ///
 	replace                         ///
 	cacheforce                      ///
+	FILLgaps                        ///
+	NOWcasts						///
 	n2disp(passthru)                ///
 	cachedir(passthru) *            ///
 	] 
@@ -190,11 +194,17 @@ program define pip_wb_check_args, rclass
 		error
 	}
 		
-	if ("`fillgaps'" != "") {
-		noi disp "{res}Note:{txt} option {it:fillgaps} not allowed with " /* 
-		*/  "subcommand {cmd:wb}."
-		error
+	//------------ nowcasts
+	if ("`nowcasts'" != "") {
+		// if nowcasts is selected, fillgaps is also selected
+		local fillgaps = "fillgaps"
 	}
+	return local nowcasts = "`nowcasts'"
+	local optnames "`optnames' nowcasts"
+	
+	//------------ fillgaps
+	return local fillgaps = "`fillgaps'"
+	local optnames "`optnames' fillgaps"
 		
 	// poshare
 	if ("`popshare'" != "") {
@@ -222,6 +232,12 @@ program define pip_wb_check_args, rclass
 	if ("`clear'" == "") local clear "clear"
 	return local clear = "`clear'"
 	local optnames "`optnames' clear"
+
+	// allow n2disp as undocumented option
+	if ("`n2disp'" != "") {
+		return local n2disp = "`n2disp'"
+		local optnames "`optnames' n2disp"
+	}
 	return local optnames "`optnames'"
 
 end
@@ -307,7 +323,9 @@ end
 
 //------------Clean Cl data
 program define pip_wb_clean, rclass
-	version 16.1
+	
+	syntax  [, NOWcasts fillgaps ]
+	
 	if ("${pip_version}" == "") {
 		noi disp "{err}No version selected."
 		error
@@ -354,6 +372,19 @@ program define pip_wb_clean, rclass
 		local old "reporting_year"
 		local new  "year"
 		rename (`old') (`new')
+
+		//------------drop unnecesary variables
+		keep region_name region_code year poverty_line mean headcount ///
+			 poverty_gap poverty_severity watts population spr pg estimate_type ///
+			 pop_in_poverty
+		
+		//------------ Nowcasts and fillgaps
+		if ("`fillgaps'" == "") {
+			drop if estimate_type == "projection"
+		}
+		if ("`nowcasts'" == "") {
+			drop if estimate_type == "nowcast"
+		}
 		
 		//------------ drop vars with missing value
 		pip_utils dropvars
@@ -361,43 +392,6 @@ program define pip_wb_clean, rclass
 	}
 	
 end
-
-//------------ display results
-program define pip_wb_display_results
-	
-	syntax , [n2disp(numlist)]
-	
-	if ("`n2disp'" == "") local n2disp 1
-	local n2disp = min(`c(N)', `n2disp')
-	
-	if (`n2disp' > 1) {
-		noi di as res _n "{ul: first `n2disp' observations}"
-	} 
-	else	if (`n2disp' == 1) {
-		noi di as res _n "{ul: first observation}"
-	}
-	else {
-		noi di as res _n "{ul: No observations available}"
-	}	
-	
-	sort region_code year 
-	
-	tempname tolist
-	frame copy `c(frame)' `tolist'
-	qui frame `tolist' {
-		gsort region_code -year 
-		
-		count if (region_code == "WLD")
-		local cwld = r(N)
-		if (`cwld' >= `n2disp') {
-			keep if (region_code == "WLD")			
-		}
-		noi list region_code year poverty_line headcount mean ///
-		in 1/`n2disp',  abbreviate(12) noobs
-	}
-	
-end
-
 
 program define pip_wb_povcalnet
 	ren year        requestyear

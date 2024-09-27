@@ -6,7 +6,7 @@ url:
 Dependencies:  The World Bank
 ----------------------------------------------------
 Creation Date:    16 May 2023 - 18:14:47
-Modification Date:   
+Modification Date:   21 Jul 2024 - 20:39:11 (DClarke)
 Do-file version:    01
 References:          
 Output:             
@@ -29,7 +29,7 @@ program define pip_utils, rclass
 		local subcmd = trim(ustrregexs(1))
 		local if = trim(ustrregexs(2))
 	}
-		//========================================================
+	//========================================================
 	// Execute 
 	//========================================================
 	
@@ -42,26 +42,43 @@ program define pip_utils, rclass
 	
 	if ("`subcmd'" == "dispquery") {
 		pip_uitls_disp_query
+		exit
+	}
+
+	//  -------------- frame to locals
+	if ("`subcmd'" == "frame2locals") {
+		pip_utils_frame2locals
+		return add
+		exit
 	}
 	
 	
+	// frame exists
 	if ustrregexm("`subcmd'", "^frame") {
 		pip_utils_frameexists, `frame'
 		return add
+		exit
 	}
 	
 	if ("`subcmd'" == "finalmsg") {
 		noi pip_utils_final_msg
 		return add
+		exit
 	}
 	
 	if ("`subcmd'" == "keepframes") {
 		pip_utils_keep_frame, `frame_prefix' `keepframes' `efficient'
+		exit
 	}
 	if ustrregexm("`subcmd'", "^click"){
 		pip_utils_clicktable `if', `variable' `title' `statacode' `length' `width'
+		exit
 	}
-	
+	//------------ Output result display
+	if ("`subcmd'" == "output") {
+		noi pip_utils_output, `n2disp' `sortvars' `dispvars' `sepvar' `worldcheck'
+		exit
+	}
 	
 	
 end
@@ -236,6 +253,57 @@ program define pip_utils_clicktable
 	
 end
 
+//------------ Final display message
+program define pip_utils_output
+	syntax  [, ///
+		n2disp(integer 1) ///
+		sortvars(varlist) ///
+		dispvars(varlist) ///
+		sepvar(varlist)   ///
+		worldcheck        ///
+	]
+	local n2disp = min(`c(N)', `n2disp')
+	
+	//Display header
+	if      `n2disp'==1 local MSG "first observation"
+	else if `n2disp' >1 local MSG "first `n2disp' observations"
+	else                local MSG "No observations available"
+	noi dis as result _n "{ul:`MSG'}"
+
+	//Worldcheck checks if observations should be displayed only for WLD region
+	local rflag=0
+	if "`worldcheck'"!="" {
+		qui count if region_code=="WLD"
+		if `r(N)'>=`n2disp' {
+            preserve
+            qui keep if region_code=="WLD"
+            local rflag=1
+        }
+	}
+	
+	//DISPLAY OUTPUT
+	//Arguments below could be generalised to argument if desired
+	local dispopts abbreviate(12) noobs
+	//Sort if specified [could also use gsort if and remove varlist]
+	if "`sortvars'"!="" sort `sortvars'
+	//Print output
+	if `n2disp'!=0 noi list `dispvars' in 1/`n2disp', `dispopts' sepby(`sepvars')
+	if `rflag'==1 restore
+
+end
+
+//  -------------- frame to locals
+program define pip_utils_frame2locals, rclass
+	qui ds
+	local vars = "`r(varlist)'"
+	numlist "1/`c(N)'"
+	local obs = r(numlist)
+	foreach var of local vars {
+		foreach ob of local obs {
+			return local `var'_`ob' = `var'[`ob']
+		}
+	}
+end 
 
 exit
 /* End of do-file */
