@@ -73,7 +73,7 @@ all other economies are included in geographic regions, as defined by the World 
 {synopt:{opt  CIV }} Cote d'Ivoire{p_end}
 {synopt:{opt  HRV }} Croatia{p_end}
 {synopt:{opt  CYP }} Cyprus{p_end}
-{synopt:{opt  CZE }} Czech Republic{p_end}
+{synopt:{opt  CZE }} Czechia{p_end}
 {synopt:{opt  DNK }} Denmark{p_end}
 {synopt:{opt  DJI }} Djibouti{p_end}
 {synopt:{opt  DOM }} Dominican Republic{p_end}
@@ -186,7 +186,7 @@ all other economies are included in geographic regions, as defined by the World 
 {synopt:{opt  TON }} Tonga{p_end}
 {synopt:{opt  TTO }} Trinidad and Tobago{p_end}
 {synopt:{opt  TUN }} Tunisia{p_end}
-{synopt:{opt  TUR }} Turkey{p_end}
+{synopt:{opt  TUR }} Türkiye{p_end}
 {synopt:{opt  TKM }} Turkmenistan{p_end}
 {synopt:{opt  TUV }} Tuvalu{p_end}
 {synopt:{opt  UGA }} Uganda{p_end}
@@ -197,7 +197,7 @@ all other economies are included in geographic regions, as defined by the World 
 {synopt:{opt  UZB }} Uzbekistan{p_end}
 {synopt:{opt  VUT }} Vanuatu{p_end}
 {synopt:{opt  VEN }} Venezuela, Republica Bolivariana de{p_end}
-{synopt:{opt  VNM }} Vietnam{p_end}
+{synopt:{opt  VNM }} Viet Nam{p_end}
 {synopt:{opt  PSE }} West Bank and Gaza{p_end}
 {synopt:{opt  YEM }} Yemen, Republic of{p_end}
 {synopt:{opt  ZMB }} Zambia{p_end}
