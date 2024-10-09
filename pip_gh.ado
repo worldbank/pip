@@ -45,8 +45,6 @@ if ("`username'" == "") {
 ==================================================*/
 
 if ("`subcommand'" == "update") {
-	// Set toinstall = 0, update to 1 if update will generate install 
-	local toinstall=0
 	* Check repository of files 
 	* local cmd pip
 	cap findfile github.dta, path("`c(sysdir_plus)'g/")
