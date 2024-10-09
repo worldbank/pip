@@ -137,6 +137,11 @@ program define pip_cp_check_args, rclass
 		local optnames "`optnames' n2disp"
 	}
 	
+    // clear
+	return local clear = "`clear'"
+	local optnames "`optnames' clear"
+
+    // Return all options as local
 	return local optnames "`optnames'"
    
 end
