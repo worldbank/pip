@@ -289,17 +289,17 @@ program define pip, rclass
 		}
 		//------------ World Bank Aggregate
 		else if ("`subcmd'" == "wb") {
-			noi pip_wb, `est_opts' `clear' `n2disp' `povcalnet_format' `cachedir'
+			noi pip_wb, `est_opts' `n2disp' `povcalnet_format' `cachedir'
 			noi pip_timer pip, off `printtimer'
 		}
 		//------------ Country Profile
 		else if ("`subcmd'" == "cp") {
-			pip_cp, `est_opts' `clear' `n2disp' `cachedir'
+			pip_cp, `est_opts' `n2disp' `cachedir'
 			noi pip_timer pip, off `printtimer'
 		}
 		//------------ Grouped data
 		else if ("`subcmd'" == "gd") {
-			noi pip_gd, `est_opts' `clear' `n2disp' `cachedir'
+			noi pip_gd, `est_opts'  `n2disp' `cachedir'
 			return add
 			noi pip_timer pip, off `printtimer'
 		}
