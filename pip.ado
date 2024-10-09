@@ -473,3 +473,5 @@ Version Control:
 *! -- add pip_utils_frame2locals
 *! -- add examples
 *! -- Update help file
+*! version 0.10.11  <2024oct09>
+*! -- HOT FIX: parse `clear' option to pip_cp_check_args
