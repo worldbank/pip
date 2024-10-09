@@ -42,6 +42,9 @@ Update {cmd:pip}
 {synopt :{opt version(#)}}Version to install. Only works with option {it:gh}.{p_end}
 {synopt :{opt path(path)}}{it:(Programmer option)} Un/Installs {cmd:pip} 
 in that directory. Default is PLUS, as it is usually the case with commands from SSC.{p_end}
+{synopt :{opt check}}Checks whether {cmd:pip update} will result in a new install 
+without actually installing the update.  This can be used (with {cmd:pip update} only)
+to test for new versions without updating currently installed versions.{p_end}
 {synoptline}
 
 
