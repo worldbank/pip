@@ -70,17 +70,17 @@ qui {
 }
 
 if ("`reg_cite'" != "") {
-	local cite_ado = `"Castañeda, R.Andrés. (${pip_adoyear}) "pip: Stata Module to Access World Bank’s Global Poverty and Inequality Data" (version ${pip_ado_version}). Stata. Washington, DC: World Bank Group. https://worldbank.github.io/pip/"'
+	local cite_ado = `"Castañeda, R.Andrés and Damian Clarke. (${pip_adoyear}) "pip: Stata Module to Access World Bank’s Global Poverty and Inequality Data" (version ${pip_ado_version}). Stata. Washington, DC: World Bank Group. https://worldbank.github.io/pip/"'
 	noi disp _n "{hline 90}" ///
 	as res in  smcl "{p 2 8 2}Please cite this Stata tool as:{p_end}" /// 
 	as text `"{p 6 10 4 90}`cite_ado'{p_end}"' /// 
-	"{p 75 0 4}{stata pip_cite, ado_bibtext:bibtext}{p_end}"
+	"{p 75 0 4}{stata pip_cite, ado_bibtext:bibtex}{p_end}"
 	
 	
 	local cite_data = `"World Bank. (`data_year'). Poverty and Inequality Platform (version `version') [Data set]. World Bank Group. https://pip.worldbank.org/"'
 	noi disp as res in smcl _n "{p 2 8 2}Please cite the PIP data as:{p_end}" ///
 	as text `"{p 6 10 4 100}`cite_data'{p_end}"' /// 
-	"{p 75 0 4}{stata pip_cite, data_bibtext version(`version'):bibtext}{p_end}"
+	"{p 75 0 4}{stata pip_cite, data_bibtext version(`version'):bibtex}{p_end}"
 	
 	return local cite_ado   =  `"`cite_ado'"'
 	return local cite_data  =  `"`cite_data'"'
@@ -105,17 +105,20 @@ local dateHRF =   trim("`dateHRF'")
 //------------display ado bibtext
 if ("${pip_cite_ado}" == "") {
 	
-	local ado_date: disp %tdCCYY-NN-DD `ado_date'
 	local ado_date = date("${pip_ado_date}", "YMD")
+	local ado_year = year(`ado_date')
+
+	local ado_date: disp %tdCCYY-NN-DD `ado_date'
 	local ado_date = trim("`ado_date'")
-	
+
 	local  crlf "`=char(10)'`=char(13)'"
 	global pip_cite_ado =   ///
 	"{p 4 8 2}@software{castaneda${pip_adoyear},{p_end}"                                                                             + /// 
 	"{p 8 12 2}title = {\{pip\}: {{Stata}} Module to Access {{World Bank}}’s {{Global Poverty}} and {{Inequality}} Data},{p_end}"    + /// 
 	"{p 8 12 2}shorttitle = {PIP},{p_end}"                                                                                           + /// 
-	"{p 8 12 2}author = {Castañeda, R.Andrés},{p_end}"                                                                               + /// 
+	"{p 8 12 2}author = {Castañeda, R.Andrés and Damian Clarke},{p_end}"                                                                               + /// 
 	"{p 8 12 2}date = {`ado_date'},{p_end}"                                                                                          + /// 
+	"{p 8 12 2}year = {`ado_year'},{p_end}"                                                                                          + /// 
 	"{p 8 12 2}location = {{Washington, DC}},{p_end}"                                                                                + /// 
 	"{p 8 12 2}url = {https://worldbank.github.io/pip/},{p_end}"                                                                     + /// 
 	"{p 8 12 2}urldate = {`dateHRF'},{p_end}"                                                                                        + /// 
@@ -172,7 +175,12 @@ mata:
 void pip_ado() {
 	lines  = st_strscalar("pipado")
 	lines  = ustrsplit(lines, "`=char(10)'")'
-	pipver = select(lines, regexm(lines, `"^\*!"'))[1]
+	// Select all comment lines 
+	pipdates = select(lines, regexm(lines, `"^\*!"'))
+	// Match all dates from these lines assuming named as 2YYYmmmDD (eg 2024Sep29)
+	pipver = select(pipdates, regexm(pipdates, `"<2[0-9]{3}[a-zA-Z]{3}[0-9]{2}"'))
+	// Latest version is last date
+	pipver = pipver[rows(pipver)]
 	st_local("pipver", pipver)
 }
 

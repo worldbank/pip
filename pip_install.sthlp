@@ -41,7 +41,11 @@ Update {cmd:pip}
 {browse "https://ideas.repec.org/c/boc/bocode/s459179.html":SSC}.{p_end}
 {synopt :{opt version(#)}}Version to install. Only works with option {it:gh}.{p_end}
 {synopt :{opt path(path)}}{it:(Programmer option)} Un/Installs {cmd:pip} 
-in that directory. Default is PLUS, as it is usually the case with commands from SSC.{p_end}
+in to the directory indicated in {opt path()}. Default is PLUS, as it is usually the 
+case with commands installed from the SSC.{p_end}
+{synopt :{opt check}}Checks whether {cmd:pip update} will result in a new install 
+without actually installing the update.  This can be used (with {cmd:pip update} only)
+to test for new versions without updating currently installed versions.{p_end}
 {synoptline}
 
 
@@ -57,8 +61,8 @@ the development version from GitHub ({cmd:pip install gh}). The {it:install} sub
 prevents issues from duplicate, and potentially conflicting, installations 
 of the command. Using this subcommand it is possible to install pip from SSC 
 and from GitHub, one after the other. If a version is already installed, 
-the command will request a deinstallation or a different installation path. Further
-details are provided in the examples section {it:{help pip##installation_ex:below}}. {p_end}
+the command will request a de-installation or a different installation path. Further
+details are provided in the examples section {it:{help pip_install##examples:below}}. {p_end}
 
 {pstd}
 {opt uninstall} Uninstalls any version of pip in the installation path. This is
@@ -72,9 +76,10 @@ from either SSC ({cmd:ssc install pip}) or from GitHub ({cmd:github install worl
 {opt update} This subcommand makes sure that the {cmd:pip} version is up-to-date. By
 default, the first time that {cmd:pip} is used in a session, it will search for 
 any new versions available from either SSC or GitHub, depending on where it 
-was originally installed from (for this reason the first time {cmd:pip} is 
-used in a session takes longer than subsequently). If you want to get the 
-latest version without leaving your Stata session, type {cmd:pip update}.
+was originally installed from (for this reason, the run time when {cmd:pip} is 
+first called in a session is longer than the run time of subsequent calls to {cmd:pip}). 
+If you wish to install the latest version of {cmd:pip} without leaving your Stata session, 
+type {cmd:pip update}.
 {p_end}
 
 {marker installation_process}{...}
@@ -83,17 +88,17 @@ latest version without leaving your Stata session, type {cmd:pip update}.
 {pmore}
 In case of conflicting installation issues, this is the recommended process to install {cmd:pip} properly:{p_end}
 {p 10 14 6}1. Uninstall {cmd:pip} by typing {cmd:pip uninstall}{p_end}
-{p 10 14 6}2. Install the stable version of {cmd:pip} from SSS 
+{p 10 14 6}2. Install the stable version of {cmd:pip} from the SSC 
 ({cmd:ssc install pip}) or the development version from GitHub 
 ({cmd:github install worldbank/pip}){p_end}
 {p 10 14 6}3. from now on, {res:always} install pip using the {cmd:install}
 subcommand: {cmd:pip install ssc} for SSC, or {cmd:pip install gh} for 
 GitHub.{p_end}
-{p 10 14 6}4. In rare occasions, when you don't want to restart your Stata 
+{p 10 14 6}4. On rare occasions, if you do not want to restart your Stata 
 session but want to update the version of {cmd:pip}, use {cmd:pip update}. {it:Note}: this
 subcommand was intended for the members of the core PIP team,
 who constantly need to update their {cmd:pip} version.{p_end}
-{p 10 14 6}5. If {cmd:pip} fails, start this process over.{p_end}
+{p 10 14 6}5. If {cmd:pip} fails, restart this process.{p_end}
 
 
 {marker install_troubleshoot}{...}
@@ -105,10 +110,10 @@ conflicting issues in your {help sysdir:search path} if the installation is
 not {it:{help net:done properly}}. 
 The subcommand {cmd:install} is helpful to keep your 
 {help sysdir:search path} clean. Say, for example, that you install the 
-dev version from GitHub in the regular way, and then 
-you install the stable version from SSC. By doing that, you are creating 
+dev version of {cmd:pip} from GitHub in the regular way, and then 
+you install the stable version from SSC. By doing this, you are creating 
 two entries in the {it:stata.trk} file, making Stata believe that you 
-have installed {cmd:pip} twice, but in reality you don't because you used 
+have installed {cmd:pip} twice, but in reality you do not, because you used 
 the same location to install both packages. You can confirm this 
 by typing the following: {p_end}
 {cmd}
@@ -126,15 +131,16 @@ by typing the following: {p_end}
 	'PIP': Poverty and Inequality Platform Stata wrapper
 
 	[319] package pip from http://fmwww.bc.edu/repec/bocode/p
-	'PIP': module to access poverty and inequality data from the World Bank's Poverty and 
-	Inequality Platform (PIP)
+	'PIP': module to access poverty and inequality data from the World Bank's Poverty and Inequality Platform (PIP)
 {text}
 {p 8 8 2}
-By using the {it:install} subcommand, {cmd:pip} makes sure all the conflicting installations
+By using the {it:install} subcommand, {cmd:pip} makes ensures that all conflicting installations
 are solved. You can install {cmd:pip} from SSC and from GitHub, one after the other, and you 
-won't have conflicting installations. 
+won't have conflicting installations.
+
+{p 8 8 2}
 Be aware that if you have more than one version installed in your {help sysdir:search path}, 
-{cmd:pip} is going to request you to confirm that you want to uninstall both versions by typing 
+{cmd:pip} will request that you confirm that you want to uninstall both versions by typing 
 {it:yes} in the conosole and hitting {it:enter}.
 {p_end}
 
@@ -146,6 +152,27 @@ Be aware that if you have more than one version installed in your {help sysdir:s
 {text}
 {p 8 8 2}To troubleshoot, follow the 
 {it:{help pip_install##installation_process:installation process}}.{p_end}
+
+
+{marker examples}{...}
+{title:Examples}
+
+{ul:Installation}
+
+{pstd}
+Install the current development version of pip from github (removes the SSC version, if installed)
+
+{phang2}
+{cmd: pip install, gh} 
+
+{ul:Updates}
+
+{pstd}
+Check for any updates to the current version installed, without actually installing updates
+
+{phang2}
+{stata pip update, check}
+
 
 
 {p 40 20 2}(Go back to {it:{help pip##sections:pip's main menu}}){p_end}

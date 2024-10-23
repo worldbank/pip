@@ -60,7 +60,6 @@ qui {
 		local pip_globals: all globals "pip_*"
 		* disp "`pip_globals'"
 		foreach gl of local pip_globals {
-			if regexm("`gl'", "svr") continue
 			global `gl' ""
 		}
 		

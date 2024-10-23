@@ -71,7 +71,8 @@ program define pip_install, rclass
 			" with option {it:path()}" _n ///
 			"Type {it:yes} in the console and hit enter to confirm you agree to uninstall {cmd:pip}" _request(_confirm)
 			if ("`confirm'" != "yes") {	
-				error 
+				dis as error "You did not indicate yes, and hence {cmd:pip} will not be uninstalled"
+				exit
 			}
 		}
 		mata: pip_reverse_macro("trk_srcs")
@@ -96,9 +97,6 @@ program define pip_install, rclass
 		if ("`sour'" == "") {
 			noi disp as text "{cmd:pip} was successfully uninstalled"
 			if ("`src'" == "uninstall") exit	
-		}
-		else {
-			error
 		}
 	}
 	
