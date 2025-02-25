@@ -45,7 +45,7 @@ disp "`toins'"
 
 
 make pip, replace toc pkg                                  ///  readme
-	version(0.10.14)                                                       ///
+	version(0.10.14.9000)                                                  ///
     license("MIT")                                                         ///
     author(`""R.Andres Castaneda" "Damian Clarke""')                       ///
     affiliation(`" "The World Bank" "University of Chile & University of Exeter""')                                                         ///
