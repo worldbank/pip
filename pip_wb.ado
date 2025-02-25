@@ -340,7 +340,10 @@ program define pip_wb_clean, rclass
 		//========================================================
 		// labels
 		//========================================================
-		
+		if ("`ppp_version'" == "2005") local pg_shortfall = 0
+		if ("`ppp_version'" == "2011") local pg_shortfall = 22
+		if ("`ppp_version'" == "2017") local pg_shortfall = 25
+		if ("`ppp_version'" == "2021") local pg_shortfall = 28
 		
 		//------------ All variables
 		rename reporting_pop population
@@ -357,6 +360,8 @@ program define pip_wb_clean, rclass
 		label var watts            "watts index"
 		label var region_name      "world bank region"
 		cap label var estimate_type    "type of estimate"
+		label var spr	            "societal poverty rate, poverty headcount rate at the SPL"
+		label var pg	            "prosperity gap, average shortfall from \$`pg_shortfall'/day"
 		
 		order region_name region_code reporting_year  poverty_line ///
 		mean headcount poverty_gap  poverty_severity watts   ///

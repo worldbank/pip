@@ -479,6 +479,11 @@ program define pip_cl_clean, rclass
 		//========================================================
 		// labels
 		//========================================================
+
+		if ("`ppp_version'" == "2005") local pg_shortfall = 0
+		if ("`ppp_version'" == "2011") local pg_shortfall = 22
+		if ("`ppp_version'" == "2017") local pg_shortfall = 25
+		if ("`ppp_version'" == "2021") local pg_shortfall = 28
 		
 		//------------ Survey coverage
 		tostring survey_coverage, replace
@@ -523,6 +528,10 @@ program define pip_cl_clean, rclass
 		label var mld 				"mean log deviation"
 		label var polarization 	    "polarization"
 		label var reporting_pop     "population in year"
+		label var spl	            "societal poverty line in `ppp_version' PPP US\$ (per capita per day)"
+		label var spr	            "societal poverty rate, poverty headcount rate at the SPL"
+		label var pg	            "prosperity gap, average shortfall from \$`pg_shortfall'/day"
+
 		
 		ds decile*
 		local vardec = "`r(varlist)'"
