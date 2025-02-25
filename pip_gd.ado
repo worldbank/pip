@@ -282,6 +282,7 @@ program define pip_gd_check_args, rclass
         	if ("`ppp_year'" == "2005") local povline = 1.25
         	if ("`ppp_year'" == "2011") local povline = 1.9
         	if ("`ppp_year'" == "2017") local povline = 2.15
+			if ("`ppp_year'" == "2021") local povline = 3
 		}
 		return local povline  = "`povline'"
 		local optnames "`optnames' povline"

@@ -196,7 +196,7 @@ program pip_example06
 		msize(vsmall)) (lfit gini loggdp),           ///
 		ylabel(, format(%2.0f)) ///
 		ytitle("Gini Index" " ", size(small))                   ///
-		xtitle(" " "GDP per Capita per Year (in 2017 USD PPP)", ///
+		xtitle(" " "GDP per Capita per Year (in 2021 USD PPP)", ///
 		size(small))  graphregion(c(white)) ysize(5) xsize(7)   ///
 		ylabel(,labs(small) nogrid angle(verticle))             ///
 		xlabel(,labs(small)) scheme(s2color)                    ///

@@ -34,7 +34,7 @@
 {synopt :{opt cov:erage(string)}}Coverage level ("national", "urban", "rural", "all"). Default "{it:all}".{p_end}
 {synopt :{opt y:ear}(numlist|string)}{help numlist} of years  or "all", or "last". Default is "{it:all}".{p_end}
 {synopt :{opt povl:ine:}(#)}List of poverty lines (accepts up to 5) in specified PPP (see option {help pip##general_options:ppp_year(#)}) to calculate 
-poverty. Default is 2.15 at 2017 PPPs.{p_end}
+poverty. Default is 3.00 at 2021 PPPs.{p_end}
 {synopt :{opt fill:gaps}}Loads extrapolations and interpolations at the country
 level and year estimates with NOT enough data coverage at the regional level 
 ({it:see details {help pip_cl##fillgaps:below}}).{p_end}
@@ -58,8 +58,8 @@ the {cmd:cl} (the default) and {cmd:wb} subcommands are the main modules of {cmd
 {cmd:cl} provides the country-level poverty and inequality estimates, whereas 
 {cmd:wb} provides regional and global level poverty estimates. As of now, the
 underlying welfare aggregate is the per capita household income or consumption
-expressed in 2017 PPP USD (the option {cmd:ppp_year(2011)} allows to
-estimate values in 2011 PPPs). Poverty lines, means, and medians are expressed in
+expressed in 2021 PPP USD (the option {cmd:ppp_year(2017)} allows to
+estimate values in 2017 PPPs). Poverty lines, means, and medians are expressed in
 {cmd:daily amounts}. 
 
 {phang}
@@ -142,7 +142,7 @@ for each country.
 {opt povline(#)} The poverty lines for which the poverty measures will be
  calculated. When selecting multiple poverty lines, use less than 4 decimals 
  and separate each value with spaces. If left empty, the default poverty line of 
- $2.15 is used. By default, poverty lines  are expressed in 2017 PPP USD per capita
+ $3 is used. By default, poverty lines  are expressed in 2021 PPP USD per capita
  per day. If option {opt ppp_year(2011)} is specified, the poverty lines will be
  expressed in 2011 PPPs.
 
@@ -153,8 +153,8 @@ line. In other words, the estimated poverty line will be the nearest
 income or consumption level such that the incomes of 10% of the 
 population fall below it. This has no default, and cannot be combined 
 with {opt povline}. The quantile (recorded in the variable poverty_line) 
-is expressed in 2017 PPP USD per capita per day (unless option 
-{opt ppp_year(2011)} is specified, in which case it will be reported in 
+is expressed in 2021 PPP USD per capita per day (unless option 
+{opt ppp_year(2017)} is specified, in which case it will be reported in 
 2011 PPP values) ({err:Note: }{it:this option only applies to subcommand 
 {cmd:cl}}).
 
