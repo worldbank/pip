@@ -96,8 +96,8 @@ program define pip_wb_check_args, rclass
 	pause                           /// 
 	POVCALNET_format                ///
 	replace                         ///
-	FILLgaps                        ///
-	NOWcasts						///
+	noFILLgaps                        ///
+	noNOWcasts						///
 	n2disp(passthru)                ///
     *                               ///
 	] 
@@ -194,10 +194,10 @@ program define pip_wb_check_args, rclass
 	}
 		
 	//------------ nowcasts
-	if ("`nowcasts'" != "") {
-		// if nowcasts is selected, fillgaps is also selected
-		local fillgaps = "fillgaps"
-	}
+	// if ("`nowcasts'" != "") {
+	// 	// if nowcasts is selected, fillgaps is also selected
+	// 	local fillgaps = "fillgaps"
+	// }
 	return local nowcasts = "`nowcasts'"
 	local optnames "`optnames' nowcasts"
 	
@@ -324,7 +324,7 @@ end
 //------------Clean Cl data
 program define pip_wb_clean, rclass
 	
-	syntax  [, NOWcasts fillgaps ]
+	syntax  [, noNOWcasts noFILLgaps ]
 	
 	if ("${pip_version}" == "") {
 		noi disp "{err}No version selected."
@@ -384,10 +384,10 @@ program define pip_wb_clean, rclass
 			 pop_in_poverty
 		
 		//------------ Nowcasts and fillgaps
-		if ("`fillgaps'" == "") {
+		if ("`fillgaps'" != "") {
 			drop if estimate_type == "projection"
 		}
-		if ("`nowcasts'" == "") {
+		if ("`nowcasts'" != "") {
 			drop if estimate_type == "nowcast"
 		}
 		

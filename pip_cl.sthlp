@@ -35,11 +35,13 @@
 {synopt :{opt y:ear}(numlist|string)}{help numlist} of years  or "all", or "last". Default is "{it:all}".{p_end}
 {synopt :{opt povl:ine:}(#)}List of poverty lines (accepts up to 5) in specified PPP (see option {help pip##general_options:ppp_year(#)}) to calculate 
 poverty. Default is 3.00 at 2021 PPPs.{p_end}
-{synopt :{opt fill:gaps}}Loads extrapolations and interpolations at the country
+{synopt :{opt (no)}{opt fill:gaps}}Loads extrapolations and interpolations at the country
 level and year estimates with NOT enough data coverage at the regional level 
 ({it:see details {help pip_cl##fillgaps:below}}).{p_end}
-{synopt :{opt now:casts}}Loads nowcast estimates at the country-level, 
-regional, and global levels.{p_end}
+{synopt :{opt no}{opt now:casts}}By default, nowcast estimates are loaded at the
+ country, regional, and global levels. Specify {opt nonowcasts} to exclude these
+estimates from the results.{p_end}
+
 {pstd}
 
 {p 4 4 2}The following options only work at the country level:{p_end}
@@ -155,35 +157,25 @@ population fall below it. This has no default, and cannot be combined
 with {opt povline}. The quantile (recorded in the variable poverty_line) 
 is expressed in 2021 PPP USD per capita per day (unless option 
 {opt ppp_year(2017)} is specified, in which case it will be reported in 
-2011 PPP values) ({err:Note: }{it:this option only applies to subcommand 
-{cmd:cl}}).
+2011 PPP values) 
+({err:Note:}{it: this option only applies to subcommand {cmd:cl}}).
 
 {marker fillgaps}{...}
 {phang}
-{opt fill:gaps} This option works differently depending on the level of aggregation:
+{opt fill:gaps} This option works differently depending on the level of aggregation.
 
 {phang}
-{res:{ul:Country-level:} } {opt fillgaps} loads all country-level estimates that are 
-used to create the global and regional aggregates in the reference years. This
-includes estimates that are extrapolated or interpolated for those years where 
-nor survey data is available, year estimates for those surveys whose welfare 
-aggregate was collected over multiple years.
+{res:{ul:Country-level:} } {opt fillgaps} loads all country-level estimates used to construct the global and regional aggregates in the reference years. This includes extrapolated or interpolated values for countries without survey data in the reference year, as well as annualized estimates from surveys whose welfare aggregates span multiple years.
 
-{p 8 8 2}{res:Note}: Countries without a survey in the reference-year have been 
-extrapolated or interpolated using national accounts growth rates and assuming
-distribution-neutrality (see Chapter 6
-{browse "https://openknowledge.worldbank.org/bitstream/handle/10986/20384/9781464803611.pdf":here}).
-Therefore, changes at the country-level from one reference year to the next need 
-to be interpreted carefully and may not be the result of a new household survey.
+{p 8 8 2}{res:Note}: In cases where no survey is available for a given reference year, estimates have been generated using national accounts growth rates under the assumption of distribution-neutrality (see Chapter 6
+{browse "https://openknowledge.worldbank.org/bitstream/handle/10986/20384/9781464803611.pdf":here}). Therefore, changes at the country level between reference years should be interpreted with caution, as they may not reflect new household survey data.
 
 {phang}
-{res:{ul:Regional/Global-level:} } {opt fillgaps} loads estimates for all the years
-at all levels of aggregation, even if there is not enough survey coverage in that 
-years for a specific region aggregate (e.g., region or global). ({err:We highly discourage the use of these estimates for any analysis}).
+{res:{ul:Regional/Global-level:} } the {opt nofillgaps} option removes all estimates for years lacking sufficient survey coverage for a given aggregate (e.g., regional or global).
+({err:This option exists because we strongly discourage using such estimates for analytical purposes}).{p_end}
 
 {phang}
-{opt now:casts} This option loads nowcast estimates at the country-level, regional,
- and global levels. Activating {opt nowcasts} activates {opt fillgaps} as well.
+{opt no}{opt now:casts} is an "off" option that suppresses the loading of nowcast estimates at the country, regional, and global levels. Specifying {opt nonowcasts} excludes these estimates from the results.
 
 {marker examples}{...}
 {title:Examples}
@@ -239,20 +231,21 @@ from 2015-2016 to 2015. Only works for reference years.
 {stata pip wb, clear}       // all regions and reference years{p_end}
 
 {phang}
-2.5. {opt fillgaps} and {opt nowcasts} 
+2.5. {opt fillgaps}, {opt nofillgaps} and {opt nonowcasts} 
 
 {phang2}
 {stata pip, clear}          // survey estimates{p_end}
 {phang2}
-{stata pip, clear fillgaps} // interpolations and extrapolations{p_end}
+{stata pip, clear fillgaps} // interpolations, extrapolations and nowcasts{p_end}
 {phang2}
-{stata pip, clear nowcasts}  // {opt fillgaps} plus nowcasts{p_end}
+{stata pip, clear fillgaps nonowcasts}  // just interpolations and extrapolations{p_end}
 {phang2}
-{stata pip wb, clear}       // Official regional and global data{p_end}
+{stata pip wb, clear}       // Official regional and global data with 
+projections and nowcasts{p_end}
 {phang2}
-{stata pip wb, fillgaps}  // aggregates for years with no survey coverage{p_end}
+{stata pip wb, nofillgaps}  // remove aggregates for years with no survey coverage but keep nowcast{p_end}
 {phang2}
-{stata pip wb, nowcasts}   // {opt fillgaps} plus nowcasts{p_end}
+{stata pip wb, nonowcasts}   // Remove nowcasts but keep aggregates for years with no survey coverage{p_end}
 
 
 {ul:3. Samples uniquely identified by country/year}
