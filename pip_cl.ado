@@ -104,7 +104,7 @@ program define pip_cl_check_args, rclass
 	POVLine(numlist)                /// 
 	POPShare(numlist)	   	        /// 
 	FILLgaps                        ///
-	NOWcasts                        /// 
+	noNOWcasts                      /// 
 	COVerage(string)                /// 
 	CLEAR(string)                   /// 
 	pause                           /// 
@@ -222,10 +222,10 @@ program define pip_cl_check_args, rclass
 	local optnames "`optnames' povline popshare"
 		
 	//------------ nowcasts
-	if ("`nowcasts'" != "") {
-		// if nowcasts is selected, fillgaps is also selected
-		local fillgaps = "fillgaps"
-	}
+	// if ("`nowcasts'" != "") {
+	// 	// if nowcasts is selected, fillgaps is also selected
+	// 	local fillgaps = "fillgaps"
+	// }
 	return local nowcasts = "`nowcasts'"
 	local optnames "`optnames' nowcasts"
 	
@@ -412,7 +412,7 @@ end
 //------------Clean Cl data
 
 program define pip_cl_clean, rclass
-	syntax  [, NOWcasts fillgaps ]
+	syntax  [, noNOWcasts fillgaps ]
 		
 	noi disp "{ul:Cleaning data}: `fillgaps' `nowcasts'. zero `0'"
 	
@@ -613,7 +613,7 @@ program define pip_cl_clean, rclass
 				 survey_time is_interpolated distribution_type spl spr /// 
 				 pg estimate_type
 				 
-			if ("`nowcasts'" == "") {
+			if ("`nowcasts'" != "") {
 				drop if estimate_type == "nowcast"
 			}
 		}
