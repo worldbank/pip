@@ -24,7 +24,7 @@
 {synopt :{opt requested_mean(#)}} Scalar value indicating the mean welfare in the population.{p_end}
 {synopt :{opt n_bins(#)}} Scalar value indicating the number of bins requested when Lorenz curve estimates are requested.{p_end}
 {synopt :{opt povl:ine:}(numlist)} List of poverty lines in specified PPP (see option {help pip##general_options:ppp_year(#)}) to calculate
-poverty. Default is 2.15 at 2017 PPPs.{p_end}
+poverty. Default is $3.0 at 2021 PPPs.{p_end}
 {synopt :{opt clear}}Clear results.{res: NOTE: }This options has a special use. See details {help pip_gd##clear:below}{p_end}
 {synoptline}
 
@@ -110,8 +110,8 @@ option.  A scalar value should be indicated, strictly between 0 and 1,000.
 {opt povline(numlist)} The poverty lines for which the poverty measures will be calculated.
 When selecting multiple poverty lines, use less than 4 decimals and separate each value
 with spaces. If left empty, the default poverty line of $2.15 is used. By default,
-poverty lines are expressed in 2017 PPP USD per capita per day. If option
-{opt ppp_year(2011)} is specified, the poverty lines will be expressed in 2011 PPPs.
+poverty lines are expressed in 2021 PPP USD per capita per day. If option
+{opt ppp_year(2017)} is specified, the poverty lines will be expressed in 2017 PPPs.
 
 {marker clear}{...}
 {phang}

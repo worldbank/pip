@@ -99,7 +99,7 @@ The options below work for any subcommand that returns vintaged data
 Option {it:version()} takes prevalence over the next 3 options
 {it:ppp_year()}, {it:release()} & {it:identity()}, as the combination of
 these three parameters uniquely identifies a dataset.{p_end}
-{synopt :{opt ppp:_year:}(#)}PPP round (2011 or 2017). {p_end}
+{synopt :{opt ppp:_year:}(#)}PPP round (2017 or 2021). {p_end}
 {synopt :{opt rel:ease(numlist)}}8 digit number with the PIP release date in the format {it:YYYYMMDD}.{p_end}
 {synopt :{opt ide:ntity(string)}{err:*}}Version of data to run the query on (e.g., prod, int, test). See description of each identity {bf:{help pip_note:here}}.{p_end}
 {synopt :{opt ser:ver(string)}{err:*}}Name of server to query (e.g, prod, dev, qa). See description of each server {bf:{help pip_note:here}}.{p_end}
@@ -404,12 +404,12 @@ https://worldbank.github.io/pip/ {p_end}
 
 {title:Thanks for citing {cmd:pip} data as follows}
 
-{p 4 8 2} World Bank. (2023). Poverty and Inequality Platform (version 0.10.14)
-[Data set]. World Bank Group. www.pip.worldbank.org. Accessed  14 Jan 2025.{p_end}
+{p 4 8 2} World Bank. (2023). Poverty and Inequality Platform (version 0.10.14.9002)
+[Data set]. World Bank Group. www.pip.worldbank.org. Accessed 12 Aug 2025.{p_end}
 
 {p 4 8 2}Available version_IDs:{p_end}
-{p 4 8 2}2017 PPPs: 20230919_2017_01_02_PROD{p_end}
-{p 4 8 2}2011 PPPs: 20230919_2011_02_02_PROD{p_end}
+{p 4 8 2}2021 PPPs: 20250401_2021_01_02_PROD{p_end}
+{p 4 8 2}2017 PPPs: 20250401_2017_01_02_PROD{p_end}
 
 {pstd}
 Please make reference to the date when the database was downloaded, as statistics may change.

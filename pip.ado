@@ -1,8 +1,11 @@
 /*=======================================================
 Program Name: pip.ado
-Author:
+Authors:
 R.Andres Castaneda
 acastanedaa@worldbank.org
+
+Damian Clarke 
+dclarke4@worldbank.org, dclarke@fen.uchile.cl
 
 Contributor:
 Tefera Bekele Degefu
@@ -443,4 +446,13 @@ Version Control:
 *! -- Fix issue with regex in Stata 18 
 *! version 0.10.14  <2025jan14>
 *! -- remove internal caching
+*! version 0.10.14.9000  <2025feb24>
+*! -- update povline default to 2021 PPPs
+*! -- update help files
+*! -- add labels to SPL, SPR and PG
+*! version 0.10.14.9001  <2025feb28>
+*! -- update helpfile
+*! version 0.10.14.9002  <2025mar24>
+*! -- revert option nowcast for nonowcast
+*! -- change fillgaps to nofillgaps in subcmd wb
 

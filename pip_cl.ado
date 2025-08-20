@@ -104,7 +104,7 @@ program define pip_cl_check_args, rclass
 	POVLine(numlist)                /// 
 	POPShare(numlist)	   	        /// 
 	FILLgaps                        ///
-	NOWcasts                        /// 
+	noNOWcasts                      /// 
 	COVerage(string)                /// 
 	CLEAR(string)                   /// 
 	pause                           /// 
@@ -214,6 +214,7 @@ program define pip_cl_check_args, rclass
 		if ("`ppp_year'" == "2005") local povline = 1.25
 		if ("`ppp_year'" == "2011") local povline = 1.9
 		if ("`ppp_year'" == "2017") local povline = 2.15
+		if ("`ppp_year'" == "2021") local povline = 3
 	}
 	
 	return local povline  = "`povline'"
@@ -221,10 +222,10 @@ program define pip_cl_check_args, rclass
 	local optnames "`optnames' povline popshare"
 		
 	//------------ nowcasts
-	if ("`nowcasts'" != "") {
-		// if nowcasts is selected, fillgaps is also selected
-		local fillgaps = "fillgaps"
-	}
+	// if ("`nowcasts'" != "") {
+	// 	// if nowcasts is selected, fillgaps is also selected
+	// 	local fillgaps = "fillgaps"
+	// }
 	return local nowcasts = "`nowcasts'"
 	local optnames "`optnames' nowcasts"
 	
@@ -411,7 +412,7 @@ end
 //------------Clean Cl data
 
 program define pip_cl_clean, rclass
-	syntax  [, NOWcasts fillgaps ]
+	syntax  [, noNOWcasts fillgaps ]
 		
 	noi disp "{ul:Cleaning data}: `fillgaps' `nowcasts'. zero `0'"
 	
@@ -478,6 +479,11 @@ program define pip_cl_clean, rclass
 		//========================================================
 		// labels
 		//========================================================
+
+		if ("`ppp_version'" == "2005") local pg_shortfall = 0
+		if ("`ppp_version'" == "2011") local pg_shortfall = 22
+		if ("`ppp_version'" == "2017") local pg_shortfall = 25
+		if ("`ppp_version'" == "2021") local pg_shortfall = 28
 		
 		//------------ Survey coverage
 		tostring survey_coverage, replace
@@ -522,6 +528,10 @@ program define pip_cl_clean, rclass
 		label var mld 				"mean log deviation"
 		label var polarization 	    "polarization"
 		label var reporting_pop     "population in year"
+		label var spl	            "societal poverty line in `ppp_version' PPP US\$ (per capita per day)"
+		label var spr	            "societal poverty rate, poverty headcount rate at the SPL"
+		label var pg	            "prosperity gap, average shortfall from \$`pg_shortfall'/day"
+
 		
 		ds decile*
 		local vardec = "`r(varlist)'"
@@ -603,7 +613,7 @@ program define pip_cl_clean, rclass
 				 survey_time is_interpolated distribution_type spl spr /// 
 				 pg estimate_type
 				 
-			if ("`nowcasts'" == "") {
+			if ("`nowcasts'" != "") {
 				drop if estimate_type == "nowcast"
 			}
 		}

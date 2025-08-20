@@ -8,17 +8,17 @@
 cap program drop getfiles
 program define getfiles, rclass
 
-args mask
+	args mask
 
-local f2add: dir . files "`mask'", respectcase
+	local f2add: dir . files "`mask'", respectcase
 
-foreach a of local f2add {
-	local as "`as' `a'"
-}
-local as = trim("`as'")
-local as: subinstr local as " " ";", all
+	foreach a of local f2add {
+		local as "`as' `a'"
+	}
+	local as = trim("`as'")
+	local as: subinstr local as " " ";", all
 
-return local files = "`as'"
+	return local files = "`as'"
 end
 
 
@@ -45,7 +45,7 @@ disp "`toins'"
 
 
 make pip, replace toc pkg                                  ///  readme
-	version(0.10.14)                                                       ///
+	version(0.10.14.9002)                                                  ///
     license("MIT")                                                         ///
     author(`""R.Andres Castaneda" "Damian Clarke""')                       ///
     affiliation(`" "The World Bank" "University of Chile & University of Exeter""')                                                         ///

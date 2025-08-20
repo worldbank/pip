@@ -27,7 +27,7 @@
 				----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 				  server(string)*            Name of a server to query on (e.g, prod, dev, qa). See description of each server here.
 				  identity(string)*          Version of data to run the query on (e.g., prod, int, test).
-				  ppp_year(#)                PPP round (eg., 2005, 2011, 2017).
+				  ppp_year(#)                PPP round (eg., 2017, 2021).
 				  release(numlist)           PIP data release date.
 
 				Operational                  Description

@@ -17,7 +17,7 @@ in general, to the release date of PIP. However, it could refer to any date. Oth
 internal WB users; external users have access only to the publicly released versions.
 What identifies a folder as an official release is the suffix SSS, which is explained below: 
 
-{p 8 8 2}{it:{bf: YYYY}} : Refers to the PPP round (e.g. 2011, 2017 at present). 
+{p 8 8 2}{it:{bf: YYYY}} : Refers to the PPP round (e.g. 2017, 2021 at present). 
 
 {p 8 8 2}{it:{bf: RV}} : Refers to the {ul:release version of the PPP round}. The same round of PPPs may
 be revised by the International Comparison Program (ICP) team.  
