@@ -455,4 +455,8 @@ Version Control:
 *! version 0.10.14.9002  <2025mar24>
 *! -- revert option nowcast for nonowcast
 *! -- change fillgaps to nofillgaps in subcmd wb
+*! version 0.10.15  <2025mar24>
+*! -- Implement nofillgaps and nonowcast for wb
+*! -- fix nowcast default in cl
+*! -- add labels to SPL, SPR and PG
 
