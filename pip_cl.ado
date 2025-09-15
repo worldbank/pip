@@ -75,7 +75,8 @@ program define pip_cl, rclass
 		//------------ display results
 		noi pip_utils output, `n2disp' /// 
 		 sortvars(country_code year) /// 
-		 dispvars(country_code year poverty_line headcount mean median welfare_type) ///
+		 dispvars(country_code year poverty_line headcount mean /// median 
+		 welfare_type) ///
 		 sepvar(country_code)		
 		
 		//------------ Povcalnet format
