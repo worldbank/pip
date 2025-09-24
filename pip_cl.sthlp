@@ -455,6 +455,54 @@ Not necessarily the latest
 {txt}      ({stata "pip_examples pip_example03":click to run})
 
 
+{ul:5. Aggregates examples}
+
+{phang2}
+{ul:5.1} Generate estimates using the old regional classification
+
+{cmd}
+		local curframe = c(frame)
+		frame `curframe': preserve
+		tempname pip_temp
+		frame create `pip_temp'
+		frame change `pip_temp'
+		
+		// load pip regional data
+		pip wb, clear fillgaps server(dev)
+		keep if inlist(region_code,"EAP","ECA","LAC","MNA","OHI","SAR","SSA") // keep only old regions
+		keep region* year poverty_line headcount pop_in_poverty
+		list 
+	
+		frame change `pip_temp'
+
+{txt}      ({stata "pip_examples pip_example14":click to run})
+
+{phang2}
+{ul:5.2} Generate poverty estimates for countries classified as FCV (Fragile & Conflict-Affected)
+
+{cmd}
+		local curframe = c(frame)
+		frame `curframe': preserve
+		tempname pip_temp
+		frame create `pip_temp'
+		frame change `pip_temp'
+		
+		// load pip old regions
+		pip tables, table(country_list) clear server(dev)
+		tempfile group_names
+		save `group_names'
+		
+		// load pip country data & other classifications
+		pip, clear fillgaps server(dev)
+		merge m:1 country_code using `group_names', nogen
+		gen double pop_in_poverty = headcount * population
+		collapse (mean) headcount (rawsum) pop_in_poverty [aw=population], by(fcv* year)
+		list 
+		
+		frame change `pip_temp'
+
+{txt}      ({stata "pip_examples pip_example15":click to run})
+
 {p 40 20 2}(Go back to {it:{help pip##sections:pip's main menu}}){p_end}
 
 
