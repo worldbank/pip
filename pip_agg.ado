@@ -41,7 +41,7 @@ program define pip_agg, rclass
 		//========================================================
 		// Build query (queries returned in ${pip_last_queries}) 
 		//========================================================
-		pip_agg_query, region(`region') year(`year') povline(`povline')   /*
+		pip_agg_query,  year(`year') povline(`povline')   /*
 		*/            ppp_version(`ppp_year') coverage(`coverage') 
 		
 		//========================================================
@@ -55,7 +55,7 @@ program define pip_agg, rclass
 		
 		//------------ clean
 		pip_timer pip_agg_clean, on
-		pip_agg_clean, `nowcasts' `fillgaps'
+		pip_agg_clean, `nowcasts' `fillgaps' aggregation(`aggregation')
 		pip_timer pip_agg_clean, off
 		
 		//------------ Add data notes
@@ -304,7 +304,7 @@ end
 //------------Clean Cl data
 program define pip_agg_clean, rclass
 	
-	syntax  [, noNOWcasts noFILLgaps ]
+	syntax  [, noNOWcasts noFILLgaps aggregation(string)]
 	
 	if ("${pip_version}" == "") {
 		noi disp "{err}No version selected."
@@ -317,6 +317,26 @@ program define pip_agg_clean, rclass
 	
 	
 	qui {
+		//========= select relevant aggregations
+		// All of this must be changed to use the API directly when ready 
+		// rather than filtering here
+		frame _pip_cl`_version' {
+			if ("`aggregation'" == "official") {
+				levelsof region_code, local(reg_codes) clean separate("|")
+				local reg_codes "`reg_codes'|WLD" // think how to implement this
+			}
+			else if (inlist("`aggregation'", "pcn", "vintage")) {
+				levelsof regionpcn_code, local(reg_codes) clean  separate("|")				
+				local reg_codes "`reg_codes'|WLD" // think how to implement this
+			}
+			else {
+				noi disp in red "aggregation not available."
+				error
+			}
+		}
+
+		keep if regexm(region_code, "`reg_codes'")
+
 		//========================================================
 		// labels
 		//========================================================

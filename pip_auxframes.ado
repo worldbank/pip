@@ -23,8 +23,8 @@ program define pip_auxframes, rclass
 	local _version   = "_`1'_`3'_`9'"
 	
 	//------------ name of tables and frames
-	local tables "countries regions framework"
-	local frames "cts regions fw"
+	local tables "countries regions framework country_list"
+	local frames "cts regions fw cl"
 	
 	//------------ Iterations
 	gettoken table tables: tables 
