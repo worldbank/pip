@@ -88,13 +88,12 @@ program define pip_agg_check_args, rclass
 	version 16.1
 	syntax ///
 	[ ,                             /// 
-	REGion(string)                  /// 
+	AGGregation(string)             /// 
 	Year(string)                    /// 
 	POVLine(numlist)                /// 
 	COVerage(string)                /// 
 	CLEAR                           /// 
 	pause                           /// 
-	POVCALNET_format                ///
 	replace                         ///
 	noFILLgaps                        ///
 	noNOWcasts						///
@@ -151,47 +150,22 @@ program define pip_agg_check_args, rclass
 	return local coverage = "`coverage'"
 	local optnames "`optnames' coverage"
 	
-	//------------ Region
-	if ("`region'" != "") {
-		local region = upper("`region'")
+	//------------ Aggregation
+	if ("`aggregation'" != "") {
+		local aggregation = lower("`aggregation'")
 		
-		if (regexm("`region'", "SAR")) {
-			noi disp in red "Note: " in y "The official code of South Asia is" ///
-			"{it: SAS}, not {it:SAR}. We'll make the change for you"
-			local region: subinstr local region "SAR" "SAS", word 
-		}
-		
-		//------------ Regions frame
-		local frpiprgn "_pip_regions`_version'" 
-		frame `frpiprgn' {
-			levelsof region_code, local(av_regions)  clean
-		}
-		
-		// Add all to have the same functionality as in country(all)
-		local av_regions = "`av_regions'" + " ALL"
-		
-		local inregion: list region in av_regions
-		if (`inregion' == 0) {
-			
-			noi disp in red "region `region' is not available." _n ///
-			"Only the following are available:" _n "`av_regions'"
-			
+		local av_agg "official pcn vintage" // this should come from the API
+		local inagg: list aggregation in av_agg
+		if (`inagg' == 0) {	
+			noi disp in red "aggregation `aggregation' is not available." _n ///
+			"Select one of the following:" _n "`av_agg'"	
 			error
 		}
 	}
 
-	return local region = "`region'"
-	local optnames "`optnames' region"
+	return local aggregation = "`aggregation'"
+	local optnames "`optnames' aggregation"
 	
-	//========================================================
-	//  Aggregate level (wb)
-	//========================================================
-
-	if ("`country'" != "") {
-		noi disp as err "option {it:country()} is not allowed with subcommand {it:wb}"
-		noi disp as res "Note: " as txt "subcommand {it:wb} only accepts options {it:region()} and {it:year()}"
-		error
-	}
 		
 	//------------ nowcasts
 	// if ("`nowcasts'" != "") {
