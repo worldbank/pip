@@ -236,6 +236,12 @@ program define pip, rclass
 			noi pip_cl, `est_opts' `n2disp' `povcalnet_format'
 			noi pip_timer pip, off `printtimer' 
 		}
+		//------------ Aggregate data
+		else if ("`subcmd'" == "agg") {
+			noi pip_agg, `est_opts'  `n2disp'
+			return add
+			noi pip_timer pip, off `printtimer'
+		}
 		//------------ World Bank Aggregate
 		else if ("`subcmd'" == "wb") {
 			noi pip_wb, `est_opts' `n2disp' `povcalnet_format'
@@ -252,12 +258,7 @@ program define pip, rclass
 			return add
 			noi pip_timer pip, off `printtimer'
 		}
-		//------------ Aggregate data
-		else if ("`subcmd'" == "agg") {
-			noi pip_agg, `est_opts'  `n2disp'
-			return add
-			noi pip_timer pip, off `printtimer'
-		}
+		//------------ Subcommand not recognized
 		else {
 			noi disp "{err}Subcommand {it:`subcmd'} is not recognized." _n /* 
 			*/ "see {it:{help pip}}"

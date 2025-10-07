@@ -151,16 +151,25 @@ program define pip_agg_check_args, rclass
 	local optnames "`optnames' coverage"
 	
 	//------------ Aggregation
+	local av_agg "official pcn vintage" // this should come from the API
 	if ("`aggregation'" != "") {
-		local aggregation = lower("`aggregation'")
-		
-		local av_agg "official pcn vintage" // this should come from the API
+		local aggregation = lower("`aggregation'")		
 		local inagg: list aggregation in av_agg
 		if (`inagg' == 0) {	
 			noi disp in red "aggregation `aggregation' is not available." _n ///
-			"Select one of the following:" _n "`av_agg'"	
+			"Select one of the following:" _n
+			foreach agg of local av_agg {
+				noi disp "    - `agg'" 
+			}
 			error
 		}
+	} 
+	else {
+		noi disp "{err: NOTE:} aggregations available are:" _n 
+		foreach agg of local av_agg {
+			noi disp "    - `agg'" 
+		}
+		error
 	}
 
 	return local aggregation = "`aggregation'"
@@ -226,7 +235,6 @@ program define pip_agg_query, rclass
 	version 16.1
 	syntax ///
 	[ ,                             /// 
-	REGion(string)                  /// 
 	YEAR(string)                    /// 
 	POVLine(numlist)                /// 
 	ppp_version(numlist)            /// 
@@ -239,9 +247,7 @@ program define pip_agg_query, rclass
 	qui {
 		
 		// country
-		local country = stritrim(ustrtrim("`region'"))
-		local country : subinstr local country " " ",", all
-		if ("`country'" == "") local country = "all"
+		local country = "all"
 		// year
 		local year: subinstr local year " " ",", all
 		if ("`year'" == "") local year = "all"
