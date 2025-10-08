@@ -12,12 +12,12 @@ Output:             dta
 /*==================================================
 0: Program set up
 ==================================================*/
-program define pip_wb, rclass
+program define pip_agg, rclass
 	version 16.1
 	
-	pip_timer pip_wb, on
+	pip_timer pip_agg, on
 	
-	pip_wb_check_args `0'
+	pip_agg_check_args `0'
 	local optnames "`r(optnames)'" 
 	mata: pip_retlist2locals("`optnames'")
 	
@@ -41,7 +41,7 @@ program define pip_wb, rclass
 		//========================================================
 		// Build query (queries returned in ${pip_last_queries}) 
 		//========================================================
-		pip_wb_query, region(`region') year(`year') povline(`povline')   /*
+		pip_agg_query,  year(`year') povline(`povline')   /*
 		*/            ppp_version(`ppp_year') coverage(`coverage') 
 		
 		//========================================================
@@ -49,14 +49,14 @@ program define pip_wb, rclass
 		//========================================================
 		
 		//------------ download
-		pip_timer pip_wb.pip_get, on
+		pip_timer pip_agg.pip_get, on
 		pip_get, `clear'
-		pip_timer pip_wb.pip_get, off
+		pip_timer pip_agg.pip_get, off
 		
 		//------------ clean
-		pip_timer pip_wb_clean, on
-		pip_wb_clean, `nowcasts' `fillgaps'
-		pip_timer pip_wb_clean, off
+		pip_timer pip_agg_clean, on
+		pip_agg_clean, `nowcasts' `fillgaps' aggregate(`aggregate')
+		pip_timer pip_agg_clean, off
 		
 		//------------ Add data notes
 		local datalabel "WB poverty at regional and global level"
@@ -76,25 +76,24 @@ program define pip_wb, rclass
 			*/	" is meant for replicability purposes only or to be used in Stata code " /* 
 			*/ "that still executes the deprecated {cmd:povcalnet} command.{p_end}" _n
 			
-			pip_wb_povcalnet
+			pip_agg_povcalnet
 		}
 		
 		
 	}
-	pip_timer pip_wb, off
+	pip_timer pip_agg, off
 end
 
-program define pip_wb_check_args, rclass
+program define pip_agg_check_args, rclass
 	version 16.1
 	syntax ///
 	[ ,                             /// 
-	REGion(string)                  /// 
+	aggregate(string)             /// 
 	Year(string)                    /// 
 	POVLine(numlist)                /// 
 	COVerage(string)                /// 
 	CLEAR                           /// 
 	pause                           /// 
-	POVCALNET_format                ///
 	replace                         ///
 	noFILLgaps                        ///
 	noNOWcasts						///
@@ -151,47 +150,31 @@ program define pip_wb_check_args, rclass
 	return local coverage = "`coverage'"
 	local optnames "`optnames' coverage"
 	
-	//------------ Region
-	if ("`region'" != "") {
-		local region = upper("`region'")
-		
-		if (regexm("`region'", "SAR")) {
-			noi disp in red "Note: " in y "The official code of South Asia is" ///
-			"{it: SAS}, not {it:SAR}. We'll make the change for you"
-			local region: subinstr local region "SAR" "SAS", word 
-		}
-		
-		//------------ Regions frame
-		local frpiprgn "_pip_regions`_version'" 
-		frame `frpiprgn' {
-			levelsof region_code, local(av_regions)  clean
-		}
-		
-		// Add all to have the same functionality as in country(all)
-		local av_regions = "`av_regions'" + " ALL"
-		
-		local inregion: list region in av_regions
-		if (`inregion' == 0) {
-			
-			noi disp in red "region `region' is not available." _n ///
-			"Only the following are available:" _n "`av_regions'"
-			
+	//------------ aggregate
+	local av_agg "official pcn vintage" // this should come from the API
+	if ("`aggregate'" != "") {
+		local aggregate = lower("`aggregate'")		
+		local inagg: list aggregate in av_agg
+		if (`inagg' == 0) {	
+			noi disp "{err:agregate {it:`aggregate'} is not available.}" _n ///
+			"Select one of the following:"
+			foreach agg of local av_agg {
+				noi disp "    - `agg'" 
+			}
 			error
 		}
-	}
-
-	return local region = "`region'"
-	local optnames "`optnames' region"
-	
-	//========================================================
-	//  Aggregate level (wb)
-	//========================================================
-
-	if ("`country'" != "") {
-		noi disp as err "option {it:country()} is not allowed with subcommand {it:wb}"
-		noi disp as res "Note: " as txt "subcommand {it:wb} only accepts options {it:region()} and {it:year()}"
+	} 
+	else {
+		noi disp "{err: NOTE:} aggregates available:" _n 
+		foreach agg of local av_agg {
+			noi disp "    - `agg'" 
+		}
 		error
 	}
+
+	return local aggregate = "`aggregate'"
+	local optnames "`optnames' aggregate"
+	
 		
 	//------------ nowcasts
 	// if ("`nowcasts'" != "") {
@@ -248,11 +231,10 @@ end
 
 //------------ Build CL query
 
-program define pip_wb_query, rclass
+program define pip_agg_query, rclass
 	version 16.1
 	syntax ///
 	[ ,                             /// 
-	REGion(string)                  /// 
 	YEAR(string)                    /// 
 	POVLine(numlist)                /// 
 	ppp_version(numlist)            /// 
@@ -265,9 +247,7 @@ program define pip_wb_query, rclass
 	qui {
 		
 		// country
-		local country = stritrim(ustrtrim("`region'"))
-		local country : subinstr local country " " ",", all
-		if ("`country'" == "") local country = "all"
+		local country = "all"
 		// year
 		local year: subinstr local year " " ",", all
 		if ("`year'" == "") local year = "all"
@@ -322,9 +302,9 @@ end
 
 
 //------------Clean Cl data
-program define pip_wb_clean, rclass
+program define pip_agg_clean, rclass
 	
-	syntax  [, noNOWcasts noFILLgaps ]
+	syntax  [, noNOWcasts noFILLgaps aggregate(string)]
 	
 	if ("${pip_version}" == "") {
 		noi disp "{err}No version selected."
@@ -337,10 +317,22 @@ program define pip_wb_clean, rclass
 	
 	
 	qui {
-		//========= select official aggregates
-		frame _pip_cl`_version' {	
-			levelsof region_code, local(reg_codes) clean separate("|")
-			local reg_codes "`reg_codes'|WLD" 
+		//========= select relevant aggregates
+		// All of this must be changed to use the API directly when ready 
+		// rather than filtering here
+		frame _pip_cl`_version' {
+			if ("`aggregate'" == "official") {
+				levelsof region_code, local(reg_codes) clean separate("|")
+				local reg_codes "`reg_codes'|WLD" // think how to implement this
+			}
+			else if (inlist("`aggregate'", "pcn", "vintage")) {
+				levelsof regionpcn_code, local(reg_codes) clean  separate("|")				
+				local reg_codes "`reg_codes'|WLD" // think how to implement this
+			}
+			else {
+				noi disp in red "aggregate not available."
+				error
+			}
 		}
 
 		keep if regexm(region_code, "`reg_codes'")
@@ -406,7 +398,7 @@ program define pip_wb_clean, rclass
 	
 end
 
-program define pip_wb_povcalnet
+program define pip_agg_povcalnet
 	ren year        requestyear
 	ren population  reqyearpopulation
 	

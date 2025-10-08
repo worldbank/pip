@@ -226,18 +226,6 @@ program define pip, rclass
 			exit
 		}
 		
-		//========================================================
-		//  Check of arguments
-		//========================================================
-
-		/*
-		pip_timer pip.pip_pov_check_args, on
-		noi pip_pov_check_args `subcmd', `est_opts'
-		local optnames "`r(optnames)'" 
-		mata: pip_retlist2locals("`optnames'")
-		mata: pip_locals2call("`optnames'", "est_opts")
-		pip_timer pip.pip_pov_check_args, off
-		*/
 		
 		//========================================================
 		// retrieve and format estimates
@@ -247,6 +235,12 @@ program define pip, rclass
 		if ("`subcmd'" == "cl") {
 			noi pip_cl, `est_opts' `n2disp' `povcalnet_format'
 			noi pip_timer pip, off `printtimer' 
+		}
+		//------------ Aggregate data
+		else if ("`subcmd'" == "agg") {
+			noi pip_agg, `est_opts'  `n2disp'
+			return add
+			noi pip_timer pip, off `printtimer'
 		}
 		//------------ World Bank Aggregate
 		else if ("`subcmd'" == "wb") {
@@ -263,6 +257,12 @@ program define pip, rclass
 			noi pip_gd, `est_opts'  `n2disp'
 			return add
 			noi pip_timer pip, off `printtimer'
+		}
+		//------------ Subcommand not recognized
+		else {
+			noi disp "{err}Subcommand {it:`subcmd'} is not recognized." _n /* 
+			*/ "see {it:{help pip}}"
+			error
 		}
 		
 		//========================================================
