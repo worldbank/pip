@@ -57,7 +57,7 @@ official World Bank aggregates, which is equivalent to the {cmd:pip wb} command.
 When option {cmd:aggregate(pcn)} or {cmd:aggregate(vintage)} is specified, the 
 command will return the World Bank aggregates used before the release of 2025-09-30, 
 with {result:current data}. If you want to retrieve the previous aggregation with
-historical data, you need to use the {opt:version()} option.
+historical data, you need to use the {opt version()} option.
 
 
 
@@ -65,24 +65,7 @@ historical data, you need to use the {opt:version()} option.
 {title:Options Details}
 
 {phang}
-{opt country(string)} {help pip_countries##countries:Countries and Economies Abbreviations}. 
-If specified with {opt year(#)}, this option will return all the countries for which there is
-actual survey data in the year specified. When selecting multiple countries, use the corresponding
-three-letter codes separated by spaces. The option {it:all} is a shorthand for calling all countries.
-
-{phang}
-{opt region(string)} {help pip_countries##regions:Regions Abbreviations}  If 
-specified with {opt year(#)}, this option will return all the countries in the specified region(s)
-that have a survey in that year. For example, {opt region(LAC)} will return all countries in Latin
-America and the Caribbean that have a survey in the specific year. When selecting multiple regions,
-use the corresponding three-letter codes separated by spaces. The  option {it:all} is a shorthand
-for calling all regions, which is equivalent to calling all countries.
-
-{phang}
-{opt coverage(string)} Selects the geographic coverage of the estimates. By default, all coverage
-levels are loaded, but the user may select "national", "urban", or "rural".
-Only one level of coverage can be selected per query.
-
+{opt agg:regate(string)} 
 {phang}
 {opt year(#)} Four digit years are accepted. When selecting multiple years, use
 spaces to separate them. The option {it:all} is a shorthand for calling all

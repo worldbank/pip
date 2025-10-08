@@ -337,6 +337,14 @@ program define pip_wb_clean, rclass
 	
 	
 	qui {
+		//========= select official aggregates
+		frame _pip_cl`_version' {	
+			levelsof region_code, local(reg_codes) clean separate("|")
+			local reg_codes "`reg_codes'|WLD" 
+		}
+
+		keep if regexm(region_code, "`reg_codes'")
+
 		//========================================================
 		// labels
 		//========================================================
