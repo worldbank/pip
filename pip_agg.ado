@@ -156,8 +156,8 @@ program define pip_agg_check_args, rclass
 		local aggregation = lower("`aggregation'")		
 		local inagg: list aggregation in av_agg
 		if (`inagg' == 0) {	
-			noi disp in red "aggregation `aggregation' is not available." _n ///
-			"Select one of the following:" _n
+			noi disp "{err:agregate {it:`aggregation'} is not available.}" _n ///
+			"Select one of the following:"
 			foreach agg of local av_agg {
 				noi disp "    - `agg'" 
 			}
@@ -165,7 +165,7 @@ program define pip_agg_check_args, rclass
 		}
 	} 
 	else {
-		noi disp "{err: NOTE:} aggregations available are:" _n 
+		noi disp "{err: NOTE:} aggregates available:" _n 
 		foreach agg of local av_agg {
 			noi disp "    - `agg'" 
 		}

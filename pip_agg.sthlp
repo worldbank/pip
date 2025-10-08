@@ -65,7 +65,8 @@ historical data, you need to use the {opt version()} option.
 {title:Options Details}
 
 {phang}
-{opt agg:regate(string)} 
+{opt agg:regate(string)} blah
+
 {phang}
 {opt year(#)} Four digit years are accepted. When selecting multiple years, use
 spaces to separate them. The option {it:all} is a shorthand for calling all
@@ -80,30 +81,9 @@ for each country.
  per day. If option {opt ppp_year(2011)} is specified, the poverty lines will be
  expressed in 2011 PPPs.
 
-{phang}
-{opt popshare(#)} The desired quantile. For example, specifying 
-popshare(0.1) returns the first decile as the value of the poverty 
-line. In other words, the estimated poverty line will be the nearest 
-income or consumption level such that the incomes of 10% of the 
-population fall below it. This has no default, and cannot be combined 
-with {opt povline}. The quantile (recorded in the variable poverty_line) 
-is expressed in 2021 PPP USD per capita per day (unless option 
-{opt ppp_year(2017)} is specified, in which case it will be reported in 
-2011 PPP values) 
-({err:Note:}{it: this option only applies to subcommand {cmd:cl}}).
-
 {marker fillgaps}{...}
 {phang}
-{opt fill:gaps} This option works differently depending on the level of aggregation.
-
-{phang}
-{res:{ul:Country-level:} } {opt fillgaps} loads all country-level estimates used to construct the global and regional aggregates in the reference years. This includes extrapolated or interpolated values for countries without survey data in the reference year, as well as annualized estimates from surveys whose welfare aggregates span multiple years.
-
-{p 8 8 2}{res:Note}: In cases where no survey is available for a given reference year, estimates have been generated using national accounts growth rates under the assumption of distribution-neutrality (see Chapter 6
-{browse "https://openknowledge.worldbank.org/bitstream/handle/10986/20384/9781464803611.pdf":here}). Therefore, changes at the country level between reference years should be interpreted with caution, as they may not reflect new household survey data.
-
-{phang}
-{res:{ul:Regional/Global-level:} } the {opt nofillgaps} option removes all estimates for years lacking sufficient survey coverage for a given aggregate (e.g., regional or global).
+The {opt nofillgaps} option removes all estimates for years lacking sufficient survey coverage for a given aggregate (e.g., regional or global).
 ({err:This option exists because we strongly discourage using such estimates for analytical purposes}).{p_end}
 
 {phang}
@@ -112,19 +92,15 @@ is expressed in 2021 PPP USD per capita per day (unless option
 {marker examples}{...}
 {title:Examples}
 
-{pstd}
-The examples below do not comprehend of all of {cmd:pip}'s features.
-
-{ul:1. Basic examples}
 
 {phang}
-1.1. Load latest available survey-year estimates for Colombia and Argentina
+Display aggregates available
 
 {phang2}
-{stata pip cl, country(col arg) year(last) clear} 
+{stata pip agg} 
 
 {phang}
-1.2. Load clickable menu of data available
+Load clickable menu of data available
 
 {phang2}
 {stata pip, info}
