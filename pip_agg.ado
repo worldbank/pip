@@ -55,7 +55,7 @@ program define pip_agg, rclass
 		
 		//------------ clean
 		pip_timer pip_agg_clean, on
-		pip_agg_clean, `nowcasts' `fillgaps' aggregation(`aggregation')
+		pip_agg_clean, `nowcasts' `fillgaps' aggregate(`aggregate')
 		pip_timer pip_agg_clean, off
 		
 		//------------ Add data notes
@@ -88,7 +88,7 @@ program define pip_agg_check_args, rclass
 	version 16.1
 	syntax ///
 	[ ,                             /// 
-	AGGregation(string)             /// 
+	aggregate(string)             /// 
 	Year(string)                    /// 
 	POVLine(numlist)                /// 
 	COVerage(string)                /// 
@@ -150,13 +150,13 @@ program define pip_agg_check_args, rclass
 	return local coverage = "`coverage'"
 	local optnames "`optnames' coverage"
 	
-	//------------ Aggregation
+	//------------ aggregate
 	local av_agg "official pcn vintage" // this should come from the API
-	if ("`aggregation'" != "") {
-		local aggregation = lower("`aggregation'")		
-		local inagg: list aggregation in av_agg
+	if ("`aggregate'" != "") {
+		local aggregate = lower("`aggregate'")		
+		local inagg: list aggregate in av_agg
 		if (`inagg' == 0) {	
-			noi disp "{err:agregate {it:`aggregation'} is not available.}" _n ///
+			noi disp "{err:agregate {it:`aggregate'} is not available.}" _n ///
 			"Select one of the following:"
 			foreach agg of local av_agg {
 				noi disp "    - `agg'" 
@@ -172,8 +172,8 @@ program define pip_agg_check_args, rclass
 		error
 	}
 
-	return local aggregation = "`aggregation'"
-	local optnames "`optnames' aggregation"
+	return local aggregate = "`aggregate'"
+	local optnames "`optnames' aggregate"
 	
 		
 	//------------ nowcasts
@@ -304,7 +304,7 @@ end
 //------------Clean Cl data
 program define pip_agg_clean, rclass
 	
-	syntax  [, noNOWcasts noFILLgaps aggregation(string)]
+	syntax  [, noNOWcasts noFILLgaps aggregate(string)]
 	
 	if ("${pip_version}" == "") {
 		noi disp "{err}No version selected."
@@ -317,20 +317,20 @@ program define pip_agg_clean, rclass
 	
 	
 	qui {
-		//========= select relevant aggregations
+		//========= select relevant aggregates
 		// All of this must be changed to use the API directly when ready 
 		// rather than filtering here
 		frame _pip_cl`_version' {
-			if ("`aggregation'" == "official") {
+			if ("`aggregate'" == "official") {
 				levelsof region_code, local(reg_codes) clean separate("|")
 				local reg_codes "`reg_codes'|WLD" // think how to implement this
 			}
-			else if (inlist("`aggregation'", "pcn", "vintage")) {
+			else if (inlist("`aggregate'", "pcn", "vintage")) {
 				levelsof regionpcn_code, local(reg_codes) clean  separate("|")				
 				local reg_codes "`reg_codes'|WLD" // think how to implement this
 			}
 			else {
-				noi disp in red "aggregation not available."
+				noi disp in red "aggregate not available."
 				error
 			}
 		}

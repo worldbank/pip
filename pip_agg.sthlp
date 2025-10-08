@@ -100,17 +100,19 @@ Display aggregates available
 {stata pip agg} 
 
 {phang}
-Load clickable menu of data available
+Load official aggregates (equivalent to {cmd:pip wb})
 
 {phang2}
-{stata pip, info}
+{stata pip agg, aggregate(official) clear}
 
 {phang}
-1.3. Load only urban coverage level
+Load previous aggregates. ({it:vintage} or {it:pcn} directive. Same results)
 
 {phang2}
-{stata pip cl, country(all) coverage("urban") clear}
+{stata pip agg, aggregate(pcn) clear} {it:// for povcalnet}
 
+{phang2}
+{stata pip agg, aggregate(vintage) clear} 
 
 {ul:2. Differences between queries }
 
