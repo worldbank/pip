@@ -461,3 +461,5 @@ Version Control:
 *! -- add labels to SPL, SPR and PG
 *! version 0.10.15.9000  <2025sep15>
 *! -- Temporal fix to make it work with new data.
+*! version 0.10.16  <2025oct08>
+*! -- Add `pip agg' subcommand to retrieve vintage aggregates.
