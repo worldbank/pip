@@ -88,7 +88,7 @@ program define pip_agg_check_args, rclass
 	version 16.1
 	syntax ///
 	[ ,                             /// 
-	aggregate(string)             /// 
+	AGGregate(string)             /// 
 	Year(string)                    /// 
 	POVLine(numlist)                /// 
 	COVerage(string)                /// 
