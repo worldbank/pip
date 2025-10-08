@@ -43,21 +43,20 @@ estimates from the results.{p_end}
 {title:Description}:
 
 {pstd}
-After 2025-09-30, the regional aggregates in PIP API now coincide with the official
-aggregates used by the World Bank in WDI. However, it is still possible to retrieve
-the previous aggregation using the {cmd:agg} subcommand. For now, it is only 
-possible to retrieve the new official aggregates or the previous
-ones, but we plan to add more aggregation options in the future.
+Starting from 2025-09-30, the regional aggregates in the PIP API match the official
+aggregates published by the World Bank in the WDI. You can still access previous
+aggregations using the {cmd:agg} subcommand. Currently, only the new official
+aggregates or the previous ones are available, but more aggregation options may be
+added in the future.
 
 {pstd}
-By default, the {cmd:pip agg}  command (without any options) will display the 
-current aggregates available and aborts the process with an error message. 
-When options {cmd:aggregate(official)} is specified, the command will return the 
-official World Bank aggregates, which is equivalent to the {cmd:pip wb} command. 
-When option {cmd:aggregate(pcn)} or {cmd:aggregate(vintage)} is specified, the 
-command will return the World Bank aggregates used before the release of 2025-09-30, 
-with {result:current data}. If you want to retrieve the previous aggregation with
-historical data, you need to use the {opt version()} option.
+By default, running {cmd:pip agg} without options will display the available
+aggregates and stop with an error message. To obtain the official World Bank
+aggregates, use the {cmd:aggregate(official)} option—this is equivalent to running
+{cmd:pip wb}. To access the World Bank aggregates used before 2025-09-30, use
+{cmd:aggregate(pcn)} or {cmd:aggregate(vintage)}; these return results with
+{result:current data}. If you want the previous aggregation with historical data,
+specify the {opt version()} option.
 
 
 
