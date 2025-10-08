@@ -455,7 +455,7 @@ program pip_example14
 	frame change `pip_temp'
 	
 	// load pip regional data
-	pip wb, clear fillgaps server(dev)
+	pip wb, clear fillgaps 
 	keep if inlist(region_code,"EAP","ECA","LAC","MNA","OHI","SAR","SSA") // keep only old regions
     keep region* year poverty_line headcount pop_in_poverty
 	list 
@@ -472,12 +472,12 @@ program pip_example15
 	frame change `pip_temp'
 	
 	// load pip old regions & other classifications
-	pip tables, table(country_list) clear server(dev)
+	pip tables, table(country_list) clear 
 	tempfile group_names
 	save `group_names'
 	
 	// load pip country data
-	pip, clear fillgaps server(dev)
+	pip, clear fillgaps 
 	merge m:1 country_code using `group_names', nogen
 	gen double pop_in_poverty = headcount * population
 	collapse (mean) headcount (rawsum) pop_in_poverty [aw=population], by(fcv* year)
