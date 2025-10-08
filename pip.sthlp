@@ -37,6 +37,7 @@
 {synopt :{helpb pip_cl:wb}}World Bank's regional and global aggregation. {help pip_cl##options:options}{p_end}
 {synopt :{helpb pip_cp:cp}}Country Profile estimates. {help pip_cp##options:options}{p_end}
 {synopt :{helpb pip_gd:gd}}Grouped Data estimates. {help pip_gd##options:options}{p_end}
+{synopt :{helpb pip_agg:agg}}Aggregates. {help pip_agg##options:options}{p_end}
 {synopt :{helpb pip_tables:tables}}Clickable list of auxiliary tables. {help pip_tables##options:options}{p_end}
 {synopt :{helpb pip_print:print}}Print useful information. {help pip_print##options:options}{p_end}
 {synopt :{helpb pip_install:[un]install}}Installs the stable version of pip from SSC

@@ -11,7 +11,7 @@
 Country aggregates
 
 {p 8 16 2}
-{cmd:pip agg}, [{cmd:,} {it:{help pip##agg_options:agg options}}]
+{cmd:pip agg}, [{cmd:,} {it:{help pip_agg##agg_options:agg options}}]
 
 
 {marker opts_desc}{...}
