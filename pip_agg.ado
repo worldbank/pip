@@ -151,7 +151,20 @@ program define pip_agg_check_args, rclass
 	local optnames "`optnames' coverage"
 	
 	//------------ aggregate
-	local av_agg "official pcn vintage" // this should come from the API
+	
+	local _version _20250930_2021_PROD // to comment
+	frame _pip_cl`_version' {
+		qui ds 
+		local vars `r(varlist)'
+		// Extract vars that do not end in _code or _name
+		foreach var of local vars {
+			if !regexm("`var'", "_code$") & !regexm("`var'", "_name$") {
+				local keep_vars "`keep_vars' `var'"
+			}
+		}
+		local av_agg "official pcn vintage `keep_vars'"
+	}
+
 	if ("`aggregate'" != "") {
 		local aggregate = lower("`aggregate'")		
 		local inagg: list aggregate in av_agg
@@ -162,6 +175,12 @@ program define pip_agg_check_args, rclass
 				noi disp "    - `agg'" 
 			}
 			error
+		}
+		else if (inlist("`aggregate'", "official", "wb", "region")) {
+			local aggregate "region"
+		} 
+		else if (inlist("`aggregate'", "pcn", "vintage", "regionpcn")) {
+			local aggregate "regionpcn"
 		}
 	} 
 	else {
