@@ -42,7 +42,8 @@ program define pip_agg, rclass
 		// Build query (queries returned in ${pip_last_queries}) 
 		//========================================================
 		pip_agg_query,  year(`year') povline(`povline')   /*
-		*/            ppp_version(`ppp_year') coverage(`coverage') 
+		*/            ppp_version(`ppp_year') coverage(`coverage') /*
+		*/            aggregate(`aggregate')
 		
 		//========================================================
 		// Getting data
@@ -257,7 +258,8 @@ program define pip_agg_query, rclass
 	YEAR(string)                    /// 
 	POVLine(numlist)                /// 
 	ppp_version(numlist)            /// 
-	COVerage(string)                /// 
+	COVerage(string)                ///
+	AGGregate(string)               ///
 	] 
 	
 	//========================================================
@@ -274,6 +276,10 @@ program define pip_agg_query, rclass
 		// reporting level
 		if ("`coverage'" == "") local reporting_level = "all"
 		else                    local reporting_level = "`coverage'"
+		
+		// group_by
+		if ("`aggregate'" == "") local group_by = "wb"
+		else                     local group_by = "`aggregate'"
 		// version
 		local version "${pip_version}"
 		
@@ -282,7 +288,7 @@ program define pip_agg_query, rclass
 		//========================================================
 		
 		local params = "country year reporting_level " + /* 
-		*/             " version welfare_type ppp_version" 
+		*/             " version welfare_type ppp_version group_by" 
 		
 		
 		foreach p of local params {
@@ -299,7 +305,7 @@ program define pip_agg_query, rclass
 		
 		local endpoint "pip-grp"
 		if ("`povline'" == "") {
-			global pip_last_queries "`endpoint'?`query'&format=csv&group_by=wb"
+			global pip_last_queries "`endpoint'?`query'&format=csv"
 			exit
 		}
 		
