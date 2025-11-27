@@ -342,25 +342,6 @@ program define pip_agg_clean, rclass
 	
 	
 	qui {
-		//========= select relevant aggregates
-		// All of this must be changed to use the API directly when ready 
-		// rather than filtering here
-		frame _pip_cl`_version' {
-			if ("`aggregate'" == "official") {
-				levelsof region_code, local(reg_codes) clean separate("|")
-				local reg_codes "`reg_codes'|WLD" // think how to implement this
-			}
-			else if (inlist("`aggregate'", "pcn", "vintage")) {
-				levelsof regionpcn_code, local(reg_codes) clean  separate("|")				
-				local reg_codes "`reg_codes'|WLD" // think how to implement this
-			}
-			else {
-				noi disp in red "aggregate not available."
-				error
-			}
-		}
-
-		keep if regexm(region_code, "`reg_codes'")
 
 		//========================================================
 		// labels
