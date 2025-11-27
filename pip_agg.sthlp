@@ -23,8 +23,7 @@ Country aggregates
 {synoptset 27 tabbed}{...}
 {synopthdr:agg options}
 {synoptline}
-{synopt :{opt agg:regate}(string)}Directive to retrieve aggregate 
-({it:see details {help pip_agg##fillgaps:below}}).{p_end}
+{synopt :{opt agg:regate}(string)}Which aggregate to retrieve. Several names are accepted as synonyms (see details below).{p_end}
 {synopt :{opt y:ear}(numlist|string)}{help numlist} of years  or "all", or "last". Default is "{it:all}".{p_end}
 {synopt :{opt povl:ine:}(#)}List of poverty lines (accepts up to 5) in specified PPP (see option {help pip##general_options:ppp_year(#)}) to calculate 
 poverty. Default is 3.00 at 2021 PPPs.{p_end}
@@ -43,28 +42,63 @@ estimates from the results.{p_end}
 {title:Description}:
 
 {pstd}
-Starting from 2025-09-30, the regional aggregates in the PIP API match the official
-aggregates published by the World Bank in the WDI. You can still access previous
-aggregations using the {cmd:agg} subcommand. Currently, only the new official
-aggregates or the previous ones are available, but more aggregation options may be
-added in the future.
+This command retrieves regional and global poverty aggregates from the PIP API.
+Starting from 2025-09-30, the PIP API regional aggregates match the official
+aggregates published by the World Bank in the WDI. The {cmd:agg} subcommand lets
+you request either the current official aggregates or previous/vintage
+aggregations.
 
 {pstd}
-By default, running {cmd:pip agg} without options will display the available
-aggregates and stop with an error message. To obtain the official World Bank
-aggregates, use the {cmd:aggregate(official)} option—this is equivalent to running
-{cmd:pip wb}. To access the World Bank aggregates used before 2025-09-30, use
-{cmd:aggregate(pcn)} or {cmd:aggregate(vintage)}; these return results with
-{result:current data}. If you want the previous aggregation with historical data,
-specify the {opt version()} option.
+Running {cmd:pip agg} without any options will list the available aggregate names
+and stop with an explanatory message. Use the {opt agg( )} option to select an
+aggregate. The most commonly-used choices are described below and have several
+accepted synonyms.
 
+{pstd}
+Key synonyms and behavior:
+
+{phang}
+- {it:official}, {it:wb}, {it:region}: These names are equivalent and
+	request the official World Bank aggregates (equivalent to {cmd:pip wb}).
+
+{phang}
+- {it:pcn}, {it:vintage}, {it:regionpcn}: These names are equivalent and
+	request the previous (PovcalNet / vintage) aggregation.
+
+{pstd}
+Other aggregate names: Additional aggregate names may be available depending on
+the selected {it:pip_version}. These names represent pre-defined grouping
+variables (for example, income groups, fragile countries, ida, among others that are stored in the
+internal table `country_list` and exposed when you run {cmd:pip agg} with no
+arguments. To see the full list of available aggregates for your active
+{it:pip_version}, load the auxiliary frames via {cmd:pip tables} (automatically
+run by {cmd:pip agg}) and inspect the `country_list` frame.
+
+{pstd}
+If you want the previous aggregation with historical data, specify the
+{opt version()} option together with an appropriate aggregate name.
 
 
 {marker opt_details}{...}
 {title:Options Details}
 
 {phang}
-{opt agg:regate(string)} blah
+{opt agg:regate(string)}Select which pre-defined aggregate to retrieve. Accepted
+values include synonyms and version-specific names:
+
+{pmore} 
+- {it:official}, {it:wb}, {it:region}: synonyms that request the official World
+	Bank aggregates (WDI-style).
+
+ {pmore}
+- {it:pcn}, {it:vintage}, {it:regionpcn}: synonyms that request the previous
+	PovcalNet / vintage aggregation.
+
+{phang}
+Other aggregate identifiers may appear in the list printed by {cmd:pip agg} and
+correspond to grouping variables available for the active {it:pip_version}. Use
+the `country_list` frame (loaded by {cmd:pip tables}) to inspect what these
+version-specific values mean.
 
 {phang}
 {opt year(#)} Four digit years are accepted. When selecting multiple years, use
