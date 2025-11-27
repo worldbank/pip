@@ -178,10 +178,10 @@ program define pip_agg_check_args, rclass
 			error
 		}
 		else if (inlist("`aggregate'", "official", "wb", "region")) {
-			local aggregate "region"
+			local aggregate "wb"
 		} 
 		else if (inlist("`aggregate'", "pcn", "vintage", "regionpcn")) {
-			local aggregate "regionpcn"
+			local aggregate "vintage"
 		}
 	} 
 	else {
@@ -314,7 +314,7 @@ program define pip_agg_query, rclass
 		local i = 1
 		foreach v of local povline {
 			// each povline or popshare + format
-			local queryp = "`endpoint'?`query'&povline=`v'&format=csv&group_by=wb" 
+			local queryp = "`endpoint'?`query'&povline=`v'&format=csv" 
 			if (`i' == 1) mata: `M' = "`queryp'"
 			else          mata: `M' = `M' , "`queryp'"
 			local ++i
