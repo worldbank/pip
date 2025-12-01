@@ -189,7 +189,7 @@ program define pip_agg_check_args, rclass
 		foreach agg of local av_agg {
 			noi disp "    - `agg'" 
 		}
-		error
+		exit
 	}
 
 	return local aggregate = "`aggregate'"
