@@ -405,7 +405,7 @@ https://worldbank.github.io/pip/ {p_end}
 
 {title:Thanks for citing {cmd:pip} data as follows}
 
-{p 4 8 2} World Bank. (2023). Poverty and Inequality Platform (version 0.10.16.9000)
+{p 4 8 2} World Bank. (2023). Poverty and Inequality Platform (version 0.10.16.9001)
 [Data set]. World Bank Group. www.pip.worldbank.org. Accessed  1 Dec 2025.{p_end}
 
 {p 4 8 2}Available version_IDs:{p_end}
