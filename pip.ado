@@ -465,3 +465,5 @@ Version Control:
 *! -- Add `pip agg' subcommand to retrieve vintage aggregates.
 *! version 0.10.16.9000  <2025nov26>
 *! -- allow aggregate() option in pip agg to work with new API version.
+*! version 0.10.16.9001  <2025dec01>
+*! -- fix error message in pip_agg.
