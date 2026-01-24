@@ -1,0 +1,201 @@
+
+  ___  ____  ____  ____  ____ ®
+ /__    /   ____/   /   ____/      StataNow 19.5
+___/   /   /___/   /   /___/       MP—Parallel Edition
+
+ Statistics and Data Science       Copyright 1985-2025 StataCorp LLC
+                                   StataCorp
+                                   4905 Lakeway Drive
+                                   College Station, Texas 77845 USA
+                                   800-782-8272        https://www.stata.com
+                                   979-696-4600        service@stata.com
+
+Stata license: Unlimited-user 6-core network, expiring 16 Dec 2025
+Serial number: 501909318806
+  Licensed to: WBG User
+               World Bank
+
+Notes:
+      1. Stata is running in batch mode.
+      2. Unicode is supported; see help unicode_advice.
+      3. More than 2 billion observations are allowed; see help obs_advice.
+      4. Maximum number of variables is set to 5,000 but can be increased;
+          see help set_maxvar.
+
+
+Running c:\ado\profile.do ...
+ Note: Datalibweb token is invalid or expired.
+Please visit the datalibweb website to renew the token.
+r; t=7.06 21:50:29
+
+. do tests/_wrapper_do.do 
+
+. // Wrapper to capture Stata output to a plain text log
+. capture log close _all
+r; t=0.00 21:50:29
+
+. log using "tests/stata_test_output.log", replace text
+-------------------------------------------------------------------------------
+      name:  <unnamed>
+       log:  C:\Users\wb384996\OneDrive - WBG\WorldBank\DECDG\PIP\pip\tests/sta
+> ta_test_output.log
+  log type:  text
+ opened on:  11 Dec 2025, 21:50:29
+r; t=0.01 21:50:29
+
+. set more off
+r; t=0.00 21:50:29
+
+. di "Starting pip tests wrapper"
+Starting pip tests wrapper
+r; t=0.00 21:50:29
+
+. do tests/run_tests.do
+
+. // Minimal test runner for pip package
+. // Run each test do-file and collect failures
+. clear all
+r; t=0.11 21:50:29
+
+. set more off
+r; t=0.00 21:50:29
+
+. 
+. local tests "test_pip_get.do test_pip_cl.do"
+r; t=0.00 21:50:29
+
+. foreach t of local tests {
+  2.     di "\n=== Running test: `t' ==="
+  3.     capture noisily do "tests/`t'"
+  4.     if (_rc) {
+  5.         di as err "Test `t' FAILED with return code = " _rc
+  6.     }
+  7.     else di as result "Test `t' passed"
+  8. }
+\n=== Running test: test_pip_get.do ===
+
+. // Test pip_get downloads a simple endpoint and returns data
+. // This test requires internet access and that `pip_host` is set
+. version 16.1
+r; t=0.00 21:50:29
+
+. capture program drop test_pip_get
+r; t=0.00 21:50:29
+
+. program define test_pip_get
+  1.     // Ensure pip host is set (use default if empty)
+.     if "${pip_host}" == "" {
+  2.         di as err "pip_host not set. Set global `pip_host' before running 
+> tests."
+  3.         exit 1
+  4.     }
+  5. 
+.     // Use the health-check endpoint which should return small CSV/JSON
+.     capture global pip_last_queries "health-check?format=csv"
+  6.     if (_rc) exit 1
+  7. 
+.     // call pip_get which will import the CSV
+.     capture noisily pip_get, clear
+  8.     if (_rc) {
+  9.         di as err "pip_get failed with rc=" _rc
+ 10.         exit _rc
+ 11.     }
+ 12. 
+.     // Expect at least one variable in the dataset
+.     ds
+ 13.     if (r(N_vars) == 0) {
+ 14.         di as err "pip_get did not import any variables"
+ 15.         exit 2
+ 16.     }
+ 17. 
+.     di as result "pip_get test succeeded: imported `r(N_obs)' obs and `r(N_va
+> rs)' vars"
+ 18. end
+r; t=0.00 21:50:29
+
+. 
+. test_pip_get
+pip_host not set. Set global  before running tests.
+--Break--
+r(1); t=0.00 21:50:29
+
+end of do-file
+Test test_pip_get.do FAILED with return code = 1
+\n=== Running test: test_pip_cl.do ===
+
+. // Test pip_cl produces country-level data and required variables
+. version 16.1
+r; t=0.00 21:50:30
+
+. capture program drop test_pip_cl
+r; t=0.00 21:50:30
+
+. program define test_pip_cl
+  1.     // Check pip version/global settings
+.     if "${pip_version}" == "" {
+  2.         di as err "pip_version not set. Set global `pip_version' before ru
+> nning tests."
+  3.         exit 1
+  4.     }
+  5. 
+.     // Run a small, non-destructive country-level query
+.     capture noisily pip, cl country(USA) year(2017) n2disp(0)
+  6.     if (_rc) {
+  7.         di as err "pip cl failed with rc=" _rc
+  8.         exit _rc
+  9.     }
+ 10. 
+.     // Verify dataset has country_code and poverty_line or poverty_line varia
+> ble
+.     capture confirm variable country_code
+ 11.     if (_rc) {
+ 12.         di as err "Expected variable `country_code' not found"
+ 13.         exit 2
+ 14.     }
+ 15. 
+.     capture confirm variable poverty_line
+ 16.     if (_rc) {
+ 17.         di as err "Expected variable `poverty_line' not found"
+ 18.         exit 3
+ 19.     }
+ 20. 
+.     di as result "pip_cl test succeeded: dataset looks good"
+ 21. end
+r; t=0.00 21:50:30
+
+. 
+. test_pip_cl
+pip_version not set. Set global  before running tests.
+--Break--
+r(1); t=0.00 21:50:30
+
+end of do-file
+Test test_pip_cl.do FAILED with return code = 1
+r; t=0.06 21:50:30
+
+. 
+. di "\nAll tests completed."
+\nAll tests completed.
+r; t=0.00 21:50:30
+
+. 
+end of do-file
+r; t=0.19 21:50:30
+
+. di "Finished pip tests wrapper"
+Finished pip tests wrapper
+r; t=0.00 21:50:30
+
+. log close
+      name:  <unnamed>
+       log:  C:\Users\wb384996\OneDrive - WBG\WorldBank\DECDG\PIP\pip\tests/sta
+> ta_test_output.log
+  log type:  text
+ closed on:  11 Dec 2025, 21:50:30
+-------------------------------------------------------------------------------
+r; t=0.00 21:50:30
+
+. exit
+
+end of do-file
+r; t=0.73 21:50:30

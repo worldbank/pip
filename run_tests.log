@@ -1,0 +1,68 @@
+
+  ___  ____  ____  ____  ____ ®
+ /__    /   ____/   /   ____/      StataNow 19.5
+___/   /   /___/   /   /___/       MP—Parallel Edition
+
+ Statistics and Data Science       Copyright 1985-2025 StataCorp LLC
+                                   StataCorp
+                                   4905 Lakeway Drive
+                                   College Station, Texas 77845 USA
+                                   800-782-8272        https://www.stata.com
+                                   979-696-4600        service@stata.com
+
+Stata license: Unlimited-user 6-core network, expiring 16 Dec 2025
+Serial number: 501909318806
+  Licensed to: WBG User
+               World Bank
+
+Notes:
+      1. Stata is running in batch mode.
+      2. Unicode is supported; see help unicode_advice.
+      3. More than 2 billion observations are allowed; see help obs_advice.
+      4. Maximum number of variables is set to 5,000 but can be increased;
+          see help set_maxvar.
+
+
+Running c:\ado\profile.do ...
+ Note: Datalibweb token is invalid or expired.
+Please visit the datalibweb website to renew the token.
+r; t=3.62 21:49:03
+
+. do tests/run_tests.do 
+
+. // Minimal test runner for pip package
+. // Run each test do-file and collect failures
+. clear all
+r; t=0.10 21:49:04
+
+. set more off
+r; t=0.00 21:49:04
+
+. 
+. local tests "test_pip_get.do test_pip_cl.do"
+r; t=0.00 21:49:04
+
+. foreach t of local tests {
+  2.     di "\n=== Running test: `t' ==="
+  3.     capture noisily do `t'
+  4.     if (_rc) {
+  5.         di as err "Test `t' FAILED with return code = " _rc
+  6.     }
+  7.     else di as result "Test `t' passed"
+  8. }
+\n=== Running test: test_pip_get.do ===
+file test_pip_get.do not found
+Test test_pip_get.do FAILED with return code = 601
+\n=== Running test: test_pip_cl.do ===
+file test_pip_cl.do not found
+Test test_pip_cl.do FAILED with return code = 601
+r; t=0.24 21:49:04
+
+. 
+. di "\nAll tests completed."
+\nAll tests completed.
+r; t=0.00 21:49:04
+
+. 
+end of do-file
+r; t=0.67 21:49:04
