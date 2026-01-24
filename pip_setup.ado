@@ -60,7 +60,7 @@ program define pip_setup, rclass
 	}
 	
 	
-	// cche dir
+	// cache dir
 	if ("`subcmd'" == "cachedir") {
 		noi pip_setup_cachedir, `options'
 		exit
@@ -72,7 +72,7 @@ program define pip_setup, rclass
 		pip_set_server, `options'
 		exit
 	}
-	
+
 	qui {
 		
 		//========================================================
@@ -84,7 +84,7 @@ program define pip_setup, rclass
 		tempname spipmata
 		scalar `spipmata' = fileread("`pip_funmata_file'")
 		
-		pip_cache gethash, query(`"`: disp `spipmata''"')
+		pip_setup_gethash, query(`"`: disp `spipmata''"')
 		local pipmata_hash = "`r(piphash)'"
 		
 		// To avoid MATA library to be  built each time. 
@@ -111,15 +111,7 @@ program define pip_setup, rclass
 		
 		//------------Run globals 
 		pip_setup run 			
-		
-		//========================================================
-		// PIP cache directory
-		//========================================================
-		mata: st_local("ex_cachedir", strofreal(direxists("${pip_cachedir}")))
-		if ("${pip_cachedir}" == "" | `ex_cachedir' == 0) {
-			noi pip_setup_cachedir, cachedir("${pip_cachedir}") 
-		}
-		
+
 		//========================================================
 		// Set global for server
 		//========================================================
@@ -127,6 +119,23 @@ program define pip_setup, rclass
 			pip_set_server
 		}
 		
+		//========================================================
+		// Set details in help file
+		//========================================================
+		local d1 = "www.pip.worldbank.org. Accessed"
+		local d2 = "[Data set]. World Bank Group. www.pip.worldbank.org. Accessed `c(current_date)'.{p_end}"
+		pip_get_version
+		local v1 = "Poverty and Inequality Platform \(version"
+		local v2 = "{p 4 8 2} World Bank. (2023). Poverty and Inequality Platform (version $pip_ado_version)"
+		cap findfile "pip.sthlp"
+		if _rc==0 {
+			local help_file = "`r(fn)'"
+			mata: pip_replace_in_pattern("`help_file'", `"`d1'"', `"`d2'"')
+			cap copy `tempf' "`origf'" , replace 
+
+			mata: pip_replace_in_pattern("`help_file'", `"`v1'"', `"`v2'"')
+			cap copy `tempf' "`origf'" , replace 
+		}
 	}
 	
 end
@@ -168,7 +177,6 @@ program define pip_setup_create, rclass
 		file write `do' `"global pip_pipmata_hash = """' _dup(3) _n 
 		file write `do' `"global pip_lastupdate = """' _dup(3) _n 
 		file write `do' `"global pip_source   = """' _dup(3) _n 
-		file write `do' `"global pip_cachedir = """' _dup(3) _n 
 		file write `do' _dup(5) _n 
 		file write `do' `"exit"' _n 
 		file write `do' `"/* End of do-file */"' _n 
@@ -211,73 +219,29 @@ program define pip_setup_replace, rclass
 end
 
 
-program define pip_setup_cachedir, rclass
-	version 16.1
-	
-	syntax [anything(name=subcmd)] , [ ///
-	cachedir(string)                   ///  
+
+//========================================================
+//  Get Hash based on string 
+//========================================================
+// -- DC: This permits removal of pip_cache.ado
+program define pip_setup_gethash, rclass
+	syntax [anything(name=subcmd)], [   ///
+	query(string)               ///
+	PREfix(string)              ///
 	]
 	
+	version 16.1
+	
 	qui {
+		if ("`prefix'" == "") local prefix = "pip"
+		tempname spiphash
 		
-		tempname direxist
-		if ("`cachedir'" == "") {
-			// find folder to store setup.do
-			if !inlist("${pip_cachedir}", "no", "") local oldcachedir `""${pip_cachedir}""'
-			else                                    local oldcachedir ""
-			
-			local pdirs `" `oldcachedir' "`c(sysdir_personal)'" "`c(sysdir_plus)'" "`c(pwd)'" "`c(sysdir_site)'" "'
-			
-			tokenize `"`pdirs'"'
-			scalar `direxist' = 0
-			while ("`1'" != "") {
-				mata: st_local("cachedir", pathjoin("`1'", "pip_cache"))
-				mata: st_numscalar("`direxist'", pip_check_folder("`cachedir'"))
-				if (`direxist' == 1 )  {
-					cap window stopbox rusure ///
-					`"Do you want to use directory "`cachedir'" to store PIP cache data?"' ///
-					`"If you don't, click "No" and provide an alternative directory path in the console."'
-					
-					if (_rc) {
-						db pip_setup_cachedir
-						noi disp "{err}NOTE: {res}Abort operation until cache directory is either set up or disabled"
-						error
-					}
-					
-					continue, break // exit while
-				}
-				macro shift
-			} // end of while
-			
-		} // if cache dir is empty
-		
-		
-		if ("`cachedir'" != "") {
-			if inlist(lower("`cachedir'"), "0", "no") {
-				local cachedir    = 0
-				scalar `direxist' = 1 // bypass condition
-			}
-			else mata: st_numscalar("`direxist'", pip_check_folder("`cachedir'"))
-			
-			if (`direxist' == 1 )  {
-				local pattern "pip_cachedir"
-				local newline `"global pip_cachedir = "`cachedir'""'
-				pip_setup replace, pattern(`"`pattern'"') new(`"`newline'"')
-				pip_setup run
-				if ("`cachedir'" != "0") {
-					noi disp "{res}Cache directory has been set up. If you want to change it, type {cmd:pip_setup cachedir}"
-				}
-				else {
-					noi disp "{res}Cache has been {err}disabled{res}. If you want to change it, type {cmd:pip cache, setup}"
-				}
-			}
-		}
-		
-		
+		mata:  st_numscalar("`spiphash'", hash1(`"`prefix'`query'"', ., 2)) 
+		local piphash = "_pip" + strofreal(`spiphash', "%12.0g")
+		return local piphash = "`piphash'"
 	}
 	
 end
-
 
 
 //========================================================
@@ -312,6 +276,25 @@ program define pip_setup_dates
 	
 end
 
+//========================================================
+//  Auxiliary program to find version
+//========================================================
+program define pip_get_version, rclass
+	findfile pip.ado
+	scalar pipado = fileread("`r(fn)'")
+
+	//Find version as last occurrence of version X.XX.XX <YYYYMMMDD> in pip.ado
+	mata: lines  = st_strscalar("pipado")
+	mata: lines  = ustrsplit(lines, "`=char(10)'")'
+	mata: pipdates = select(lines, regexm(lines, `"^\*!"'))
+	mata: pipver = select(pipdates, regexm(pipdates, `"<2[0-9]+[a-zA-Z]+[0-9]+"'))
+	mata: pipver = pipver[rows(pipver)]
+	mata: regexm(pipver, "version[ ]+([0-9\.]+)[ ]+(<.+>)")
+	mata: st_local("pipver", regexs(1))
+
+	// save pipver as global pip_version
+	global pip_ado_version `pipver'
+end
 
 exit
 /* End of do-file */

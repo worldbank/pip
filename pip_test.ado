@@ -51,11 +51,6 @@ program define pip_test, rclass
 		}
 		noi disp "{p2line}" 
 		
-		//------------ Build  Stata calls
-		mata: st_local("fuse", pathjoin("${pip_cachedir}", "`hash'.dta"))
-		local duse    `"use "`fuse'", clear "'
-		local ddelete `"pip_cache delete,  piphash(`hash')"'
-		
 		noi disp "{break}{col 10}{ul:{res:ACTION:}}{col 20}"     /* 
 		*/ `" {browse "`injson'":see in browser} or {col 35}"' /* 
 		*/ `"{browse "`incsv'":download .csv}"' _n

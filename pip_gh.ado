@@ -21,10 +21,11 @@ version 16.1
 
 syntax [anything(name=subcommand)]  ///
 [,                             	    ///
-username(string)                   ///
-cmd(string)                        ///
-version(string)                    ///
-pause                             /// 
+username(string)                    ///
+cmd(string)                         ///
+version(string)                     ///
+pause                               /// 
+check                               /// 
 ] 
 
 if ("`pause'" == "pause") pause on
@@ -44,16 +45,21 @@ if ("`username'" == "") {
 ==================================================*/
 
 if ("`subcommand'" == "update") {
-	
 	* Check repository of files 
 	* local cmd pip
 	cap findfile github.dta, path("`c(sysdir_plus)'g/")
 	if (_rc) {
-		github install `username'/`cmd', replace
-		cap window stopbox note "pip command has been reinstalled to " ///
-		"keep record of new updates. Please type {stata discard} and retry."
-		global pip_old_session = ""
-		exit 
+		if ("`check'" == "check") {
+			dis "pip update will install a new version of the {cmd:pip} package."
+			dis "If you wish to proceed, run {cmd:pip update} without the check argument."
+		}
+		else {
+			github install `username'/`cmd', replace
+			cap window stopbox note "pip command has been reinstalled to " ///
+			"keep record of new updates. Please type {stata discard} and retry."
+			global pip_old_session = ""
+		}
+		exit
 	}
 	local ghfile "`r(fn)'"
 	* use "`ghfile'", clear
@@ -64,12 +70,18 @@ if ("`subcommand'" == "update") {
 		use "`ghfile'", clear
 		qui keep if name == "`cmd'"  
 		if _N == 0 {
-			di in red "`cmd' package was not found"
-			github install `username'/`cmd', replace
-			cap window stopbox note "pip command has been reinstalled to " ///
-			"keep record of new updates. Please type discard and retry."
-			global pip_old_session = ""
-			exit 
+			if ("`check'" == "check") {
+				dis "pip update will install a new version of the {cmd:pip} package."
+				dis "If you wish to proceed, run {cmd:pip update} without the check argument."
+			}
+			else {
+				di in red "`cmd' package was not found"
+				github install `username'/`cmd', replace
+				cap window stopbox note "pip command has been reinstalled to " ///
+				"keep record of new updates. Please type discard and retry."
+				global pip_old_session = ""
+			}
+			exit
 		}
 		if _N > 1 {
 			di as err "{p}multiple {cmd:pip} packages found!"      ///
@@ -111,15 +123,26 @@ if ("`subcommand'" == "update") {
 	
 	* force installation 
 	if ("`crrtversion'" == "") {
-		local username "worldbank"  // to modify
-		github install `username'/`cmd', replace version(`latestversion')
-		cap window stopbox note "pip command has been reinstalled to " ///
-		"keep record of new updates. Please type discard and retry."
-		global pip_old_session = ""
+		if ("`check'" == "check") {
+			dis "pip update will install a new version of the {cmd:pip} package."
+			dis "If you wish to proceed, run {cmd:pip update} without the check argument."
+		}
+		else {
+			local username "worldbank"  // to modify
+			github install `username'/`cmd', replace version(`latestversion')
+			cap window stopbox note "pip command has been reinstalled to " ///
+			"keep record of new updates. Please type discard and retry."
+			global pip_old_session = ""
+		}
 		exit 
 	}
 	
 	if (`last' > `current' ) {
+		if ("`check'" == "check") {
+			dis "There is a new version of `cmd' in Github (`latestversion')."
+			dis "If you wish to proceed, run {cmd:pip update} without the check argument."
+			exit		
+		}
 		cap window stopbox rusure "There is a new version of `cmd' in Github (`latestversion')." ///
 		"Would you like to install it now?"
 		

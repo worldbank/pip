@@ -24,7 +24,7 @@
 {synopt :{opt requested_mean(#)}} Scalar value indicating the mean welfare in the population.{p_end}
 {synopt :{opt n_bins(#)}} Scalar value indicating the number of bins requested when Lorenz curve estimates are requested.{p_end}
 {synopt :{opt povl:ine:}(numlist)} List of poverty lines in specified PPP (see option {help pip##general_options:ppp_year(#)}) to calculate
-poverty. Default is 2.15 at 2017 PPPs.{p_end}
+poverty. Default is $3.0 at 2021 PPPs.{p_end}
 {synopt :{opt clear}}Clear results.{res: NOTE: }This options has a special use. See details {help pip_gd##clear:below}{p_end}
 {synoptline}
 
@@ -110,8 +110,8 @@ option.  A scalar value should be indicated, strictly between 0 and 1,000.
 {opt povline(numlist)} The poverty lines for which the poverty measures will be calculated.
 When selecting multiple poverty lines, use less than 4 decimals and separate each value
 with spaces. If left empty, the default poverty line of $2.15 is used. By default,
-poverty lines are expressed in 2017 PPP USD per capita per day. If option
-{opt ppp_year(2011)} is specified, the poverty lines will be expressed in 2011 PPPs.
+poverty lines are expressed in 2021 PPP USD per capita per day. If option
+{opt ppp_year(2017)} is specified, the poverty lines will be expressed in 2017 PPPs.
 
 {marker clear}{...}
 {phang}
@@ -138,13 +138,13 @@ the frame where you had the original data.{p_end}
 Request poverty and inequality statistics for a particular welfare and population distribution, with a mean welfare of 2.911786.
 
 {phang2}
-{stata pip gd, cum_welfare(.0002 .0006 .0011 .0021 .0031 .0048 .0066 .0095 .0128 .0177 .0229 .0355 .0513 .0689 .0882) cum_population(.001 .003 .005 .009 .013 .019 .025 .034 .044 .0581 .0721 .1041 .1411 .1792 .2182) requested_mean(2.911786)} 
+{stata pip gd, cum_welfare(.00208 .01013 .03122 .07083 .12808 .23498 .34887 .51994 .6427 .79201 .86966 .91277 1) cum_population(.0092 .0339 .085 .164 .2609 .4133 .5497 .7196 .8196 .9174 .957 .9751 1) requested_mean(2.91178)} 
 
 {pstd}
 Request the fitted Lorenz curve based on the cumulative population and welfare shares above, with 50 points and graph resulting Lorenz curve.
 
 {phang2}
-{stata pip gd, lorenz cum_welfare(.0002 .0006 .0011 .0021 .0031 .0048 .0066 .0095 .0128 .0177 .0229 .0355 .0513 .0689 .0882) cum_population(.001 .003 .005 .009 .013 .019 .025 .034 .044 .0581 .0721 .1041 .1411 .1792 .2182) n_bins(50) n2disp(10)} 
+{stata pip gd, lorenz cum_welfare(.00208 .01013 .03122 .07083 .12808 .23498 .34887 .51994 .6427 .79201 .86966 .91277 1) cum_population(.0092 .0339 .085 .164 .2609 .4133 .5497 .7196 .8196 .9174 .957 .9751 1) n_bins(50) n2disp(10)} 
 
 {phang2}
 {stata twoway line welfare weight} 
@@ -153,7 +153,7 @@ Request the fitted Lorenz curve based on the cumulative population and welfare s
 Request the regression parameters used to estimate the Lorenz curve based on the cumulative population and welfare shares above.
 
 {phang2}
-{stata pip gd, params cum_welfare(.0002 .0006 .0011 .0021 .0031 .0048 .0066 .0095 .0128 .0177 .0229 .0355 .0513 .0689 .0882) cum_population(.001 .003 .005 .009 .013 .019 .025 .034 .044 .0581 .0721 .1041 .1411 .1792 .2182)} 
+{stata pip gd, params cum_welfare(.00208 .01013 .03122 .07083 .12808 .23498 .34887 .51994 .6427 .79201 .86966 .91277 1) cum_population(.0092 .0339 .085 .164 .2609 .4133 .5497 .7196 .8196 .9174 .957 .9751 1)} 
 
 {marker ex_frame}{...}
 {ul:Using current frame}

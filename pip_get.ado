@@ -1,5 +1,5 @@
 /*==================================================
-project:       Get data from API of from cache
+project:       Get data from API
 Author:        R.Andres Castaneda 
 ----------------------------------------------------
 Creation Date:    12 May 2023 - 11:32:30
@@ -12,9 +12,7 @@ program define pip_get, rclass
 	version 16.1
 	syntax , [         ///
 	clear              ///
-	cacheforce         ///
 	gname(string)      ///
-	cachedir(passthru) ///
 	]
 	
 	if (c(changed) != 1 & "`clear'" == "") error 4
@@ -30,17 +28,9 @@ program define pip_get, rclass
 		foreach query of global `gname' {
 			local queryfull "${pip_host}/`query'"
 			
-			pip_cache load, query("`queryfull'") `cacheforce' `clear' `cachedir'
-			local pc_exists = "`r(pc_exists)'"
-			local piphash   = "`r(piphash)'"
-			
-			if ("`pc_exists'" == "0" | "${pip_cachedir}" == "0") {	
-				cap import delimited  "`queryfull'", `clear' varn(1) asdouble
-				if  (_rc) noi pip_download_err_msg "`queryfull'"
+			cap import delimited  "`queryfull'", `clear' varn(1) asdouble
+			if  (_rc) noi pip_download_err_msg "`queryfull'"
 				
-				pip_cache save, piphash("`piphash'") query("`queryfull'") /* 
-				*/  `cacheforce' `cachedir'
-			}
 			append using `fpip_get'
 			save `fpip_get', replace
 		}	

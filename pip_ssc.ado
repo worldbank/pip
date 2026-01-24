@@ -20,7 +20,8 @@ version 16.1
 
 syntax [anything(name=subcommand)]  ///
 [,                             	    ///
-pause                             /// 
+pause                               /// 
+check                               /// 
 ] 
 
 if ("`pause'" == "pause") pause on
@@ -33,6 +34,11 @@ else                      pause off
 if ("`subcommand'" == "update") {
 	qui adoupdate pip, ssconly
 	if ("`r(pkglist)'" == "pip") {
+		if ("`check'" == "check") {
+			di "There is a new version of pip in SSC."
+			di "If you wish to proceed, run {cmd:pip update} without the check argument."
+			exit
+		}
 		cap window stopbox rusure "There is a new version of pip in SSC." ///
 		"Would you like to install it now?"
 		

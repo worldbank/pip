@@ -8,17 +8,17 @@
 cap program drop getfiles
 program define getfiles, rclass
 
-args mask
+	args mask
 
-local f2add: dir . files "`mask'", respectcase
+	local f2add: dir . files "`mask'", respectcase
 
-foreach a of local f2add {
-	local as "`as' `a'"
-}
-local as = trim("`as'")
-local as: subinstr local as " " ";", all
+	foreach a of local f2add {
+		local as "`as' `a'"
+	}
+	local as = trim("`as'")
+	local as: subinstr local as " " ";", all
 
-return local files = "`as'"
+	return local files = "`as'"
 end
 
 
@@ -45,11 +45,11 @@ disp "`toins'"
 
 
 make pip, replace toc pkg                                  ///  readme
-	version(0.10.10)                                   ///
-    license("MIT")                                         ///
-    author("R.Andres Castaneda")                           ///
-    affiliation("The World Bank")                          ///
-    email("acastanedaa@worldbank.org")                     ///
+	version(0.10.17)                                                  ///
+    license("MIT")                                                         ///
+    author(`""R.Andres Castaneda" "Damian Clarke""')                       ///
+    affiliation(`" "The World Bank" "University of Chile & University of Exeter""')                                                         ///
+    email(`"acastanedaa@worldbank.org" "dclarke4@worldbank.org, dclarke@fen.uchile.cl""')                     ///
     url("")                                                ///
     title("Poverty and Inequality Platform Stata wrapper") ///
     description("World Bank PIP API Stata wrapper")        ///

@@ -19,7 +19,6 @@ program define pip_tables, rclass
 	syntax , [                       ///
 	table(string)                    ///
 	clear                            ///
-	cachedir(passthru)               ///
 	]
 	
 	version 16.1
@@ -53,7 +52,7 @@ program define pip_tables, rclass
 	//------------Get table
 	
 	pip_timer pip_tables.pip_get, on
-	pip_get, `clear' `cacheforce' `cachedir' gname(`gname')
+	pip_get, `clear' gname(`gname')
 	pip_timer pip_tables.pip_get, off
 	
 	return local table_call = "`table_call'"

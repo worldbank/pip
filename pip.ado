@@ -1,8 +1,11 @@
 /*=======================================================
 Program Name: pip.ado
-Author:
+Authors:
 R.Andres Castaneda
 acastanedaa@worldbank.org
+
+Damian Clarke 
+dclarke4@worldbank.org, dclarke@fen.uchile.cl
 
 Contributor:
 Tefera Bekele Degefu
@@ -22,17 +25,18 @@ program define pip, rclass
 	Program set up
 	==================================================*/
 	pip_setup
-	
+
 	//------------ Parsing args
 	pip_parseopts `0'   // parse whatever the user gives
+
 	local returnnames "`r(returnnames)'" // name of all returned object
 	local optnames    "`r(optnames)'"    // names of options (after the comma)
 	mata: pip_retlist2locals("`returnnames'") // convert return to locals
-	
+
 	if ("`subcmd'" == "") local subcmd "cl"  // default country-level 
 	
 	pip_split_options `optnames'  // get general options and estimation opts
-	
+
 	mata: pip_locals2call("`r(gen_opts)'", "gen_opts")
 	mata: pip_locals2call("`r(est_opts)'", "est_opts")
 
@@ -88,12 +92,6 @@ program define pip, rclass
 			pip_timer pip, off 
 			exit
 		}
-		
-		if ("`cachedir'" != "") {
-			pip_setup cachedir, `cachedir'
-			pip_timer pip, off 
-			exit
-		}
 	}
 	
 	//------------Cleaup
@@ -105,23 +103,30 @@ program define pip, rclass
 	
 	
 	//------------Drops
-	if regexm("`subcmd'", "^dropframe") {
-		pip_drop frame, `frame_prefix'
-		noi pip_timer pip, off
+	if regexm("`subcmd'", "^drop") {
+		tokenize `subcmd'
+		if "`2'"=="frame" {
+			if ("`frame_prefix'" == "") local frame_prefix "frame_prefix(_pip_)"
+			pip_drop frame, `frame_prefix'
+			noi pip_timer pip, off
+		}
+		else if "`2'"=="global" {
+			pip_drop global
+			pip_timer pip, off
+		}
+		else {
+			noi disp "{err}subcommand {it:drop} must be used with {it:frame} or {it:global}." _n /* 
+			*/ "E.x., {cmd:pip drop frame} or {cmd:pip drop global}."
+			error
+		}
 		exit
 	}
-	
-	if regexm("`subcmd'", "^dropglobal") {
-		pip_drop global
-		pip_timer pip, off
-		exit
-	}
-	
+
 	//------------Install and Uninstall
 	if regexm("`subcmd'", "^install") {
 		if ( ("`gh'" == "" & "`ssc'" == "") | /* 
 		*/  ("`gh'" != "" & "`ssc'" != "") ) {
-			noi disp "{err}subcommand {it:install} must be use "  /* 
+			noi disp "{err}subcommand {it:install} must be use "    /* 
 			*/	 "with either {it:ssc} or {it:gh}" _n               /* 
 			*/  "E.x., {cmd:pip install, ssc} or {cmd:pip install, gh}."
 			error
@@ -139,7 +144,6 @@ program define pip, rclass
 		noi pip_timer pip, off
 		exit
 	}
-	
 	if regexm("`subcmd'", "^update") {
 		noi pip_update, `path' `pause'
 		pip_timer pip, off
@@ -180,13 +184,6 @@ program define pip, rclass
 			pip_timer pip, off 
 			exit
 		}	
-		if ("`cache'" != "") {
-			//------------ Cache info
-			pip_cache info
-			return add
-			pip_timer pip, off 
-			exit
-		}
 		if ("`setup'" != "") {
 			//------------ Cache info
 			pip_setup display
@@ -198,43 +195,7 @@ program define pip, rclass
 		 */ "see {it:{help pip##print_options:print options}}"
 		 error
 	}
-	
-	//========================================================
-	// Cache 
-	//========================================================
-	if ("`subcmd'" == "cache") {
-		if ("`delete'" != "") {
-			pip_cache `delete', `cachedir'
-			pip_timer pip, off 
-			exit
-		}
-		if ("`iscache'" != "") {
-			pip_cache `iscache'
-			return add
-			pip_timer pip, off 
-			exit
-		}
-		if ("`info'" != "") {
-			pip_cache info
-			return add
-			pip_timer pip, off 
-			exit
-		}
-		if ("`inventory'" != "" | "`metadata'" != "") {
-			pip_cache inventory
-			pip_timer pip, off 
-			exit
-		}
-		if ("`setup'" != "") {
-			pip_setup cachedir, `cachedir'
-			pip_timer pip, off 
-			exit
-		}
 		
-		pip_timer pip, off
-		exit
-	}
-	
 	//------------Info
 	if regexm("`subcmd'", "^info") {
 		noi pip_info, `clear' `pause' `release' `ppp_year' /* 
@@ -265,18 +226,6 @@ program define pip, rclass
 			exit
 		}
 		
-		//========================================================
-		//  Check of arguments
-		//========================================================
-
-		/*
-		pip_timer pip.pip_pov_check_args, on
-		noi pip_pov_check_args `subcmd', `est_opts'
-		local optnames "`r(optnames)'" 
-		mata: pip_retlist2locals("`optnames'")
-		mata: pip_locals2call("`optnames'", "est_opts")
-		pip_timer pip.pip_pov_check_args, off
-		*/
 		
 		//========================================================
 		// retrieve and format estimates
@@ -284,24 +233,36 @@ program define pip, rclass
 		
 		//------------ Country lavel
 		if ("`subcmd'" == "cl") {
-			noi pip_cl, `est_opts' `n2disp' `povcalnet_format' `cachedir'
+			noi pip_cl, `est_opts' `n2disp' `povcalnet_format'
 			noi pip_timer pip, off `printtimer' 
+		}
+		//------------ Aggregate data
+		else if ("`subcmd'" == "agg") {
+			noi pip_agg, `est_opts'  `n2disp'
+			return add
+			noi pip_timer pip, off `printtimer'
 		}
 		//------------ World Bank Aggregate
 		else if ("`subcmd'" == "wb") {
-			noi pip_wb, `est_opts' `clear' `n2disp' `povcalnet_format' `cachedir'
+			noi pip_wb, `est_opts' `n2disp' `povcalnet_format'
 			noi pip_timer pip, off `printtimer'
 		}
 		//------------ Country Profile
 		else if ("`subcmd'" == "cp") {
-			pip_cp, `est_opts' `clear' `n2disp' `cachedir'
+			pip_cp, `est_opts' `n2disp'
 			noi pip_timer pip, off `printtimer'
 		}
 		//------------ Grouped data
 		else if ("`subcmd'" == "gd") {
-			noi pip_gd, `est_opts' `clear' `n2disp' `cachedir'
+			noi pip_gd, `est_opts'  `n2disp'
 			return add
 			noi pip_timer pip, off `printtimer'
+		}
+		//------------ Subcommand not recognized
+		else {
+			noi disp "{err}Subcommand {it:`subcmd'} is not recognized." _n /* 
+			*/ "see {it:{help pip}}"
+			error
 		}
 		
 		//========================================================
@@ -473,3 +434,34 @@ Version Control:
 *! -- add pip_utils_frame2locals
 *! -- add examples
 *! -- Update help file
+*! version 0.10.11  <2024oct09>
+*! -- HOT FIX: parse `clear' option to pip_cp_check_args
+*! version 0.10.12  <2024oct31>
+*! -- update bibtex
+*! -- Standardize drop subcommands
+*! -- Incorporate `pip update, check'
+*! -- Fix installing 
+*! -- Update help file 
+*! version 0.10.13  <2024nov26>
+*! -- Fix issue with regex in Stata 18 
+*! version 0.10.14  <2025jan14>
+*! -- remove internal caching
+*! version 0.10.14.9000  <2025feb24>
+*! -- update povline default to 2021 PPPs
+*! -- update help files
+*! -- add labels to SPL, SPR and PG
+*! version 0.10.14.9001  <2025feb28>
+*! -- update helpfile
+*! version 0.10.14.9002  <2025mar24>
+*! -- revert option nowcast for nonowcast
+*! -- change fillgaps to nofillgaps in subcmd wb
+*! version 0.10.15  <2025mar24>
+*! -- Implement nofillgaps and nonowcast for wb
+*! -- fix nowcast default in cl
+*! -- add labels to SPL, SPR and PG
+*! version 0.10.16  <2025oct08>
+*! -- Temporal fix to make it work with new data.
+*! -- Add `pip agg' subcommand to retrieve vintage aggregates.
+*! version 0.10.17  <2026jun24>
+*! -- allow aggregate() option in pip agg to work with new API version.
+*! -- fix error message in pip_agg.

@@ -34,12 +34,14 @@
 {synopt :{opt cov:erage(string)}}Coverage level ("national", "urban", "rural", "all"). Default "{it:all}".{p_end}
 {synopt :{opt y:ear}(numlist|string)}{help numlist} of years  or "all", or "last". Default is "{it:all}".{p_end}
 {synopt :{opt povl:ine:}(#)}List of poverty lines (accepts up to 5) in specified PPP (see option {help pip##general_options:ppp_year(#)}) to calculate 
-poverty. Default is 2.15 at 2017 PPPs.{p_end}
-{synopt :{opt fill:gaps}}Loads extrapolations and interpolations at the country
+poverty. Default is 3.00 at 2021 PPPs.{p_end}
+{synopt :{opt (no)}{opt fill:gaps}}Loads extrapolations and interpolations at the country
 level and year estimates with NOT enough data coverage at the regional level 
 ({it:see details {help pip_cl##fillgaps:below}}).{p_end}
-{synopt :{opt now:casts}}Loads nowcast estimates at the country-level, 
-regional, and global levels.{p_end}
+{synopt :{opt no}{opt now:casts}}By default, nowcast estimates are loaded at the
+ country, regional, and global levels. Specify {opt nonowcasts} to exclude these
+estimates from the results.{p_end}
+
 {pstd}
 
 {p 4 4 2}The following options only work at the country level:{p_end}
@@ -58,8 +60,8 @@ the {cmd:cl} (the default) and {cmd:wb} subcommands are the main modules of {cmd
 {cmd:cl} provides the country-level poverty and inequality estimates, whereas 
 {cmd:wb} provides regional and global level poverty estimates. As of now, the
 underlying welfare aggregate is the per capita household income or consumption
-expressed in 2017 PPP USD (the option {cmd:ppp_year(2011)} allows to
-estimate values in 2011 PPPs). Poverty lines, means, and medians are expressed in
+expressed in 2021 PPP USD (the option {cmd:ppp_year(2017)} allows to
+estimate values in 2017 PPPs). Poverty lines, means, and medians are expressed in
 {cmd:daily amounts}. 
 
 {phang}
@@ -142,7 +144,7 @@ for each country.
 {opt povline(#)} The poverty lines for which the poverty measures will be
  calculated. When selecting multiple poverty lines, use less than 4 decimals 
  and separate each value with spaces. If left empty, the default poverty line of 
- $2.15 is used. By default, poverty lines  are expressed in 2017 PPP USD per capita
+ $3 is used. By default, poverty lines  are expressed in 2021 PPP USD per capita
  per day. If option {opt ppp_year(2011)} is specified, the poverty lines will be
  expressed in 2011 PPPs.
 
@@ -153,37 +155,27 @@ line. In other words, the estimated poverty line will be the nearest
 income or consumption level such that the incomes of 10% of the 
 population fall below it. This has no default, and cannot be combined 
 with {opt povline}. The quantile (recorded in the variable poverty_line) 
-is expressed in 2017 PPP USD per capita per day (unless option 
-{opt ppp_year(2011)} is specified, in which case it will be reported in 
-2011 PPP values) ({err:Note: }{it:this option only applies to subcommand 
-{cmd:cl}}).
+is expressed in 2021 PPP USD per capita per day (unless option 
+{opt ppp_year(2017)} is specified, in which case it will be reported in 
+2011 PPP values) 
+({err:Note:}{it: this option only applies to subcommand {cmd:cl}}).
 
 {marker fillgaps}{...}
 {phang}
-{opt fill:gaps} This option works differently depending on the level of aggregation:
+{opt fill:gaps} This option works differently depending on the level of aggregation.
 
 {phang}
-{res:{ul:Country-level:} } {opt fillgaps} loads all country-level estimates that are 
-used to create the global and regional aggregates in the reference years. This
-includes estimates that are extrapolated or interpolated for those years where 
-nor survey data is available, year estimates for those surveys whose welfare 
-aggregate was collected over multiple years.
+{res:{ul:Country-level:} } {opt fillgaps} loads all country-level estimates used to construct the global and regional aggregates in the reference years. This includes extrapolated or interpolated values for countries without survey data in the reference year, as well as annualized estimates from surveys whose welfare aggregates span multiple years.
 
-{p 8 8 2}{res:Note}: Countries without a survey in the reference-year have been 
-extrapolated or interpolated using national accounts growth rates and assuming
-distribution-neutrality (see Chapter 6
-{browse "https://openknowledge.worldbank.org/bitstream/handle/10986/20384/9781464803611.pdf":here}).
-Therefore, changes at the country-level from one reference year to the next need 
-to be interpreted carefully and may not be the result of a new household survey.
+{p 8 8 2}{res:Note}: In cases where no survey is available for a given reference year, estimates have been generated using national accounts growth rates under the assumption of distribution-neutrality (see Chapter 6
+{browse "https://openknowledge.worldbank.org/bitstream/handle/10986/20384/9781464803611.pdf":here}). Therefore, changes at the country level between reference years should be interpreted with caution, as they may not reflect new household survey data.
 
 {phang}
-{res:{ul:Regional/Global-level:} } {opt fillgaps} loads estimates for all the years
-at all levels of aggregation, even if there is not enough survey coverage in that 
-years for a specific region aggregate (e.g., region or global). ({err:We highly discourage the use of these estimates for any analysis}).
+{res:{ul:Regional/Global-level:} } the {opt nofillgaps} option removes all estimates for years lacking sufficient survey coverage for a given aggregate (e.g., regional or global).
+({err:This option exists because we strongly discourage using such estimates for analytical purposes}).{p_end}
 
 {phang}
-{opt now:casts} This option loads nowcast estimates at the country-level, regional,
- and global levels. Activating {opt nowcasts} activates {opt fillgaps} as well.
+{opt no}{opt now:casts} is an "off" option that suppresses the loading of nowcast estimates at the country, regional, and global levels. Specifying {opt nonowcasts} excludes these estimates from the results.
 
 {marker examples}{...}
 {title:Examples}
@@ -239,20 +231,21 @@ from 2015-2016 to 2015. Only works for reference years.
 {stata pip wb, clear}       // all regions and reference years{p_end}
 
 {phang}
-2.5. {opt fillgaps} and {opt nowcasts} 
+2.5. {opt fillgaps}, {opt nofillgaps} and {opt nonowcasts} 
 
 {phang2}
 {stata pip, clear}          // survey estimates{p_end}
 {phang2}
-{stata pip, clear fillgaps} // interpolations and extrapolations{p_end}
+{stata pip, clear fillgaps} // interpolations, extrapolations and nowcasts{p_end}
 {phang2}
-{stata pip, clear nowcasts}  // {opt fillgaps} plus nowcasts{p_end}
+{stata pip, clear fillgaps nonowcasts}  // just interpolations and extrapolations{p_end}
 {phang2}
-{stata pip wb, clear}       // Official regional and global data{p_end}
+{stata pip wb, clear}       // Official regional and global data with 
+projections and nowcasts{p_end}
 {phang2}
-{stata pip wb, fillgaps}  // aggregates for years with no survey coverage{p_end}
+{stata pip wb, nofillgaps}  // remove aggregates for years with no survey coverage but keep nowcast{p_end}
 {phang2}
-{stata pip wb, nowcasts}   // {opt fillgaps} plus nowcasts{p_end}
+{stata pip wb, nonowcasts}   // Remove nowcasts but keep aggregates for years with no survey coverage{p_end}
 
 
 {ul:3. Samples uniquely identified by country/year}
@@ -461,6 +454,54 @@ Not necessarily the latest
 	  	ylab(,labs(small) nogrid angle(0)) scheme(s2color)
 {txt}      ({stata "pip_examples pip_example03":click to run})
 
+
+{ul:5. Aggregates examples}
+
+{phang2}
+{ul:5.1} Generate estimates using the old regional classification
+
+{cmd}
+		local curframe = c(frame)
+		frame `curframe': preserve
+		tempname pip_temp
+		frame create `pip_temp'
+		frame change `pip_temp'
+		
+		// load pip regional data
+		pip wb, clear fillgaps 
+		keep if inlist(region_code,"EAP","ECA","LAC","MNA","OHI","SAR","SSA") // keep only old regions
+		keep region* year poverty_line headcount pop_in_poverty
+		list 
+	
+		frame change `pip_temp'
+
+{txt}      ({stata "pip_examples pip_example14":click to run})
+
+{phang2}
+{ul:5.2} Generate poverty estimates for countries classified as FCV (Fragile & Conflict-Affected)
+
+{cmd}
+		local curframe = c(frame)
+		frame `curframe': preserve
+		tempname pip_temp
+		frame create `pip_temp'
+		frame change `pip_temp'
+		
+		// load pip old regions
+		pip tables, table(country_list) clear 
+		tempfile group_names
+		save `group_names'
+		
+		// load pip country data & other classifications
+		pip, clear fillgaps 
+		merge m:1 country_code using `group_names', nogen
+		gen double pop_in_poverty = headcount * population
+		collapse (mean) headcount (rawsum) pop_in_poverty [aw=population], by(fcv* year)
+		list 
+		
+		frame change `pip_temp'
+
+{txt}      ({stata "pip_examples pip_example15":click to run})
 
 {p 40 20 2}(Go back to {it:{help pip##sections:pip's main menu}}){p_end}
 

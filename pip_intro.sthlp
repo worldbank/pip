@@ -130,7 +130,7 @@ Query a particular region using {cmd:region()} options (see full {help pip_count
 {pstd}
 By default, {cmd:pip} estimate poverty measures at the international poverty
 line of the current {browse "https://www.worldbank.org/en/programs/icp":ICP}
-round. For the 2017 round, the value is  $2.15-a-day.
+round. For the 2021 round, the value is  $3.0-a-day.
 However, you can estimate poverty at different thresholds, indicating the desired
 poverty line value(s) in the {it:povline()} option: 
 

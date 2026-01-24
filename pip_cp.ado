@@ -52,7 +52,7 @@ program define pip_cp, rclass
 		//========================================================		
 		//------------ download
 		pip_timer pip_cp.pip_get, on
-		pip_get, `clear' `cacheforce' `cachedir'
+		pip_get, `clear'
 		pip_timer pip_cp.pip_get, off
 
 		//------------ clean
@@ -91,9 +91,8 @@ program define pip_cp_check_args, rclass
 	SERver(string)                  /// 
 	pause                           /// 
 	replace                         ///
-	cacheforce                      ///
 	n2disp(passthru)                ///
-	cachedir(passthru)  *           ///
+	*                               ///
 	] 
 	
 	//========================================================
@@ -126,6 +125,7 @@ program define pip_cp_check_args, rclass
 		if ("`ppp_year'" == "2005") local povline = 1.25
 		if ("`ppp_year'" == "2011") local povline = 1.9
 		if ("`ppp_year'" == "2017") local povline = 2.15
+		if ("`ppp_year'" == "2021") local povline = 3
 	}
 	
 	return local povline  = "`povline'"
@@ -137,6 +137,11 @@ program define pip_cp_check_args, rclass
 		local optnames "`optnames' n2disp"
 	}
 	
+    // clear
+	return local clear = "`clear'"
+	local optnames "`optnames' clear"
+
+    // Return all options as local
 	return local optnames "`optnames'"
    
 end

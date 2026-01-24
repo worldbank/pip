@@ -60,8 +60,7 @@ program define pip_set_server, rclass
 	* disp tpage
 	
 	*##e
-	
-	
+		
 	if (!regexm(tpage, "API is running") | _rc) {
 		noi disp in red "There is a problem with PIP API server. Try again later"
 		error

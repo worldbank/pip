@@ -46,6 +46,7 @@ all other economies are included in geographic regions, as defined by the World 
 {synopt:{opt  AUT }} Austria{p_end}
 {synopt:{opt  AZE }} Azerbaijan{p_end}
 {synopt:{opt  BGD }} Bangladesh{p_end}
+{synopt:{opt  BRB }} Barbados{p_end}
 {synopt:{opt  BLR }} Belarus{p_end}
 {synopt:{opt  BEL }} Belgium{p_end}
 {synopt:{opt  BLZ }} Belize{p_end}
@@ -67,19 +68,20 @@ all other economies are included in geographic regions, as defined by the World 
 {synopt:{opt  CHN }} China{p_end}
 {synopt:{opt  COL }} Colombia{p_end}
 {synopt:{opt  COM }} Comoros{p_end}
-{synopt:{opt  COD }} Congo, Democratic Republic of{p_end}
-{synopt:{opt  COG }} Congo, Republic of{p_end}
+{synopt:{opt  COD }} Congo, Dem. Rep.{p_end}
+{synopt:{opt  COG }} Congo, Rep.{p_end}
 {synopt:{opt  CRI }} Costa Rica{p_end}
 {synopt:{opt  CIV }} Cote d'Ivoire{p_end}
 {synopt:{opt  HRV }} Croatia{p_end}
 {synopt:{opt  CYP }} Cyprus{p_end}
-{synopt:{opt  CZE }} Czech Republic{p_end}
+{synopt:{opt  CZE }} Czechia{p_end}
 {synopt:{opt  DNK }} Denmark{p_end}
 {synopt:{opt  DJI }} Djibouti{p_end}
 {synopt:{opt  DOM }} Dominican Republic{p_end}
 {synopt:{opt  ECU }} Ecuador{p_end}
-{synopt:{opt  EGY }} Egypt, Arab Republic of{p_end}
+{synopt:{opt  EGY }} Egypt, Arab Rep.{p_end}
 {synopt:{opt  SLV }} El Salvador{p_end}
+{synopt:{opt  GNQ }} Equatorial Guinea{p_end}
 {synopt:{opt  EST }} Estonia{p_end}
 {synopt:{opt  SWZ }} Eswatini{p_end}
 {synopt:{opt  ETH }} Ethiopia{p_end}
@@ -92,6 +94,7 @@ all other economies are included in geographic regions, as defined by the World 
 {synopt:{opt  DEU }} Germany{p_end}
 {synopt:{opt  GHA }} Ghana{p_end}
 {synopt:{opt  GRC }} Greece{p_end}
+{synopt:{opt  GRD }} Grenada{p_end}
 {synopt:{opt  GTM }} Guatemala{p_end}
 {synopt:{opt  GIN }} Guinea{p_end}
 {synopt:{opt  GNB }} Guinea-Bissau{p_end}
@@ -102,7 +105,7 @@ all other economies are included in geographic regions, as defined by the World 
 {synopt:{opt  ISL }} Iceland{p_end}
 {synopt:{opt  IND }} India{p_end}
 {synopt:{opt  IDN }} Indonesia{p_end}
-{synopt:{opt  IRN }} Iran, Islamic Republic of{p_end}
+{synopt:{opt  IRN }} Iran, Islamic Rep.{p_end}
 {synopt:{opt  IRQ }} Iraq{p_end}
 {synopt:{opt  IRL }} Ireland{p_end}
 {synopt:{opt  ISR }} Israel{p_end}
@@ -129,6 +132,7 @@ all other economies are included in geographic regions, as defined by the World 
 {synopt:{opt  MDV }} Maldives{p_end}
 {synopt:{opt  MLI }} Mali{p_end}
 {synopt:{opt  MLT }} Malta{p_end}
+{synopt:{opt  MHL }} Marshall Islands{p_end}
 {synopt:{opt  MRT }} Mauritania{p_end}
 {synopt:{opt  MUS }} Mauritius{p_end}
 {synopt:{opt  MEX }} Mexico{p_end}
@@ -140,6 +144,7 @@ all other economies are included in geographic regions, as defined by the World 
 {synopt:{opt  MOZ }} Mozambique{p_end}
 {synopt:{opt  MMR }} Myanmar{p_end}
 {synopt:{opt  NAM }} Namibia{p_end}
+{synopt:{opt  NRU }} Nauru{p_end}
 {synopt:{opt  NPL }} Nepal{p_end}
 {synopt:{opt  NLD }} Netherlands{p_end}
 {synopt:{opt  NIC }} Nicaragua{p_end}
@@ -155,6 +160,7 @@ all other economies are included in geographic regions, as defined by the World 
 {synopt:{opt  PHL }} Philippines{p_end}
 {synopt:{opt  POL }} Poland{p_end}
 {synopt:{opt  PRT }} Portugal{p_end}
+{synopt:{opt  QAT }} Qatar{p_end}
 {synopt:{opt  ROU }} Romania{p_end}
 {synopt:{opt  RUS }} Russian Federation{p_end}
 {synopt:{opt  RWA }} Rwanda{p_end}
@@ -167,7 +173,7 @@ all other economies are included in geographic regions, as defined by the World 
 {synopt:{opt  SVK }} Slovak Republic{p_end}
 {synopt:{opt  SVN }} Slovenia{p_end}
 {synopt:{opt  SLB }} Solomon Islands{p_end}
-{synopt:{opt  SOM }} Somalia{p_end}
+{synopt:{opt  SOM }} Somalia, Fed. Rep.{p_end}
 {synopt:{opt  ZAF }} South Africa{p_end}
 {synopt:{opt  SSD }} South Sudan{p_end}
 {synopt:{opt  ESP }} Spain{p_end}
@@ -178,6 +184,7 @@ all other economies are included in geographic regions, as defined by the World 
 {synopt:{opt  SWE }} Sweden{p_end}
 {synopt:{opt  CHE }} Switzerland{p_end}
 {synopt:{opt  SYR }} Syrian Arab Republic{p_end}
+{synopt:{opt  TWN }} Taiwan, China{p_end}
 {synopt:{opt  TJK }} Tajikistan{p_end}
 {synopt:{opt  TZA }} Tanzania{p_end}
 {synopt:{opt  THA }} Thailand{p_end}
@@ -186,18 +193,19 @@ all other economies are included in geographic regions, as defined by the World 
 {synopt:{opt  TON }} Tonga{p_end}
 {synopt:{opt  TTO }} Trinidad and Tobago{p_end}
 {synopt:{opt  TUN }} Tunisia{p_end}
-{synopt:{opt  TUR }} Turkey{p_end}
+{synopt:{opt  TUR }} Türkiye{p_end}
 {synopt:{opt  TKM }} Turkmenistan{p_end}
 {synopt:{opt  TUV }} Tuvalu{p_end}
 {synopt:{opt  UGA }} Uganda{p_end}
 {synopt:{opt  UKR }} Ukraine{p_end}
+{synopt:{opt  ARE }} United Arab Emirates{p_end}
 {synopt:{opt  GBR }} United Kingdom{p_end}
 {synopt:{opt  USA }} United States{p_end}
 {synopt:{opt  URY }} Uruguay{p_end}
 {synopt:{opt  UZB }} Uzbekistan{p_end}
 {synopt:{opt  VUT }} Vanuatu{p_end}
 {synopt:{opt  VEN }} Venezuela, Republica Bolivariana de{p_end}
-{synopt:{opt  VNM }} Vietnam{p_end}
+{synopt:{opt  VNM }} Viet Nam{p_end}
 {synopt:{opt  PSE }} West Bank and Gaza{p_end}
 {synopt:{opt  YEM }} Yemen, Republic of{p_end}
 {synopt:{opt  ZMB }} Zambia{p_end}

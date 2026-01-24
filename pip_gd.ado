@@ -70,7 +70,7 @@ program define pip_gd,  rclass
 		qui frame create _pip_gd
 		frame _pip_gd {
 			pip_timer pip_gd.pip_get, on
-			pip_get, `cacheforce' `clear' `cachedir'
+			pip_get, `clear'
 			pip_timer pip_gd.pip_get, off
 
 			//Clean
@@ -124,9 +124,8 @@ program define pip_gd_check_args, rclass
 	clear                           /// 
 	pause                           ///
 	replace                         /// 
-	cacheforce                      ///
 	n2disp(passthru)                ///
-	cachedir(passthru) *            ///  
+	*                               ///  
 	]
 
 	//Set-up
@@ -257,10 +256,11 @@ program define pip_gd_check_args, rclass
 		local sum_wel = ``element''
 	}
 
-	if `sum_pop'!=1|`sum_wel'!=1 {
+	if (round(`sum_pop', .001) != 1 | round(`sum_wel', .001) != 1) {
 		local sp = string(`sum_pop', "%05.3f")
 		local sw = string(`sum_wel', "%05.3f")
-		dis "Warning: cum_population sums to `sp' and cumulative welfare sums to `sw'."
+		dis as error "{it: cum_population} sums to `sp' and {it: cumulative} welfare sums to `sw'. Both must sum up to 1."
+		exit 124
 	}
 
 	//Return cumulative welfare and population arguments
@@ -282,6 +282,7 @@ program define pip_gd_check_args, rclass
         	if ("`ppp_year'" == "2005") local povline = 1.25
         	if ("`ppp_year'" == "2011") local povline = 1.9
         	if ("`ppp_year'" == "2017") local povline = 2.15
+			if ("`ppp_year'" == "2021") local povline = 3
 		}
 		return local povline  = "`povline'"
 		local optnames "`optnames' povline"

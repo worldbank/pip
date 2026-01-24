@@ -24,6 +24,7 @@ version(string)              ///
 pause                        /// 
 replace                      ///
 path(string)                 ///
+check                        ///
 ] 
 
 version 16.1
@@ -54,15 +55,14 @@ local src = "`r(src)'"
 return add
 
 //------------  If PIP was installed from github
-if ("`src'" == "gh") {
-	
-	pip_gh update, username(`username') cmd(`cmd') `pause'
+if ("`src'" == "gh") {	
+	pip_gh update, username(`username') cmd(`cmd') `pause' `check'
 	return add
 } // end if installed from github 
 
 //------------ if pip was installed from SSC
 else {  
-	pip_ssc update, `pause'
+	pip_ssc update, `pause' `check'
 	return add
 }  // Finish checking pip update 
 

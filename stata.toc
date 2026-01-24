@@ -1,7 +1,7 @@
-v 0.10.10
-d Materials by R.Andres Castaneda
-d The World Bank
-d acastanedaa@worldbank.org
+v 0.10.17
+d Authors:
+d  -- R.Andres Castaneda, The World Bank (acastanedaa@worldbank.org")
+d  -- Damian Clarke, University of Chile & University of Exeter (dclarke4@worldbank.org, dclarke@fen.uchile.cl)
 
 d 'pip': World Bank PIP API Stata wrapper
 
