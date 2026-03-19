@@ -22,7 +22,8 @@ program define getfiles, rclass
 end
 
 
-cd "c:/Users/`c(username)'/OneDrive - WBG/WorldBank/DECDG/PIP/pip"
+* Working directory is set by the caller (rundo.exe uses the script's location).
+* If running interactively, cd to the project root first.
 getfiles "*.ado"
 local as = "`r(files)'"
 
@@ -45,7 +46,7 @@ disp "`toins'"
 
 
 make pip, replace toc pkg                                  ///  readme
-	version(0.10.17)                                                  ///
+	version(0.11.0)                                                  ///
     license("MIT")                                                         ///
     author(`""R.Andres Castaneda" "Damian Clarke""')                       ///
     affiliation(`" "The World Bank" "University of Chile & University of Exeter""')                                                         ///

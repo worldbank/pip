@@ -75,7 +75,7 @@ program define pip, rclass
 	// ------------------------------------------------------------------------
 	
 	pip_timer pip.pip_new_session, on
-	pip_new_session , `pause' `path'
+	pip_new_session
 	pip_timer pip.pip_new_session, off
 	
 	local curframe = c(frame)
@@ -123,9 +123,11 @@ program define pip, rclass
 		exit
 	}
 
-	//------------Install, Uninstall, Update (deprecated — GitHub only)
+	//------------Install, Uninstall, Update (deprecated - GitHub only)
+	* Note: install_cmd detection below is intentionally duplicated from pip_gh.ado
+	* to avoid a slow API call just for a deprecation notice.
 	if regexm("`subcmd'", "^install|^uninstall|^update") {
-		cap which github
+		capture which github
 		if (_rc == 0) {
 			local install_cmd "github install worldbank/pip, replace"
 		}

@@ -16,25 +16,17 @@ Output:
 /*==================================================
 0: Program set up
 ==================================================*/
-program define pip_new_session, rclass
+program define pip_new_session
 version 16.1
 
-syntax [anything(name=subcommand)]  ///
-[,                             	    ///
-path(string)                        ///
-pause                               ///
-]
-
-if ("`pause'" == "pause") pause on
-else                      pause off
-
-
-// ---- Skip if already checked this session -----
+* ---- Skip if already checked this session -----
+* $pip_version_checked is set once per session (cleared on Stata restart).
+* It prevents repeated API calls when pip is called multiple times.
 if ("${pip_version_checked}" != "") exit
 
 
-// ---- Check for new version on GitHub (once per session) -----
-* Failures are fully silent — network issues must not disrupt users
+* ---- Check for new version on GitHub (once per session) -----
+* Failures are fully silent - network issues must not disrupt users
 
 capture noi pip_gh
 if (_rc == 0) {
@@ -52,22 +44,10 @@ if (_rc == 0) {
 global pip_version_checked "1"
 
 
-// ---- Update pip_setup globals -----
+* ---- Update pip_setup globals -----
 pip_setup run
 
 end
 
 exit
 /* End of do-file */
-
-><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><
-
-Notes:
-1.
-2.
-3.
-
-
-Version Control:
-
-

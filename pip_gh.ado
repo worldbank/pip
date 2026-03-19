@@ -21,23 +21,21 @@ Output:        r(update_available), r(latest_version), r(current_version),
 program define pip_gh, rclass
 version 16.1
 
-// ---- 1. Get installed version from 'which pip' output -----
+* ---- 1. Get installed version from 'which pip' output -----
 
 capture which pip
-if (_rc) {
-	* pip not found â€” skip silently
-	exit
-}
+if (_rc) exit   * pip not found - skip silently
 local whichout = r(fn)
 
 * The *!version line is the first line of pip.ado
+* Assumes pip.ado starts with "*!version X.Y.Z" (standard Stata convention)
 tempname fh
 capture {
 	file open `fh' using `"`whichout'"', read text
 	file read `fh' line
 	file close `fh'
 }
-if (_rc) exit   // can't read file â€” skip silently
+if (_rc) exit   * can't read file - skip silently
 
 * Parse version string from "*!version X.Y.Z"
 if !regexm(`"`line'"', "([0-9]+)\.([0-9]+)\.([0-9]+)") exit
@@ -45,24 +43,27 @@ local crrMajor = regexs(1)
 local crrMinor = regexs(2)
 local crrPatch = regexs(3)
 local crrtversion = "`crrMajor'.`crrMinor'.`crrPatch'"
-local current = `crrMajor'`crrMinor'`crrPatch'
+* Weighted numeric comparison avoids wrong results with multi-digit components
+* (e.g. concatenation: 0.9.10 -> "0910" > 0.10.0 -> "0100" would be wrong)
+local current_cmp = `crrMajor' * 1000000 + `crrMinor' * 1000 + `crrPatch'
 
 
-// ---- 2. Query GitHub API for latest release -----
+* ---- 2. Query GitHub API for latest release -----
 
-_pip_githubquery worldbank/pip
+pip_githubquery worldbank/pip
 local latestversion = "`r(latestversion)'"
-if ("`latestversion'" == "") exit   // API unreachable â€” skip silently
+if ("`latestversion'" == "") exit   * API unreachable - skip silently
 
 if regexm("`latestversion'", "([0-9]+)\.([0-9]+)\.([0-9]+)") {
 	local lastMajor = regexs(1)
 	local lastMinor = regexs(2)
 	local lastPatch = regexs(3)
 }
-local last = `lastMajor'`lastMinor'`lastPatch'
+else exit   * tag is not a valid semver - skip silently
+local last_cmp = `lastMajor' * 1000000 + `lastMinor' * 1000 + `lastPatch'
 
 
-// ---- 3. Build install command (prefer 'github' package if available) -----
+* ---- 3. Build install command (prefer 'github' package if available) -----
 
 capture which github
 if (_rc == 0) {
@@ -73,11 +74,12 @@ else {
 }
 
 
-// ---- 4. Compare and return results -----
+* ---- 4. Compare and return results -----
+* r(update_available) is returned as string "1"/"0" (r-class macros are always strings)
 
-local update_available = (`last' > `current')
+local update_available = cond(`last_cmp' > `current_cmp', "1", "0")
 
-return local update_available = `update_available'
+return local update_available "`update_available'"
 return local latest_version   = "`latestversion'"
 return local current_version  = "`crrtversion'"
 return local install_cmd      = `"`install_cmd'"'
@@ -85,45 +87,32 @@ return local install_cmd      = `"`install_cmd'"'
 end
 
 
-//========================================================
-// Auxiliary: query GitHub releases API
-//========================================================
+*==================================================
+* Auxiliary: query GitHub releases/latest API
+*==================================================
 
-program define _pip_githubquery, rclass
+program define pip_githubquery, rclass
 /*
-  Queries https://api.github.com/repos/<repo>/releases and returns
+  Queries https://api.github.com/repos/<repo>/releases/latest and returns
   the tag name of the most recent release in r(latestversion).
-  Fails silently if the network is unavailable.
+  Fails silently if the network is unavailable or the repo has no releases.
 */
 version 16.1
 syntax anything(name=repo)
 
-preserve
-drop _all
-
+local latestversion ""
 capture {
-	local page "https://api.github.com/repos/`repo'/releases"
-	scalar _pip_gh_page = fileread(`"`page'"')
-	mata {
-		lines = st_strscalar("_pip_gh_page")
-		lines = ustrsplit(lines, ",")'
-		lines = strtrim(lines)
-		lines = stritrim(lines)
-		lines = subinstr(lines, `"":""', "->")
-		lines = subinstr(lines, `"""', "")
+	local page `"https://api.github.com/repos/`repo'/releases/latest"'
+	scalar _pip_gh_json = fileread(`"`page'"')
+	if regexm(scalar(_pip_gh_json), `""tag_name":"([^"]+)""') {
+		local latestversion = regexs(1)
 	}
-	getmata lines, replace
-
-	split lines, parse("->")
-	rename lines? (code url)
-
-	keep if regexm(url, "releases/tag")
-	gen tag = regexs(2) if regexm(url, "(releases/tag/)(.*)")
-	local latestversion = tag[1]
 }
-scalar drop _pip_gh_page
+capture scalar drop _pip_gh_json
 
-restore
+* Strip leading 'v' prefix from tag if present (e.g. "v0.11.0" -> "0.11.0")
+if regexm("`latestversion'", "^v(.+)") local latestversion = regexs(1)
+
 return local latestversion `latestversion'
 
 end
