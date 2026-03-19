@@ -171,11 +171,7 @@ program define pip_utils_final_msg, rclass
 	`cnoi' pip_cite, reg_cite
 	notes: `r(cite_data)'
 	return add
-	
-	* Install alternative version
-	if ("${pip_old_session}" == "") {
-		noi pip_${pip_source} msg
-	}
+
 end
 
 //------------ Keep or drop frames

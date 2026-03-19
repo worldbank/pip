@@ -24,7 +24,7 @@ version 16.1
 * ---- 1. Get installed version from 'which pip' output -----
 
 capture which pip
-if (_rc) exit   * pip not found - skip silently
+if (_rc) exit   // pip not found - skip silently
 local whichout = r(fn)
 
 * The *!version line is the first line of pip.ado
@@ -35,7 +35,7 @@ capture {
 	file read `fh' line
 	file close `fh'
 }
-if (_rc) exit   * can't read file - skip silently
+if (_rc) exit   // can't read file - skip silently
 
 * Parse version string from "*!version X.Y.Z"
 if !regexm(`"`line'"', "([0-9]+)\.([0-9]+)\.([0-9]+)") exit
@@ -52,14 +52,14 @@ local current_cmp = `crrMajor' * 1000000 + `crrMinor' * 1000 + `crrPatch'
 
 pip_githubquery worldbank/pip
 local latestversion = "`r(latestversion)'"
-if ("`latestversion'" == "") exit   * API unreachable - skip silently
+if ("`latestversion'" == "") exit   // API unreachable - skip silently
 
 if regexm("`latestversion'", "([0-9]+)\.([0-9]+)\.([0-9]+)") {
 	local lastMajor = regexs(1)
 	local lastMinor = regexs(2)
 	local lastPatch = regexs(3)
 }
-else exit   * tag is not a valid semver - skip silently
+else exit   // tag is not a valid semver - skip silently
 local last_cmp = `lastMajor' * 1000000 + `lastMinor' * 1000 + `lastPatch'
 
 
