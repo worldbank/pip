@@ -1,4 +1,5 @@
-﻿*!version 0.11.0  <2026mar19>
+
+*! version 0.11.0  <2026mar19>
 /*=======================================================
 Program Name: pip.ado
 Authors:
@@ -18,7 +19,6 @@ Dependencies: The World Bank - DECIS
 -----------------------------------------------------------------------
 References: https://pip.worldbank.org/home  https://pip.worldbank.org/api
 =======================================================*/
-
 
 program define pip, rclass
 	version 16.1

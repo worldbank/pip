@@ -1,4 +1,4 @@
-﻿*!version 0.11.0  <2026mar19>
+*!version 0.11.0  <2026mar19>
 /*==================================================
 project:       Check whether a new version of pip is available on GitHub
 Author:        R.Andres Castaneda
