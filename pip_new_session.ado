@@ -1,15 +1,16 @@
+*!version 0.11.0  <2026mar19>
 /*==================================================
 project:       Execute in each new Stata session
-Author:        R.Andres Castaneda 
+Author:        R.Andres Castaneda
 E-email:       acastanedaa@worldbank.org
-url:           
+url:
 Dependencies:  The World bank
 ----------------------------------------------------
 Creation Date:    30 Nov 2021 - 16:05:24
-Modification Date:   
-Do-file version:    01
-References:          
-Output:             
+Modification Date: 19 Mar 2026
+Do-file version:    02
+References:
+Output:
 ==================================================*/
 
 /*==================================================
@@ -19,78 +20,44 @@ program define pip_new_session, rclass
 version 16.1
 
 syntax [anything(name=subcommand)]  ///
-[,                             	    /// 
+[,                             	    ///
 path(string)                        ///
-pause                             /// 
-] 
+pause                               ///
+]
 
 if ("`pause'" == "pause") pause on
 else                      pause off
 
-*##s
-* ---- Initial time parameters
 
-if ("${pip_old_session}" != "") exit
+// ---- Skip if already checked this session -----
+if ("${pip_version_checked}" != "") exit
 
-if ("${pip_lastupdate}" != "") {
-	local day_diff = date("${pip_date_file}","YMD") - ///
-	                 date("${pip_lastupdate}","YMD")
-	if (`day_diff' <= 31) {
-		noi disp "Check for updates will be done in `=31-`day_diff'' days"
-		global pip_old_session "1"
-		exit
+
+// ---- Check for new version on GitHub (once per session) -----
+* Failures are fully silent — network issues must not disrupt users
+
+capture noi pip_gh
+if (_rc == 0) {
+	local update_available = "`r(update_available)'"
+	local latest_version   = "`r(latest_version)'"
+	local install_cmd      = `"`r(install_cmd)'"'
+
+	if ("`update_available'" == "1") {
+		noi disp as text _n ///
+			"Note: A new version of {cmd:pip} is available (v`latest_version'). " ///
+			"To update, run: {stata `install_cmd'}"
 	}
 }
 
+global pip_version_checked "1"
 
-*##e
 
-/*==================================================
-1: Update PIP
-==================================================*/
+// ---- Update pip_setup globals -----
+pip_setup run
 
-pip_update, path(`path')
-local pip_source = "`r(src)'"
-local bye        = "`r(bye)'"
-
-/*==================================================
-2: Dependencies         
-==================================================*/
-
-*---------- check SSC commands
-/* 
-local ssc_cmds missings 
-
-noi disp in y "Note: " in w "{cmd:pip} requires the packages " ///
-"below from SSC: " _n in g "`ssc_cmds'"
-
-foreach cmd of local ssc_cmds {
-	capture which `cmd'
-	if (_rc != 0) {
-		ssc install `cmd'
-		noi disp in g "{cmd:`cmd'} " in w _col(15) "installed"
-	}
-}
-
-adoupdate `ssc_cmds', ssconly
-if ("`r(pkglist)'" != "") adoupdate `r(pkglist)', update ssconly
- */
-
-* ----- Globals
-
-local tgl = `"global pip_source   = "`pip_source'""'
-pip_setup replace, pattern("pip_lastupdate") /* 
- */ new(`"global pip_lastupdate "${pip_date_file}""')
-pip_setup replace, pattern("pip_source") new(`"`tgl'"')
-
-pip_setup run 
-
-`bye'
-
-end 
+end
 
 exit
-
 /* End of do-file */
 
 ><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><
