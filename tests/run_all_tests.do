@@ -43,6 +43,16 @@ foreach test of local tests {
         local failures "`failures' `test'"
         di as error "  -> FAILED (_rc = " _rc ")"
     }
+    * Clean up data and extra frames between tests to prevent state leakage
+    capture {
+        clear
+        frame dir
+        local _cln_frames "`r(frames)'"
+        foreach _fr of local _cln_frames {
+            if ("`_fr'" != "default") capture frame drop `_fr'
+        }
+        frame change default
+    }
 }
 
 di as result _n _dup(60) "="

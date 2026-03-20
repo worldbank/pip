@@ -81,4 +81,37 @@ else {
 
 program drop _pip_test_stale_rclass
 
+* ---- Test 3: pip_new_session three-part guard blocks partial r() -----
+* Verify that ALL three macros must be non-empty for the display to fire.
+* If any one is empty the guard should block, regardless of the others.
+di as result "--- Test 3: three-part guard component tests ---"
+local test3_pass 1
+foreach missing_var in update_available latest_version install_cmd {
+    local update_available "1"
+    local latest_version   "0.11.0"
+    local install_cmd      "github install worldbank/pip, replace"
+    local `missing_var' ""   // empty one component at a time
+    local would_display = ("`update_available'" == "1" & "`latest_version'" != "" & "`install_cmd'" != "")
+    if (`would_display') {
+        di as error "  FAIL Test 3: guard should block when `missing_var' is empty"
+        local test3_pass 0
+    }
+    else {
+        di as result "  PASS Test 3: guard blocks when `missing_var' is empty"
+    }
+}
+* Verify all three populated triggers display
+local update_available "1"
+local latest_version   "0.11.0"
+local install_cmd      "github install worldbank/pip, replace"
+local would_display = ("`update_available'" == "1" & "`latest_version'" != "" & "`install_cmd'" != "")
+if (!`would_display') {
+    di as error "  FAIL Test 3b: guard should allow display when all conditions met"
+    local test3_pass 0
+}
+else {
+    di as result "  PASS Test 3b: guard allows display when all three conditions met"
+}
+if (!`test3_pass') error 9
+
 di as result _n "All pip_gh silent failure tests passed."

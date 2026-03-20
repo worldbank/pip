@@ -30,12 +30,12 @@ local whichout = r(fn)
 * The *!version line is the first line of pip.ado
 * Assumes pip.ado starts with "*!version X.Y.Z" (standard Stata convention)
 tempname fh
-capture {
-	file open `fh' using `"`whichout'"', read text
-	file read `fh' line
-	file close `fh'
-}
-if (_rc) exit 1   // can't read file - skip silently
+capture file open `fh' using `"`whichout'"', read text
+if (_rc) exit 1   // can't open file - skip silently
+capture file read `fh' line
+local rc_fh = _rc              // save before file close resets _rc
+capture file close `fh'        // always runs: file was opened successfully above
+if (`rc_fh') exit 1   // can't read file - skip silently
 
 * Parse version string from "*!version X.Y.Z"
 if !regexm(`"`line'"', "([0-9]+)\.([0-9]+)\.([0-9]+)") exit 1

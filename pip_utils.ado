@@ -26,7 +26,7 @@ program define pip_utils, rclass
 	pip_parseopts `0'
 	mata: pip_retlist2locals("`r(returnnames)'")
 	
-	if ustrregexm(`"`subcmd'"', "(.+) (if .+)") {
+	if (ustrregexm(`"`subcmd'"', "(.+) (if .+)")) {
 		local subcmd = trim(ustrregexs(1))
 		local if = trim(ustrregexs(2))
 	}
@@ -183,17 +183,16 @@ program define pip_utils_keep_frame
 	
 	foreach fr of local av_frames {
 		// Only process internal frames with _pip_ prefix
-		if (substr("`fr'", 1, 5) == "_pip_") {
-			local frbase = substr("`fr'", 6, .)
-			// If user wants to keep frames
-			if ("`keepframes'" != "") {
-				local frname = "`frame_prefix'" + "`frbase'"
-				frame copy `fr' `frname', replace
-			}
-			// If user wants to drop them
-			if ("`efficient'" == "noefficient") {
-				frame drop `fr'
-			}
+		if (substr("`fr'", 1, 5) != "_pip_") continue
+		local frbase = substr("`fr'", 6, .)
+		// If user wants to keep frames
+		if ("`keepframes'" != "") {
+			local frname = "`frame_prefix'" + "`frbase'"
+			frame copy `fr' `frname', replace
+		}
+		// If user wants to drop them
+		if ("`efficient'" == "noefficient") {
+			frame drop `fr'
 		}
 	} // end frame loop
 end

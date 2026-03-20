@@ -43,18 +43,15 @@ program define pip_setup, rclass
 	
 	// run pip_setup.do
 	if ("`subcmd'" == "run") {
-		cap findfile "pip_setup.do"
-		if (_rc)  pip_setup_create // if setup.do is not found
-		
-		if ("`options'" == "display") type "`r(fn)'"
-		run  "`r(fn)'"
+		pip_setup_ensure
+		local _setup_fn "`r(fn)'"
+		if ("`options'" == "display") type "`_setup_fn'"
+		run  "`_setup_fn'"
 		exit
 	}
-	// run pip_setup.do
+	// display pip_setup.do
 	if ("`subcmd'" == "display") {
-		cap findfile "pip_setup.do"
-		if (_rc)  pip_setup_create // if setup.do is not found
-		
+		pip_setup_ensure
 		type "`r(fn)'"
 		exit
 	}
@@ -104,8 +101,7 @@ program define pip_setup, rclass
 			local newline = `"global pip_pipmata_hash  = "`pipmata_hash'""'
 			* local newline = `"global pip_pipmata_hash  = "1959982309""'
 			
-			cap findfile "pip_setup.do"
-			if (_rc)  pip_setup_create // if setup.do is not found
+			pip_setup_ensure
 			pip_setup replace, pattern(`"`pattern'"') new(`"`newline'"')
 		}
 		
