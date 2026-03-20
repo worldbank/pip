@@ -27,14 +27,16 @@ if ("${pip_version_checked}" != "") exit
 
 * ---- Check for new version on GitHub (once per session) -----
 * Failures are fully silent - network issues must not disrupt users
+* exit 1 from pip_gh means 'skipped silently' (not an error)
 
-capture noi pip_gh
+capture pip_gh
 if (_rc == 0) {
+	* Only consume r() macros if they were actually set by pip_gh
 	local update_available = "`r(update_available)'"
 	local latest_version   = "`r(latest_version)'"
 	local install_cmd      = `"`r(install_cmd)'"'
 
-	if ("`update_available'" == "1") {
+	if ("`update_available'" == "1" & "`latest_version'" != "" & "`install_cmd'" != "") {
 		noi disp as text _n ///
 			"Note: A new version of {cmd:pip} is available (v`latest_version'). " ///
 			"To update, run: {stata `install_cmd'}"

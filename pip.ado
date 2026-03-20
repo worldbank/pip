@@ -67,9 +67,28 @@ program define pip, rclass
 	
 	if ("`pause'" == "pause") pause on
 	else                      pause off
-	set checksum off
-	
-	
+	if ("${pip_checksum_set}" == "") {
+		set checksum off
+		global pip_checksum_set "1"
+	}
+
+	//------------Install, Uninstall, Update (deprecated - GitHub only)
+	* Checked here, before pip_new_session, to avoid an unnecessary GitHub API call.
+	if regexm("`subcmd'", "^install|^uninstall|^update") {
+		capture which github
+		if (_rc == 0) {
+			local install_cmd "github install worldbank/pip, replace"
+		}
+		else {
+			local install_cmd `"net install pip, from("https://raw.githubusercontent.com/worldbank/pip/main/") replace"'
+		}
+		noi disp as text _n ///
+			"{cmd:pip `subcmd'} has been removed. {cmd:pip} is now only available on GitHub." _n ///
+			"To update, run: {stata `install_cmd'}"
+		pip_timer pip, off
+		exit
+	}
+
 	// ------------------------------------------------------------------------
 	// New session procedure
 	// ------------------------------------------------------------------------
@@ -120,24 +139,6 @@ program define pip, rclass
 			*/ "E.x., {cmd:pip drop frame} or {cmd:pip drop global}."
 			error
 		}
-		exit
-	}
-
-	//------------Install, Uninstall, Update (deprecated - GitHub only)
-	* Note: install_cmd detection below is intentionally duplicated from pip_gh.ado
-	* to avoid a slow API call just for a deprecation notice.
-	if regexm("`subcmd'", "^install|^uninstall|^update") {
-		capture which github
-		if (_rc == 0) {
-			local install_cmd "github install worldbank/pip, replace"
-		}
-		else {
-			local install_cmd `"net install pip, from("https://raw.githubusercontent.com/worldbank/pip/main/") replace"'
-		}
-		noi disp as text _n ///
-			"{cmd:pip `subcmd'} has been removed. {cmd:pip} is now only available on GitHub." _n ///
-			"To update, run: {stata `install_cmd'}"
-		pip_timer pip, off
 		exit
 	}
 

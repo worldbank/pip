@@ -24,7 +24,7 @@ version 16.1
 * ---- 1. Get installed version from 'which pip' output -----
 
 capture which pip
-if (_rc) exit   // pip not found - skip silently
+if (_rc) exit 1   // pip not found - skip silently
 local whichout = r(fn)
 
 * The *!version line is the first line of pip.ado
@@ -35,16 +35,17 @@ capture {
 	file read `fh' line
 	file close `fh'
 }
-if (_rc) exit   // can't read file - skip silently
+if (_rc) exit 1   // can't read file - skip silently
 
 * Parse version string from "*!version X.Y.Z"
-if !regexm(`"`line'"', "([0-9]+)\.([0-9]+)\.([0-9]+)") exit
+if !regexm(`"`line'"', "([0-9]+)\.([0-9]+)\.([0-9]+)") exit 1
 local crrMajor = regexs(1)
 local crrMinor = regexs(2)
 local crrPatch = regexs(3)
 local crrtversion = "`crrMajor'.`crrMinor'.`crrPatch'"
 * Weighted numeric comparison avoids wrong results with multi-digit components
 * (e.g. concatenation: 0.9.10 -> "0910" > 0.10.0 -> "0100" would be wrong)
+* Constraint: each component must be < 1000 for the weighting to be correct.
 local current_cmp = `crrMajor' * 1000000 + `crrMinor' * 1000 + `crrPatch'
 
 
@@ -52,14 +53,14 @@ local current_cmp = `crrMajor' * 1000000 + `crrMinor' * 1000 + `crrPatch'
 
 pip_githubquery worldbank/pip
 local latestversion = "`r(latestversion)'"
-if ("`latestversion'" == "") exit   // API unreachable - skip silently
+if ("`latestversion'" == "") exit 1   // API unreachable - skip silently
 
-if regexm("`latestversion'", "([0-9]+)\.([0-9]+)\.([0-9]+)") {
+if regexm("`latestversion'", "^([0-9]+)\.([0-9]+)\.([0-9]+)$") {
 	local lastMajor = regexs(1)
 	local lastMinor = regexs(2)
 	local lastPatch = regexs(3)
 }
-else exit   // tag is not a valid semver - skip silently
+else exit 1   // tag is not a valid semver or is a pre-release - skip silently
 local last_cmp = `lastMajor' * 1000000 + `lastMinor' * 1000 + `lastPatch'
 
 
@@ -101,14 +102,16 @@ version 16.1
 syntax anything(name=repo)
 
 local latestversion ""
+capture scalar drop `gh_json'   // pre-clear in case of prior interrupted run
+tempname gh_json
 capture {
 	local page `"https://api.github.com/repos/`repo'/releases/latest"'
-	scalar _pip_gh_json = fileread(`"`page'"')
-	if regexm(scalar(_pip_gh_json), `""tag_name":"([^"]+)""') {
+	scalar `gh_json' = fileread(`"`page'"')
+	if regexm(scalar(`gh_json'), `""tag_name": *"([^"]+)""') {
 		local latestversion = regexs(1)
 	}
 }
-capture scalar drop _pip_gh_json
+capture scalar drop `gh_json'
 
 * Strip leading 'v' prefix from tag if present (e.g. "v0.11.0" -> "0.11.0")
 if regexm("`latestversion'", "^v(.+)") local latestversion = regexs(1)

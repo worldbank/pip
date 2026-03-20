@@ -3,6 +3,7 @@
 // DO NOT FORGET to update the version of the package, if changed!
 // for more information visit http://github.com/haghish/github
 
+version 16.1
 *##s
 
 cap program drop getfiles

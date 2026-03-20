@@ -1,3 +1,4 @@
+*!version 0.11.0  <2026mar19>
 /*==================================================
 project:       Useful function to use across pip
 Author:        R.Andres Castaneda 
@@ -6,8 +7,8 @@ url:
 Dependencies:  The World Bank
 ----------------------------------------------------
 Creation Date:    16 May 2023 - 18:14:47
-Modification Date:   21 Jul 2024 - 20:39:11 (DClarke)
-Do-file version:    01
+Modification Date:   19 Mar 2026
+Do-file version:    02
 References:          
 Output:             
 ==================================================*/
@@ -41,7 +42,7 @@ program define pip_utils, rclass
 	//------------ display query
 	
 	if ("`subcmd'" == "dispquery") {
-		pip_uitls_disp_query
+		pip_utils_disp_query
 		exit
 	}
 
@@ -88,7 +89,7 @@ end
 //========================================================
 //------------ display query
 
-program define pip_uitls_disp_query
+program define pip_utils_disp_query
 	
 	foreach q of global pip_last_queries {
 		disp "{res}{hline}"
@@ -123,25 +124,21 @@ end
 //------------ drop missing vars
 
 program define pip_utils_dropvars
-	
-	ds
-	local varlist `r(varlist)'
-	foreach v of local varlist {
 
-        cap confirm numeric variable `v'
-        if (_rc) {
-            count if `v' == "."
-            local Ndots = r(N)
-        }
-        else local Ndots = 0
-		count if missing(`v')
-        local Nmiss = r(N)
-        local Tmiss = `Nmiss' + `Ndots'
+	ds, has(type numeric)
+	local numvars `r(varlist)'
+	ds, not(type numeric)
+	local strvars `r(varlist)'
 
-		if (`Tmiss' == c(N)) { 
-			local droplist `droplist' `v' 
-		} 
+	foreach v of local numvars {
+		qui sum `v'
+		if (`r(N)' == 0) local droplist `droplist' `v'
 	}
+	foreach v of local strvars {
+		qui count if missing(`v') | `v' == "."
+		if (`r(N)' == c(N)) local droplist `droplist' `v'
+	}
+
 	if "`droplist'" != "" { 
 		drop `droplist' 
 		di "{p}note: `droplist' dropped{p_end}" // from missings.ado
@@ -184,23 +181,21 @@ program define pip_utils_keep_frame
 	frame dir
 	local av_frames "`r(frames)'"
 	
-	* set trace on 
 	foreach fr of local av_frames {
-		
-		if (regexm("`fr'", "(^_pip_)(.+)")) {
-			
-			// If users wants to keep frames
+		// Only process internal frames with _pip_ prefix
+		if (substr("`fr'", 1, 5) == "_pip_") {
+			local frbase = substr("`fr'", 6, .)
+			// If user wants to keep frames
 			if ("`keepframes'" != "") {
-				local frname = "`frame_prefix'" + regexs(2)
-				frame copy `fr' `frname', `replace'
+				local frname = "`frame_prefix'" + "`frbase'"
+				frame copy `fr' `frname', replace
 			}
-			// if user wants to drop them
+			// If user wants to drop them
 			if ("`efficient'" == "noefficient") {
 				frame drop `fr'
 			}
 		}
-		
-	} // condition to keep frames
+	} // end frame loop
 end
 
 program define pip_utils_clicktable
@@ -292,10 +287,8 @@ end
 program define pip_utils_frame2locals, rclass
 	qui ds
 	local vars = "`r(varlist)'"
-	numlist "1/`c(N)'"
-	local obs = r(numlist)
-	foreach var of local vars {
-		foreach ob of local obs {
+	forvalues ob = 1/`c(N)' {
+		foreach var of local vars {
 			return local `var'_`ob' = `var'[`ob']
 		}
 	}

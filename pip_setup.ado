@@ -176,7 +176,6 @@ program define pip_setup_create, rclass
 		file write `do' `""' _dup(2) _n    
 		file write `do' `"global pip_pipmata_hash = """' _dup(3) _n 
 		file write `do' `"global pip_lastupdate = """' _dup(3) _n 
-		file write `do' `"global pip_source   = """' _dup(3) _n 
 		file write `do' _dup(5) _n 
 		file write `do' `"exit"' _n 
 		file write `do' `"/* End of do-file */"' _n 

@@ -50,6 +50,12 @@ features ({res:coming soon}).{p_end}
 browser (api) or download as .csv.{p_end}
 {synopt :{helpb pip_misc:drop}}({it:Programmer's option}) Deletes objects from memory.{p_end}
 {synoptline}
+
+{p 4 4 2}Removed subcommands{p_end}
+{synopt :{opt install}}Removed. Use {stata "github install worldbank/pip, replace"} instead.{p_end}
+{synopt :{opt update}}Removed. Use {stata "github install worldbank/pip, replace"} instead.{p_end}
+{synopt :{opt uninstall}}Removed. Use {stata "github uninstall pip"} instead.{p_end}
+{synoptline}
 {pstd}
 {bf:Note}: {cmd:pip} requires an internet connection.
 
@@ -409,7 +415,7 @@ https://worldbank.github.io/pip/ {p_end}
 
 {title:Thanks for citing {cmd:pip} data as follows}
 
-{p 4 8 2} World Bank. (2023). Poverty and Inequality Platform (version 0.10.17)
+{p 4 8 2} World Bank. (2023). Poverty and Inequality Platform (version 0.11.0)
 [Data set]. World Bank Group. www.pip.worldbank.org. Accessed 19 Mar 2026.{p_end}
 
 {p 4 8 2}Available version_IDs:{p_end}
