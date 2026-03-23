@@ -1,7 +1,7 @@
-// the 'make.do' file is automatically created by 'github' package.
-// execute the code below to generate the package installation files.
-// DO NOT FORGET to update the version of the package, if changed!
-// for more information visit http://github.com/haghish/github
+// make.do is maintained manually and checked into version control.
+// Execute this script to regenerate pip.pkg and stata.toc.
+// DO NOT FORGET to update the version number when it changes.
+// For more information visit http://github.com/haghish/github
 
 version 16.1
 *##s

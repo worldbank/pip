@@ -34,7 +34,8 @@ program define pip, rclass
 	local optnames    "`r(optnames)'"    // names of options (after the comma)
 	mata: pip_retlist2locals("`returnnames'") // convert return to locals
 
-	if ("`subcmd'" == "") local subcmd "cl"  // default country-level 
+	local _default_subcmd "cl"   // country-level is the default subcommand
+	if ("`subcmd'" == "") local subcmd "`_default_subcmd'"
 	
 	pip_split_options `optnames'  // get general options and estimation opts
 
@@ -74,7 +75,7 @@ program define pip, rclass
 
 	//------------Install, Uninstall, Update (deprecated - GitHub only)
 	* Checked here, before pip_new_session, to avoid an unnecessary GitHub API call.
-	if regexm("`subcmd'", "^install|^uninstall|^update") {
+	if regexm("`subcmd'", "^install|^uninstall|^update|^ssc") {
 		capture which github
 		if (_rc == 0) {
 			local install_cmd "github install worldbank/pip, replace"
@@ -226,6 +227,7 @@ program define pip, rclass
 		//------------ Country lavel
 		if ("`subcmd'" == "cl") {
 			noi pip_cl, `est_opts' `n2disp' `povcalnet_format'
+			return add
 			noi pip_timer pip, off `printtimer' 
 		}
 		//------------ Aggregate data
@@ -237,11 +239,13 @@ program define pip, rclass
 		//------------ World Bank Aggregate
 		else if ("`subcmd'" == "wb") {
 			noi pip_wb, `est_opts' `n2disp' `povcalnet_format'
+			return add
 			noi pip_timer pip, off `printtimer'
 		}
 		//------------ Country Profile
 		else if ("`subcmd'" == "cp") {
 			pip_cp, `est_opts' `n2disp'
+			return add
 			noi pip_timer pip, off `printtimer'
 		}
 		//------------ Grouped data
@@ -272,38 +276,8 @@ program define pip, rclass
 end  // end of pip
 
 
-//========================================================
-//  aux programs
-//========================================================
-
-program define pip_split_options, rclass
-	syntax [anything(name=optnames)], [abblength(integer 3)]
-	
-	if ("`optnames'" == "") exit
-	// current General options (Hard coded)
-	local gen_opts "version ppp_year release identity server n2disp cachedir"
-	
-	// get abbreviation regex
-	mata: pip_abb_regex(tokens("`gen_opts'"), `abblength', "patterns")
-	
-	// loop each options over each abbreviation
-	foreach o of local optnames {  // options by the user
-		local bsgo 0 // belogs to selected general options
-		foreach p of local patterns {  // patterns for general opt abbreviations
-			if regexm("`o'", "^`p'") {
-				local sgo `"`sgo' `o'"' // selected general options
-				local bsgo 1
-				continue, break
-			}
-		}
-		if (`bsgo' == 0) local oo `"`oo' `o'"' // estimation options
-	}
-	
-	return local gen_opts = "`sgo'"
-	return local est_opts     = "`oo'"
-	
-end 
-
+// pip_split_options is defined in pip_parseopts.ado
+// (moved from here to allow testing without loading all of pip.ado)
 
 exit
 /* End of do-file */

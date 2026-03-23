@@ -64,7 +64,14 @@ foreach suite in "unit" "integration" "." {
     }
 
     * Check directory exists before globbing
-    local suite_files: dir "`suite_dir'" files "test_*.do", respectcase
+    * Root suite: only run _diag_*.do (diagnostic scripts).
+    * test_*.do files at root are unit/ mirror copies — they run there.
+    if ("`suite'" == ".") {
+        local suite_files: dir "`suite_dir'" files "_diag_*.do", respectcase
+    }
+    else {
+        local suite_files: dir "`suite_dir'" files "test_*.do", respectcase
+    }
     if (`"`suite_files'"' == "") continue
 
     di as result _n _dup(50) "-"
@@ -124,6 +131,10 @@ foreach suite in "unit" "integration" "." {
 
     di as result "  Suite `suite_label': `suite_pass' passed, `suite_fail' failed"
 }
+
+* Restore to tests/ directory before the summary block.
+* The last executed suite may have left us in unit/ or integration/.
+cap cd "`tests_dir'"
 
 * ---- Final summary -----
 di as result _n _dup(60) "="

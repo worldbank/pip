@@ -1,4 +1,4 @@
-*!version 0.11.0  <2026mar19>
+*! version 0.11.0  <2026mar19>
 /*==================================================
 project:       Check whether a new version of pip is available on GitHub
 Author:        R.Andres Castaneda
@@ -19,6 +19,19 @@ Output:        r(update_available), r(latest_version), r(current_version),
               0: Program set up
 ==================================================*/
 program define pip_gh, rclass
+/*
+Purpose: Check whether a newer version of pip is available on GitHub.
+         Returns update-availability metadata once per session.
+Syntax:  pip_gh  (called automatically by pip_new_session)
+Returns: r(update_available) — "1" if newer version exists, "0" otherwise
+         r(latest_version)   — semver tag from GitHub (e.g. "0.11.0")
+         r(current_version)  — installed version parsed from pip.ado *! line
+         r(install_cmd)      — recommended install command (github or net install)
+Errors:  exit 1 (silent) if pip not found, file unreadable, API unreachable,
+         tag malformed, or same version. Callers must guard r() reads with
+         _rc == 0 AND check that r(latest_version) != "".
+Notes:   Uses pip_githubquery to hit /releases/latest; strips leading 'v' prefix.
+*/
 version 16.1
 
 * ---- 1. Get installed version from 'which pip' output -----
@@ -94,16 +107,22 @@ end
 
 program define pip_githubquery, rclass
 /*
-  Queries https://api.github.com/repos/<repo>/releases/latest and returns
-  the tag name of the most recent release in r(latestversion).
-  Fails silently if the network is unavailable or the repo has no releases.
+Purpose: Query GitHub releases/latest API for a given repo.
+         Returns the tag name of the most recent non-prerelease release.
+Syntax:  pip_githubquery <owner/repo>
+         e.g.  pip_githubquery worldbank/pip
+Returns: r(latestversion) — tag name string (e.g. "v0.11.0"); empty if
+         API is unreachable or the repo has no releases.
+Errors:  None (all failures leave r(latestversion) empty; caller checks).
+Notes:   Uses fileread() on the HTTPS URL — requires Stata's built-in SSL.
+         JSON is parsed with a regex that tolerates optional whitespace after
+         the colon:  "tag_name": *"([^"]+)"  (handles `: ` and `:`)
 */
 version 16.1
 syntax anything(name=repo)
 
 local latestversion ""
-capture scalar drop `gh_json'   // pre-clear in case of prior interrupted run
-tempname gh_json
+tempname gh_json   // tempnames are session-unique; no pre-clear needed
 capture {
 	local page `"https://api.github.com/repos/`repo'/releases/latest"'
 	scalar `gh_json' = fileread(`"`page'"')

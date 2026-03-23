@@ -125,14 +125,18 @@ if ("`extracted'" != "v0.11.0") {
 }
 di as result "  PASS Test 8: regex handles 'tag_name': 'v...' with space"
 
-* ---- Test 9: old regex (no space) fails on real API format -----
-* Documents the bug that was present before the fix
+* ---- Test 9: regression guard — document the historical no-space bug -----
+* Test 8 verified the CORRECT regex (space-tolerant) matches real API JSON.
+* This test confirms the WRONG regex (no space) would have failed on the same
+* input, documenting why the fix was necessary. Both tests together give
+* full coverage: we validate what works AND why the old pattern broke.
 local json `"{"tag_name": "v0.11.0","prerelease":false}"'
 if regexm(`"`json'"', `""tag_name":"([^"]+)""') {
-    di as error "UNEXPECTED: old regex (no space) matched - GitHub API format may have changed"
+    di as error "UNEXPECTED: old no-space regex matched — GitHub API format may have changed"
+    di as error "  If so, the space-tolerant pattern (Test 8) should also be re-validated."
 }
 else {
-    di as result "  PASS Test 9: confirms old regex (no space) would have failed silently"
+    di as result "  PASS Test 9: confirms old no-space regex would have failed (fix was necessary)"
 }
 
 di as result _n "All pip_gh arithmetic and regex tests passed."

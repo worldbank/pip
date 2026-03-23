@@ -90,6 +90,12 @@ end
 //------------ display query
 
 program define pip_utils_disp_query
+/*
+Purpose: Print each query in ${pip_last_queries} to the console in
+         human-readable key=value format.
+Syntax:  pip_utils_disp_query  (no arguments)
+Returns: None (display only)
+*/
 	
 	foreach q of global pip_last_queries {
 		disp "{res}{hline}"
@@ -124,6 +130,16 @@ end
 //------------ drop missing vars
 
 program define pip_utils_dropvars
+/*
+Purpose: Drop variables that are entirely missing or empty-string.
+         Numeric vars are dropped if r(N)==0 after sum.
+         String vars are dropped if all values are "." or "".
+         Note: misstable summarize would do this in a single pass;
+         the current per-variable approach is sufficient for the
+         narrow pip variable set (typically <100 vars).
+Syntax:  pip_utils_dropvars  (no arguments; operates on current dataset)
+Returns: None (modifies dataset in place; emits a note if vars dropped)
+*/
 
 	ds, has(type numeric)
 	local numvars `r(varlist)'
@@ -148,6 +164,11 @@ end
 
 
 program define pip_utils_frameexists, rclass
+/*
+Purpose: Test whether a named Stata frame exists.
+Syntax:  pip_utils_frameexists, frame(name)
+Returns: r(fexists) — 1 if frame exists, 0 otherwise
+*/
 	syntax, frame(string)
 	
 	mata: st_local("fexists", strofreal(st_frameexists("`frame'")))
@@ -156,6 +177,13 @@ end
 
 
 program define pip_utils_final_msg, rclass
+/*
+Purpose: Display the standard pip citation prompt after each query.
+         First call in a session displays interactively (noi pip_cite);
+         subsequent calls within the same old session are quiet.
+Syntax:  pip_utils_final_msg  (no arguments)
+Returns: r(cite_data) — citation string (from pip_cite)
+*/
 	* citations
 	if ("${pip_old_session}" == "1") {
 		local cnoi "noi"
@@ -173,6 +201,13 @@ end
 
 //------------ Keep or drop frames
 program define pip_utils_keep_frame
+/*
+Purpose: After a pip query, optionally copy internal _pip_* frames to
+         user-visible frames (with a user-chosen prefix) and optionally
+         drop the internal frames to free memory.
+Syntax:  pip_utils_keep_frame, [frame_prefix(string)] [keepframes] [noEFFICIENT]
+Returns: None (modifies frame environment)
+*/
 	syntax , [ frame_prefix(string) keepframes noEFFICIENT]
 	if ("`frame_prefix'" == "") {
 		local frame_prefix "pip_"
@@ -198,7 +233,13 @@ program define pip_utils_keep_frame
 end
 
 program define pip_utils_clicktable
-	
+/*
+Purpose: Display a compact clickable table of variable levels.
+         Each level is rendered as a Stata {stata ...} link.
+Syntax:  pip_utils_clicktable [if], variable(varname) [title(str)]
+         [statacode(str)] [length(numlist)] [width(integer)]
+Returns: None (display only)
+*/
 	syntax [if] , VARiable(varname) ///
 	[                     ///
 	title(string)         ///
@@ -245,6 +286,15 @@ end
 
 //------------ Final display message
 program define pip_utils_output
+/*
+Purpose: Display the first n2disp rows of the query result.
+         When worldcheck is set and WLD rows exist, shows WLD rows only.
+Syntax:  pip_utils_output, [n2disp(int)] [sortvars(varlist)]
+         [dispvars(varlist)] [sepvar(varlist)] [worldcheck]
+Returns: None (display only)
+Notes:   Uses preserve/restore for the worldcheck path; restore is
+         unconditional even on list error to prevent dataset corruption.
+*/
 	syntax  [, ///
 		n2disp(integer 1) ///
 		sortvars(varlist) ///
@@ -276,14 +326,39 @@ program define pip_utils_output
 	local dispopts abbreviate(12) noobs
 	//Sort if specified [could also use gsort if and remove varlist]
 	if "`sortvars'"!="" sort `sortvars'
-	//Print output
-	if `n2disp'!=0 noi list `dispvars' in 1/`n2disp', `dispopts' sepby(`sepvars')
-	if `rflag'==1 restore
+	//Print output; restore is unconditional to prevent dataset corruption
+	//if list errors (e.g., a variable in dispvars no longer exists).
+	if `rflag'==1 {
+		capture {
+			if `n2disp'!=0 noi list `dispvars' in 1/`n2disp', `dispopts' sepby(`sepvar')
+		}
+		local _list_rc = _rc
+		restore
+		if `_list_rc' error `_list_rc'
+	}
+	else {
+		if `n2disp'!=0 noi list `dispvars' in 1/`n2disp', `dispopts' sepby(`sepvar')
+	}
 
 end
 
 //  -------------- frame to locals
 program define pip_utils_frame2locals, rclass
+/*
+Purpose: Return every cell of the current dataset as an r() macro.
+         Intended for SMALL reference tables only (e.g., pip version
+         metadata frames with < 20 rows).
+         Each cell is returned as r(<varname>_<row_number>).
+Syntax:  pip_utils_frame2locals  (no arguments; operates on c. frame)
+Returns: r(<var>_<n>) for each variable and row
+Notes:   Hard limit: max 50 rows. Stata r() is not designed for hundreds
+         of macros; callers iterating large frames should use frameput.
+*/
+	if `c(N)' > 50 {
+		noi disp as error "pip_utils frame2locals: frame has `c(N)' rows " ///
+			"(max 50). Use a different approach for large frames."
+		error 198
+	}
 	qui ds
 	local vars = "`r(varlist)'"
 	forvalues ob = 1/`c(N)' {

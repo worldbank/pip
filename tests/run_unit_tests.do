@@ -16,6 +16,14 @@ else {
 
 local unit_dir "`tests_dir'/unit"
 
+* ---- Validate unit directory exists before proceeding -----
+cap cd "`unit_dir'"
+if (_rc) {
+    di as error "FATAL: unit test directory not found or inaccessible: `unit_dir'"
+    error 999
+}
+qui cd "`tests_dir'"   // restore after validation check
+
 * ---- Hoist project root on ado path once — prevents duplicate entries -----
 * across test files that each call  adopath ++  individually.
 local _save_cwd "`c(pwd)'"

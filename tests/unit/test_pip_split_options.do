@@ -12,11 +12,9 @@ set more off
 
 adopath ++ "../.."
 
-* pip_split_options is defined inside pip.ado — load the full ado
-capture program drop pip
+* pip_split_options is now defined in pip_parseopts.ado
 capture program drop pip_split_options
 capture program drop pip_parseopts
-run "../../pip.ado"
 run "../../pip_parseopts.ado"
 
 * pip_fun.mata must be compiled for pip_abb_regex (used by pip_split_options)

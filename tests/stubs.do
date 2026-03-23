@@ -100,12 +100,20 @@ program define pip_versions, rclass
 		AVAILability                        ///
 		*                                   ///
 	]
+	// Hard-coded stub version. Update this when the real version format
+	// changes (segments added/removed) to keep tests meaningful.
 	local stub_ver "20230601_2017_01_02_PROD"
 	global pip_version "`stub_ver'"
-	tokenize "`stub_ver'", parse("_")
-	return local release  = "`1'"
-	return local ppp_year = "`3'"
-	return local identity = "`9'"
+	// Extract by regex rather than token position so tests don't silently
+	// pass with wrong values if the segment count ever changes.
+	if regexm("`stub_ver'", "^([0-9]+)_([0-9]+)_[0-9]+_[0-9]+_([A-Z]+)$") {
+		local _release  = regexs(1)
+		local _ppp_year = regexs(2)
+		local _identity = regexs(3)
+	}
+	return local release  = "`_release'"
+	return local ppp_year = "`_ppp_year'"
+	return local identity = "`_identity'"
 	return local version  = "`stub_ver'"
 end
 

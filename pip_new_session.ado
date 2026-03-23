@@ -17,6 +17,16 @@ Output:
 0: Program set up
 ==================================================*/
 program define pip_new_session
+/*
+Purpose: Execute once per Stata session to check for pip updates on GitHub.
+         Sets global ${pip_version_checked} to prevent repeated API calls
+         when pip is called multiple times in the same session.
+         All network failures are fully silent — users must not be disrupted.
+Syntax:  pip_new_session  (called automatically by the pip dispatcher)
+Returns: None; may set ${pip_version_checked} and print an update notice.
+Notes:   pip_setup has already run before this is called; globals from
+         pip_setup.do are therefore already populated.
+*/
 version 16.1
 
 * ---- Skip if already checked this session -----
@@ -44,10 +54,6 @@ if (_rc == 0) {
 }
 
 global pip_version_checked "1"
-
-
-* ---- Update pip_setup globals -----
-pip_setup run
 
 end
 
