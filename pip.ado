@@ -276,8 +276,8 @@ program define pip, rclass
 end  // end of pip
 
 
-// pip_split_options is defined in pip_parseopts.ado
-// (moved from here to allow testing without loading all of pip.ado)
+// pip_split_options is defined in pip_split_options.ado
+// (Stata's ado auto-loader only retains the first program per file)
 
 exit
 /* End of do-file */

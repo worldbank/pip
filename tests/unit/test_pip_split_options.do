@@ -12,10 +12,10 @@ set more off
 
 adopath ++ "../.."
 
-* pip_split_options is now defined in pip_parseopts.ado
+* pip_split_options is now in its own pip_split_options.ado file.
+* The adopath addition above lets Stata auto-discover it.
 capture program drop pip_split_options
 capture program drop pip_parseopts
-run "../../pip_parseopts.ado"
 
 * pip_fun.mata must be compiled for pip_abb_regex (used by pip_split_options)
 run "../../pip_fun.mata"
