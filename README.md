@@ -92,6 +92,64 @@ log close pip_test
 
 ```
 
+## Running Tests
+
+The test suite lives in `tests/` and is split into two categories:
+
+| Suite | Location | Purpose |
+|---|---|---|
+| **Unit** | `tests/unit/` | Fast, offline — no internet needed |
+| **Integration** | `tests/integration/` | Requires a live connection to the PIP API |
+
+### Run all tests
+
+```stata
+do "tests/run_all_tests.do"
+```
+
+Or from within the `tests/` directory:
+
+```stata
+do "run_all_tests.do"
+```
+
+The runner discovers all `test_*.do` files in `unit/`, `integration/`, and the `tests/` root, runs them in order, and prints a pass/fail summary.
+
+### Run a single suite
+
+```stata
+* Unit tests only (no network needed)
+do "tests/unit/test_pip_parseopts.do"
+
+* A single integration test
+do "tests/integration/test_pip_cl.do"
+```
+
+### Test layout
+
+```
+tests/
+  test_helpers.do          ← shared assertion programs (loaded automatically)
+  run_all_tests.do         ← master runner
+  unit/                    ← 16 offline tests
+    test_pip_parseopts.do
+    test_pip_cache.do
+    test_pip_fun_mata.do
+    ...
+  integration/             ← 13 live API tests
+    test_pip_cl.do
+    test_pip_wb.do
+    test_pip_dispatcher.do
+    ...
+```
+
+### Interpreting results
+
+- `PASS <test name>` — assertion succeeded
+- `FAIL <test name>: <reason>` — assertion failed; the runner continues and reports all failures at the end
+- Exit code `9` means at least one test failed
+
+
 ## License
 
 [Creative Commons Attribution 4.0 International]([url](https://creativecommons.org/licenses/by/4.0/))
