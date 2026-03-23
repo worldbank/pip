@@ -1,3 +1,4 @@
+*! version 0.11.0  <2026mar23>
 /*==================================================
 project:       Run globals and setup env for pip
 Author:        R.Andres Castaneda 
@@ -230,6 +231,13 @@ program define pip_setup_ensure, rclass
 	version 16.1
 
 	qui {
+		// Fast path: path already resolved this session (avoids repeated
+		// disk I/O on network/OneDrive paths where findfile is slow).
+		if (`"${pip_setup_fn}"' != `""') {
+			return local fn = "${pip_setup_fn}"
+			exit
+		}
+
 		cap findfile "pip_setup.do"
 		if (_rc) {
 			// Not found on ado path — attempt to create it.
@@ -239,17 +247,14 @@ program define pip_setup_ensure, rclass
 					"could not find or create pip_setup.do." _n ///
 					"Check that at least one of the following " ///
 					"directories is writable:" _n ///
-					`"  "`c(sysdir_personal)'" "`c(sysdir_plus)'" "'  ///
-					`"  "`c(pwd)'" "`c(sysdir_site)'""'
+					"  `c(sysdir_personal)'  `c(sysdir_plus)'" _n ///
+					"  `c(pwd)'  `c(sysdir_site)'"
 				error 198
 			}
-			// Use the path returned directly by pip_setup_create.
-			local fn = "`r(fn)'"
 		}
-		else {
-			local fn = "`r(fn)'"
-		}
-
+		// r(fn) is set by whichever call succeeded (findfile or pip_setup_create).
+		local fn = "`r(fn)'"
+		global pip_setup_fn = "`fn'"  // cache for subsequent calls this session
 		return local fn = "`fn'"
 	}
 end

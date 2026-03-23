@@ -37,6 +37,16 @@ run "../test_helpers.do"
 
 di as result "=== pip_setup_ensure: find / create pip_setup.do ==="
 
+// ---- Test 0: precondition — pip_setup.do is reachable on the ado path ----
+// All subsequent tests depend on findfile locating pip_setup.do.  Failing
+// here gives a clear diagnosis instead of cryptic errors downstream.
+capture findfile "pip_setup.do"
+if (_rc) {
+    pip_test_fail, test("0: precondition: pip_setup.do on ado path") ///
+        msg("pip_setup.do not found — check that adopath includes project root")
+}
+pip_test_pass, test("0: precondition: pip_setup.do on ado path")
+
 // ---- Test 1: pip_setup_ensure succeeds when pip_setup.do already exists --
 // This is the normal case on any machine that has run pip before.
 capture pip_setup_ensure
@@ -64,11 +74,13 @@ local _rc4 = _rc
 assert_rc_zero, test("4: file returned by r(fn) exists on disk") rc(`_rc4')
 
 // ---- Test 5: pip_setup run no longer errors (validates the r(199) fix) ---
-// This was the exact failure mode before pip_setup_ensure was defined.
-// Pre-set pip_pipmata_hash to "changed" to ensure it will try to run the
-// setup flow, then clear it after.
+// This was the EXACT failure mode before pip_setup_ensure was defined:
+//   pip_setup called pip_setup_ensure which did not exist → r(199) abort.
+// We clear pip_pipmata_hash so pip_setup cannot skip the run path via the
+// hash gate.  The hash is RESTORED BEFORE asserting so a failing assert
+// (which calls error) leaves the session in a clean state.
 local _saved_hash "${pip_pipmata_hash}"
-global pip_pipmata_hash ""   // force pip_setup to proceed through run path
+global pip_pipmata_hash ""   // force run path: hash mismatch triggers it
 
 capture noisily pip_setup run
 local _rc5 = _rc

@@ -16,6 +16,13 @@ else {
 
 local unit_dir "`tests_dir'/unit"
 
+* ---- Hoist project root on ado path once — prevents duplicate entries -----
+* across test files that each call  adopath ++  individually.
+local _save_cwd "`c(pwd)'"
+qui cd "`tests_dir'/.."
+adopath ++ "`c(pwd)'"
+qui cd "`_save_cwd'"
+
 * ---- Load assertion helpers -----
 run "`tests_dir'/test_helpers.do"
 
@@ -61,6 +68,11 @@ foreach test of local suite_files {
         local _gl: all globals "pip_*"
         foreach g of local _gl {
             global `g' ""
+        }
+        * Drop stub programs if loaded during this test.
+        foreach _s in pip_new_session pip_set_server pip_versions ///
+                      pip_cl pip_wb pip_gh {
+            capture program drop `_s'
         }
     }
 }

@@ -31,7 +31,7 @@ run "../test_helpers.do"
 di as result "=== pip smoke tests (live API) ==="
 
 // ---- Minimum variable sets expected from each subcommand ----------------
-local cl_min_vars "country_code year headcount poverty_gap poverty_severity mean"
+local cl_min_vars "country_code year headcount poverty_gap poverty_severity mean welfare_type"
 local wb_min_vars "region_code year headcount poverty_gap poverty_severity mean"
 
 // =========================================================

@@ -30,7 +30,7 @@ run "../../pip_fun.mata"
 
 // Load shared assertion helpers and stubs.
 run "../test_helpers.do"
-run "../test_stubs.do"   // activates offline mode; sets globals and stubs
+run "../stubs.do"        // activates offline mode; sets globals and stubs
 
 di as result "=== pip smoke tests (offline, stubs active) ==="
 
@@ -39,7 +39,7 @@ assert_global_set,  test("pre: pip_host global is set")    global(pip_host)
 assert_global_set,  test("pre: pip_version global is set") global(pip_version)
 
 // ---- Minimum variable sets expected from each subcommand ----------------
-local cl_min_vars "country_code year headcount poverty_gap poverty_severity mean"
+local cl_min_vars "country_code year headcount poverty_gap poverty_severity mean welfare_type"
 local wb_min_vars "region_code year headcount poverty_gap poverty_severity mean"
 
 // =========================================================
@@ -52,8 +52,11 @@ assert_nobs_positive, test("1: pip,clear returns N > 0")
 foreach v of local cl_min_vars {
     assert_var_exists, test("1: var `v' present (default)") var(`v')
 }
-assert_var_type, test("1: country_code is string") var(country_code) type(string)
-assert_var_type, test("1: headcount is numeric")   var(headcount)    type(numeric)
+assert_var_type, test("1: country_code is string")     var(country_code)     type(string)
+assert_var_type, test("1: headcount is numeric")        var(headcount)        type(numeric)
+assert_var_type, test("1: poverty_gap is numeric")      var(poverty_gap)      type(numeric)
+assert_var_type, test("1: poverty_severity is numeric") var(poverty_severity) type(numeric)
+assert_var_type, test("1: welfare_type is numeric")     var(welfare_type)     type(numeric)
 
 // =========================================================
 // Test 2: pip cl, clear  (explicit country-level)
@@ -98,21 +101,10 @@ assert_rc_zero, test("5: pip,fillgaps,clear succeeds without error") rc(`_rc5')
 assert_nobs_positive, test("5: pip,fillgaps,clear returns N > 0")
 
 // =========================================================
-// Test 6: pip_setup (no args) — the plumbing entry point
-// Tests that pip_setup itself runs without network calls
-// when pip_host is already set.
+// Test 6: see  tests/unit/test_pip_setup_stub_compat.do
+// (pip_setup no-args when stubs are active — extracted to
+//  keep each file focused on a single concern)
 // =========================================================
-// Ensure we reload the fixed pip_setup from disk.
-foreach _prog in pip_setup pip_setup_ensure pip_setup_create ///
-    pip_setup_replace pip_setup_gethash pip_setup_dates pip_get_version {
-    capture program drop `_prog'
-}
-run "../../pip_setup.ado"
-
-capture noisily pip_setup
-local _rc6 = _rc
-assert_rc_zero, test("6: pip_setup (no args) completes without error") rc(`_rc6')
-assert_global_set, test("6: pip_host still set after pip_setup") global(pip_host)
 
 // =========================================================
 // Test 7: Dispatcher does NOT produce r(199) (regression guard)
@@ -127,15 +119,19 @@ if (`_rc7' == 199) {
 }
 pip_test_pass, test("7: pip,clear does not return r(199)")
 
-clear
-
-// ---- Clean up stubs so subsequent test files load real programs ----------
-// Stubs are dropped here so that programs after this file in the same
-// Stata session (integration tests, root-suite tests) get the genuine
-// ado-path implementations rather than the offline stand-ins.
-foreach _stub in pip_new_session pip_set_server pip_versions ///
-                 pip_cl pip_wb pip_gh {
-    capture program drop `_stub'
+// =========================================================
+// Test 8: invalid subcommand returns an error (negative test)
+// The dispatcher must reject unrecognised subcommands; if it
+// silently succeeds the entire routing layer is suspect.
+// =========================================================
+capture pip xyzzy, clear
+if (_rc == 0) {
+    pip_test_fail, test("8: pip xyzzy errors on unknown subcommand") ///
+        msg("expected non-zero rc for unrecognised subcommand, got 0")
 }
+pip_test_pass, test("8: pip xyzzy returns error for unknown subcommand")
 
+clear
+// Stub cleanup is handled unconditionally by the test runner's
+// between-test block so that stubs are always dropped, even on failure.
 di as result _n "All pip offline smoke tests passed."

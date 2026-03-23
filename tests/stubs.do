@@ -14,7 +14,7 @@ Purpose:       Redefine all network-dependent pip sub-programs as minimal
                    adopath ++ "../.."
                    run "../../pip_fun.mata"
                    run "../test_helpers.do"
-                   run "../test_stubs.do"   // <-- activates stubs
+                   run "../stubs.do"         // <-- activates stubs
                    pip, clear              // now runs offline
 
                IMPORTANT: these stubs are for testing ONLY. They bypass
@@ -36,6 +36,8 @@ Purpose:       Redefine all network-dependent pip sub-programs as minimal
                pip_host             →  stub URL
                pip_server           →  "prod"
                pip_version          →  "20230601_2017_01_02_PROD"
+
+Layer:         Setup / offline test stubs
 ==================================================*/
 version 16.1
 set more off
@@ -125,14 +127,19 @@ program define pip_cl
 	gen str3  region_code      = cond(_n == 1, "EAP", "SAS")
 	gen       year             = 2018
 	gen       poverty_line     = 2.15
-	gen       mean             = 5 + _n
-	gen       headcount        = 0.01 * _n
-	gen       poverty_gap      = 0.005 * _n
-	gen       poverty_severity = 0.002 * _n
-	gen byte  welfare_type     = 1
-	gen       population       = 1000000 * _n
+	gen       mean             = 5 + _n        // 6 and 7 USD/day (synthetic)
+	gen       headcount        = 0.01 * _n     // 1% and 2% headcount rate
+	gen       poverty_gap      = 0.005 * _n    // synthetic (half of headcount)
+	gen       poverty_severity = 0.002 * _n    // synthetic (fifth of headcount)
+	// welfare_type: heterogeneous (1=Consumption, 2=Income) to catch code
+	// that incorrectly assumes a single welfare type across all rows.
+	gen byte  welfare_type     = _n
+	label define _wt_lbl 1 "Consumption" 2 "Income", replace
+	label values welfare_type _wt_lbl
+	gen       population       = 1000000 * _n  // 1 M and 2 M (synthetic)
 	if ("`fillgaps'" != "") {
-		gen byte is_interpolated = 1
+		// Mix interpolated/non-interpolated so tests can validate both values.
+		gen byte is_interpolated = cond(_n == 1, 0, 1)
 		local datalabel "Country level (lined up)"
 	}
 	else {
@@ -177,4 +184,4 @@ program define pip_gh, rclass
 end
 
 
-di as result "(test_stubs.do loaded — offline mode active)"
+di as result "(stubs.do loaded — offline mode active)"

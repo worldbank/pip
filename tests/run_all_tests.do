@@ -23,6 +23,13 @@ else {
     local tests_dir "`c(pwd)'/tests"
 }
 
+* ---- Hoist project root on ado path once — prevents duplicate entries -----
+* across test files that each call  adopath ++  individually.
+local _save_cwd "`c(pwd)'"
+qui cd "`tests_dir'/.."
+adopath ++ "`c(pwd)'"
+qui cd "`_save_cwd'"
+
 * ---- Load shared assertion helpers -----
 * Helpers define programs: assert_rc_zero, assert_var_exists, etc.
 capture do "`tests_dir'/test_helpers.do"
@@ -106,6 +113,11 @@ foreach suite in "unit" "integration" "." {
             local _pip_globs: all globals "pip_*"
             foreach _g of local _pip_globs {
                 global `_g' ""
+            }
+            * Drop stub programs if loaded during this test.
+            foreach _s in pip_new_session pip_set_server pip_versions ///
+                          pip_cl pip_wb pip_gh {
+                capture program drop `_s'
             }
         }
     }
