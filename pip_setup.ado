@@ -214,6 +214,46 @@ program define pip_setup_replace, rclass
 end
 
 
+//========================================================
+//  Ensure pip_setup.do exists; create it if missing
+//========================================================
+/* 
+   Purpose : Find pip_setup.do on the ado path. If not found,
+             call pip_setup_create to write a blank one to the
+             first writable Stata personal directory. Returns
+             r(fn) with the full path to the file.
+   Returns : r(fn) — absolute path to pip_setup.do
+   Errors  : 198 if the file cannot be found and cannot be
+             created (e.g., no writable personal directory).
+*/
+program define pip_setup_ensure, rclass
+	version 16.1
+
+	qui {
+		cap findfile "pip_setup.do"
+		if (_rc) {
+			// Not found on ado path — attempt to create it.
+			cap pip_setup_create
+			if (_rc) {
+				noi disp as error "pip_setup_ensure: " ///
+					"could not find or create pip_setup.do." _n ///
+					"Check that at least one of the following " ///
+					"directories is writable:" _n ///
+					`"  "`c(sysdir_personal)'" "`c(sysdir_plus)'" "'  ///
+					`"  "`c(pwd)'" "`c(sysdir_site)'""'
+				error 198
+			}
+			// Use the path returned directly by pip_setup_create.
+			local fn = "`r(fn)'"
+		}
+		else {
+			local fn = "`r(fn)'"
+		}
+
+		return local fn = "`fn'"
+	}
+end
+
 
 //========================================================
 //  Get Hash based on string 
