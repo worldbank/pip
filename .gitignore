@@ -17,6 +17,12 @@ stata.toc
 /pip_setup.do
 .vscode/settings.json
 
+
+# Compound GPID local config (user-specific, never commit)
+compound-gpid.local.md
+
+.vscode/tasks.json
+
 # Compound GPID managed items (junctions + copied file - do not commit)
 .github/prompts/
 .github/skills/
@@ -24,9 +30,3 @@ stata.toc
 .github/instructions/
 .github/copilot-instructions.md
 
-# Compound GPID local config (user-specific, never commit)
-compound-gpid.local.md
-# Compound GPID knowledge base (local thinking artifacts, typically not committed)
-.cg-docs/
-
-.vscode/tasks.json
