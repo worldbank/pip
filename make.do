@@ -25,6 +25,11 @@ end
 
 * Working directory is set by the caller (rundo.exe uses the script's location).
 * If running interactively, cd to the project root first.
+
+if ("`c(username)'" == "wb384996") {
+    cd "c:\Users\wb384996\OneDrive - WBG\WorldBank\DECDG\PIP\pip"
+}
+
 getfiles "*.ado"
 local as = "`r(files)'"
 
@@ -47,7 +52,7 @@ disp "`toins'"
 
 
 make pip, replace toc pkg                                  ///  readme
-	version(0.11.0)                                                  ///
+	version(0.11.0.9000)                                                  ///
     license("MIT")                                                         ///
     author(`""R.Andres Castaneda" "Damian Clarke""')                       ///
     affiliation(`" "The World Bank" "University of Chile & University of Exeter""')                                                         ///
