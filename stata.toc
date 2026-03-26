@@ -1,0 +1,8 @@
+v 0.11.0
+d Authors:
+d  -- R.Andres Castaneda, The World Bank (acastanedaa@worldbank.org")
+d  -- Damian Clarke, University of Chile & University of Exeter (dclarke4@worldbank.org, dclarke@fen.uchile.cl)
+
+d 'pip': World Bank PIP API Stata wrapper
+
+p pip
