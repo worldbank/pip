@@ -153,7 +153,6 @@ program define pip_agg_check_args, rclass
 	
 	//------------ aggregate
 	
-	local _version _20250930_2021_PROD // to comment
 	frame _pip_cl`_version' {
 		qui ds 
 		local vars `r(varlist)'
