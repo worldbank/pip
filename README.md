@@ -157,12 +157,16 @@ tests/
 [Creative Commons Attribution 4.0 International]([url](https://creativecommons.org/licenses/by/4.0/))
 
 
-## Author
-
+## Authors
 
 **R.Andres Castaneda**  
 The World Bank  
 acastanedaa@worldbank.org
+
+**Damian Clarke**
+University of Chile & University of Exeter  
+dclarke@fen.uchile.cl
+
 
 Contributors
 ------
@@ -170,6 +174,3 @@ Tefera Bekele Degefu
 The World Bank  
 tdegefu@worldbank.org
 
-Damian Clarke  
-University of Chile & University of Exeter  
-dclarke@fen.uchile.cl
