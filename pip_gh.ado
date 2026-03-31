@@ -1,250 +1,143 @@
+*! version 0.11.0  <2026mar19>
 /*==================================================
-project:       message to the user if file is installed from GitHub
-Author:        R.Andres Castaneda 
+project:       Check whether a new version of pip is available on GitHub
+Author:        R.Andres Castaneda
 E-email:       acastanedaa@worldbank.org
-url:           
+url:
 Dependencies:  The World Bank
 ----------------------------------------------------
 Creation Date:     6 Oct 2022 - 16:35:59
-Modification Date:   
-Do-file version:    01
-References:          
-Output:             
+Modification Date: 19 Mar 2026
+Do-file version:    02
+References:
+Output:        r(update_available), r(latest_version), r(current_version),
+               r(install_cmd)
 ==================================================*/
+
 
 /*==================================================
               0: Program set up
 ==================================================*/
 program define pip_gh, rclass
+/*
+Purpose: Check whether a newer version of pip is available on GitHub.
+         Returns update-availability metadata once per session.
+Syntax:  pip_gh  (called automatically by pip_new_session)
+Returns: r(update_available) — "1" if newer version exists, "0" otherwise
+         r(latest_version)   — semver tag from GitHub (e.g. "0.11.0")
+         r(current_version)  — installed version parsed from pip.ado *! line
+         r(install_cmd)      — recommended install command (github or net install)
+Errors:  exit 1 (silent) if pip not found, file unreadable, API unreachable,
+         tag malformed, or same version. Callers must guard r() reads with
+         _rc == 0 AND check that r(latest_version) != "".
+Notes:   Uses pip_githubquery to hit /releases/latest; strips leading 'v' prefix.
+*/
 version 16.1
 
+* ---- 1. Get installed version from 'which pip' output -----
 
-syntax [anything(name=subcommand)]  ///
-[,                             	    ///
-username(string)                    ///
-cmd(string)                         ///
-version(string)                     ///
-pause                               /// 
-check                               /// 
-] 
+capture which pip
+if (_rc) exit 1   // pip not found - skip silently
+local whichout = r(fn)
 
-if ("`pause'" == "pause") pause on
-else                      pause off
+* The *!version line is the first line of pip.ado
+* Assumes pip.ado starts with "*!version X.Y.Z" (standard Stata convention)
+tempname fh
+capture file open `fh' using `"`whichout'"', read text
+if (_rc) exit 1   // can't open file - skip silently
+capture file read `fh' line
+local rc_fh = _rc              // save before file close resets _rc
+capture file close `fh'        // always runs: file was opened successfully above
+if (`rc_fh') exit 1   // can't read file - skip silently
 
-if ("`cmd'" == "") {
-	local cmd pip
+* Parse version string from "*!version X.Y.Z"
+if !regexm(`"`line'"', "([0-9]+)\.([0-9]+)\.([0-9]+)") exit 1
+local crrMajor = regexs(1)
+local crrMinor = regexs(2)
+local crrPatch = regexs(3)
+local crrtversion = "`crrMajor'.`crrMinor'.`crrPatch'"
+* Weighted numeric comparison avoids wrong results with multi-digit components
+* (e.g. concatenation: 0.9.10 -> "0910" > 0.10.0 -> "0100" would be wrong)
+* Constraint: each component must be < 1000 for the weighting to be correct.
+local current_cmp = `crrMajor' * 1000000 + `crrMinor' * 1000 + `crrPatch'
+
+
+* ---- 2. Query GitHub API for latest release -----
+
+pip_githubquery worldbank/pip
+local latestversion = "`r(latestversion)'"
+if ("`latestversion'" == "") exit 1   // API unreachable - skip silently
+
+if regexm("`latestversion'", "^([0-9]+)\.([0-9]+)\.([0-9]+)$") {
+	local lastMajor = regexs(1)
+	local lastMinor = regexs(2)
+	local lastPatch = regexs(3)
+}
+else exit 1   // tag is not a valid semver or is a pre-release - skip silently
+local last_cmp = `lastMajor' * 1000000 + `lastMinor' * 1000 + `lastPatch'
+
+
+* ---- 3. Build install command (prefer 'github' package if available) -----
+
+capture which github
+if (_rc == 0) {
+	local install_cmd "github install worldbank/pip, replace"
+}
+else {
+	local install_cmd `"net install pip, from("https://raw.githubusercontent.com/worldbank/pip/main/") replace"'
 }
 
-if ("`username'" == "") {
-	local username "worldbank"  
-}
 
+* ---- 4. Compare and return results -----
+* r(update_available) is returned as string "1"/"0" (r-class macros are always strings)
 
-/*==================================================
-              1: Update
-==================================================*/
+local update_available = cond(`last_cmp' > `current_cmp', "1", "0")
 
-if ("`subcommand'" == "update") {
-	* Check repository of files 
-	* local cmd pip
-	cap findfile github.dta, path("`c(sysdir_plus)'g/")
-	if (_rc) {
-		if ("`check'" == "check") {
-			dis "pip update will install a new version of the {cmd:pip} package."
-			dis "If you wish to proceed, run {cmd:pip update} without the check argument."
-		}
-		else {
-			github install `username'/`cmd', replace
-			cap window stopbox note "pip command has been reinstalled to " ///
-			"keep record of new updates. Please type {stata discard} and retry."
-			global pip_old_session = ""
-		}
-		exit
-	}
-	local ghfile "`r(fn)'"
-	* use "`ghfile'", clear
-	
-	tempname ghdta 
-	frame create `ghdta'
-	frame `ghdta' {
-		use "`ghfile'", clear
-		qui keep if name == "`cmd'"  
-		if _N == 0 {
-			if ("`check'" == "check") {
-				dis "pip update will install a new version of the {cmd:pip} package."
-				dis "If you wish to proceed, run {cmd:pip update} without the check argument."
-			}
-			else {
-				di in red "`cmd' package was not found"
-				github install `username'/`cmd', replace
-				cap window stopbox note "pip command has been reinstalled to " ///
-				"keep record of new updates. Please type discard and retry."
-				global pip_old_session = ""
-			}
-			exit
-		}
-		if _N > 1 {
-			di as err "{p}multiple {cmd:pip} packages found!"      ///
-			"this can be caused if you had installed multiple "     ///
-			"packages from different repositories, but with an "    ///
-			"identical name..." _n
-			noi list
-		}
-		if _N == 1 {
-			local repo        : di address[1]
-			local crrtversion : di version[1]
-		}
-	}
-	
-	* github query `repo'
-	_tmp_githubquery `repo'
-	local latestversion = "`r(latestversion)'"
-	* disp "`latestversion'"
-	if regexm("`latestversion'", "([0-9]+)\.([0-9]+)\.([0-9]+)\.?([0-9]*)") {
-		local lastMajor = regexs(1)
-		local lastMinor = regexs(2)
-		local lastPatch = regexs(3)		 
-		local lastDevel = regexs(4)		 
-	}
-	if ("`lastDevel'" == "") local lastDevel 0
-	local last    = `lastMajor'`lastMinor'`lastPatch'.`lastDevel'
-	
-	* github version `cmd'
-	* local crrtversion =  "`r(version)'"
-	if regexm("`crrtversion'", "([0-9]+)\.([0-9]+)\.([0-9]+)\.?([0-9]*)"){
-		local crrMajor = regexs(1)
-		local crrMinor = regexs(2)
-		local crrPatch = regexs(3)
-		local crrDevel = regexs(4)		 
-	}
-	if ("`crrDevel'" == "") local crrDevel 0
-	local current = `crrMajor'`crrMinor'`crrPatch'.`crrDevel'
-	* disp "`current'"
-	
-	* force installation 
-	if ("`crrtversion'" == "") {
-		if ("`check'" == "check") {
-			dis "pip update will install a new version of the {cmd:pip} package."
-			dis "If you wish to proceed, run {cmd:pip update} without the check argument."
-		}
-		else {
-			local username "worldbank"  // to modify
-			github install `username'/`cmd', replace version(`latestversion')
-			cap window stopbox note "pip command has been reinstalled to " ///
-			"keep record of new updates. Please type discard and retry."
-			global pip_old_session = ""
-		}
-		exit 
-	}
-	
-	if (`last' > `current' ) {
-		if ("`check'" == "check") {
-			dis "There is a new version of `cmd' in Github (`latestversion')."
-			dis "If you wish to proceed, run {cmd:pip update} without the check argument."
-			exit		
-		}
-		cap window stopbox rusure "There is a new version of `cmd' in Github (`latestversion')." ///
-		"Would you like to install it now?"
-		
-		if (_rc == 0) {
-			cap github install `repo', replace version(`latestversion')
-			if (_rc == 0) {
-				cap window stopbox note "Installation complete. please type" ///
-				"discard in your command window to finish"
-				local bye "exit"
-			}
-			else {
-				noi disp as err "there was an error in the installation. " _n ///
-				"please run the following to retry, " _n(2) ///
-				"{stata github install `repo', replace}"
-				local bye "error"
-			}
-		}	
-		else local bye ""
-		
-	}  // end of checking github update
-	
-	else {
-		noi disp as result "Github version of {cmd:`cmd'} is up to date."
-		local bye ""
-	}
-	
-	return local bye = "`bye'"
-	
-} // end if installed from github 
-
-
-
-/*==================================================
-              2: Message
-==================================================*/
-if (inlist("`subcommand'", "msg", "message")) {
-	noi disp "You're using Github as the host of the {cmd:pip} Stata package." 
-	noi disp "If you want to install the SSC version type {stata pip_install ssc}" 
-}
-
-//========================================================
-// Install
-//========================================================
-
-if (inlist("`subcommand'", "install")) {
-	pip_install gh, replace version(`version')
-}
-
+return local update_available "`update_available'"
+return local latest_version   = "`latestversion'"
+return local current_version  = "`crrtversion'"
+return local install_cmd      = `"`install_cmd'"'
 
 end
 
-//========================================================
-// Aux programs
-//========================================================
 
-// Temporal github query
-program define _tmp_githubquery, rclass 
-syntax anything
+*==================================================
+* Auxiliary: query GitHub releases/latest API
+*==================================================
 
-qui {
-	
-	preserve
-	drop _all
-	
-	local page "https://api.github.com/repos/`anything'/releases"
-	scalar page = fileread(`"`page'"')
-	mata {
-		lines = st_strscalar("page")
-		lines = ustrsplit(lines, ",")'
-		lines = strtrim(lines)
-		lines = stritrim(lines)
-		
-		lines =  subinstr(lines, `"":""', "->")
-		lines =  subinstr(lines, `"""', "")
+program define pip_githubquery, rclass
+/*
+Purpose: Query GitHub releases/latest API for a given repo.
+         Returns the tag name of the most recent non-prerelease release.
+Syntax:  pip_githubquery <owner/repo>
+         e.g.  pip_githubquery worldbank/pip
+Returns: r(latestversion) — tag name string (e.g. "v0.11.0"); empty if
+         API is unreachable or the repo has no releases.
+Errors:  None (all failures leave r(latestversion) empty; caller checks).
+Notes:   Uses fileread() on the HTTPS URL — requires Stata's built-in SSL.
+         JSON is parsed with a regex that tolerates optional whitespace after
+         the colon:  "tag_name": *"([^"]+)"  (handles `: ` and `:`)
+*/
+version 16.1
+syntax anything(name=repo)
+
+local latestversion ""
+tempname gh_json   // tempnames are session-unique; no pre-clear needed
+capture {
+	local page `"https://api.github.com/repos/`repo'/releases/latest"'
+	scalar `gh_json' = fileread(`"`page'"')
+	if regexm(scalar(`gh_json'), `""tag_name": *"([^"]+)""') {
+		local latestversion = regexs(1)
 	}
-	getmata lines, replace
-	
-	split lines, parse ("->")
-	rename lines? (code url)
-	
-	keep if regexm(url, "releases/tag")
-	gen tag  = regexs(2) if regexm(url, "(releases/tag/)(.*)")
-	local latestversion = tag[1]
-	
 }
+capture scalar drop `gh_json'
 
-return local latestversion `latestversion' 
+* Strip leading 'v' prefix from tag if present (e.g. "v0.11.0" -> "0.11.0")
+if regexm("`latestversion'", "^v(.+)") local latestversion = regexs(1)
 
-end 
+return local latestversion `latestversion'
+
+end
 
 exit
-
 /* End of do-file */
-
-><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><
-
-Notes:
-1.
-2.
-3.
-
-
-Version Control:
-
-

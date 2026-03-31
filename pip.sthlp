@@ -40,8 +40,6 @@
 {synopt :{helpb pip_agg:agg}}Aggregates. {help pip_agg##options:options}{p_end}
 {synopt :{helpb pip_tables:tables}}Clickable list of auxiliary tables. {help pip_tables##options:options}{p_end}
 {synopt :{helpb pip_print:print}}Print useful information. {help pip_print##options:options}{p_end}
-{synopt :{helpb pip_install:[un]install}}Installs the stable version of pip from SSC
-({cmd:pip install ssc}) or the development version from GitHub ({cmd:pip install gh}).{p_end}
 {synopt :{helpb pip_setup:setup}}Utility function to set {cmd:pip} options and
 features ({res:coming soon}).{p_end}
 
@@ -51,6 +49,12 @@ features ({res:coming soon}).{p_end}
 {synopt :{helpb pip_misc:test}}Displays metadata from the last query and provides actions to see output in
 browser (api) or download as .csv.{p_end}
 {synopt :{helpb pip_misc:drop}}({it:Programmer's option}) Deletes objects from memory.{p_end}
+{synoptline}
+
+{p 4 4 2}Removed subcommands{p_end}
+{synopt :{opt install}}Removed. Use {stata "github install worldbank/pip, replace"} instead.{p_end}
+{synopt :{opt update}}Removed. Use {stata "github install worldbank/pip, replace"} instead.{p_end}
+{synopt :{opt uninstall}}Removed. Use {stata "github uninstall pip"} instead.{p_end}
 {synoptline}
 {pstd}
 {bf:Note}: {cmd:pip} requires an internet connection.
@@ -288,15 +292,21 @@ Additional pip variables are listed at the bottom.
 In case {cmd:pip} is not working correctly, try the following steps in the given order:
 {p_end}
 
-{pmore} 1. Uninstall {cmd:pip} by typing  {cmd: pip uninstall}
+{pmore} 1. Uninstall {cmd:pip}. If you installed via the {cmd:github} package, type
+{cmd:github uninstall pip}. Otherwise, run {cmd:ado uninstall pip}.
 	
 {pmore} 2. Execute {cmd:which pip}. If {cmd:pip} is still installed, delete all
 the {cmd:pip} files from wherever they are in your computer until the command above returns error. The idea is to leave no trace of {cmd:pip} in your computer.
 
-{pmore} 3. Install {cmd:pip} again with the following code and check the version number. It should be the same as the most {browse "https://github.com/worldbank/pip/releases":recent release}
+{pmore} 3. Install {cmd:pip} again from GitHub and check the version number. It should be the same as the most {browse "https://github.com/worldbank/pip/releases":recent release}
 
 	{cmd}
+		* {text:Option A: using the {cmd:github} package (recommended)}
 		github install worldbank/pip
+		
+		* {text:Option B: without the {cmd:github} package}
+		net install pip, from("https://raw.githubusercontent.com/worldbank/pip/main/") replace
+		
 		discard
 		which pip
 	{txt}
@@ -405,8 +415,8 @@ https://worldbank.github.io/pip/ {p_end}
 
 {title:Thanks for citing {cmd:pip} data as follows}
 
-{p 4 8 2} World Bank. (2023). Poverty and Inequality Platform (version 0.10.16.9001)
-[Data set]. World Bank Group. www.pip.worldbank.org. Accessed  1 Dec 2025.{p_end}
+{p 4 8 2} World Bank. (2023). Poverty and Inequality Platform (version 0.11.0)
+[Data set]. World Bank Group. www.pip.worldbank.org. Accessed 25 Mar 2026.{p_end}
 
 {p 4 8 2}Available version_IDs:{p_end}
 {p 4 8 2}2021 PPPs: 20250401_2021_01_02_PROD{p_end}

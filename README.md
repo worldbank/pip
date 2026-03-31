@@ -1,4 +1,4 @@
-[![](https://img.shields.io/badge/devel%20version-0.10.17-blue.svg)](https://github.com/worldbank/pip)
+[![](https://img.shields.io/badge/devel%20version-0.11.0-blue.svg)](https://github.com/worldbank/pip)
 
 
 # `pip` : Stata module to access World Bank’s Global Poverty and Inequality data
@@ -10,19 +10,21 @@ World Bank PIP API Stata wrapper
 
 ## Installation
 
-### From SSC (Current version is out of date)
+### From GitHub (recommended)
 
-```stata
-ssc install pip
-```
-
-### From GitHub 
-
-We recommend installing the [github](https://github.com/haghish/github) Stata command by [E. F. Haghish](https://github.com/haghish)
+We recommend installing via the [github](https://github.com/haghish/github) Stata command by [E. F. Haghish](https://github.com/haghish)
 
 ```stata
 net install github, from("https://haghish.github.io/github/")
 github install worldbank/pip
+```
+
+### From GitHub (without the `github` package)
+
+If you cannot or prefer not to install the `github` package, you can install `pip` directly:
+
+```stata
+net install pip, from("https://raw.githubusercontent.com/worldbank/pip/main/") replace
 ```
 
 If you get an error similar to the image below, it might be the case that downloading from Github is not available in your computer due to firewall restrictions. Try disconnecting from the VPN and installing `{pip}` again.
@@ -41,23 +43,34 @@ If none of the options above worked, you could still install `pip` manually foll
 
 In case `{pip}` is not working correctly, try the following steps in order
 
-1.	Uninstall `{pip}` by typing this
+1. Uninstall `{pip}`:
+
 ```stata
+* If installed via the github package:
 github uninstall pip
+
+* Otherwise:
+ado uninstall pip
 ```
 
-2.	Execute the following and see if `{pip}` is still installed somewhere in your computer
+2. Execute the following and see if `{pip}` is still installed somewhere in your computer
+
 ```stata
 which pip
 ```
 
-If it is installed, delete all the `{pip}` files from wherever they are in your computer until the command above returns error. The idea is to leave no trace of  `{pip}` in your computer. 
- 
-3.	Install `{pip}` again with the following code and check the version number. It should be the same as the most [recent release](https://github.com/worldbank/pip/releases)
+If it is installed, delete all the `{pip}` files from wherever they are in your computer until the command above returns error.
 
+3. Install `{pip}` again and check the version number. It should be the same as the most [recent release](https://github.com/worldbank/pip/releases)
 
 ```stata
+* Option A: using the github package (recommended)
 github install worldbank/pip
+
+* Option B: without the github package
+net install pip, from("https://raw.githubusercontent.com/worldbank/pip/main/") replace
+
+discard
 which pip
 ```
 4.	Try to run it again and see if `{pip}` fails. 
@@ -78,6 +91,64 @@ set trace off
 log close pip_test
 
 ```
+
+## Running Tests
+
+The test suite lives in `tests/` and is split into two categories:
+
+| Suite | Location | Purpose |
+|---|---|---|
+| **Unit** | `tests/unit/` | Fast, offline — no internet needed |
+| **Integration** | `tests/integration/` | Requires a live connection to the PIP API |
+
+### Run all tests
+
+```stata
+do "tests/run_all_tests.do"
+```
+
+Or from within the `tests/` directory:
+
+```stata
+do "run_all_tests.do"
+```
+
+The runner discovers all `test_*.do` files in `unit/`, `integration/`, and the `tests/` root, runs them in order, and prints a pass/fail summary.
+
+### Run a single suite
+
+```stata
+* Unit tests only (no network needed)
+do "tests/unit/test_pip_parseopts.do"
+
+* A single integration test
+do "tests/integration/test_pip_cl.do"
+```
+
+### Test layout
+
+```
+tests/
+  test_helpers.do          ← shared assertion programs (loaded automatically)
+  run_all_tests.do         ← master runner
+  unit/                    ← 16 offline tests
+    test_pip_parseopts.do
+    test_pip_cache.do
+    test_pip_fun_mata.do
+    ...
+  integration/             ← 13 live API tests
+    test_pip_cl.do
+    test_pip_wb.do
+    test_pip_dispatcher.do
+    ...
+```
+
+### Interpreting results
+
+- `PASS <test name>` — assertion succeeded
+- `FAIL <test name>: <reason>` — assertion failed; the runner continues and reports all failures at the end
+- Exit code `9` means at least one test failed
+
 
 ## License
 

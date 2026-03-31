@@ -6,5 +6,23 @@ tempCodeRunnerFile.do
 /_pip_cache/
 /_*/
 
+# Stata outputs - do not commit
+*.log
+*.smcl
+
 /pip_setup.do
 .vscode/settings.json
+
+
+# Compound GPID local config (user-specific, never commit)
+compound-gpid.local.md
+
+.vscode/tasks.json
+
+# Compound GPID managed items (junctions + copied file - do not commit)
+.github/prompts/
+.github/skills/
+.github/agents/
+.github/instructions/
+.github/copilot-instructions.md
+

@@ -1,3 +1,4 @@
+*!version 0.11.0  <2026mar19>
 /*==================================================
 project:       Useful function to use across pip
 Author:        R.Andres Castaneda 
@@ -6,8 +7,8 @@ url:
 Dependencies:  The World Bank
 ----------------------------------------------------
 Creation Date:    16 May 2023 - 18:14:47
-Modification Date:   21 Jul 2024 - 20:39:11 (DClarke)
-Do-file version:    01
+Modification Date:   19 Mar 2026
+Do-file version:    02
 References:          
 Output:             
 ==================================================*/
@@ -25,7 +26,7 @@ program define pip_utils, rclass
 	pip_parseopts `0'
 	mata: pip_retlist2locals("`r(returnnames)'")
 	
-	if ustrregexm(`"`subcmd'"', "(.+) (if .+)") {
+	if (ustrregexm(`"`subcmd'"', "(.+) (if .+)")) {
 		local subcmd = trim(ustrregexs(1))
 		local if = trim(ustrregexs(2))
 	}
@@ -41,7 +42,7 @@ program define pip_utils, rclass
 	//------------ display query
 	
 	if ("`subcmd'" == "dispquery") {
-		pip_uitls_disp_query
+		pip_utils_disp_query
 		exit
 	}
 
@@ -88,7 +89,13 @@ end
 //========================================================
 //------------ display query
 
-program define pip_uitls_disp_query
+program define pip_utils_disp_query
+/*
+Purpose: Print each query in ${pip_last_queries} to the console in
+         human-readable key=value format.
+Syntax:  pip_utils_disp_query  (no arguments)
+Returns: None (display only)
+*/
 	
 	foreach q of global pip_last_queries {
 		disp "{res}{hline}"
@@ -123,25 +130,31 @@ end
 //------------ drop missing vars
 
 program define pip_utils_dropvars
-	
-	ds
-	local varlist `r(varlist)'
-	foreach v of local varlist {
+/*
+Purpose: Drop variables that are entirely missing or empty-string.
+         Numeric vars are dropped if r(N)==0 after sum.
+         String vars are dropped if all values are "." or "".
+         Note: misstable summarize would do this in a single pass;
+         the current per-variable approach is sufficient for the
+         narrow pip variable set (typically <100 vars).
+Syntax:  pip_utils_dropvars  (no arguments; operates on current dataset)
+Returns: None (modifies dataset in place; emits a note if vars dropped)
+*/
 
-        cap confirm numeric variable `v'
-        if (_rc) {
-            count if `v' == "."
-            local Ndots = r(N)
-        }
-        else local Ndots = 0
-		count if missing(`v')
-        local Nmiss = r(N)
-        local Tmiss = `Nmiss' + `Ndots'
+	ds, has(type numeric)
+	local numvars `r(varlist)'
+	ds, not(type numeric)
+	local strvars `r(varlist)'
 
-		if (`Tmiss' == c(N)) { 
-			local droplist `droplist' `v' 
-		} 
+	foreach v of local numvars {
+		qui sum `v'
+		if (`r(N)' == 0) local droplist `droplist' `v'
 	}
+	foreach v of local strvars {
+		qui count if missing(`v') | `v' == "."
+		if (`r(N)' == c(N)) local droplist `droplist' `v'
+	}
+
 	if "`droplist'" != "" { 
 		drop `droplist' 
 		di "{p}note: `droplist' dropped{p_end}" // from missings.ado
@@ -151,6 +164,11 @@ end
 
 
 program define pip_utils_frameexists, rclass
+/*
+Purpose: Test whether a named Stata frame exists.
+Syntax:  pip_utils_frameexists, frame(name)
+Returns: r(fexists) — 1 if frame exists, 0 otherwise
+*/
 	syntax, frame(string)
 	
 	mata: st_local("fexists", strofreal(st_frameexists("`frame'")))
@@ -159,6 +177,13 @@ end
 
 
 program define pip_utils_final_msg, rclass
+/*
+Purpose: Display the standard pip citation prompt after each query.
+         First call in a session displays interactively (noi pip_cite);
+         subsequent calls within the same old session are quiet.
+Syntax:  pip_utils_final_msg  (no arguments)
+Returns: r(cite_data) — citation string (from pip_cite)
+*/
 	* citations
 	if ("${pip_old_session}" == "1") {
 		local cnoi "noi"
@@ -171,15 +196,18 @@ program define pip_utils_final_msg, rclass
 	`cnoi' pip_cite, reg_cite
 	notes: `r(cite_data)'
 	return add
-	
-	* Install alternative version
-	if ("${pip_old_session}" == "") {
-		noi pip_${pip_source} msg
-	}
+
 end
 
 //------------ Keep or drop frames
 program define pip_utils_keep_frame
+/*
+Purpose: After a pip query, optionally copy internal _pip_* frames to
+         user-visible frames (with a user-chosen prefix) and optionally
+         drop the internal frames to free memory.
+Syntax:  pip_utils_keep_frame, [frame_prefix(string)] [keepframes] [noEFFICIENT]
+Returns: None (modifies frame environment)
+*/
 	syntax , [ frame_prefix(string) keepframes noEFFICIENT]
 	if ("`frame_prefix'" == "") {
 		local frame_prefix "pip_"
@@ -188,27 +216,30 @@ program define pip_utils_keep_frame
 	frame dir
 	local av_frames "`r(frames)'"
 	
-	* set trace on 
 	foreach fr of local av_frames {
-		
-		if (regexm("`fr'", "(^_pip_)(.+)")) {
-			
-			// If users wants to keep frames
-			if ("`keepframes'" != "") {
-				local frname = "`frame_prefix'" + regexs(2)
-				frame copy `fr' `frname', `replace'
-			}
-			// if user wants to drop them
-			if ("`efficient'" == "noefficient") {
-				frame drop `fr'
-			}
+		// Only process internal frames with _pip_ prefix
+		if (substr("`fr'", 1, 5) != "_pip_") continue
+		local frbase = substr("`fr'", 6, .)
+		// If user wants to keep frames
+		if ("`keepframes'" != "") {
+			local frname = "`frame_prefix'" + "`frbase'"
+			frame copy `fr' `frname', replace
 		}
-		
-	} // condition to keep frames
+		// If user wants to drop them
+		if ("`efficient'" == "noefficient") {
+			frame drop `fr'
+		}
+	} // end frame loop
 end
 
 program define pip_utils_clicktable
-	
+/*
+Purpose: Display a compact clickable table of variable levels.
+         Each level is rendered as a Stata {stata ...} link.
+Syntax:  pip_utils_clicktable [if], variable(varname) [title(str)]
+         [statacode(str)] [length(numlist)] [width(integer)]
+Returns: None (display only)
+*/
 	syntax [if] , VARiable(varname) ///
 	[                     ///
 	title(string)         ///
@@ -255,6 +286,15 @@ end
 
 //------------ Final display message
 program define pip_utils_output
+/*
+Purpose: Display the first n2disp rows of the query result.
+         When worldcheck is set and WLD rows exist, shows WLD rows only.
+Syntax:  pip_utils_output, [n2disp(int)] [sortvars(varlist)]
+         [dispvars(varlist)] [sepvar(varlist)] [worldcheck]
+Returns: None (display only)
+Notes:   Uses preserve/restore for the worldcheck path; restore is
+         unconditional even on list error to prevent dataset corruption.
+*/
 	syntax  [, ///
 		n2disp(integer 1) ///
 		sortvars(varlist) ///
@@ -286,20 +326,43 @@ program define pip_utils_output
 	local dispopts abbreviate(12) noobs
 	//Sort if specified [could also use gsort if and remove varlist]
 	if "`sortvars'"!="" sort `sortvars'
-	//Print output
-	if `n2disp'!=0 noi list `dispvars' in 1/`n2disp', `dispopts' sepby(`sepvars')
-	if `rflag'==1 restore
+	//Print output; restore is unconditional to prevent dataset corruption
+	//if list errors (e.g., a variable in dispvars no longer exists).
+	if `rflag'==1 {
+		capture {
+			if `n2disp'!=0 noi list `dispvars' in 1/`n2disp', `dispopts' sepby(`sepvar')
+		}
+		local _list_rc = _rc
+		restore
+		if `_list_rc' error `_list_rc'
+	}
+	else {
+		if `n2disp'!=0 noi list `dispvars' in 1/`n2disp', `dispopts' sepby(`sepvar')
+	}
 
 end
 
 //  -------------- frame to locals
 program define pip_utils_frame2locals, rclass
+/*
+Purpose: Return every cell of the current dataset as an r() macro.
+         Intended for SMALL reference tables only (e.g., pip version
+         metadata frames with < 20 rows).
+         Each cell is returned as r(<varname>_<row_number>).
+Syntax:  pip_utils_frame2locals  (no arguments; operates on c. frame)
+Returns: r(<var>_<n>) for each variable and row
+Notes:   Hard limit: max 50 rows. Stata r() is not designed for hundreds
+         of macros; callers iterating large frames should use frameput.
+*/
+	if `c(N)' > 50 {
+		noi disp as error "pip_utils frame2locals: frame has `c(N)' rows " ///
+			"(max 50). Use a different approach for large frames."
+		error 198
+	}
 	qui ds
 	local vars = "`r(varlist)'"
-	numlist "1/`c(N)'"
-	local obs = r(numlist)
-	foreach var of local vars {
-		foreach ob of local obs {
+	forvalues ob = 1/`c(N)' {
+		foreach var of local vars {
 			return local `var'_`ob' = `var'[`ob']
 		}
 	}

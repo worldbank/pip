@@ -1,3 +1,4 @@
+*! version 0.11.0  <2026mar23>
 /*==================================================
 project:       Parse options of pip command to be use by mata
 Author:        R.Andres Castaneda 
@@ -56,6 +57,15 @@ program define pip_parseopts, rclass
 			}
 			else local optname = "`opt'"
 		}
+		// guard: derived optname must be a legal Stata name
+		if ("`optname'" == "" | !regexm("`optname'", "^[a-zA-Z_][a-zA-Z0-9_]*$")) {
+			di as error "pip_parseopts: invalid option name '`optname'' derived from '`opt''"
+			error 198
+		}
+		// warn on duplicates (second value silently overwrites the first)
+		if strpos(" `optnames' ", " `optname' ") {
+			di as text "pip_parseopts: option '`optname'' specified more than once; last value used"
+		}
 		// return option as local
 		return local `optname' = `"`opt'"'
 		local returnnames "`returnnames' `optname'"
@@ -69,17 +79,11 @@ program define pip_parseopts, rclass
 	return local optnames    = ustrtrim("`optnames'")
 	
 end
+
+// pip_split_options is now in its own pip_split_options.ado file because
+// Stata's ado auto-loader only retains the first program definition (matching
+// the filename); sub-programs defined after the first `end` are discarded
+// on auto-load and unavailable unless explicitly sourced.
+
 exit
 /* End of do-file */
-
-><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><
-
-Notes:
-1.
-2.
-3.
-
-
-Version Control:
-
-

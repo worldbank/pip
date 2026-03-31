@@ -1,3 +1,4 @@
+*! version 0.11.0  <2026mar23>
 /*==================================================
 project:       Run globals and setup env for pip
 Author:        R.Andres Castaneda 
@@ -43,18 +44,15 @@ program define pip_setup, rclass
 	
 	// run pip_setup.do
 	if ("`subcmd'" == "run") {
-		cap findfile "pip_setup.do"
-		if (_rc)  pip_setup_create // if setup.do is not found
-		
-		if ("`options'" == "display") type "`r(fn)'"
-		run  "`r(fn)'"
+		pip_setup_ensure
+		local _setup_fn "`r(fn)'"
+		if ("`options'" == "display") type "`_setup_fn'"
+		run  "`_setup_fn'"
 		exit
 	}
-	// run pip_setup.do
+	// display pip_setup.do
 	if ("`subcmd'" == "display") {
-		cap findfile "pip_setup.do"
-		if (_rc)  pip_setup_create // if setup.do is not found
-		
+		pip_setup_ensure
 		type "`r(fn)'"
 		exit
 	}
@@ -75,6 +73,14 @@ program define pip_setup, rclass
 
 	qui {
 		
+		//========================================================
+		//  One-time session initialisation
+		//  Gate: skip all expensive I/O after the first pip call.
+		//  pip drop global clears pip_session_initialized, so a
+		//  forced re-init is always available via that route.
+		//========================================================
+		if ("${pip_session_initialized}" == "") {
+
 		//========================================================
 		//  compile mata code
 		//========================================================
@@ -102,14 +108,12 @@ program define pip_setup, rclass
 			
 			local pattern = "pip_pipmata_hash"
 			local newline = `"global pip_pipmata_hash  = "`pipmata_hash'""'
-			* local newline = `"global pip_pipmata_hash  = "1959982309""'
 			
-			cap findfile "pip_setup.do"
-			if (_rc)  pip_setup_create // if setup.do is not found
+			pip_setup_ensure
 			pip_setup replace, pattern(`"`pattern'"') new(`"`newline'"')
 		}
 		
-		//------------Run globals 
+		//------------Run globals (loads pip_pipmata_hash + pip_lastupdate)
 		pip_setup run 			
 
 		//========================================================
@@ -120,7 +124,7 @@ program define pip_setup, rclass
 		}
 		
 		//========================================================
-		// Set details in help file
+		// Set details in help file (once per session only)
 		//========================================================
 		local d1 = "www.pip.worldbank.org. Accessed"
 		local d2 = "[Data set]. World Bank Group. www.pip.worldbank.org. Accessed `c(current_date)'.{p_end}"
@@ -131,11 +135,23 @@ program define pip_setup, rclass
 		if _rc==0 {
 			local help_file = "`r(fn)'"
 			mata: pip_replace_in_pattern("`help_file'", `"`d1'"', `"`d2'"')
-			cap copy `tempf' "`origf'" , replace 
+			if (`"`tempf'"' != `""') cap copy `tempf' "`origf'" , replace
 
 			mata: pip_replace_in_pattern("`help_file'", `"`v1'"', `"`v2'"')
-			cap copy `tempf' "`origf'" , replace 
+			if (`"`tempf'"' != `""') cap copy `tempf' "`origf'" , replace
 		}
+		
+		global pip_session_initialized "1"
+		} // end: session initialisation gate
+		
+		//========================================================
+		// Server check: always ensure pip_host is set
+		// (user may have called pip_set_server manually)
+		//========================================================
+		if ("${pip_host}" == "") {
+			pip_set_server
+		}
+		
 	}
 	
 end
@@ -176,7 +192,6 @@ program define pip_setup_create, rclass
 		file write `do' `""' _dup(2) _n    
 		file write `do' `"global pip_pipmata_hash = """' _dup(3) _n 
 		file write `do' `"global pip_lastupdate = """' _dup(3) _n 
-		file write `do' `"global pip_source   = """' _dup(3) _n 
 		file write `do' _dup(5) _n 
 		file write `do' `"exit"' _n 
 		file write `do' `"/* End of do-file */"' _n 
@@ -207,17 +222,70 @@ program define pip_setup_replace, rclass
 	]
 	
 	qui {
-		
-		findfile "pip_setup.do"
+		// Use pip_setup_ensure to leverage the ${pip_setup_fn} cache
+		// (avoids repeated findfile on slow OneDrive/network paths).
+		pip_setup_ensure
 		local setup_file = "`r(fn)'"
 		mata: pip_replace_in_pattern("`setup_file'", `"`pattern'"', `"`newline'"')
-		copy `tempf' "`origf'" , replace // locals tempf and origf are created in MATA routine
+		// tempf and origf are set by pip_replace_in_pattern via st_local().
+		// Guard against Mata early-exit (pattern not found / file read error).
+		if (`"`tempf'"' == `""') {
+			noi disp as error "pip_setup_replace: pattern not found or file unreadable: `setup_file'"
+			error 198
+		}
+		copy `tempf' "`origf'" , replace
 		
 		return local fn = "`setup_file'"
 	}
 	
 end
 
+
+//========================================================
+//  Ensure pip_setup.do exists; create it if missing
+//========================================================
+program define pip_setup_ensure, rclass
+/*
+Purpose : Find pip_setup.do on the ado path. If not found,
+          call pip_setup_create to write a blank one to the
+          first writable Stata personal directory.
+          Caches the resolved path in ${pip_setup_fn} to avoid
+          repeated disk I/O on network/OneDrive paths (slow).
+Args    : None
+Returns : r(fn) — absolute path to pip_setup.do
+Errors  : 198 if the file cannot be found and cannot be created
+          (e.g., no writable personal directory).
+*/
+	version 16.1
+
+	qui {
+		// Fast path: path already resolved this session (avoids repeated
+		// disk I/O on network/OneDrive paths where findfile is slow).
+		if (`"${pip_setup_fn}"' != `""') {
+			return local fn = "${pip_setup_fn}"
+			exit
+		}
+
+		cap findfile "pip_setup.do"
+		if (_rc) {
+			// Not found on ado path — attempt to create it.
+			cap pip_setup_create
+			if (_rc) {
+				noi disp as error "pip_setup_ensure: " ///
+					"could not find or create pip_setup.do." _n ///
+					"Check that at least one of the following " ///
+					"directories is writable:" _n ///
+					"  `c(sysdir_personal)'  `c(sysdir_plus)'" _n ///
+					"  `c(pwd)'  `c(sysdir_site)'"
+				error 198
+			}
+		}
+		// r(fn) is set by whichever call succeeded (findfile or pip_setup_create).
+		local fn = "`r(fn)'"
+		global pip_setup_fn = "`fn'"  // cache for subsequent calls this session
+		return local fn = "`fn'"
+	}
+end
 
 
 //========================================================
@@ -237,7 +305,9 @@ program define pip_setup_gethash, rclass
 		tempname spiphash
 		
 		mata:  st_numscalar("`spiphash'", hash1(`"`prefix'`query'"', ., 2)) 
-		local piphash = "_pip" + strofreal(`spiphash', "%12.0g")
+		// %15.0f forces integer format; %12.0g could produce scientific notation
+		// for values ≥ 1e12 (unlikely for CRC32 but fragile by design).
+		local piphash = "_pip" + strofreal(`spiphash', "%15.0f")
 		return local piphash = "`piphash'"
 	}
 	

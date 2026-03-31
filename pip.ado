@@ -1,3 +1,7 @@
+
+*! version 0.11.0.9000  <2026mar26>
+
+
 /*=======================================================
 Program Name: pip.ado
 Authors:
@@ -18,7 +22,6 @@ Dependencies: The World Bank - DECIS
 References: https://pip.worldbank.org/home  https://pip.worldbank.org/api
 =======================================================*/
 
-
 program define pip, rclass
 	version 16.1
 	/*==================================================
@@ -33,7 +36,8 @@ program define pip, rclass
 	local optnames    "`r(optnames)'"    // names of options (after the comma)
 	mata: pip_retlist2locals("`returnnames'") // convert return to locals
 
-	if ("`subcmd'" == "") local subcmd "cl"  // default country-level 
+	local _default_subcmd "cl"   // country-level is the default subcommand
+	if ("`subcmd'" == "") local subcmd "`_default_subcmd'"
 	
 	pip_split_options `optnames'  // get general options and estimation opts
 
@@ -66,15 +70,34 @@ program define pip, rclass
 	
 	if ("`pause'" == "pause") pause on
 	else                      pause off
-	set checksum off
-	
-	
+	if ("${pip_checksum_set}" == "") {
+		set checksum off
+		global pip_checksum_set "1"
+	}
+
+	//------------Install, Uninstall, Update (deprecated - GitHub only)
+	* Checked here, before pip_new_session, to avoid an unnecessary GitHub API call.
+	if regexm("`subcmd'", "^install|^uninstall|^update|^ssc") {
+		capture which github
+		if (_rc == 0) {
+			local install_cmd "github install worldbank/pip, replace"
+		}
+		else {
+			local install_cmd `"net install pip, from("https://raw.githubusercontent.com/worldbank/pip/main/") replace"'
+		}
+		noi disp as text _n ///
+			"{cmd:pip `subcmd'} has been removed. {cmd:pip} is now only available on GitHub." _n ///
+			"To update, run: {stata `install_cmd'}"
+		pip_timer pip, off
+		exit
+	}
+
 	// ------------------------------------------------------------------------
 	// New session procedure
 	// ------------------------------------------------------------------------
 	
 	pip_timer pip.pip_new_session, on
-	pip_new_session , `pause' `path'
+	pip_new_session
 	pip_timer pip.pip_new_session, off
 	
 	local curframe = c(frame)
@@ -119,34 +142,6 @@ program define pip, rclass
 			*/ "E.x., {cmd:pip drop frame} or {cmd:pip drop global}."
 			error
 		}
-		exit
-	}
-
-	//------------Install and Uninstall
-	if regexm("`subcmd'", "^install") {
-		if ( ("`gh'" == "" & "`ssc'" == "") | /* 
-		*/  ("`gh'" != "" & "`ssc'" != "") ) {
-			noi disp "{err}subcommand {it:install} must be use "    /* 
-			*/	 "with either {it:ssc} or {it:gh}" _n               /* 
-			*/  "E.x., {cmd:pip install, ssc} or {cmd:pip install, gh}."
-			error
-		}
-		
-		pip_timer pip.pip_install, on
-		noi pip_install `gh'`ssc', `path' `pause' `version' `username' `replace'
-		pip_timer pip.pip_install, off
-		pip_timer pip, off
-		exit
-	}
-	
-	if regexm("`subcmd'", "^uninstall") {
-		pip_install uninstall, `path' `pause'
-		noi pip_timer pip, off
-		exit
-	}
-	if regexm("`subcmd'", "^update") {
-		noi pip_update, `path' `pause'
-		pip_timer pip, off
 		exit
 	}
 
@@ -234,6 +229,7 @@ program define pip, rclass
 		//------------ Country lavel
 		if ("`subcmd'" == "cl") {
 			noi pip_cl, `est_opts' `n2disp' `povcalnet_format'
+			return add
 			noi pip_timer pip, off `printtimer' 
 		}
 		//------------ Aggregate data
@@ -245,11 +241,13 @@ program define pip, rclass
 		//------------ World Bank Aggregate
 		else if ("`subcmd'" == "wb") {
 			noi pip_wb, `est_opts' `n2disp' `povcalnet_format'
+			return add
 			noi pip_timer pip, off `printtimer'
 		}
 		//------------ Country Profile
 		else if ("`subcmd'" == "cp") {
 			pip_cp, `est_opts' `n2disp'
+			return add
 			noi pip_timer pip, off `printtimer'
 		}
 		//------------ Grouped data
@@ -280,188 +278,8 @@ program define pip, rclass
 end  // end of pip
 
 
-//========================================================
-//  aux programs
-//========================================================
-
-program define pip_split_options, rclass
-	syntax [anything(name=optnames)], [abblength(integer 3)]
-	
-	if ("`optnames'" == "") exit
-	// current General options (Hard coded)
-	local gen_opts "version ppp_year release identity server n2disp cachedir"
-	
-	// get abbreviation regex
-	mata: pip_abb_regex(tokens("`gen_opts'"), `abblength', "patterns")
-	
-	// loop each options over each abbreviation
-	foreach o of local optnames {  // options by the user
-		local bsgo 0 // belogs to selected general options
-		foreach p of local patterns {  // patterns for general opt abbreviations
-			if regexm("`o'", "^`p'") {
-				local sgo `"`sgo' `o'"' // selected general options
-				local bsgo 1
-				continue, break
-			}
-		}
-		if (`bsgo' == 0) local oo `"`oo' `o'"' // estimation options
-	}
-	
-	return local gen_opts = "`sgo'"
-	return local est_opts     = "`oo'"
-	
-end 
-
+// pip_split_options is defined in pip_split_options.ado
+// (Stata's ado auto-loader only retains the first program per file)
 
 exit
 /* End of do-file */
-
-><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><
-
-Notes:
-
-Version Control:
-
-
-
-*! version 0.0.1        <2021dec01>
-*! version 0.1.0        <2022feb01>
-*! version 0.2.0        <2022apr01>
-*! version 0.3.0        <2022apr07>
-*! version 0.3.1        <2022apr08>
-*! version 0.3.2        <2022apr26>
-*! version 0.3.3        <2022may25>
-*! version 0.3.4        <2022Jun10>
-*! version 0.3.5        <2022Jul06>
-*! version 0.3.6        <2022Sep08>
-*! version 0.3.7        <2022Oct06>
-*! version 0.3.8        <2022Oct06>
-*! version 0.9.5        <2023Feb14> (Stable version)
-*! ^^^^^^^^ DEPRECATED DEVELOPMENT^^^^^^^^^^
-*! version 0.10.0           <2023May19>
-*! -- Update help file with installation instructions.
-*! -- Change some variable labels for clarity
-*! -- Add general troubleshooting to documentation.
-*! -- Fix link of country info in pip_info
-*! -- First attempt of caching... not fully working
-*! -- add pip_setup.ado to run mata and pip_setup.do 
-*! -- add mata functions to edit pip_setup.do
-*! -- add pip_setup.do file... this should be created internally
-*! -- add caching to aux tables
-*! -- several improvements to caching and setup.do 
-*! -- Remove old code.
-*! -- BREAK CHANGE: options names MUST be parsed completely. Partial naming breaks
-*! -- dismiss dependency of {missings} command
-*! -- add setup of variables for many future uses
-*! -- add MATA functionality 
-*! -- efficient execution of code
-*! -- new modular structure for future additions
-*! -- new timer functionality
-*! -- local Caching is enabled for all calls
-*! -- All callings of data are done with pip_get
-*! -- Complete refactoring of pip. many breaking changes
-*! version 0.10.1       <2023May22>
-*! -- Fix circularity when building MATA library.
-*! -- Fix issue with pip_find_src
-*! -- Add dialog box for cache directory
-*1 -- Fix bug
-*! version 0.10.2       <2023May23>
-*! -- Hot fix on query
-*! version 0.10.3         <2023May24>
-*! -- add version() option to install from GitHub
-*! -- Create clickable table program
-*! -- Fix bug in pip_table query
-*! -- add pip_get to pip_versions
-*! -- Add interactive management of cache info
-*! version 0.10.4    <2023May31>
-*! -- Fix coverage issue
-*! -- BREAKING CHANGE: `pip versions` is now `pip print, version`
-*! -- Add more print options
-*! -- Improve cache manipulation, specially with cachedir() option
-*! -- Modular Helpfile (Incomplete)
-*! version 0.10.5    <2023Jun06>
-*! -- delete pip_clean as we don't need it anymore
-*! -- fix issue of building the mata lib all the time
-*! -- comment message of repeated timer
-*! -- get length of string for formatting in pip_utils_cliackable
-*! -- refactor pip_info to pip_utils click
-*! -- delete lukup auxiliary frame. We don't need it anymore
-*! -- provide table of countries when wrong country is selected
-*! -- add fillgaps to check in pov_check_args
-*! -- replacre optnames for returnnames and add optnames only for options
-*! -- update abbreviation of general and pip_cl help files
-*! -- update to version 16.1
-*! -- Allow user to see Cache inventory `pip cache, inventory`
-*! -- fix issue with `pip cache, iscache` working now
-*! -- complete pip_tables help file
-*! -- update print and tables help file
-*! -- info of cache memory
-*! -- add cache info to help file
-*! -- add help for pip wb (which points to pip_cl) and for pip setup (init)
-*! -- update format
-*! -- add cachedir in each pip_get call
-*! -- make local cachedir prevail over global pip_cachedir
-*! -- add pip_test
-*! -- update helpfile with new subcommand test
-*! -- Incorporate pip_cp by Tefera
-*! version 0.10.6    <2023Jun23>
-*! -- Fix big bug about ppp year and wrong url query. 
-*! version 0.10.7    <2023Aug17>
-*! -- fix issue with ppp_year()
-*! -- move pip_check_args to specific functions per subcmd
-*! -- fix getting pip_version stick
-*! -- change ppp and ppp_year for ppp_version()
-*! --fix issue with last and mrv in year()
-*! --fix messages when year is out of boundries
-*! --fix problem with setting globals and not being able to use the general options.
-*! version 0.10.8  <2024jan11>
-*! -- Add server to cache info
-*! -- fix problem in scmd tables not working with server()
-*! -- improve message for setting up cache dir
-*! -- force proper formatting.
-*! -- fix bug with version in pip_cl.
-*! -- fix bug in pip-grp. Now group_by=wb is called explicitly.
-*! version 0.10.9  <2024aug28>
-*! -- Update help file.
-*! -- Add estiamte_type as string variable and leave it optional for now
-*! -- add pause message in formating 
-*! -- Allow upper case in server option
-*! version 0.10.10  <2024sep27>
-*! -- implement fillgaps and nowcasts options at both country and regional levels
-*! -- Add Datt data
-*! -- Add add gd subcommand
-*! -- save results of pip_gd in separate frames
-*! -- add pip_utils_frame2locals
-*! -- add examples
-*! -- Update help file
-*! version 0.10.11  <2024oct09>
-*! -- HOT FIX: parse `clear' option to pip_cp_check_args
-*! version 0.10.12  <2024oct31>
-*! -- update bibtex
-*! -- Standardize drop subcommands
-*! -- Incorporate `pip update, check'
-*! -- Fix installing 
-*! -- Update help file 
-*! version 0.10.13  <2024nov26>
-*! -- Fix issue with regex in Stata 18 
-*! version 0.10.14  <2025jan14>
-*! -- remove internal caching
-*! version 0.10.14.9000  <2025feb24>
-*! -- update povline default to 2021 PPPs
-*! -- update help files
-*! -- add labels to SPL, SPR and PG
-*! version 0.10.14.9001  <2025feb28>
-*! -- update helpfile
-*! version 0.10.14.9002  <2025mar24>
-*! -- revert option nowcast for nonowcast
-*! -- change fillgaps to nofillgaps in subcmd wb
-*! version 0.10.15  <2025mar24>
-*! -- Implement nofillgaps and nonowcast for wb
-*! -- fix nowcast default in cl
-*! -- add labels to SPL, SPR and PG
-*! version 0.10.16  <2025oct08>
-*! -- Temporal fix to make it work with new data.
-*! -- Add `pip agg' subcommand to retrieve vintage aggregates.
-*! version 0.10.17  <2026jun24>
-*! -- allow aggregate() option in pip agg to work with new API version.
-*! -- fix error message in pip_agg.
