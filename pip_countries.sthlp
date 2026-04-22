@@ -16,17 +16,15 @@
 {synoptset 33 tabbed}{...}
 {col 7}{it:Code}{col 41}{cmd:Name}
 {col 6}{hline 70}
-{synopt:{opt  EAP }} East Asia and Pacific{p_end}
-{synopt:{opt  ECA }} Europe and Central Asia{p_end}
-{synopt:{opt  HIC }} Other High Income{p_end}
-{synopt:{opt  LAC }} Latin America and the Caribbean{p_end}
-{synopt:{opt  MNA }} Middle East and North Africa{p_end}
+{synopt:{opt  EAS }} East Asia and Pacific{p_end}
+{synopt:{opt  ECS }} Europe and Central Asia{p_end}
+{synopt:{opt  LCN }} Latin America and the Caribbean{p_end}
+{synopt:{opt  MEA }} Middle East, North Africa, Afghanistan and Pakistan{p_end}
+{synopt:{opt  NAC }} North America{p_end}
 {synopt:{opt  SAS }} South Asia{p_end}
-{synopt:{opt  SSA }} Sub-Saharan Africa{p_end}
+{synopt:{opt  SSF }} Sub-Saharan Africa{p_end}
 {col 6}{hline 70}
-{p 6 6 0 76}{err:Note}: {it:Other High Income} includes mostly high-income economies
-(for a list see p. 152 of World Bank, 2018, and the pip webpage); 
-all other economies are included in geographic regions, as defined by the World Bank.{p_end}
+{p 6 6 0 76}{err:Note}: Based on World Bank's July 2025 regional categorization (for a full country list by region see the pip webpage).{p_end}
 
 
 	
